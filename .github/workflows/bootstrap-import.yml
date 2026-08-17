@@ -16,10 +16,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Verify transport chunks
-        shell: bash
-        run: sha256sum -c .bootstrap/checksums.txt
-
       - name: Reconstruct and verify archive
         shell: bash
         run: |
