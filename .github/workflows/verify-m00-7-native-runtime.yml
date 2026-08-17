@@ -55,6 +55,7 @@ jobs:
     env:
       CI: '1'
       EXPO_NO_TELEMETRY: '1'
+      NODE_ENV: production
     defaults:
       run:
         working-directory: experiments/m00-7-native-runtime
@@ -63,7 +64,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
@@ -85,17 +86,17 @@ jobs:
           profile: pixel_6
           disable-animations: true
           script: |
-            cd experiments/m00-7-native-runtime
-            adb install -r android/app/build/outputs/apk/release/app-release.apk
+            mkdir -p experiments/m00-7-native-runtime/artifacts
+            adb install -r experiments/m00-7-native-runtime/android/app/build/outputs/apk/release/app-release.apk
             adb shell monkey -p com.electrocraft.m007 -c android.intent.category.LAUNCHER 1
             sleep 12
             adb shell uiautomator dump /sdcard/m007-runtime.xml
-            adb pull /sdcard/m007-runtime.xml artifacts/m007-runtime.xml
+            adb pull /sdcard/m007-runtime.xml experiments/m00-7-native-runtime/artifacts/m007-runtime.xml
             adb shell am start -W -a android.intent.action.VIEW -d 'electrocraft://guarded' com.electrocraft.m007
             sleep 4
             adb shell uiautomator dump /sdcard/m007-guard.xml
-            adb pull /sdcard/m007-guard.xml artifacts/m007-guard.xml
-            node scripts/native-log-gate.mjs artifacts/m007-runtime.xml artifacts/m007-guard.xml
+            adb pull /sdcard/m007-guard.xml experiments/m00-7-native-runtime/artifacts/m007-guard.xml
+            node experiments/m00-7-native-runtime/scripts/native-log-gate.mjs experiments/m00-7-native-runtime/artifacts/m007-runtime.xml experiments/m00-7-native-runtime/artifacts/m007-guard.xml
       - name: Upload Android runtime evidence
         if: always()
         uses: actions/upload-artifact@v4
