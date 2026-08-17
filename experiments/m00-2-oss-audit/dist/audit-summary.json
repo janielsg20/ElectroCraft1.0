@@ -1,0 +1,30 @@
+{
+  "verifiedAt": "2026-08-17",
+  "engineCount": 30,
+  "coreTargetCount": 9,
+  "capabilityGatedCount": 8,
+  "licenseCounts": {
+    "MIT": 19,
+    "Apache-2.0": 6,
+    "MIT-core": 1,
+    "service-api": 2,
+    "ISC": 1,
+    "MIT-standard; premium plugins excluded": 1
+  },
+  "representativeRuntimeEvidence": "SQLite via Node node:sqlite; package-specific PGlite/Drizzle runtime is owned by F00/M00.4 POC Studio DB genérica",
+  "assertions": {
+    "puckOwnsVisualAuthoring": true,
+    "puckAiDoesNotOwnAi": true,
+    "shadcnBase": "Radix (explicit; Base UI is default upstream)",
+    "i18nFallback": "es",
+    "queryCacheOwner": "TanStack Query",
+    "adminOwner": "Refine",
+    "formStateOwner": "React Hook Form",
+    "schemaOwner": "Zod",
+    "workflowOwner": "Rete",
+    "richTextOwner": "Tiptap",
+    "runtimeStateOwner": "Zustand",
+    "geminiInteractionsLane": "GA v1; preview features capability-gated",
+    "aiDraftApply": true
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "date": "2026-08-17",
+  "node": "v22.16.0",
+  "npm": "10.9.2",
+  "fixtureExternalNpmDependencies": 0,
+  "realRuntimeFixture": "SQLite through Node 22 node:sqlite",
+  "packageRegistryNetwork": "unavailable from execution container (EAI_AGAIN); no green result is fabricated",
+  "scopeNote": "M00.4 is the dedicated real PGlite/Drizzle Studio DB POC; M00.3 is the dedicated Puck Composition POC."
+}

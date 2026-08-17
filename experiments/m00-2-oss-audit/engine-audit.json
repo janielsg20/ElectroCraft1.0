@@ -1,0 +1,817 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-08-17",
+  "coreTargets": [
+    "local-project",
+    "react-web",
+    "static-web",
+    "pwa",
+    "android-expo",
+    "ios-expo",
+    "capacitor",
+    "lamp",
+    "wordpress"
+  ],
+  "engines": [
+    {
+      "id": "puck",
+      "name": "Puck",
+      "packages": [
+        "@puckeditor/core"
+      ],
+      "responsibility": "Autoría visual React: composición, Slots/nesting, Fields, Outline, Preview, permissions, history/viewports/theming cuando la API pública lo soporte.",
+      "publicApis": [
+        "Puck",
+        "Puck.Components",
+        "Puck.Fields",
+        "Puck.Layout",
+        "Puck.Outline",
+        "Puck.Preview",
+        "Slot",
+        "permissions"
+      ],
+      "stability": "stable-core; Puck AI beta/preview and excluded from AI ownership",
+      "license": "MIT",
+      "targets": [
+        "local-project"
+      ],
+      "boundary": "ElectroCraft aporta modelo canónico, adapters, UX y compilación; no reconstruye editor visual, árbol de outline, nesting ni history de Puck. Puck AI no es la arquitectura AI.",
+      "sources": [
+        "https://puckeditor.com/docs/api-reference/components/puck",
+        "https://puckeditor.com/docs/api-reference/components/slot",
+        "https://puckeditor.com/docs/integrating-puck/permissions",
+        "https://github.com/puckeditor/puck"
+      ]
+    },
+    {
+      "id": "shadcn-radix",
+      "name": "shadcn/ui + Radix",
+      "packages": [
+        "shadcn",
+        "@radix-ui/*"
+      ],
+      "responsibility": "Primitivas y componentes del Studio con código poseído por el proyecto; Radix es la base elegida.",
+      "publicApis": [
+        "shadcn CLI --base radix",
+        "components.json/registry base",
+        "Radix primitives"
+      ],
+      "stability": "stable; Base UI is the July 2026 default for new projects, while Radix remains fully supported and must be selected explicitly",
+      "license": "MIT",
+      "targets": [
+        "local-project"
+      ],
+      "boundary": "No mezclar Base UI y Radix en la misma base de componentes. ElectroCraft puede adaptar estilos/alta densidad, no crear un segundo sistema de primitives.",
+      "sources": [
+        "https://ui.shadcn.com/docs",
+        "https://ui.shadcn.com/docs/changelog",
+        "https://github.com/shadcn-ui/ui"
+      ]
+    },
+    {
+      "id": "ai-elements",
+      "name": "AI Elements",
+      "packages": [
+        "selected registry components"
+      ],
+      "responsibility": "Componentes visuales seleccionados para superficies AI.",
+      "publicApis": [
+        "registry components"
+      ],
+      "stability": "component-registry; track upstream changes",
+      "license": "MIT",
+      "targets": [
+        "local-project"
+      ],
+      "boundary": "Solo UI. No posee modelos, tools, memoria, transporte ni Draft/Apply.",
+      "sources": [
+        "https://ai-sdk.dev/elements",
+        "https://github.com/vercel/ai-elements"
+      ]
+    },
+    {
+      "id": "i18next",
+      "name": "i18next",
+      "packages": [
+        "i18next"
+      ],
+      "responsibility": "Catálogo i18n, resolución de idioma y fallback.",
+      "publicApis": [
+        "createInstance",
+        "init",
+        "t",
+        "fallbackLng"
+      ],
+      "stability": "stable",
+      "license": "MIT",
+      "targets": [
+        "local-project",
+        "react-web",
+        "static-web",
+        "pwa",
+        "android-expo",
+        "ios-expo",
+        "capacitor",
+        "lamp",
+        "wordpress"
+      ],
+      "boundary": "Fallback visible del Studio en español; no mantener un catálogo paralelo.",
+      "sources": [
+        "https://www.i18next.com/overview/typescript",
+        "https://www.i18next.com/principles/fallback",
+        "https://github.com/i18next/i18next"
+      ]
+    },
+    {
+      "id": "react-i18next",
+      "name": "react-i18next",
+      "packages": [
+        "react-i18next"
+      ],
+      "responsibility": "Binding React para i18next y workflow tipado en UI.",
+      "publicApis": [
+        "I18nextProvider",
+        "useTranslation",
+        "Trans"
+      ],
+      "stability": "stable",
+      "license": "MIT",
+      "targets": [
+        "local-project",
+        "react-web",
+        "static-web",
+        "pwa",
+        "capacitor"
+      ],
+      "boundary": "No reemplaza i18next; solo binding React.",
+      "sources": [
+        "https://react.i18next.com/",
+        "https://github.com/i18next/react-i18next"
+      ]
+    },
+    {
+      "id": "pglite",
+      "name": "PGlite",
+      "packages": [
+        "@electric-sql/pglite"
+      ],
+      "responsibility": "Postgres WASM local para Internal Data y persistencia local; Worker compartido para multi-tab cuando aplique.",
+      "publicApis": [
+        "PGlite",
+        "PGliteWorker",
+        "query",
+        "exec"
+      ],
+      "stability": "stable APIs; browser worker integration requires target validation",
+      "license": "Apache-2.0",
+      "targets": [
+        "local-project",
+        "react-web",
+        "pwa",
+        "capacitor"
+      ],
+      "boundary": "Es storage/runtime local, no modelo canónico de datos ni motor de sync inventado por ElectroCraft.",
+      "sources": [
+        "https://pglite.dev/",
+        "https://pglite.dev/docs/multi-tab-worker",
+        "https://github.com/electric-sql/pglite"
+      ]
+    },
+    {
+      "id": "drizzle",
+      "name": "Drizzle ORM",
+      "packages": [
+        "drizzle-orm"
+      ],
+      "responsibility": "Schema/query/migrations tipadas sobre stores SQL soportados, incluido PGlite.",
+      "publicApis": [
+        "drizzle",
+        "sql",
+        "migrations"
+      ],
+      "stability": "stable",
+      "license": "Apache-2.0",
+      "targets": [
+        "local-project",
+        "react-web",
+        "pwa",
+        "capacitor",
+        "lamp"
+      ],
+      "boundary": "No crear ORM/migration DSL paralelo.",
+      "sources": [
+        "https://orm.drizzle.team/docs/connect-pglite",
+        "https://orm.drizzle.team/docs/migrations",
+        "https://github.com/drizzle-team/drizzle-orm"
+      ]
+    },
+    {
+      "id": "refine",
+      "name": "Refine",
+      "packages": [
+        "@refinedev/core"
+      ],
+      "responsibility": "Orquestación de Administración: resources, providers, CRUD/admin composition.",
+      "publicApis": [
+        "Refine",
+        "dataProvider",
+        "authProvider",
+        "resources"
+      ],
+      "stability": "stable",
+      "license": "MIT",
+      "targets": [
+        "local-project",
+        "react-web",
+        "pwa",
+        "capacitor"
+      ],
+      "boundary": "Solo Administración; no posee query cache, table engine, form state, validation ni modelos de datos canónicos.",
+      "sources": [
+        "https://refine.dev/docs/",
+        "https://github.com/refinedev/refine"
+      ]
+    },
+    {
+      "id": "tanstack-query",
+      "name": "TanStack Query",
+      "packages": [
+        "@tanstack/react-query",
+        "@tanstack/query-core"
+      ],
+      "responsibility": "Único cache/estado asíncrono de server/query data en React.",
+      "publicApis": [
+        "QueryClient",
+        "useQuery",
+        "useMutation",
+        "invalidateQueries"
+      ],
+      "stability": "stable v5 API family",
+      "license": "MIT",
+      "targets": [
+        "local-project",
+        "react-web",
+        "static-web",
+        "pwa",
+        "capacitor"
+      ],
+      "boundary": "No crear segundo query cache en Refine, stores o adapters.",
+      "sources": [
+        "https://tanstack.com/query/latest/docs/framework/react/overview",
+        "https://github.com/TanStack/query"
+      ]
+    },
+    {
+      "id": "tanstack-table",
+      "name": "TanStack Table",
+      "packages": [
+        "@tanstack/react-table"
+      ],
+      "responsibility": "Motor headless de tablas, sorting/filtering/pagination state.",
+      "publicApis": [
+        "useReactTable",
+        "getCoreRowModel"
+      ],
+      "stability": "v8 remains the latest stable line; v9 is beta and requires the @beta dist-tag, so Core must not adopt v9 implicitly",
+      "license": "MIT",
+      "targets": [
+        "local-project",
+        "react-web",
+        "static-web",
+        "pwa",
+        "capacitor"
+      ],
+      "boundary": "TanStack Table owns headless table state/algorithms. ElectroCraft/Refine composes UI above it; v9 beta requires an explicit future pin/ADR and no parallel table/CSV engine is allowed.",
+      "sources": [
+        "https://tanstack.com/table/latest/docs/introduction",
+        "https://github.com/TanStack/table"
+      ]
+    },
+    {
+      "id": "rhf",
+      "name": "React Hook Form",
+      "packages": [
+        "react-hook-form"
+      ],
+      "responsibility": "Estado, registro, validación orchestration y submission de forms React.",
+      "publicApis": [
+        "useForm",
+        "Controller",
+        "FormProvider"
+      ],
+      "stability": "stable",
+      "license": "MIT",
+      "targets": [
+        "local-project",
+        "react-web",
+        "static-web",
+        "pwa",
+        "capacitor"
+      ],
+      "boundary": "No crear form-state engine paralelo.",
+      "sources": [
+        "https://react-hook-form.com/docs",
+        "https://github.com/react-hook-form/react-hook-form"
+      ]
+    },
+    {
+      "id": "zod",
+      "name": "Zod",
+      "packages": [
+        "zod"
+      ],
+      "responsibility": "Schemas y validación runtime/TypeScript para contratos ElectroCraft.",
+      "publicApis": [
+        "z.object",
+        "parse",
+        "safeParse",
+        "JSON Schema"
+      ],
+      "stability": "stable v4 API family",
+      "license": "MIT",
+      "targets": [
+        "local-project",
+        "react-web",
+        "static-web",
+        "pwa",
+        "android-expo",
+        "ios-expo",
+        "capacitor",
+        "lamp",
+        "wordpress"
+      ],
+      "boundary": "Una schema source por contrato; adapters consumen schema, no duplican validadores.",
+      "sources": [
+        "https://zod.dev/",
+        "https://github.com/colinhacks/zod"
+      ]
+    },
+    {
+      "id": "rqb",
+      "name": "React Query Builder",
+      "packages": [
+        "react-querybuilder"
+      ],
+      "responsibility": "Autoría acotada de condiciones/filtros lógicos.",
+      "publicApis": [
+        "QueryBuilder",
+        "formatQuery"
+      ],
+      "stability": "stable",
+      "license": "MIT",
+      "targets": [
+        "local-project"
+      ],
+      "boundary": "No es workflow engine ni query-cache; produce/edita condiciones canónicas.",
+      "sources": [
+        "https://react-querybuilder.js.org/",
+        "https://github.com/react-querybuilder/react-querybuilder"
+      ]
+    },
+    {
+      "id": "rete",
+      "name": "Rete",
+      "packages": [
+        "rete"
+      ],
+      "responsibility": "Grafo visual y procesamiento de workflows; dataflow/control-flow según plugins/APIs.",
+      "publicApis": [
+        "NodeEditor",
+        "ClassicPreset",
+        "DataflowEngine",
+        "ControlFlowEngine"
+      ],
+      "stability": "stable v2 API family",
+      "license": "MIT",
+      "targets": [
+        "local-project"
+      ],
+      "boundary": "Rete posee graph editing/processing; ElectroCraft mapea Actions/Workflow canonical model y runtime/export semantics.",
+      "sources": [
+        "https://retejs.org/docs/",
+        "https://retejs.org/docs/guides/processing/dataflow",
+        "https://retejs.org/docs/guides/processing/control-flow",
+        "https://github.com/retejs/rete"
+      ]
+    },
+    {
+      "id": "tiptap",
+      "name": "Tiptap",
+      "packages": [
+        "@tiptap/core",
+        "@tiptap/starter-kit",
+        "@tiptap/html"
+      ],
+      "responsibility": "Rich-text editor y representación JSON/HTML renderable.",
+      "publicApis": [
+        "Editor",
+        "StarterKit",
+        "generateHTML"
+      ],
+      "stability": "stable core; paid/pro extensions excluded unless separately approved",
+      "license": "MIT-core",
+      "targets": [
+        "local-project",
+        "react-web",
+        "static-web",
+        "pwa",
+        "capacitor",
+        "lamp",
+        "wordpress"
+      ],
+      "boundary": "Un único formato rich-text canónico; no editor paralelo.",
+      "sources": [
+        "https://tiptap.dev/docs/editor/getting-started/overview",
+        "https://tiptap.dev/docs/editor/api/utilities/html",
+        "https://github.com/ueberdosis/tiptap"
+      ]
+    },
+    {
+      "id": "zustand",
+      "name": "Zustand",
+      "packages": [
+        "zustand"
+      ],
+      "responsibility": "Estado runtime/client local y stores explícitos.",
+      "publicApis": [
+        "create",
+        "createStore",
+        "persist"
+      ],
+      "stability": "stable",
+      "license": "MIT",
+      "targets": [
+        "local-project",
+        "react-web",
+        "static-web",
+        "pwa",
+        "capacitor"
+      ],
+      "boundary": "No usar Zustand como query-cache ni base de datos; persistir solo slices declarados.",
+      "sources": [
+        "https://zustand.docs.pmnd.rs/apis/create-store",
+        "https://zustand.docs.pmnd.rs/integrations/persisting-store-data",
+        "https://github.com/pmndrs/zustand"
+      ]
+    },
+    {
+      "id": "ai-sdk",
+      "name": "Vercel AI SDK",
+      "packages": [
+        "ai"
+      ],
+      "responsibility": "Orquestación AI de aplicación: generación, streaming, structured output y tool calling.",
+      "publicApis": [
+        "generateText",
+        "streamText",
+        "generateObject/tool schemas as supported"
+      ],
+      "stability": "stable API with versioned migrations",
+      "license": "Apache-2.0",
+      "targets": [
+        "local-project",
+        "react-web",
+        "pwa",
+        "capacitor"
+      ],
+      "boundary": "AI siempre escribe Draft; Apply explícito. No mutación directa del documento.",
+      "sources": [
+        "https://ai-sdk.dev/docs/introduction",
+        "https://github.com/vercel/ai"
+      ]
+    },
+    {
+      "id": "ai-sdk-google",
+      "name": "AI SDK Google provider",
+      "packages": [
+        "@ai-sdk/google"
+      ],
+      "responsibility": "Provider adapter de Gemini para AI SDK.",
+      "publicApis": [
+        "google",
+        "createGoogleGenerativeAI"
+      ],
+      "stability": "stable provider; model capabilities vary",
+      "license": "Apache-2.0",
+      "targets": [
+        "local-project",
+        "react-web",
+        "pwa",
+        "capacitor"
+      ],
+      "boundary": "Provider, no segundo AI orchestration layer.",
+      "sources": [
+        "https://ai-sdk.dev/providers/ai-sdk-providers/google-generative-ai",
+        "https://github.com/vercel/ai"
+      ]
+    },
+    {
+      "id": "google-genai",
+      "name": "Google Gen AI SDK",
+      "packages": [
+        "@google/genai"
+      ],
+      "responsibility": "SDK oficial Google para APIs Gemini específicas no cubiertas por la abstracción AI SDK.",
+      "publicApis": [
+        "GoogleGenAI",
+        "models.generateContent",
+        "function calling",
+        "structured outputs"
+      ],
+      "stability": "stable SDK; individual APIs/models may be preview",
+      "license": "Apache-2.0",
+      "targets": [
+        "local-project"
+      ],
+      "boundary": "Usar solo detrás de servicio AI/secret refs; nunca exponer API keys en cliente/export.",
+      "sources": [
+        "https://ai.google.dev/gemini-api/docs/libraries",
+        "https://ai.google.dev/gemini-api/docs/structured-output",
+        "https://ai.google.dev/gemini-api/docs/function-calling",
+        "https://github.com/googleapis/js-genai"
+      ]
+    },
+    {
+      "id": "gemini-interactions",
+      "name": "Gemini Interactions API",
+      "packages": [
+        "@google/genai"
+      ],
+      "responsibility": "Interacciones/stateful workflows de Gemini cuando el API y modelo elegido lo soporten.",
+      "publicApis": [
+        "interactions.create",
+        "interactions.get",
+        "previous_interaction_id",
+        "tools",
+        "response_format"
+      ],
+      "stability": "GA in Gemini API v1 since June 2026; v1beta remains available for preview features and individual models/agents can still be preview",
+      "license": "service-api",
+      "targets": [
+        "local-project"
+      ],
+      "boundary": "Use stable API v1 for the GA lane via @google/genai when this Google-specific capability is needed; do not make server-side interaction state canonical ElectroCraft storage. Preview models/agents stay capability-gated.",
+      "sources": [
+        "https://ai.google.dev/gemini-api/docs/interactions"
+      ]
+    },
+    {
+      "id": "gemini-images",
+      "name": "Gemini image generation",
+      "packages": [
+        "@google/genai"
+      ],
+      "responsibility": "Generación/edición de imagen AI mediante modelos Gemini compatibles.",
+      "publicApis": [
+        "models.generateContent"
+      ],
+      "stability": "model-dependent; preview/stable status follows model catalog",
+      "license": "service-api",
+      "targets": [
+        "local-project"
+      ],
+      "boundary": "Modelo configurable/capability-gated; assets entran al Draft antes de Apply.",
+      "sources": [
+        "https://ai.google.dev/gemini-api/docs/image-generation",
+        "https://ai.google.dev/gemini-api/docs/models"
+      ]
+    },
+    {
+      "id": "expo",
+      "name": "Expo SDK",
+      "packages": [
+        "expo"
+      ],
+      "responsibility": "Runtime/toolchain nativo para targets Android/iOS Expo.",
+      "publicApis": [
+        "Expo SDK modules"
+      ],
+      "stability": "stable SDK releases; experimental APIs individually gated",
+      "license": "MIT",
+      "targets": [
+        "android-expo",
+        "ios-expo"
+      ],
+      "boundary": "Solo targets nativos Expo; web runtime sigue independiente.",
+      "sources": [
+        "https://docs.expo.dev/versions/latest/",
+        "https://github.com/expo/expo"
+      ]
+    },
+    {
+      "id": "expo-router",
+      "name": "Expo Router",
+      "packages": [
+        "expo-router"
+      ],
+      "responsibility": "File-based/native navigation shell de export Expo.",
+      "publicApis": [
+        "Stack",
+        "Tabs",
+        "Link",
+        "Router"
+      ],
+      "stability": "stable",
+      "license": "MIT",
+      "targets": [
+        "android-expo",
+        "ios-expo"
+      ],
+      "boundary": "Compila Navigation/Routes canónico; no se vuelve el owner canónico.",
+      "sources": [
+        "https://docs.expo.dev/router/introduction/",
+        "https://github.com/expo/expo"
+      ]
+    },
+    {
+      "id": "expo-sqlite",
+      "name": "Expo SQLite",
+      "packages": [
+        "expo-sqlite"
+      ],
+      "responsibility": "Persistencia SQLite nativa para exports Expo cuando capability mapping lo requiera.",
+      "publicApis": [
+        "SQLiteProvider",
+        "useSQLiteContext",
+        "openDatabaseAsync"
+      ],
+      "stability": "native stable; web support is alpha and must remain capability-gated",
+      "license": "MIT",
+      "targets": [
+        "android-expo",
+        "ios-expo"
+      ],
+      "boundary": "Adapter target-specific, no reemplaza Data Source canonical model.",
+      "sources": [
+        "https://docs.expo.dev/versions/latest/sdk/sqlite/",
+        "https://github.com/expo/expo"
+      ]
+    },
+    {
+      "id": "lucide",
+      "name": "Lucide",
+      "packages": [
+        "lucide-react",
+        "lucide-react-native"
+      ],
+      "responsibility": "Iconografía consistente web/native.",
+      "publicApis": [
+        "icon components"
+      ],
+      "stability": "stable",
+      "license": "ISC",
+      "targets": [
+        "local-project",
+        "react-web",
+        "static-web",
+        "pwa",
+        "android-expo",
+        "ios-expo",
+        "capacitor"
+      ],
+      "boundary": "Assets/icons only; no UI component system paralelo.",
+      "sources": [
+        "https://lucide.dev/guide/packages/lucide-react",
+        "https://github.com/lucide-icons/lucide"
+      ]
+    },
+    {
+      "id": "echarts",
+      "name": "Apache ECharts",
+      "packages": [
+        "echarts"
+      ],
+      "responsibility": "Charts web y renderizado web/export compatible cuando aplique.",
+      "publicApis": [
+        "echarts.init",
+        "setOption",
+        "SSR APIs"
+      ],
+      "stability": "stable",
+      "license": "Apache-2.0",
+      "targets": [
+        "local-project",
+        "react-web",
+        "static-web",
+        "pwa",
+        "capacitor",
+        "lamp",
+        "wordpress"
+      ],
+      "boundary": "Charts web; no asumir soporte React Native.",
+      "sources": [
+        "https://echarts.apache.org/handbook/en/get-started/",
+        "https://echarts.apache.org/handbook/en/how-to/cross-platform/server/",
+        "https://github.com/apache/echarts"
+      ]
+    },
+    {
+      "id": "victory-native",
+      "name": "Victory Native",
+      "packages": [
+        "victory-native"
+      ],
+      "responsibility": "Charts para exports React Native.",
+      "publicApis": [
+        "CartesianChart",
+        "PolarChart and supported components"
+      ],
+      "stability": "stable library; native peer stack must be validated with Expo baseline",
+      "license": "MIT",
+      "targets": [
+        "android-expo",
+        "ios-expo"
+      ],
+      "boundary": "Charts nativos; no duplicar chart semantics canónicas.",
+      "sources": [
+        "https://commerce.nearform.com/open-source/victory-native/",
+        "https://github.com/FormidableLabs/victory-native-xl"
+      ]
+    },
+    {
+      "id": "fullcalendar",
+      "name": "FullCalendar Standard",
+      "packages": [
+        "@fullcalendar/core"
+      ],
+      "responsibility": "Calendario web estándar.",
+      "publicApis": [
+        "Calendar",
+        "standard plugins"
+      ],
+      "stability": "stable standard tier",
+      "license": "MIT-standard; premium plugins excluded",
+      "targets": [
+        "local-project",
+        "react-web",
+        "pwa",
+        "capacitor",
+        "lamp",
+        "wordpress"
+      ],
+      "boundary": "Solo Standard OSS salvo decisión separada; premium no entra por accidente.",
+      "sources": [
+        "https://fullcalendar.io/docs",
+        "https://fullcalendar.io/license",
+        "https://github.com/fullcalendar/fullcalendar"
+      ]
+    },
+    {
+      "id": "rn-calendars",
+      "name": "react-native-calendars",
+      "packages": [
+        "react-native-calendars"
+      ],
+      "responsibility": "Calendarios React Native para targets Expo.",
+      "publicApis": [
+        "Calendar",
+        "CalendarList",
+        "Agenda"
+      ],
+      "stability": "stable",
+      "license": "MIT",
+      "targets": [
+        "android-expo",
+        "ios-expo"
+      ],
+      "boundary": "Adaptador visual nativo, no modelo canónico de eventos.",
+      "sources": [
+        "https://wix.github.io/react-native-calendars/docs/Intro",
+        "https://github.com/wix/react-native-calendars"
+      ]
+    },
+    {
+      "id": "dnd-kit",
+      "name": "dnd-kit",
+      "packages": [
+        "@dnd-kit/react",
+        "@dnd-kit/helpers",
+        "legacy @dnd-kit/core only where an owning phase explicitly pins it"
+      ],
+      "responsibility": "Drag/drop accesible para interacciones del Studio fuera de las superficies que Puck ya posee.",
+      "publicApis": [
+        "DragDropProvider (new React architecture)",
+        "draggable/droppable hooks",
+        "plugins/modifiers/sensors",
+        "legacy DndContext migration surface"
+      ],
+      "stability": "active package/API transition: current docs provide @dnd-kit/react and an explicit migration guide from legacy @dnd-kit/core",
+      "license": "MIT",
+      "targets": [
+        "local-project"
+      ],
+      "boundary": "Use only for Studio interactions outside Puck-owned canvas/nesting/outline. The owning POC must pin either the new React architecture or a justified legacy surface; do not mix both casually.",
+      "sources": [
+        "https://dndkit.com/",
+        "https://github.com/clauderic/dnd-kit"
+      ]
+    }
+  ],
+  "verifiedPackageObservations": {
+    "i18next": "26.3.6 (latest release observed 2026-08-17)",
+    "@electric-sql/pglite": "0.5.5 (official tag/package observed 2026-08-17)",
+    "drizzle-orm": "0.45.2 stable; 1.0 RC is not the default stable lane",
+    "zod": "4.4.3 latest release observed 2026-08-17",
+    "expo-sdk": "latest docs expose SDK 57 compatibility table; exact workspace tuple is reverified at F22/F23 install time"
+  }
+}

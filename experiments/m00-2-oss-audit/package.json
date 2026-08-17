@@ -1,0 +1,16 @@
+{
+  "name": "electrocraft-m00-2-oss-audit",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "lint": "node scripts/lint.mjs",
+    "typecheck": "node scripts/typecheck.mjs",
+    "test": "node --test test/*.test.mjs",
+    "integration": "node scripts/integration.mjs",
+    "build": "node scripts/build-summary.mjs"
+  }
+}

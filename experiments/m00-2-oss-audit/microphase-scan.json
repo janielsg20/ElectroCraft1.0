@@ -1,0 +1,13 @@
+{
+  "patterns": [
+    "build (?:a )?custom query cache",
+    "custom CRUD engine",
+    "parallel CRUD engine",
+    "reimplement Puck",
+    "rebuild Puck",
+    "custom rich[- ]text engine",
+    "rebuild Zustand",
+    "custom form state engine"
+  ],
+  "hits": []
+}

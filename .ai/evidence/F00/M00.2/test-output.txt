@@ -1,0 +1,406 @@
+ElectroCraft F00 / M00.2 final local verification
+Date: 2026-08-17
+Node: v22.16.0
+npm: 10.9.2
+
+## npm run lint
+
+> electrocraft-m00-2-oss-audit@0.0.0 lint
+> node scripts/lint.mjs
+
+OK: 30 audited engine decisions, 9 Core targets.
+Lint OK: audit shape, ownership scan and required fixture files are clean.
+
+## npm run typecheck
+
+> electrocraft-m00-2-oss-audit@0.0.0 typecheck
+> node scripts/typecheck.mjs
+
+Typecheck OK: 10 ESM modules parse under Node v22.16.0.
+
+## npm test
+
+> electrocraft-m00-2-oss-audit@0.0.0 test
+> node --test test/*.test.mjs
+
+TAP version 13
+# Subtest: all 30 approved engine decisions have one audited owner
+ok 1 - all 30 approved engine decisions have one audited owner
+  ---
+  duration_ms: 1.196216
+  type: 'test'
+  ...
+# Subtest: every engine records API, stability, license, targets, boundary and primary sources
+ok 2 - every engine records API, stability, license, targets, boundary and primary sources
+  ---
+  duration_ms: 0.507302
+  type: 'test'
+  ...
+# Subtest: nine Core targets remain exact and equal-status
+ok 3 - nine Core targets remain exact and equal-status
+  ---
+  duration_ms: 0.976232
+  type: 'test'
+  ...
+# Subtest: single-owner guardrails prohibit parallel subsystem engines
+ok 4 - single-owner guardrails prohibit parallel subsystem engines
+  ---
+  duration_ms: 0.485239
+  type: 'test'
+  ...
+# Subtest: 2026 upstream corrections are frozen instead of following defaults blindly
+ok 5 - 2026 upstream corrections are frozen instead of following defaults blindly
+  ---
+  duration_ms: 0.559486
+  type: 'test'
+  ...
+# Subtest: Puck and AI ownership stay separated
+ok 6 - Puck and AI ownership stay separated
+  ---
+  duration_ms: 0.287537
+  type: 'test'
+  ...
+# Subtest: no later microphase explicitly rebuilds audited engine ownership
+ok 7 - no later microphase explicitly rebuilds audited engine ownership
+  ---
+  duration_ms: 2.907739
+  type: 'test'
+  ...
+# Subtest: M00.3 owns the real Puck Composition POC
+ok 8 - M00.3 owns the real Puck Composition POC
+  ---
+  duration_ms: 0.379676
+  type: 'test'
+  ...
+# Subtest: M00.4 owns the real Studio DB PGlite/Drizzle POC
+ok 9 - M00.4 owns the real Studio DB PGlite/Drizzle POC
+  ---
+  duration_ms: 0.46578
+  type: 'test'
+  ...
+# Subtest: allow when canonical role and engine both allow
+ok 10 - allow when canonical role and engine both allow
+  ---
+  duration_ms: 4.858938
+  type: 'test'
+  ...
+# Subtest: role deny is authoritative
+ok 11 - role deny is authoritative
+  ---
+  duration_ms: 0.296173
+  type: 'test'
+  ...
+# Subtest: engine deny is authoritative
+ok 12 - engine deny is authoritative
+  ---
+  duration_ms: 1.079488
+  type: 'test'
+  ...
+# Subtest: unknown actions default deny
+ok 13 - unknown actions default deny
+  ---
+  duration_ms: 0.366309
+  type: 'test'
+  ...
+# Subtest: raw secrets and invalid SecretRefs are rejected
+ok 14 - raw secrets and invalid SecretRefs are rejected
+  ---
+  duration_ms: 0.405511
+  type: 'test'
+  ...
+# Subtest: unsafe prototype keys are rejected
+ok 15 - unsafe prototype keys are rejected
+  ---
+  duration_ms: 0.303171
+  type: 'test'
+  ...
+# Subtest: canonical action surface stays narrow
+ok 16 - canonical action surface stays narrow
+  ---
+  duration_ms: 0.396756
+  type: 'test'
+  ...
+# Subtest: policy adapter strips secret fields before evaluation
+ok 17 - policy adapter strips secret fields before evaluation
+  ---
+  duration_ms: 0.96791
+  type: 'test'
+  ...
+# Subtest: policy exceptions fail closed
+ok 18 - policy exceptions fail closed
+  ---
+  duration_ms: 0.85484
+  type: 'test'
+  ...
+# Subtest: real SQLite engine persists and round-trips a target fixture
+ok 19 - real SQLite engine persists and round-trips a target fixture
+  ---
+  duration_ms: 2.081434
+  type: 'test'
+  ...
+# Subtest: real SQLite transaction rolls back atomically
+ok 20 - real SQLite transaction rolls back atomically
+  ---
+  duration_ms: 0.54646
+  type: 'test'
+  ...
+# Subtest: real SQLite engine surfaces SQL diagnostics
+ok 21 - real SQLite engine surfaces SQL diagnostics
+  ---
+  duration_ms: 0.568335
+  type: 'test'
+  ...
+1..21
+# tests 21
+# suites 0
+# pass 21
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 271.639313
+
+## npm run integration
+
+> electrocraft-m00-2-oss-audit@0.0.0 integration
+> node scripts/integration.mjs
+
+{"engine":"SQLite via node:sqlite","roundTrip":"PASS","negativeDiagnostic":"PASS","note":"Representative real storage engine for M00.2 audit; PGlite/Drizzle runtime POC belongs to M00.4."}
+
+## npm run build
+
+> electrocraft-m00-2-oss-audit@0.0.0 build
+> node scripts/build-summary.mjs
+
+Built dist/audit-summary.json (30 engines).
+
+## Regression — M00.1
+### lint
+
+> lint
+> node scripts/validate-matrix.mjs --lint
+
+OK: 84 requirements, 9 Core targets, ownership completo.
+### typecheck
+
+> typecheck
+> node --check scripts/validate-matrix.mjs && node --check test/matrix.test.mjs
+
+### test
+
+> test
+> node --test test/matrix.test.mjs
+
+TAP version 13
+# Subtest: 84 requisitos tienen ownership completo
+ok 1 - 84 requisitos tienen ownership completo
+  ---
+  duration_ms: 2.154135
+  type: 'test'
+  ...
+# Subtest: los nueve targets son Core y tienen exporter owner explícito
+ok 2 - los nueve targets son Core y tienen exporter owner explícito
+  ---
+  duration_ms: 0.710153
+  type: 'test'
+  ...
+# Subtest: CMS queda subordinado a Datos y no al modelo raíz
+ok 3 - CMS queda subordinado a Datos y no al modelo raíz
+  ---
+  duration_ms: 0.272817
+  type: 'test'
+  ...
+# Subtest: Pantallas y Navegación no comparten owner canónico
+ok 4 - Pantallas y Navegación no comparten owner canónico
+  ---
+  duration_ms: 0.215115
+  type: 'test'
+  ...
+# Subtest: AI conserva Draft/Apply explícito
+ok 5 - AI conserva Draft/Apply explícito
+  ---
+  duration_ms: 0.307969
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 129.770857
+### build
+
+> build
+> node scripts/build-summary.mjs
+
+Built dist/summary.json
+
+## Project integrity
+Project integrity PASS: 425 files, 270 microphases, no multipart import/workflow residue.
+
+## Final post-continuity verification
+
+> electrocraft-m00-2-oss-audit@0.0.0 lint
+> node scripts/lint.mjs
+
+OK: 30 audited engine decisions, 9 Core targets.
+Lint OK: audit shape, ownership scan and required fixture files are clean.
+
+> electrocraft-m00-2-oss-audit@0.0.0 typecheck
+> node scripts/typecheck.mjs
+
+Typecheck OK: 10 ESM modules parse under Node v22.16.0.
+
+> electrocraft-m00-2-oss-audit@0.0.0 test
+> node --test test/*.test.mjs
+
+TAP version 13
+# Subtest: all 30 approved engine decisions have one audited owner
+ok 1 - all 30 approved engine decisions have one audited owner
+  ---
+  duration_ms: 1.125098
+  type: 'test'
+  ...
+# Subtest: every engine records API, stability, license, targets, boundary and primary sources
+ok 2 - every engine records API, stability, license, targets, boundary and primary sources
+  ---
+  duration_ms: 0.470379
+  type: 'test'
+  ...
+# Subtest: nine Core targets remain exact and equal-status
+ok 3 - nine Core targets remain exact and equal-status
+  ---
+  duration_ms: 1.077608
+  type: 'test'
+  ...
+# Subtest: single-owner guardrails prohibit parallel subsystem engines
+ok 4 - single-owner guardrails prohibit parallel subsystem engines
+  ---
+  duration_ms: 0.490329
+  type: 'test'
+  ...
+# Subtest: 2026 upstream corrections are frozen instead of following defaults blindly
+ok 5 - 2026 upstream corrections are frozen instead of following defaults blindly
+  ---
+  duration_ms: 0.754564
+  type: 'test'
+  ...
+# Subtest: Puck and AI ownership stay separated
+ok 6 - Puck and AI ownership stay separated
+  ---
+  duration_ms: 0.415538
+  type: 'test'
+  ...
+# Subtest: no later microphase explicitly rebuilds audited engine ownership
+ok 7 - no later microphase explicitly rebuilds audited engine ownership
+  ---
+  duration_ms: 1.515483
+  type: 'test'
+  ...
+# Subtest: M00.3 owns the real Puck Composition POC
+ok 8 - M00.3 owns the real Puck Composition POC
+  ---
+  duration_ms: 0.259678
+  type: 'test'
+  ...
+# Subtest: M00.4 owns the real Studio DB PGlite/Drizzle POC
+ok 9 - M00.4 owns the real Studio DB PGlite/Drizzle POC
+  ---
+  duration_ms: 0.301457
+  type: 'test'
+  ...
+# Subtest: allow when canonical role and engine both allow
+ok 10 - allow when canonical role and engine both allow
+  ---
+  duration_ms: 5.523705
+  type: 'test'
+  ...
+# Subtest: role deny is authoritative
+ok 11 - role deny is authoritative
+  ---
+  duration_ms: 0.225531
+  type: 'test'
+  ...
+# Subtest: engine deny is authoritative
+ok 12 - engine deny is authoritative
+  ---
+  duration_ms: 0.232335
+  type: 'test'
+  ...
+# Subtest: unknown actions default deny
+ok 13 - unknown actions default deny
+  ---
+  duration_ms: 0.141105
+  type: 'test'
+  ...
+# Subtest: raw secrets and invalid SecretRefs are rejected
+ok 14 - raw secrets and invalid SecretRefs are rejected
+  ---
+  duration_ms: 0.244321
+  type: 'test'
+  ...
+# Subtest: unsafe prototype keys are rejected
+ok 15 - unsafe prototype keys are rejected
+  ---
+  duration_ms: 0.288238
+  type: 'test'
+  ...
+# Subtest: canonical action surface stays narrow
+ok 16 - canonical action surface stays narrow
+  ---
+  duration_ms: 0.184271
+  type: 'test'
+  ...
+# Subtest: policy adapter strips secret fields before evaluation
+ok 17 - policy adapter strips secret fields before evaluation
+  ---
+  duration_ms: 0.457503
+  type: 'test'
+  ...
+# Subtest: policy exceptions fail closed
+ok 18 - policy exceptions fail closed
+  ---
+  duration_ms: 0.86872
+  type: 'test'
+  ...
+# Subtest: real SQLite engine persists and round-trips a target fixture
+ok 19 - real SQLite engine persists and round-trips a target fixture
+  ---
+  duration_ms: 2.019079
+  type: 'test'
+  ...
+# Subtest: real SQLite transaction rolls back atomically
+ok 20 - real SQLite transaction rolls back atomically
+  ---
+  duration_ms: 0.403887
+  type: 'test'
+  ...
+# Subtest: real SQLite engine surfaces SQL diagnostics
+ok 21 - real SQLite engine surfaces SQL diagnostics
+  ---
+  duration_ms: 0.481285
+  type: 'test'
+  ...
+1..21
+# tests 21
+# suites 0
+# pass 21
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 277.810415
+
+> electrocraft-m00-2-oss-audit@0.0.0 integration
+> node scripts/integration.mjs
+
+{"engine":"SQLite via node:sqlite","roundTrip":"PASS","negativeDiagnostic":"PASS","note":"Representative real storage engine for M00.2 audit; PGlite/Drizzle runtime POC belongs to M00.4."}
+
+> electrocraft-m00-2-oss-audit@0.0.0 build
+> node scripts/build-summary.mjs
+
+Built dist/audit-summary.json (30 engines).
+Final continuity/integrity PASS: M00.2 CLOSED, M00.3 ACTIVE, 30 engines, 270 microphases.

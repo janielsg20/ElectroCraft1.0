@@ -170,9 +170,11 @@ Gemini remains the default product provider.
 
 Owns standard AI streaming UI pieces.
 
-## @google/genai — CONDITIONAL ESCAPE HATCH
+## @google/genai — APPROVED NARROW INTERACTIONS ADAPTER
 
-Only when F00 proves a required current Gemini-native capability is not exposed adequately by the pinned AI SDK provider.
+M00.2 confirms the specific gap: Google recommends Gemini Interactions API for new development and its core is GA in `v1`. The GenAI SDK still defaults to `v1beta` so preview capabilities are easy to access; ElectroCraft explicitly chooses `v1` for its stable Interactions lane. AI SDK + `@ai-sdk/google` remains the primary provider abstraction; `@google/genai` is only the narrow Google-native capability adapter.
+
+Use `@google/genai` only behind `GeminiNativeCapabilityAdapter` for Interactions API / Gemini-native capabilities not adequately exposed by the pinned AI SDK provider. Configure API `v1` explicitly for the GA lane; preview capabilities stay gated. API keys are SecretRefs resolved server-side only.
 
 No second complete AI stack.
 
@@ -233,7 +235,7 @@ Do not rebuild WordPress content/role/media APIs.
 - Victory Native — Native charts.
 - FullCalendar Standard — Web calendar.
 - react-native-calendars — Native calendar.
-- dnd-kit — Web Kanban.
+- dnd-kit — Studio/Web Kanban outside Puck-owned surfaces; pin the current `@dnd-kit/react` architecture or a justified legacy surface in its owning POC.
 
 All conditional/dependency-pruned.
 
