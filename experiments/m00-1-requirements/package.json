@@ -1,0 +1,11 @@
+{
+  "name": "electrocraft-m00-1-requirements-poc",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "node scripts/validate-matrix.mjs --lint",
+    "typecheck": "node --check scripts/validate-matrix.mjs && node --check test/matrix.test.mjs",
+    "test": "node --test test/matrix.test.mjs",
+    "build": "node scripts/build-summary.mjs"
+  }
+}
