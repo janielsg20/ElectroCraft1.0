@@ -17,3 +17,12 @@
 - Added exact codebase-location requirements to every microphase.
 - Replaced repeated implementation boilerplate with phase-specific code/package execution sequences.
 - Final plan: 28 phases and 270 prescriptive microphases.
+
+## 2026-08-17 — F00 / M00.1 completed
+
+- Added atomic R001–R084 capability/ownership/phase/target mapping.
+- Added executable M00.1 contract fixture with 5 passing tests.
+- Frozen all nine export destinations as explicit equal-status Core owners.
+- Frozen CMS capabilities below the App Builder mental model and separated Screens from Navigation/Routes ownership.
+- Updated REQUIREMENTS and TRACEABILITY and recorded F00 evidence.
+- Advanced active execution to M00.2.

@@ -112,3 +112,15 @@ R084 no P0/P1 gap.
 - WordPress
 
 Ninguno se muestra como destino secundario.
+
+
+## Ownership gate — M00.1
+
+La trazabilidad atómica de R001–R084 vive en `TRACEABILITY_MATRIX.md` y su fixture ejecutable en `experiments/m00-1-requirements/capability-ownership-matrix.json`.
+
+Reglas congeladas por M00.1:
+- toda capacidad tiene un owner canónico y una fase;
+- CMS se subordina a Datos/Pantallas/Administración según semántica;
+- Navegación/Rutas no se incrusta dentro del árbol de Pantallas;
+- los nueve destinos de exportación son Core y de igual estatus;
+- diferencias target-specific se resuelven mediante capability/adaptation/compiler, nunca duplicando el modelo canónico.
