@@ -16,13 +16,14 @@ ElectroCraft Native keeps one canonical project/data model and maps it into the 
 - React `19.2.3`
 - React DOM `19.2.3` only as Refine Core peer-resolution compatibility; no DOM renderer/table is used by the Native POC.
 - React Native `0.86.2` (MIT)
+- React Native Reanimated `4.5.1` and React Native Worklets `0.10.1`, explicitly pinned to the Expo SDK 57 bundled-native-module baseline so npm optional-peer resolution cannot float them independently.
 - react-native-safe-area-context `5.7.0` (MIT)
 - react-native-screens `4.26.0` (MIT)
 - Drizzle ORM `0.45.2` (Apache-2.0)
 - Zustand `5.0.14` (MIT)
 - Refine Core `5.0.12` (MIT)
 
-Npm-published package versions are the runtime source of truth. The Expo `sdk-57` source branch may already contain later patch metadata, so source-branch manifests are API provenance rather than proof that a later patch is published.
+Npm-published package versions are the runtime source of truth. Expo SDK 57 `bundledNativeModules.json` is the compatibility source for React/React Native/Reanimated/Worklets pairings. The Expo `sdk-57` source branch can contain later Expo patch metadata, so source-branch package versions are API provenance rather than proof that a later patch is the chosen runtime pin.
 
 ## POC surface
 - stable Expo Router `<Stack />`;
