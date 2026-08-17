@@ -3,7 +3,7 @@ name: Finalize M00.2 OSS audit
 on:
   push:
     paths:
-      - '.import/m00-2-payload.b64'
+      - '.import/m00-2-ready'
   workflow_dispatch:
 
 permissions:
@@ -26,7 +26,8 @@ jobs:
           set -euo pipefail
           rm -rf /tmp/m002-payload
           mkdir -p /tmp/m002-payload
-          base64 -d .import/m00-2-payload.b64 > /tmp/m00-2-payload.tar.gz
+          cat .import/m00-2-payload.part* | base64 -d > /tmp/m00-2-payload.tar.gz
+          echo '00c4f55f98b1f74048c3c9a96f666d248457fe1e0788f0e8aeb13ad77462021d  /tmp/m00-2-payload.tar.gz' | sha256sum --check --strict
           tar -xzf /tmp/m00-2-payload.tar.gz -C /tmp/m002-payload
           cp -a /tmp/m002-payload/pre/. .
       - name: Run contract and real OSS gates
@@ -92,7 +93,7 @@ jobs:
           - No later microphase required rewriting for duplicated engine responsibilities.
           EOF
           rm -rf experiments/m00-2-oss-audit/node_modules
-          rm -f .import/m00-2-payload.b64
+          rm -f .import/m00-2-payload.part* .import/m00-2-ready
           rmdir .import 2>/dev/null || true
           rm -f .github/workflows/m00-2-finalize.yml
       - name: Commit verified M00.2 result
