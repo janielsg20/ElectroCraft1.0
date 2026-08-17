@@ -9,11 +9,47 @@ on:
       - '.ai/adr/ADR-0007-native-runtime-poc.md'
       - '.ai/evidence/F00/M00.7/**'
 
+concurrency:
+  group: m00-7-native-runtime
+  cancel-in-progress: true
+
 permissions:
-  contents: read
+  contents: write
+  statuses: write
 
 jobs:
+  lockfile-bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      created: ${{ steps.lock.outputs.created }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - id: lock
+        name: Ensure committed lockfile
+        working-directory: experiments/m00-7-native-runtime
+        run: |
+          if test -f package-lock.json; then
+            echo 'created=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+          echo 'created=true' >> "$GITHUB_OUTPUT"
+      - name: Commit generated lockfile
+        if: steps.lock.outputs.created == 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/m00-7-native-runtime/package-lock.json
+          git commit -m 'Lock M00.7 native runtime dependencies'
+          git push origin HEAD:main
+
   verify-source-build:
+    needs: lockfile-bootstrap
+    if: needs.lockfile-bootstrap.outputs.created == 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     defaults:
@@ -29,13 +65,11 @@ jobs:
           node-version: '22'
       - name: Registry health
         run: npm ping
-      - name: Generate deterministic lockfile
-        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
-      - name: Install exact dependency graph
+      - name: Install committed dependency graph
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Full source/build gate
         run: npm run verify
-      - name: Preserve generated lockfile
+      - name: Preserve committed lockfile
         if: always()
         run: mkdir -p artifacts && cp package-lock.json artifacts/package-lock.generated.json || true
       - name: Upload source/build evidence
@@ -49,7 +83,8 @@ jobs:
           if-no-files-found: warn
 
   android-runtime:
-    needs: verify-source-build
+    needs: [lockfile-bootstrap, verify-source-build]
+    if: needs.lockfile-bootstrap.outputs.created == 'false' && needs.verify-source-build.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
@@ -68,9 +103,7 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - name: Generate deterministic lockfile
-        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
-      - name: Install exact dependency graph
+      - name: Install committed dependency graph
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Generate Android native source
         run: npx expo prebuild --platform android --clean --no-install
@@ -100,3 +133,28 @@ jobs:
           name: m00-7-android-runtime-evidence
           path: experiments/m00-7-native-runtime/artifacts/
           if-no-files-found: warn
+
+  report-status:
+    needs: [lockfile-bootstrap, verify-source-build, android-runtime]
+    if: always() && needs.lockfile-bootstrap.outputs.created == 'false'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish auditable commit status
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RESULT: ${{ needs.verify-source-build.result }}
+          ANDROID_RESULT: ${{ needs.android-runtime.result }}
+        run: |
+          STATE=failure
+          DESCRIPTION='M00.7 native runtime gate failed'
+          if test "$SOURCE_RESULT" = success && test "$ANDROID_RESULT" = success; then
+            STATE=success
+            DESCRIPTION='M00.7 native runtime gate passed'
+          fi
+          curl --fail-with-body -L \
+            -X POST \
+            -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" \
+            -d "{\"state\":\"$STATE\",\"target_url\":\"https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\",\"description\":\"$DESCRIPTION\",\"context\":\"M00.7 Native Runtime\"}"
