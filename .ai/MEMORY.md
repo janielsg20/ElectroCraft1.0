@@ -4,7 +4,7 @@ Product:
 ElectroCraft — No-Code App Builder.
 
 Execution:
-F00 / M00.1, M00.2 and M00.3 COMPLETADAS; M00.4 activa.
+F00 / M00.1, M00.2, M00.3 and M00.4 COMPLETADAS; M00.5 activa.
 
 M00.1 frozen invariants:
 - R001–R084 tienen owner canónico, fase y aplicabilidad.
@@ -19,7 +19,7 @@ M00.2 frozen invariants:
 - Puck owns visual authoring; Puck AI is not ElectroCraft AI.
 - shadcn/ui base = Radix explicitly even though Base UI is upstream default for new projects.
 - i18next owns i18n catalogs/fallback; Spanish is mandatory fallback.
-- PGlite owns embedded local Postgres runtime and official multi-tab Worker behavior; Drizzle owns typed SQL/schema/migrations. Their real F00 runtime POC is M00.4.
+- PGlite owns embedded local Postgres runtime and official multi-tab Worker behavior; Drizzle owns typed SQL/schema/migrations.
 - TanStack Query owns async cache. Refine is Administration only. TanStack Table owns table mechanics. RHF owns React form state. Zod owns schemas. RQB owns narrow condition authoring.
 - Rete owns workflow graph/processing; Tiptap owns rich text; Zustand owns declared JS runtime state.
 - Gemini Interactions core is GA in API `v1`; `v1beta`, preview models/agents/tools remain capability-gated. AI SDK + `@ai-sdk/google` remains the primary abstraction; `@google/genai` is narrow/capability-specific.
@@ -37,6 +37,19 @@ M00.3 frozen invariants:
 - `onAction` rebuilds `ElectroCraftDocument` from public `newState.data`; Puck ui/index/zone/history internals cannot enter persistence.
 - Exact upstream Puck blobs are SHA-verified and execute insert/reorder/replace/history including undo/redo in `experiments/m00-3-puck-composition/`.
 - Full published React package mount must be smoke-tested when the Studio workspace can install packages; the F00 container had no npm-registry DNS and no mock mount was accepted.
+
+M00.4 frozen invariants:
+- Studio DB POC pins `@electric-sql/pglite@0.5.5` and `drizzle-orm@0.45.2` and executes the published packages in GitHub Actions.
+- PGlite owns embedded Postgres, persistence and the official `PGliteWorker`/`worker()` multi-tab mechanism; browser storage baseline uses `idb://...`.
+- Drizzle owns typed physical schema/query/migrations; ElectroCraft does not create a second DB engine.
+- ElectroCraft physical public schema = exactly `projects`, `project_objects`, `project_revisions`, `content_records`, `relation_edges`, `record_field_index` for this POC contract.
+- `ElectroCraftDataSchema` models/fields remain logical and live in canonical data/JSONB; adding a model/field does not create a table or `ALTER TABLE`.
+- `record_field_index` only materializes declared queryable/faceted/sortable/searchable fields.
+- Project Objects save incrementally by ID with deterministic checksums; unrelated object checksum remains unchanged.
+- `project_objects.version` is a small object/format version; timestamps/order belong in timestamps or payload.
+- Real Node PGlite/Drizzle round-trip, rollback, close/reopen and latencies are GREEN.
+- Real Chromium two-tab PGlite Worker A↔B visibility + leader/follower + reopen persistence are GREEN.
+- CI source of truth: run `32061372828`, head `92a1a0b7f21d4db4ebad637e11084bd80415f640`, conclusion SUCCESS; evidence in `.ai/evidence/F00/M00.4/`.
 
 Core mental model:
 Screens, Navigation, Components, Data Sources, Queries, State, Actions, Forms, Auth, Administration, Resources.

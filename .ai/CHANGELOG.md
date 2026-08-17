@@ -38,7 +38,6 @@
 - Preserved exact phase ownership: Puck runtime POC = M00.3; PGlite/Drizzle runtime POC = M00.4. No false package-runtime result was recorded when npm registry access was unavailable.
 - Advanced active execution to M00.3.
 
-
 ## 2026-08-17 — F00 / M00.3 completed
 
 - Pinned the reproducible Puck POC to `@puckeditor/core@0.22.4` / tag `v0.22.4` with exact Git-blob provenance and MIT license.
@@ -51,3 +50,16 @@
 - Re-ran M00.2 (21/21 + integration/build) and M00.1 (5/5 + build) regressions successfully.
 - Documented npm-registry environment limitation instead of faking a React package mount; the real Studio workspace must smoke-test the published bundle after installation.
 - Advanced active execution to M00.4 — POC Studio DB genérica.
+
+## 2026-08-17 — F00 / M00.4 completed
+
+- Added isolated `experiments/m00-4-studio-db/` POC with exact `@electric-sql/pglite@0.5.5` + `drizzle-orm@0.45.2` pins.
+- Added Drizzle schema/migration for six generic ElectroCraft tables and proved logical models/fields do not generate physical tables or `ALTER TABLE`.
+- Added canonical Project Object checksums, selective `record_field_index`, transactional record/index writes, rollback and persistence fixtures.
+- Added official PGlite `PGliteWorker` + `worker()` browser path with persistent `idb://` storage and a Request/Resultado/Validación technical harness.
+- Added GitHub Actions closure workflow because the development container could not resolve npm; npm registry/package installation and Chromium became real CI gates instead of SKIPPED results.
+- CI run 1 exposed a transient Vite navigation race; harness stabilization preserved all assertions.
+- CI run 2 exposed an actual object-version semantic bug (`Date.now()` outside PostgreSQL `integer`); `project_objects.version` was corrected to a small format/object version.
+- CI run 3 (`32061372828`, head `92a1a0b7f21d4db4ebad637e11084bd80415f640`) passed npm install, lint, typecheck-script, 12/12 tests, real PGlite/Drizzle integration, browser contract, build, real two-tab Chromium runtime and closure gate.
+- Real two-tab evidence proves A↔B visibility, distinct leader/follower clients and persistence after close/reopen.
+- Recorded ADR-0004 and `.ai/evidence/F00/M00.4/` artifacts; advanced active execution to M00.5 — POC Query portable.

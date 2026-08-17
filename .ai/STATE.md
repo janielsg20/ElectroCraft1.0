@@ -2,22 +2,24 @@
 
 ## Estado actual
 - Fase activa: F00 — Reconocimiento, verificación y arquitectura.
-- Microfase activa: M00.4 — POC Studio DB genérica.
-- Última microfase cerrada: M00.3 — POC Visual Editor con Puck Composition.
+- Microfase activa: M00.5 — POC Query portable.
+- Última microfase cerrada: M00.4 — POC Studio DB genérica.
 - Estado: `IN_PROGRESS`.
-- Bloqueos: ninguno para iniciar M00.4.
+- Bloqueos: ninguno para iniciar M00.5.
 
-## M00.3 — cierre
-- POC fijado a `@puckeditor/core@0.22.4`/MIT, tag `v0.22.4`, con provenance de blobs oficiales.
-- Documento canónico Container/Text/Button y Palette Section -> Container semanticElement=section.
-- Adapter Electro <-> Puck usa Slot para `children`; no DropZone nuevo ni árbol canónico paralelo.
-- Composition shell contiene Components/Outline/Preview/Fields y cablea `onAction`.
-- Puck real source: insert/reorder/replace/history/undo/redo ejecutados; 16/16 tests verdes.
-- onAction sync y round-trip conservan `ElectroCraftDocument` sin ui/index/zone/history internals.
-- lint/typecheck/integration/build/E2E estructural: GREEN.
-- Regresiones: M00.2 21/21 + integration/build GREEN; M00.1 5/5 + build GREEN.
-- Limitación de entorno registrada: sin DNS a npm no se fingió un mount del bundle React publicado; el primer workspace Studio debe smoke-testearlo tras instalación real.
-- Evidencia: `.ai/evidence/F00/M00.3/`.
+## M00.4 — cierre
+- POC real fijado a `@electric-sql/pglite@0.5.5` + `drizzle-orm@0.45.2`.
+- Browser usa la integración oficial `PGliteWorker` + `worker()` con `idb://electrocraft-m00-4-studio-db`; no hay singleton PGlite en main thread.
+- Drizzle posee schema/query/migrations; migration reproducible crea exactamente `projects`, `project_objects`, `project_revisions`, `content_records`, `relation_edges` y `record_field_index`.
+- Dos modelos lógicos + records no crean tablas físicas nuevas; añadir un field al `ElectroCraftDataSchema` produce cero `ALTER TABLE`.
+- Project Objects se guardan incrementalmente con checksums independientes; `version` es versión pequeña de formato/object, no timestamp.
+- `record_field_index` materializa solo fields declarados queryables/faceted.
+- Integración PGlite/Drizzle real: GREEN, incluido rollback y close/reopen persistence.
+- Chromium dos-tabs real: GREEN; A↔B visible, clientes distintos leader/follower y persistencia tras reapertura.
+- GitHub Actions run `32061372828`, head `92a1a0b7f21d4db4ebad637e11084bd80415f640`: SUCCESS.
+- Gates: npm registry/install, lint, typecheck-script, 12/12 tests, integration, browser-contract, build, two-tab runtime y closure-gate: GREEN.
+- Latencia observada: save object `1.291 ms` promedio/20; facet query `1.602 ms` promedio/20.
+- Evidencia: `.ai/evidence/F00/M00.4/` y `.ai/adr/ADR-0004-studio-db-poc.md`.
 
 ## Próximo paso
-Ejecutar M00.4 — POC Studio DB genérica, owner PGlite + Drizzle.
+Ejecutar M00.5 — POC Query portable.

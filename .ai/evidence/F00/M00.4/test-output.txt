@@ -1,0 +1,30 @@
+M00.4 CI closure — GitHub Actions run 32061372828
+head: 92a1a0b7f21d4db4ebad637e11084bd80415f640
+job: 95483180935
+conclusion: success
+
+npm config registry + npm ping -> PASS
+npm install exact direct pins -> PASS
+Playwright Chromium install -> PASS
+npm run lint -> PASS: 6 generic tables, official Worker, zero ALTER TABLE, exact pins
+npm run typecheck -> PASS: 21 ESM modules syntax contract
+npm test -> PASS: 12/12
+npm run integration -> PASS_NODE_ENGINE
+  objectIsolation=true
+  twoLogicalModelsNoPhysicalTables=true
+  facetedIndex=true
+  schemaEvolutionZeroAlterTable=true
+  negativeRollback=true
+  closeReopenPersistence=true
+  saveObjectAverage20=1.291 ms
+  facetedQueryAverage20=1.602 ms
+npm run browser-contract -> PASS_STATIC_CONTRACT
+npm run build -> PASS
+npm run two-tab-runtime -> PASS_TWO_TAB
+  bothClientsReady=true
+  tabAWriteVisibleInTabB=true
+  tabBWriteVisibleInTabA=true
+  twoDistinctWorkerClients=true
+  closeReopenPersistence=true
+npm run closure-gate -> PASS
+workflow -> SUCCESS

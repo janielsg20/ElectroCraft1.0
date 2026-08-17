@@ -1,0 +1,26 @@
+{
+  "status": "PASS_TWO_TAB",
+  "browser": "chromium",
+  "url": "http://127.0.0.1:4173/harness/",
+  "checks": {
+    "viteAndPgliteWarmup": true,
+    "bothClientsReady": true,
+    "tabAWriteVisibleInTabB": true,
+    "tabBWriteVisibleInTabA": true,
+    "twoDistinctWorkerClients": true,
+    "closeReopenPersistence": true
+  },
+  "tabs": {
+    "a": {
+      "tabId": "b154e68b-e651-468e-9ce8-bd71dc40f1ca",
+      "ready": true,
+      "isLeader": true
+    },
+    "b": {
+      "tabId": "dddb257f-1012-4028-8c82-60c8edc45fc4",
+      "ready": true,
+      "isLeader": false
+    }
+  },
+  "transientNavigationRetries": 0
+}

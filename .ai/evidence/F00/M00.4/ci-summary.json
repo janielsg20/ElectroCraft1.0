@@ -1,0 +1,22 @@
+{
+  "workflow": "Verify M00.4 Studio DB",
+  "runId": 32061372828,
+  "jobId": 95483180935,
+  "headSha": "92a1a0b7f21d4db4ebad637e11084bd80415f640",
+  "conclusion": "success",
+  "artifactId": 9298292283,
+  "artifactDigest": "sha256:0590acc6ba339f9d02cd1d62caffe6f7c889f1a06ba8a58df717422e7af90643",
+  "gates": {
+    "npmRegistry": "PASS",
+    "packageInstall": "PASS",
+    "chromiumInstall": "PASS",
+    "lint": "PASS",
+    "typecheckScript": "PASS",
+    "unitContractTests": "PASS_12_OF_12",
+    "pgliteDrizzleIntegration": "PASS_NODE_ENGINE",
+    "browserContract": "PASS_STATIC_CONTRACT",
+    "build": "PASS",
+    "twoTabRuntime": "PASS_TWO_TAB",
+    "closureGate": "PASS"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "status": "PASS_STATIC_CONTRACT",
+  "checks": {
+    "workerExport": true,
+    "pgliteWorker": true,
+    "dedicatedWorker": true,
+    "persistentIdb": true,
+    "threeRegions": true
+  },
+  "runtimeTwoTab": "EXECUTED_BY_two-tab-runtime"
+}
