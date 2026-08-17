@@ -65,8 +65,24 @@ jobs:
         run: npm ping
       - name: Install committed dependency graph
         run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: Full package/source/security gate
-        run: npm run verify-static
+      - name: Verify installed versions
+        run: npm run versions
+      - name: Verify committed lockfile
+        run: npm run lockfile
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Build
+        run: npm run build
+      - name: Tests
+        run: npm test
+      - name: Real package API contract
+        run: npm run integration
+      - name: Gateway/security scan
+        run: npm run security
+      - name: Static closure gate
+        run: npm run closure-static
       - name: Preserve static evidence
         if: always()
         run: mkdir -p artifacts && cp package-lock.json artifacts/package-lock.generated.json || true
