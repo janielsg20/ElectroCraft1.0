@@ -1,0 +1,12 @@
+{
+  "status": "PASS_EXPO_TARGET_EXPORTS",
+  "android": {
+    "files": 29,
+    "bytes": 4639375
+  },
+  "ios": {
+    "files": 25,
+    "bytes": 3374800
+  },
+  "note": "JS/native-target bundles only; Android binary/runtime is a separate CI gate; iOS Xcode binary is not claimed on Linux."
+}

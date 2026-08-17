@@ -1,0 +1,33 @@
+{
+  "name": "electrocraft-m00-8-gemini-provider-poc",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "versions": "node scripts/verify-installed-versions.mjs",
+    "lockfile": "node scripts/verify-lockfile.mjs",
+    "lint": "node scripts/lint.mjs",
+    "typecheck": "tsc --noEmit",
+    "build": "rm -rf dist && tsc --noEmit false --outDir dist && node scripts/build-summary.mjs",
+    "test": "node --test test/*.test.mjs",
+    "integration": "node scripts/integration-contract.mjs",
+    "security": "node scripts/security-scan.mjs",
+    "closure-static": "node scripts/closure-gate.mjs static",
+    "live": "node scripts/live-gemini.mjs",
+    "closure-live": "node scripts/closure-gate.mjs live",
+    "verify-static": "npm run versions && npm run lockfile && npm run lint && npm run typecheck && npm run build && npm test && npm run integration && npm run security && npm run closure-static",
+    "verify-local": "node scripts/local-contract-gate.mjs"
+  },
+  "dependencies": {
+    "@ai-sdk/google": "4.0.31",
+    "@google/genai": "2.15.0",
+    "ai": "7.0.48",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3"
+  }
+}

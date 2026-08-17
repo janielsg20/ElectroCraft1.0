@@ -4,7 +4,7 @@ Product:
 ElectroCraft — No-Code App Builder.
 
 Execution:
-F00 / M00.1, M00.2, M00.3, M00.4, M00.5 and M00.6 COMPLETADAS; M00.7 activa.
+F00 / M00.1, M00.2, M00.3, M00.4, M00.5, M00.6 and M00.7 COMPLETADAS; M00.8 activa.
 
 M00.1 frozen invariants:
 - R001–R084 tienen owner canónico, fase y aplicabilidad.
@@ -26,7 +26,7 @@ M00.2 frozen invariants:
 - AI only writes Draft; Apply remains explicit.
 - Expo SQLite native lane is stable; web is alpha/capability-gated.
 - dnd-kit upstream package/API transition must be pinned by the owning POC and never duplicates Puck surfaces.
-- Secrets are references only; permission evaluation fails closed.
+- Secrets are refs only; permission evaluation fails closed.
 
 M00.3 frozen invariants:
 - F00 Puck POC pins `@puckeditor/core@0.22.4`/MIT to tag `v0.22.4` for reproducible source evidence; product install must reverify the lockfile version.
@@ -71,6 +71,27 @@ M00.6 frozen invariants:
 - History node + connection undo/redo is GREEN on the real published package.
 - `rete-history-plugin@2.2.0` is not used: CI exposed its published CommonJS dependency on missing `rete-comment-plugin`; pinning 2.1.1 preserves the required API without adding an unrelated engine.
 - Final reproducibility CI source of truth: run `32069657914`, job `95509740663`, head `917ed319f1c5c0af1bc7f4b068b2693dbe9d5ebc`, conclusion SUCCESS; artifact `9301226707`.
+
+M00.7 frozen invariants:
+- Native runtime baseline is Expo/React Native with stable Expo Router Stack and standard JS Tabs test group; no `unstable-native-tabs` and no DOM renderer/table.
+- Expo SQLite owns local native SQLite; Drizzle owns typed schema/query; Zustand owns declared JS runtime state/persist; Refine Core remains headless administration/data-hook orchestration.
+- Native physical POC uses generic `content_records`, `relation_edges`, `record_field_index` tables and a canonical `Container/Text/Button/List` renderer mapping.
+- Baseline native config contains no CAMERA or RECORD_AUDIO; capability fixture adds only requested camera capability.
+- Guarded unauthenticated deep link fails closed to signin.
+- Zustand `expo-sqlite/kv-store` hydration must be manual: `skipHydration:true`, followed by `rehydrate()` only after `ensureNativeSchema()`. This avoids a real parallel directory-creation race observed on Android.
+- Published lockfile graph, strict TS, 13/13 tests, Android+iOS target exports, Android prebuild pruning and x86_64 release APK are GREEN.
+- Real KVM Android runtime is GREEN: UI `M00.7 runtime OK`, SQLite/Drizzle/DataProvider/Zustand persistence all true, recordCount=1, guarded deep link -> `Inicio de sesión requerido`.
+- Final CI source of truth: run `32078336103`, source/build job `95536145137`, Android job `95536362004`, head `c6e05a475fa0df7fd7ba2a8138e1392bcf6df797`, conclusion SUCCESS.
+- Final artifacts: Android `9304563117`; source/build `9304237635`.
+
+M00.8 active decisions under test:
+- Primary provider/orchestration stack = AI SDK Core + `@ai-sdk/google` + Zod.
+- Candidate pins: `ai@7.0.48`, `@ai-sdk/google@4.0.31`, `@google/genai@2.15.0`, `zod@4.4.3`, TypeScript `6.0.3`.
+- Direct `@google/genai` is limited to one stable Gemini Interactions `v1` capability probe and cannot duplicate structured output/tools/streaming/image orchestration owned by AI SDK.
+- Canonical project data persists logical profiles only (`Automático`, `Rápido`, `Calidad`, `Imagen`); resolved model IDs are runtime/session metadata.
+- Gemini/provider secret is server-side gateway only; client contract never contains provider packages or credential fields.
+- Model tools are read/draft/validate only; Apply, DB/SQL, arbitrary code, filesystem, install, deploy and secret access remain forbidden/fail-closed.
+- M00.8 cannot close until published-package type/tests/build/security and live Gemini structured/tools/stream/image/Interactions gates are GREEN.
 
 Core mental model:
 Screens, Navigation, Components, Data Sources, Queries, State, Actions, Forms, Auth, Administration, Resources.

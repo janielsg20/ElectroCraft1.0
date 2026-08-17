@@ -1,0 +1,25 @@
+{
+  "status": "PASS_CONFIG_PRUNING",
+  "baseline": {
+    "dependencies": {},
+    "plugins": [],
+    "sensitivePermissions": []
+  },
+  "camera": {
+    "dependencies": {
+      "expo-camera": "57.0.3"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Permitir que ElectroCraft use la cámara",
+          "recordAudioAndroid": false
+        }
+      ]
+    ],
+    "sensitivePermissions": [
+      "android.permission.CAMERA"
+    ]
+  }
+}

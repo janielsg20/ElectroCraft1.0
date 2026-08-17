@@ -90,3 +90,26 @@
 - Final reproducibility run `32069657914`, job `95509740663`, head `917ed319f1c5c0af1bc7f4b068b2693dbe9d5ebc` passed registry, locked install, exact version/lock checks, lint, 18-module type contract, 9/9 tests, source runtime, `PASS_REAL_RETE_ENGINE`, `PASS_REAL_RETE_HISTORY`, build and closure gate.
 - Final artifact `9301226707`, digest `sha256:9a34d39785c8283a5f6f59272b30964939cacae04931f5bb79ce1899e946cd9b`.
 - Recorded ADR-0006/evidence and advanced active execution to M00.7 — POC Native runtime.
+
+## 2026-08-17 — F00 / M00.7 completed
+
+- Added isolated Expo Native runtime POC with stable Router Stack, JS Tabs test group, Expo SQLite + Drizzle generic persistence, native Container/Text/Button/List renderer, Zustand persisted state and Refine Core headless DataProvider.
+- Added permission-free native baseline plus camera-only capability pruning; baseline generated Android manifest contains neither CAMERA nor RECORD_AUDIO.
+- Built Android and iOS target exports and a real x86_64 Android release APK.
+- Exercised the release APK in a KVM-backed Android emulator rather than accepting source-only evidence.
+- A real runtime run exposed an Expo SQLite directory-creation race between canonical DB startup and automatic Zustand kv-store hydration.
+- Accepted final fix: Zustand `skipHydration:true` and explicit `rehydrate()` only after `ensureNativeSchema()`; regression test freezes the order and the E2E harness now fails fast on app runtime errors.
+- Final run `32078336103`, head `c6e05a475fa0df7fd7ba2a8138e1392bcf6df797`, passed registry, `npm ci`, version/lock checks, lint, strict TypeScript, 13/13 tests, package resolution, capability pruning, Android/iOS exports, Android prebuild, release APK and real Android runtime.
+- Runtime evidence shows `M00.7 runtime OK`, SQLite/Drizzle/DataProvider/Zustand persistence all true with recordCount=1; guarded `electrocraft://guarded` shows `Inicio de sesión requerido`.
+- Final artifacts: Android `9304563117` digest `sha256:ef6bcc5fe1eb7750a3731a89b5daa0c7af7c1fbe7c550cb81bb277041141f3d8`; source/build `9304237635` digest `sha256:c7be19042662e0845bd650af2da8e157bd8a0493d2d51981836fd7c913c46f63`.
+- Recorded ADR-0007/evidence and advanced active execution to M00.8 — POC AI SDK + Gemini.
+
+## 2026-08-17 — F00 / M00.8 in progress
+
+- Reverified current AI SDK/Gemini packages and current stable Gemini model/API baseline.
+- Prepared isolated `experiments/gemini-provider-poc/` with candidate exact pins `ai@7.0.48`, `@ai-sdk/google@4.0.31`, `@google/genai@2.15.0`, `zod@4.4.3`, `typescript@6.0.3`.
+- AI SDK + Google provider remains the only primary structured/tool/stream/image stack; direct Google SDK is restricted to a stable Interactions `v1` probe.
+- Added typed `GenerationPlanPoc`, bounded allowlisted tool loop, stream lifecycle/cancel handling, Gemini image Draft path, runtime-only logical-profile resolver and server-only secret gateway.
+- Added ownership/security regressions preventing direct Google SDK spread, client provider imports, credential fields, Apply/DB/SQL/files/install/deploy/secret tools and canonical model-ID persistence.
+- Added workflow to bootstrap a deterministic lockfile, run published-package TypeScript/tests/build/security and then execute live Gemini structured/tools/stream/image/Interactions gates.
+- Local no-registry contract, lint, secret scan, JSON/YAML validation and Node script syntax are GREEN; published-package/live results remain pending and are not marked complete.

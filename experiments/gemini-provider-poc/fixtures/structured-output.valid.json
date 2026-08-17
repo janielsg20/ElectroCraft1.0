@@ -1,0 +1,11 @@
+{
+  "artifactType": "screen",
+  "title": "Pantalla de inicio",
+  "summary": "Borrador técnico validado para el POC.",
+  "steps": [
+    { "id": "s1", "action": "inspect", "description": "Revisar contexto permitido" },
+    { "id": "s2", "action": "draft", "description": "Crear borrador sin aplicar" },
+    { "id": "s3", "action": "validate", "description": "Validar referencias" }
+  ],
+  "requestedTools": ["get_app_summary", "draft_create_screen", "validate_draft"]
+}

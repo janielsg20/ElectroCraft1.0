@@ -1,0 +1,9 @@
+{
+  "status": "PASS_LOCAL_CONTRACT_GATE",
+  "sourceModules": 7,
+  "nodeScriptSyntax": "PASS",
+  "jsonValidation": "PASS",
+  "workflowYamlValidation": "PASS",
+  "publishedPackageTypecheck": "CI_REQUIRED",
+  "liveGemini": "CI_REQUIRED"
+}

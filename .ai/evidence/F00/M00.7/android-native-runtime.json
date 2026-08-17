@@ -1,0 +1,5 @@
+{
+  "status": "PASS_ANDROID_NATIVE_RUNTIME",
+  "sqliteDrizzleZustandProvider": true,
+  "deepLinkGuard": true
+}

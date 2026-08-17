@@ -269,8 +269,66 @@ Adaptation/blockers:
 - Run 3 committed that lockfile, used `npm ci` only and repeated the complete suite GREEN.
 - No M00.6 blocker remains.
 
-## Active
-F00 / M00.7 — EN_CURSO.
+## M00.7 — COMPLETADA
+State: GREEN.
 
-Next microphase exact:
-M00.7 — POC Native runtime.
+Evidence:
+- `.ai/adr/ADR-0007-native-runtime-poc.md`
+- `.ai/evidence/F00/M00.7/README.md`
+- `.ai/evidence/F00/M00.7/ci-summary.json`
+- `.ai/evidence/F00/M00.7/android-native-runtime.json`
+- `.ai/evidence/F00/M00.7/android-prebuild-summary.json`
+- `.ai/evidence/F00/M00.7/build-summary.json`
+- `.ai/evidence/F00/M00.7/capability-pruning.json`
+- `experiments/m00-7-native-runtime/`
+- GitHub Actions final run `32078336103`, head `c6e05a475fa0df7fd7ba2a8138e1392bcf6df797`.
+
+Engine/API evidence:
+- Expo/React Native owns native platform runtime; Expo Router stable Stack + JS Tabs test group.
+- Expo SQLite + Drizzle execute the generic native persistence path.
+- Zustand owns persisted runtime state using `expo-sqlite/kv-store`; hydration is ordered manually after DB initialization.
+- Refine Core stays headless and executes the custom native DataProvider.
+- No DOM table/renderer is introduced.
+
+Tests exactos:
+- registry + committed `npm ci` -> PASS.
+- exact versions + lockfile v3 -> PASS.
+- lint -> 34 modules PASS.
+- strict TypeScript -> PASS.
+- tests -> 13/13 PASS.
+- real package resolution -> PASS.
+- baseline/camera capability pruning -> PASS.
+- Android + iOS target exports -> PASS.
+- Android prebuild without CAMERA/RECORD_AUDIO -> PASS.
+- x86_64 Android release APK -> PASS.
+- KVM emulator -> PASS.
+- visible `M00.7 runtime OK` -> PASS.
+- SQLite/Drizzle/DataProvider/Zustand persistence -> PASS, recordCount=1.
+- `electrocraft://guarded` -> `Inicio de sesión requerido` -> PASS.
+- commit status `M00.7 Native Runtime` -> SUCCESS.
+
+Artifacts:
+- Android `9304563117`, digest `sha256:ef6bcc5fe1eb7750a3731a89b5daa0c7af7c1fbe7c550cb81bb277041141f3d8`.
+- source/build `9304237635`, digest `sha256:c7be19042662e0845bd650af2da8e157bd8a0493d2d51981836fd7c913c46f63`.
+- lockfile SHA-256 `1eeb7b543cbc3876c5467fedfa21bd6d8f84466b5dbff9dd71ec340337c17882`.
+
+Adaptation/blockers:
+- A real runtime run exposed an Expo SQLite directory-creation race between canonical DB startup and automatic Zustand kv-store hydration.
+- Accepted fix: `skipHydration:true`; explicit `rehydrate()` only after `ensureNativeSchema()`; regression test freezes the order.
+- No M00.7 blocker remains.
+
+## Active
+F00 / M00.8 — EN_CURSO.
+
+Implementation prepared:
+- `experiments/gemini-provider-poc/`.
+- AI SDK + `@ai-sdk/google` primary; Zod typed output.
+- `@google/genai` restricted to stable Interactions `v1` probe.
+- structured output, bounded tool loop, streaming/cancel, Gemini image, secure server gateway.
+- logical profiles only in canonical data; resolved IDs are session metadata.
+- local source/security gates GREEN; published package + live Gemini CI pending.
+
+Next microphase exact after GREEN:
+M00.9 — POC Data Sources.
+
+Do not begin M00.9 until M00.8 is GREEN.

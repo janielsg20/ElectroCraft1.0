@@ -1,39 +1,45 @@
 # F00 / M00.7 evidence — POC Native runtime
 
-State: `IN_PROGRESS — source/build GREEN; final KVM Android runtime gate pending`.
+State: `COMPLETADA — GREEN`.
 
-## Local gates
-- lint -> PASS, 34 source/config modules.
-- tests -> PASS, 13/13.
-- capability pruning fixture -> `PASS_CONFIG_PRUNING`.
+## Final reproducible gate
+- workflow run `32078336103`;
+- head `c6e05a475fa0df7fd7ba2a8138e1392bcf6df797`;
+- lockfile-bootstrap `95536121263` -> SUCCESS;
+- source/build `95536145137` -> SUCCESS;
+- Android runtime `95536362004` -> SUCCESS;
+- report-status `95539234874` -> SUCCESS.
 
-## Package/source/build evidence already GREEN
-- real npm dependency resolution -> PASS after aligning Refine peer `react-dom@19.2.3` with Expo React `19.2.3`;
-- Expo SDK 57 Reanimated/Worklets pair pinned to `4.5.1` / `0.10.1` -> PASS;
+## Source/package/build
+- npm registry -> PASS;
+- `npm ci` from committed lockfile -> PASS;
 - exact installed versions -> PASS;
 - lockfile v3 -> PASS;
-- TypeScript over real installed APIs -> PASS;
-- tests -> 13/13 PASS;
+- lint -> `PASS_LINT 34 source/config modules`;
+- typecheck -> PASS;
+- tests -> 13/13 PASS, 0 fail/skipped;
 - real package resolution -> PASS;
+- baseline/camera capability pruning -> PASS;
 - Android target export -> PASS;
-- iOS target export -> PASS without claiming an Xcode/IPA build on Linux;
+- iOS target export -> PASS without claiming Xcode/IPA on Linux;
 - Android prebuild -> PASS;
-- generated AndroidManifest sensitive-permission pruning -> PASS, no CAMERA/RECORD_AUDIO;
+- no CAMERA/RECORD_AUDIO in baseline manifest;
 - x86_64 Android release APK -> PASS.
 
-## Runtime harness adaptations
-- An early emulator run failed only because `android-emulator-runner` executed script lines independently and a `cd` did not persist; paths were made explicit.
-- The next software-emulated Linux run installed and launched the APK but produced `System UI isn't responding`; artifact `9303452724` proves the overlay belonged to package `android`, not ElectroCraft.
-- The official `ReactiveCircus/android-emulator-runner` guidance requires enabling `/dev/kvm` permissions on `ubuntu-latest` for hardware acceleration. The final gate now enables KVM explicitly and fails distinctly on infrastructure System UI ANR.
+## Real Android runtime
+- KVM emulator boots, installs and launches the release APK;
+- UI -> `M00.7 runtime OK`;
+- self-test -> SQLite=true, Drizzle=true, DataProvider=true, ZustandPersistence=true, recordCount=1;
+- Refine getList path executes;
+- `electrocraft://guarded` -> visible `Inicio de sesión requerido`;
+- runtime evidence -> `PASS_ANDROID_NATIVE_RUNTIME`.
 
-## Reproducibility
-- `experiments/m00-7-native-runtime/package-lock.json` is committed in `cbc9bb3fb41848ecf64af0be90c1f974fcd40b96`.
-- Final source/build and Android jobs install only with `npm ci` from the committed lockfile.
+## Final adaptation
+A previous run exposed a real Expo SQLite directory-creation race caused by concurrent automatic Zustand kv-store hydration and canonical DB startup. Accepted fix: Zustand `skipHydration: true`; `rehydrate()` occurs only after `ensureNativeSchema()`. A regression test freezes that order.
 
-## Remaining mandatory closure gate
-- emulator-visible `M00.7 runtime OK` from real Expo SQLite + Drizzle + DataProvider + Zustand persistence;
-- guarded deep link `electrocraft://guarded` -> visible `Inicio de sesión requerido`;
-- Android runtime diagnostics/artifact;
-- final auditable commit status = success.
+## Artifacts
+- `9304563117` — `m00-7-android-runtime-evidence`, digest `sha256:ef6bcc5fe1eb7750a3731a89b5daa0c7af7c1fbe7c550cb81bb277041141f3d8`.
+- `9304237635` — `m00-7-native-source-build-evidence`, digest `sha256:c7be19042662e0845bd650af2da8e157bd8a0493d2d51981836fd7c913c46f63`.
+- lockfile SHA-256 `1eeb7b543cbc3876c5467fedfa21bd6d8f84466b5dbff9dd71ec340337c17882`.
 
-The local execution container cannot install npm dependencies, so package/native results are never fabricated locally.
+No package/native result was fabricated locally; published/native truth comes from the final Actions run above.

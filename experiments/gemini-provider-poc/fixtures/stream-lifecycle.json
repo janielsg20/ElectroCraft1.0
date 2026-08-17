@@ -1,0 +1,18 @@
+{
+  "completed": [
+    { "type": "start" },
+    { "type": "finish", "finishReason": "stop" }
+  ],
+  "incomplete": [
+    { "type": "start" },
+    { "type": "finish", "finishReason": "length" }
+  ],
+  "error": [
+    { "type": "start" },
+    { "type": "error" }
+  ],
+  "cancelled": [
+    { "type": "start" },
+    { "type": "abort" }
+  ]
+}

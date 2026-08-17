@@ -1,0 +1,35 @@
+{
+  "status": "GREEN",
+  "runId": 32078336103,
+  "headSha": "c6e05a475fa0df7fd7ba2a8138e1392bcf6df797",
+  "jobs": {
+    "lockfileBootstrap": 95536121263,
+    "verifySourceBuild": 95536145137,
+    "androidRuntime": 95536362004,
+    "reportStatus": 95539234874
+  },
+  "tests": { "passed": 13, "failed": 0, "skipped": 0 },
+  "lockfileSha256": "1eeb7b543cbc3876c5467fedfa21bd6d8f84466b5dbff9dd71ec340337c17882",
+  "artifacts": [
+    {
+      "id": 9304563117,
+      "name": "m00-7-android-runtime-evidence",
+      "digest": "sha256:ef6bcc5fe1eb7750a3731a89b5daa0c7af7c1fbe7c550cb81bb277041141f3d8"
+    },
+    {
+      "id": 9304237635,
+      "name": "m00-7-native-source-build-evidence",
+      "digest": "sha256:c7be19042662e0845bd650af2da8e157bd8a0493d2d51981836fd7c913c46f63"
+    }
+  ],
+  "runtime": {
+    "androidNative": "PASS_ANDROID_NATIVE_RUNTIME",
+    "sqlite": true,
+    "drizzle": true,
+    "zustandPersistence": true,
+    "refineDataProvider": true,
+    "deepLinkGuard": true,
+    "visibleRuntimeText": "M00.7 runtime OK",
+    "visibleGuardText": "Inicio de sesión requerido"
+  }
+}

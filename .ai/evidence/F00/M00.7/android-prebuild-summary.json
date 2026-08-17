@@ -1,0 +1,6 @@
+{
+  "status": "PASS_ANDROID_PREBUILD_PRUNING",
+  "package": "com.electrocraft.m007",
+  "cameraPermission": false,
+  "recordAudioPermission": false
+}
