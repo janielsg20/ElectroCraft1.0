@@ -14,6 +14,7 @@ ElectroCraft Native keeps one canonical project/data model and maps it into the 
 - Expo Constants `57.0.8` (MIT)
 - Expo Linking `57.0.4` (MIT)
 - React `19.2.3`
+- React DOM `19.2.3` only as Refine Core peer-resolution compatibility; no DOM renderer/table is used by the Native POC.
 - React Native `0.86.2` (MIT)
 - react-native-safe-area-context `5.7.0` (MIT)
 - react-native-screens `4.26.0` (MIT)
