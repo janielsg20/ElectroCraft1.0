@@ -1,0 +1,58 @@
+# PHASES — ElectroCraft Eighth Final
+
+- **F00 — Auditoría de producto, OSS y POCs**
+  - Congelar producto/ownership mediante POCs de editor, DB, query, workflow, Native, Gemini/AI Elements, Data Sources y paridad de exportación Capacitor/LAMP/WordPress.
+- **F01 — Monorepo, límites, documentación y CI**
+  - Crear monorepo, package boundaries, documentación, evidence y CI.
+- **F02 — Modelo canónico de App y ownership**
+  - Definir un modelo canónico de App/ExportIR neutral a engines y targets.
+- **F03 — Design System, AppShell, español y ayuda**
+  - Construir Studio español, shadcn Radix, AppShell, i18n, ayuda y responsive.
+- **F04 — Persistencia local, proyectos y revisiones**
+  - Implementar persistencia local multi-tab, incremental, recuperable y ciclo de proyectos.
+- **F05 — Screen Composer con Puck**
+  - Integrar Puck como único Screen Composer.
+- **F06 — Layout, responsive y edición avanzada**
+  - Añadir semántica portable de layout/responsive y edición avanzada.
+- **F07 — Pantallas, navegación y rutas**
+  - Implementar Screens, Navigation, Routes, params, deep links, guards y compiler boundaries.
+- **F08 — Fuentes de datos, modelos, registros y conectores**
+  - Implementar Data Sources, Gateway/Secrets, Internal Data, Models y Records.
+- **F09 — Consultas, bindings, listings y filtros**
+  - Implementar Query/Binding/Listing/Filter sobre Data Sources.
+- **F10 — Medios y Rich Text**
+  - Implementar MediaBlobStore y Tiptap.
+- **F11 — Estado, variables y entorno**
+  - Implementar StateDefinitions/Zustand y scopes.
+- **F12 — Usuarios, autenticación y permisos**
+  - Implementar Auth/Users/Roles/Permissions y simulación.
+- **F13 — Acciones, workflows y automatizaciones**
+  - Implementar ActionGraphs/Rete, providers y target compiler boundary.
+- **F14 — Formularios**
+  - Implementar Forms visuales y runtime/validation contracts.
+- **F15 — Administración visual y DataViews**
+  - Implementar Administración con Refine/TanStack y portable Admin Documents.
+- **F16 — Temas, plantillas y componentes reutilizables**
+  - Implementar Themes/Templates/Saved Blocks/Global Components.
+- **F17 — Extensiones, Kits de App y plantillas de proyecto**
+  - Implementar Extensions/Connector packs/App Templates/Kits.
+- **F18 — Generar con IA — Gemini**
+  - Implementar Gemini con AI SDK + AI Elements + Draft/Preview/Diff/Apply.
+- **F19 — Vista previa, Debug y runtime diagnostics**
+  - Implementar Preview/Debug usando runtimes reales.
+- **F20 — Compatibilidad, TargetRegistry y Export Center**
+  - Implementar Capability Analyzer, ExportTargetRegistry y Export Center para los nueve targets Core.
+- **F21 — Runtime Web y exportación Local/React/Static/PWA**
+  - Construir Web runtime y exporters Local/React/Static/PWA con shared Export Contract.
+- **F22 — Runtime Native con Expo**
+  - Construir RN/Expo runtime, routing y local data.
+- **F23 — Capacidades Native y exportación Android/iOS**
+  - Implementar device capabilities y Android/iOS exporters.
+- **F24 — Exportación Capacitor**
+  - Implementar Capacitor como target Core completo sobre Web runtime + native shell/plugins.
+- **F25 — Exportación LAMP con Slim/PDO**
+  - Implementar LAMP Core mediante Slim 4/PSR-7/PDO/Slim-CSRF/MySQL-MariaDB.
+- **F26 — Exportación WordPress Block Theme + Companion Plugin**
+  - Implementar WordPress Core como Block Theme + Companion Plugin sobre APIs nativas.
+- **F27 — Hardening, paridad de exportación y release**
+  - Cerrar seguridad, a11y, rendimiento, dependencias y paridad/evidencia de los nueve targets.

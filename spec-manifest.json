@@ -1,0 +1,68 @@
+{
+  "product": "ElectroCraft",
+  "category": "No-Code App Builder",
+  "revision": "eighth-final-master-spec",
+  "date": "2026-08-16",
+  "status": "validated",
+  "phases": 28,
+  "microphases": 270,
+  "language": {
+    "studio_default": "es",
+    "fallback": "es",
+    "engine": "i18next/react-i18next"
+  },
+  "studio": {
+    "framework": "React + TypeScript + Vite",
+    "ui": "shadcn/ui",
+    "primitive_base": "Radix",
+    "icons": "Lucide",
+    "editor": "Puck",
+    "ai_ui": "selected AI Elements"
+  },
+  "engines": {
+    "studio_db": "PGlite + Drizzle",
+    "cache": "TanStack Query",
+    "administration": "Refine Core + TanStack Table",
+    "forms": "React Hook Form + Zod",
+    "query_conditions": "React Query Builder",
+    "workflow": "Rete",
+    "rich_text": "Tiptap",
+    "state": "Zustand",
+    "ai": "Vercel AI SDK + @ai-sdk/google/Gemini",
+    "native": "React Native + Expo + Expo Router + Expo SQLite",
+    "capacitor": "Capacitor",
+    "lamp": "Slim 4 + PSR-7 + Slim-CSRF + PDO + MySQL/MariaDB",
+    "wordpress": "Block Theme + Companion Plugin + native WordPress APIs"
+  },
+  "export_targets": [
+    "local-project",
+    "react-web",
+    "static-web",
+    "pwa",
+    "android-expo",
+    "ios-expo",
+    "capacitor",
+    "lamp",
+    "wordpress"
+  ],
+  "export_policy": "all targets are Core and equal product-status; shared Export Target Contract",
+  "initial_execution": {
+    "phase": "F00",
+    "microphase": "M00.1",
+    "state": "NO_INICIADA"
+  },
+  "validation": {
+    "phases": 28,
+    "microphases": 270,
+    "numbering_gaps": 0,
+    "broken_microphase_refs": 0,
+    "duplicate_titles": 0,
+    "microphases_with_code_location": 270,
+    "microphases_with_ui_location": 270,
+    "microphases_with_visual_design": 270,
+    "microphases_with_spanish_copy": 270,
+    "microphases_with_help": 270,
+    "microphases_with_ordered_steps": 270,
+    "microphases_with_tests": 270
+  }
+}
