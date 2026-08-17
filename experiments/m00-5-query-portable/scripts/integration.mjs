@@ -3,7 +3,6 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { performance } from "node:perf_hooks";
-import { createRequire } from "node:module";
 import { compilePortableWhere, executeMultiSource, executePortableQuery, facetCount, formatWithRqb } from "../src/compiler.mjs";
 import { createQueryDefinition, validateQueryDefinition } from "../src/query-definition.mjs";
 import { dataSchema } from "../src/schema-fixture.mjs";
@@ -12,9 +11,8 @@ import { createStudioClient, loadQueryDefinition, PROJECT_ID, saveQueryDefinitio
 const root = new URL("..", import.meta.url);
 const artifactPath = new URL("artifacts/integration-result.json", root);
 await mkdir(new URL("artifacts/", root), { recursive: true });
-const require = createRequire(import.meta.url);
-const rqbPkg = JSON.parse(await readFile(require.resolve("@react-querybuilder/core/package.json"), "utf8"));
-const pglitePkg = JSON.parse(await readFile(require.resolve("@electric-sql/pglite/package.json"), "utf8"));
+const rqbPkg = JSON.parse(await readFile(new URL("node_modules/@react-querybuilder/core/package.json", root), "utf8"));
+const pglitePkg = JSON.parse(await readFile(new URL("node_modules/@electric-sql/pglite/package.json", root), "utf8"));
 
 const articleDefinition = createQueryDefinition({
   id: "query-article-portable",
