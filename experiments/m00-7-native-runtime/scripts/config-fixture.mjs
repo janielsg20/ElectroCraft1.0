@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { resolveNativeCapabilities } from '../src/capabilities/native-config.mjs';
+const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
+const app = JSON.parse(await readFile(new URL('../app.json', import.meta.url), 'utf8'));
+const baseline = resolveNativeCapabilities([]);
+const camera = resolveNativeCapabilities(['camera']);
+assert.equal(pkg.dependencies['expo-camera'], undefined);
+assert.ok(!JSON.stringify(app.expo.plugins).includes('expo-camera'));
+assert.deepEqual(baseline.sensitivePermissions, []);
+assert.deepEqual(camera.sensitivePermissions, ['android.permission.CAMERA']);
+await mkdir(new URL('../artifacts/', import.meta.url), { recursive: true });
+await writeFile(new URL('../artifacts/capability-pruning.json', import.meta.url), JSON.stringify({ status: 'PASS_CONFIG_PRUNING', baseline, camera }, null, 2) + '\n');
+console.log(JSON.stringify({ status: 'PASS_CONFIG_PRUNING', baselineSensitivePermissions: 0, cameraSensitivePermissions: 1 }));

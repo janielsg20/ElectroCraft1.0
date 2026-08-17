@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
+const [runtimeDumpPath, guardDumpPath] = process.argv.slice(2);
+assert.ok(runtimeDumpPath && guardDumpPath, 'runtime and guard UI dump paths required');
+const runtimeDump = await readFile(runtimeDumpPath, 'utf8');
+const guardDump = await readFile(guardDumpPath, 'utf8');
+assert.match(runtimeDump, /M00\.7 runtime OK/, 'native SQLite/Drizzle/Zustand/DataProvider self-test must be visible');
+assert.match(guardDump, /Inicio de sesión requerido/, 'deep-link route guard must redirect to signin');
+const result = { status: 'PASS_ANDROID_NATIVE_RUNTIME', sqliteDrizzleZustandProvider: true, deepLinkGuard: true };
+await mkdir(new URL('../artifacts/', import.meta.url), { recursive: true });
+await writeFile(new URL('../artifacts/android-native-runtime.json', import.meta.url), JSON.stringify(result, null, 2) + '\n');
+console.log(JSON.stringify(result));

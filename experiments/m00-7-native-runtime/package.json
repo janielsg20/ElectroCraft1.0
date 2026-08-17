@@ -1,0 +1,41 @@
+{
+  "name": "electrocraft-m00-7-native-runtime",
+  "version": "0.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "engines": { "node": ">=22.13.0" },
+  "scripts": {
+    "start": "expo start",
+    "lint": "node scripts/lint.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test test/*.test.mjs",
+    "versions": "node scripts/verify-installed-versions.mjs",
+    "lockfile": "node scripts/verify-lockfile.mjs",
+    "integration": "node scripts/integration-contract.mjs",
+    "config": "node scripts/config-fixture.mjs",
+    "export:android": "expo export --platform android --output-dir .generated/export-android --clear",
+    "export:ios": "expo export --platform ios --output-dir .generated/export-ios --clear",
+    "build": "npm run export:android && npm run export:ios && node scripts/summarize-build.mjs",
+    "closure-gate": "node scripts/closure-gate.mjs",
+    "verify-local": "npm run lint && npm test && npm run config",
+    "verify": "npm run versions && npm run lockfile && npm run lint && npm run typecheck && npm test && npm run integration && npm run config && npm run build && npm run closure-gate"
+  },
+  "dependencies": {
+    "@refinedev/core": "5.0.12",
+    "drizzle-orm": "0.45.2",
+    "expo": "57.0.9",
+    "expo-constants": "57.0.8",
+    "expo-linking": "57.0.4",
+    "expo-router": "57.0.9",
+    "expo-sqlite": "57.0.1",
+    "react": "19.2.3",
+    "react-native": "0.86.2",
+    "react-native-safe-area-context": "5.7.0",
+    "react-native-screens": "4.26.0",
+    "zustand": "5.0.14"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.2",
+    "typescript": "6.0.3"
+  }
+}

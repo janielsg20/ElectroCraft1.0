@@ -1,0 +1,105 @@
+name: Verify M00.7 Native Runtime
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'experiments/m00-7-native-runtime/**'
+      - '.github/workflows/verify-m00-7-native-runtime.yml'
+      - '.ai/adr/ADR-0007-native-runtime-poc.md'
+      - '.ai/evidence/F00/M00.7/**'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-source-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: experiments/m00-7-native-runtime
+    env:
+      CI: '1'
+      EXPO_NO_TELEMETRY: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Registry health
+        run: npm ping
+      - name: Generate deterministic lockfile
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Install exact dependency graph
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Full source/build gate
+        run: npm run verify
+      - name: Preserve generated lockfile
+        if: always()
+        run: cp package-lock.json artifacts/package-lock.generated.json || true
+      - name: Upload source/build evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m00-7-native-source-build-evidence
+          path: |
+            experiments/m00-7-native-runtime/artifacts/
+            experiments/m00-7-native-runtime/package-lock.json
+          if-no-files-found: warn
+
+  android-runtime:
+    needs: verify-source-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      CI: '1'
+      EXPO_NO_TELEMETRY: '1'
+    defaults:
+      run:
+        working-directory: experiments/m00-7-native-runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Generate deterministic lockfile
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Install exact dependency graph
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Generate Android native source
+        run: npx expo prebuild --platform android --clean --no-install
+      - name: Verify sensitive-permission pruning in generated source
+        run: node scripts/prebuild-summary.mjs
+      - name: Build Android release APK
+        run: cd android && ./gradlew assembleRelease --no-daemon
+      - name: Run real Android SQLite/Drizzle/Zustand/Refine and deep-link guard
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          script: |
+            cd experiments/m00-7-native-runtime
+            adb install -r android/app/build/outputs/apk/release/app-release.apk
+            adb shell monkey -p com.electrocraft.m007 -c android.intent.category.LAUNCHER 1
+            sleep 12
+            adb shell uiautomator dump /sdcard/m007-runtime.xml
+            adb pull /sdcard/m007-runtime.xml artifacts/m007-runtime.xml
+            adb shell am start -W -a android.intent.action.VIEW -d 'electrocraft://guarded' com.electrocraft.m007
+            sleep 4
+            adb shell uiautomator dump /sdcard/m007-guard.xml
+            adb pull /sdcard/m007-guard.xml artifacts/m007-guard.xml
+            node scripts/native-log-gate.mjs artifacts/m007-runtime.xml artifacts/m007-guard.xml
+      - name: Upload Android runtime evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m00-7-android-runtime-evidence
+          path: experiments/m00-7-native-runtime/artifacts/
+          if-no-files-found: warn
