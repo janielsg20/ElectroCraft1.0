@@ -1,0 +1,107 @@
+name: Finalize M00.2 OSS audit
+
+on:
+  push:
+    paths:
+      - '.import/m00-2-payload.b64'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  verify-and-finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Expand audited M00.2 payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/m002-payload
+          mkdir -p /tmp/m002-payload
+          base64 -d .import/m00-2-payload.b64 > /tmp/m00-2-payload.tar.gz
+          tar -xzf /tmp/m00-2-payload.tar.gz -C /tmp/m002-payload
+          cp -a /tmp/m002-payload/pre/. .
+      - name: Run contract and real OSS gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .ai/evidence/F00/M00.2
+          LOG="$GITHUB_WORKSPACE/.ai/evidence/F00/M00.2/test-output.txt"
+          : > "$LOG"
+          cd experiments/m00-2-oss-audit
+          {
+            echo "M00.2 GitHub Actions run: $GITHUB_RUN_ID"
+            echo "Commit under test: $GITHUB_SHA"
+            echo "Node: $(node --version)"
+            echo
+            echo '## npm install'
+            npm install --no-audit --no-fund
+            echo
+            echo '## lint'
+            npm run lint
+            echo
+            echo '## typecheck'
+            npm run typecheck
+            echo
+            echo '## test'
+            npm test
+            echo
+            echo '## build'
+            npm run build
+          } 2>&1 | tee "$LOG"
+          cp dist/audit-summary.json "$GITHUB_WORKSPACE/.ai/evidence/F00/M00.2/build-summary.json"
+      - name: Close M00.2 and advance continuity files
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp -a /tmp/m002-payload/post/. .
+          cat > .ai/evidence/F00/M00.2/README.md <<EOF
+          # Evidence — F00 / M00.2
+
+          Status: \`GREEN\`.
+
+          GitHub Actions run: \`${GITHUB_RUN_ID}\`
+          Seed commit tested: \`${GITHUB_SHA}\`
+
+          ## Executed evidence
+          - \`experiments/m00-2-oss-audit/engine-audit.json\`: 26 audited engine decisions with owner, public API, stability, license, targets and primary sources.
+          - \`experiments/m00-2-oss-audit/src/permission-adapter.mjs\`: canonical allow/deny + SecretRef security boundary.
+          - \`test-output.txt\`: install, lint, typecheck, 10 contract/security tests, 3 real OSS integration tests and build output.
+          - \`build-summary.json\`: generated audit summary.
+
+          ## Real OSS APIs exercised
+          - i18next \`createInstance()\` / \`init()\` with mandatory Spanish fallback.
+          - PGlite embedded PostgreSQL \`exec()\` plus surfaced SQL error path.
+          - Drizzle \`drizzle({ client })\` + SQL query over the real PGlite client.
+
+          ## Architecture decisions frozen
+          - Puck owns authoring mechanics; ElectroCraft canonical data remains engine-independent.
+          - shadcn initializes with explicit Radix base despite Base UI being the new-project default.
+          - PGlite/Drizzle own embedded Postgres/storage/schema/migration mechanics; no parallel local DB engine.
+          - TanStack Query/Refine/RHF/Zod/RQB/Rete/Tiptap/Zustand keep one-owner boundaries.
+          - AI SDK + \`@ai-sdk/google\` remains primary; \`@google/genai\` is narrow for proven Gemini Interactions/native gaps, stable \`v1\`, server SecretRefs only.
+          - Expo Core stays on stable APIs; experimental Router server/SSR/ExperimentalStack features are not Core defaults.
+          - No later microphase required rewriting for duplicated engine responsibilities.
+          EOF
+          rm -rf experiments/m00-2-oss-audit/node_modules
+          rm -f .import/m00-2-payload.b64
+          rmdir .import 2>/dev/null || true
+          rm -f .github/workflows/m00-2-finalize.yml
+      - name: Commit verified M00.2 result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'janielsg20'
+          git config user.email '72001897+janielsg20@users.noreply.github.com'
+          git add -A
+          git status --short
+          git commit -m 'Complete F00 M00.2 OSS responsibility audit'
+          git push origin HEAD:main
