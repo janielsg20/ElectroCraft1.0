@@ -1,0 +1,54 @@
+name: Verify M00.4 Studio DB
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "experiments/m00-4-studio-db/**"
+      - ".github/workflows/verify-m00-4-studio-db.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: experiments/m00-4-studio-db
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org/
+
+      - name: Diagnose npm registry
+        run: |
+          npm config get registry
+          npm ping
+
+      - name: Install exact POC dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Verify M00.4 closure gates
+        run: npm run verify
+
+      - name: Upload M00.4 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m00-4-studio-db-evidence
+          path: |
+            experiments/m00-4-studio-db/artifacts/*.json
+            experiments/m00-4-studio-db/package-lock.json
+          if-no-files-found: warn

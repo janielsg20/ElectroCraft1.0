@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>POC técnico · M00.4 Studio DB</title>
+  <style>
+    body { font: 14px/1.5 system-ui, sans-serif; margin: 24px; background: #f7f7f8; color: #161616; }
+    main { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
+    section { background: white; border: 1px solid #ddd; border-radius: 10px; padding: 16px; min-height: 180px; }
+    pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+    button { min-height: 40px; padding: 0 14px; }
+    @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <h1>POC técnico · M00.4 Studio DB</h1>
+  <p>Abre esta misma URL en dos pestañas para validar el Worker multi-tab y la persistencia.</p>
+  <button id="run">Ejecutar validación</button>
+  <main>
+    <section><h2>Request</h2><pre id="request">Pendiente</pre></section>
+    <section><h2>Resultado</h2><pre id="result">Pendiente</pre></section>
+    <section><h2>Validación</h2><pre id="validation">Pendiente</pre></section>
+  </main>
+  <script type="module" src="./main.mjs"></script>
+</body>
+</html>
