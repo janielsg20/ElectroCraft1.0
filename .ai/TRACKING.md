@@ -216,8 +216,61 @@ Adaptation/blockers:
 - CI run 2 was GREEN. Run 3 versioned the generated lockfile and repeated the full gate with `npm ci` successfully.
 - No M00.5 blocker remains.
 
+## M00.6 — COMPLETADA
+State: GREEN.
+
+Evidence:
+- `.ai/adr/ADR-0006-action-flow-rete-poc.md`
+- `.ai/evidence/F00/M00.6/README.md`
+- `.ai/evidence/F00/M00.6/source-audit.md`
+- `.ai/evidence/F00/M00.6/source-provenance.json`
+- `.ai/evidence/F00/M00.6/ci-summary.json`
+- `.ai/evidence/F00/M00.6/integration-real.json`
+- `.ai/evidence/F00/M00.6/history-real.json`
+- `.ai/evidence/F00/M00.6/closure.json`
+- `experiments/m00-6-action-flow-rete/`
+- GitHub Actions final run `32069657914`, job `95509740663`, head `917ed319f1c5c0af1bc7f4b068b2693dbe9d5ebc`, artifact `9301226707`.
+
+Files/areas modified:
+- `.github/workflows/verify-m00-6-action-flow-rete.yml`
+- `experiments/m00-6-action-flow-rete/*`
+- `.ai/adr/ADR-0006-action-flow-rete-poc.md`
+- `.ai/evidence/F00/M00.6/*`
+- `.ai/MEMORY.md`
+- `.ai/STATE.md`
+- `.ai/TRACKING.md`
+- `.ai/CHANGELOG.md`
+- `.ai/HANDOFF.md`
+
+Engine/API evidence:
+- `rete@2.0.6`: NodeEditor/classic graph mechanics.
+- `rete-engine@2.1.1`: real ControlFlow/Dataflow runtime.
+- `rete-area-plugin@2.3.2`: area parent contract required by history.
+- `rete-history-plugin@2.1.1`: real classic node/connection undo/redo.
+- Canonical ElectroCraft workflow stays plain JSON and never persists Rete internals.
+
+Tests exactos:
+- registry health -> PASS.
+- committed lockfile install with `npm ci` -> PASS.
+- exact installed versions and lockfile v3 -> PASS.
+- `npm run lint` -> PASS, 18 modules.
+- `npm run typecheck` -> PASS, 18 ESM modules.
+- `npm test` -> PASS, 9/9.
+- `npm run source-runtime` -> `PASS_SOURCE_TAG_RUNTIME`.
+- `npm run integration` -> `PASS_REAL_RETE_ENGINE`.
+- `npm run history` -> `PASS_REAL_RETE_HISTORY`; node + connection undo/redo.
+- `npm run build` -> `PASS_BUILD`, adapter SHA `e58dfaea25629933ce416175d4d12380d957ee9a9c1285f4ca4d33bef8ff1c65`.
+- `npm run closure-gate` -> `PASS_CLOSURE_GATE`.
+- Final workflow run `32069657914` -> SUCCESS.
+
+Adaptation/blockers:
+- Run 1 `32068398640` exposed `rete-history-plugin@2.2.0` eagerly requiring missing `rete-comment-plugin` from its published CommonJS bundle; the POC was pinned to compatible `rete-history-plugin@2.1.1` rather than adding an unrelated comment engine.
+- Run 2 became GREEN and generated the deterministic lockfile.
+- Run 3 committed that lockfile, used `npm ci` only and repeated the complete suite GREEN.
+- No M00.6 blocker remains.
+
 ## Active
-F00 / M00.6 — EN_CURSO.
+F00 / M00.7 — EN_CURSO.
 
 Next microphase exact:
-M00.6 — POC Action Flow Rete.
+M00.7 — POC Native runtime.

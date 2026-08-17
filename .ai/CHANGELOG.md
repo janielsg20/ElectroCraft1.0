@@ -38,7 +38,6 @@
 - Preserved exact phase ownership: Puck runtime POC = M00.3; PGlite/Drizzle runtime POC = M00.4. No false package-runtime result was recorded when npm registry access was unavailable.
 - Advanced active execution to M00.3.
 
-
 ## 2026-08-17 — F00 / M00.3 completed
 
 - Pinned the reproducible Puck POC to `@puckeditor/core@0.22.4` / tag `v0.22.4` with exact Git-blob provenance and MIT license.
@@ -78,3 +77,16 @@
 - Final run `32063065255`, head `2315f0f2f6d26c3ef45d22d5fd0914d8e26b0503`, passed registry, locked install, lint, 12-module syntax/type contract, 7/7 tests, real RQB/PGlite integration, build and closure gate.
 - Measured RQB format average/50 `0.0442 ms`, Electro compile average/50 `0.0479 ms`, adapter overhead `0.0037 ms`.
 - Recorded ADR-0005 and `.ai/evidence/F00/M00.5/`; advanced active execution to M00.6 — POC Action Flow Rete.
+
+## 2026-08-17 — F00 / M00.6 completed
+
+- Added isolated `experiments/m00-6-action-flow-rete/` with canonical `ElectroCraftActionGraph` v1 and Trigger -> Condition -> Data -> Toast fixture.
+- Mapped the canonical graph to real Rete ControlFlow/Dataflow without persisting Rete classes, generated IDs or history internals.
+- Added fail-closed validation for unsupported node/operator/operation/path/reference semantics.
+- Proved classic history node + connection undo/redo using the real published history package.
+- First Actions run `32068398640` exposed a packaging incompatibility in `rete-history-plugin@2.2.0` (`rete-comment-plugin` required from the published CommonJS bundle); pinned `rete-history-plugin@2.1.1` instead of adding an unrelated comment engine.
+- Actions run `32069130478` passed the full real-package gate and generated the deterministic lockfile.
+- Committed that lockfile and changed the workflow to install only with `npm ci`.
+- Final reproducibility run `32069657914`, job `95509740663`, head `917ed319f1c5c0af1bc7f4b068b2693dbe9d5ebc` passed registry, locked install, exact version/lock checks, lint, 18-module type contract, 9/9 tests, source runtime, `PASS_REAL_RETE_ENGINE`, `PASS_REAL_RETE_HISTORY`, build and closure gate.
+- Final artifact `9301226707`, digest `sha256:9a34d39785c8283a5f6f59272b30964939cacae04931f5bb79ce1899e946cd9b`.
+- Recorded ADR-0006/evidence and advanced active execution to M00.7 — POC Native runtime.

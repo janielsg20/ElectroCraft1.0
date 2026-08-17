@@ -1,33 +1,30 @@
 # HANDOFF — Eighth Final
 
 Current:
-F00 / M00.6 / EN_CURSO — implementation ready, published-package CI gate pending.
+F00 / M00.7 / EN_CURSO.
 
 Completed:
 - M00.1 GREEN — capability/ownership map.
 - M00.2 GREEN — OSS responsibility/API/license/target audit.
 - M00.3 GREEN — Puck Composition ownership/adapter POC.
 - M00.4 GREEN — PGlite + Drizzle generic Studio DB with real multi-tab/persistence evidence.
-- M00.5 GREEN — RQB 8.23.0 portable query adapter with real PGlite execution, fail-closed safety, facets, multi-source and persistence round-trip.
+- M00.5 GREEN — RQB portable query adapter with real PGlite execution.
+- M00.6 GREEN — canonical Action Flow mapped to real Rete ControlFlow/Dataflow + real node/connection undo/redo.
 
-M00.6 implemented now:
-- canonical plain-JSON `ElectroCraftActionGraph` v1;
-- Trigger -> Condition -> Data -> Toast fixture;
-- Rete ControlFlow/Dataflow adapter;
-- fail-closed canonical validation;
-- classic history node/connection undo+redo tests;
-- exact tagged-source provenance;
-- local/source gates GREEN: lint, syntax/type, 9/9 tests, source runtime, build;
-- exact direct Rete pins + transitive `@babel/runtime@7.29.7` override;
-- workflow generates lockfile, installs via `npm ci`, then proves published npm runtime/history closure.
-
-Pending before M00.6 can close:
-1. upload the bundle over `main` through the user's GitHub Desktop workflow;
-2. let `Verify M00.6 Action Flow Rete` install exact pins and run `npm run verify`;
-3. capture the workflow result/artifact and generated lockfile;
-4. update TRACKING/MEMORY/CHANGELOG/STATE/HANDOFF to COMPLETADA only if CI is GREEN.
+M00.6 closure source of truth:
+- final runtime pins: rete 2.0.6 / rete-engine 2.1.1 / rete-area-plugin 2.3.2 / rete-history-plugin 2.1.1;
+- committed lockfile; install gate = `npm ci`;
+- final reproducibility run `32069657914`, job `95509740663`, head `917ed319f1c5c0af1bc7f4b068b2693dbe9d5ebc`, SUCCESS;
+- final artifact `9301226707`, digest `sha256:9a34d39785c8283a5f6f59272b30964939cacae04931f5bb79ce1899e946cd9b`;
+- `PASS_REAL_RETE_ENGINE`;
+- `PASS_REAL_RETE_HISTORY` node + connection undo/redo;
+- `PASS_CLOSURE_GATE`;
+- no Rete classes/history internals in canonical persistence.
 
 Read next:
-AGENTS -> RULES -> MEMORY -> STATE -> TRACKING -> `.ai/microphases/M00_6.md` -> `.ai/adr/ADR-0006-action-flow-rete-poc.md` -> `.ai/evidence/F00/M00.6/`.
+AGENTS -> RULES -> MEMORY -> STATE -> TRACKING -> `.ai/microphases/M00_7.md`.
 
-Do not begin M00.7 until M00.6 is green. Do not begin F01 until all F00 POCs and ADR closure are green.
+Next:
+Execute M00.7 exactly. Keep the POC isolated under `experiments/`; use official Expo/Expo Router/Expo SQLite/Drizzle/Zustand/Refine APIs before custom code. Do not add product routes or claim Android/iOS artifacts that were not actually built.
+
+Do not begin M00.8 until M00.7 is GREEN. Do not begin F01 until all F00 POCs and ADR closure are GREEN.

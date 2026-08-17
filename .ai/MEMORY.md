@@ -4,7 +4,7 @@ Product:
 ElectroCraft — No-Code App Builder.
 
 Execution:
-F00 / M00.1, M00.2, M00.3, M00.4 and M00.5 COMPLETADAS; M00.6 activa.
+F00 / M00.1, M00.2, M00.3, M00.4, M00.5 and M00.6 COMPLETADAS; M00.7 activa.
 
 M00.1 frozen invariants:
 - R001–R084 tienen owner canónico, fase y aplicabilidad.
@@ -61,6 +61,16 @@ M00.5 frozen invariants:
 - Indexed/faceted fields map to `record_field_index`; unindexed fields use typed JSONB extraction.
 - Facet count, normalized multi-source output and Project Object close/reopen/re-execute are GREEN.
 - Final CI source of truth: run `32063065255`, job `95488578412`, head `2315f0f2f6d26c3ef45d22d5fd0914d8e26b0503`, conclusion SUCCESS; artifact `9298848789`.
+
+M00.6 frozen invariants:
+- `ElectroCraftActionGraph` v1 is the only persisted workflow definition; Rete classes, generated IDs and history never enter canonical persistence.
+- Rete owns node/connection mechanics; `rete-engine` owns ControlFlow/Dataflow; `rete-history-plugin` owns history node/connection undo/redo.
+- Runtime pins are `rete@2.0.6`, `rete-engine@2.1.1`, `rete-area-plugin@2.3.2`, `rete-history-plugin@2.1.1`, with `@babel/runtime@7.29.7` override and committed lockfile.
+- Unknown node kinds/operators/operations, unsafe data paths and invalid references fail closed.
+- True branch Trigger -> Condition -> Data -> Toast and false/no-side-effect branch are GREEN on real published Rete packages.
+- History node + connection undo/redo is GREEN on the real published package.
+- `rete-history-plugin@2.2.0` is not used: CI exposed its published CommonJS dependency on missing `rete-comment-plugin`; pinning 2.1.1 preserves the required API without adding an unrelated engine.
+- Final reproducibility CI source of truth: run `32069657914`, job `95509740663`, head `917ed319f1c5c0af1bc7f4b068b2693dbe9d5ebc`, conclusion SUCCESS; artifact `9301226707`.
 
 Core mental model:
 Screens, Navigation, Components, Data Sources, Queries, State, Actions, Forms, Auth, Administration, Resources.
