@@ -4,7 +4,7 @@ Product:
 ElectroCraft — No-Code App Builder.
 
 Execution:
-F00 / M00.1, M00.2, M00.3 and M00.4 COMPLETADAS; M00.5 activa.
+F00 / M00.1, M00.2, M00.3, M00.4 and M00.5 COMPLETADAS; M00.6 activa.
 
 M00.1 frozen invariants:
 - R001–R084 tienen owner canónico, fase y aplicabilidad.
@@ -50,6 +50,17 @@ M00.4 frozen invariants:
 - Real Node PGlite/Drizzle round-trip, rollback, close/reopen and latencies are GREEN.
 - Real Chromium two-tab PGlite Worker A↔B visibility + leader/follower + reopen persistence are GREEN.
 - CI source of truth: run `32061372828`, head `92a1a0b7f21d4db4ebad637e11084bd80415f640`, conclusion SUCCESS; evidence in `.ai/evidence/F00/M00.4/`.
+
+M00.5 frozen invariants:
+- Query POC pins `@react-querybuilder/core@8.23.0` and reuses `@electric-sql/pglite@0.5.5`; `package-lock.json` + `npm ci` are the reproducible install gate.
+- `ElectroCraftQueryDefinition` v1 wraps only canonical RQB-compatible condition data and never persists engine classes/internal state.
+- RQB owns nested boolean tree, operator formatting and bind-value parameterization.
+- ElectroCraft owns fail-closed model/field/operator/valueSource policy, canonical field binding, index-vs-JSON physical mapping and source/result normalization.
+- Unsupported semantics must become blockers; never fallback true/no-op.
+- User values remain `$n` bind parameters and never enter SQL text.
+- Indexed/faceted fields map to `record_field_index`; unindexed fields use typed JSONB extraction.
+- Facet count, normalized multi-source output and Project Object close/reopen/re-execute are GREEN.
+- Final CI source of truth: run `32063065255`, job `95488578412`, head `2315f0f2f6d26c3ef45d22d5fd0914d8e26b0503`, conclusion SUCCESS; artifact `9298848789`.
 
 Core mental model:
 Screens, Navigation, Components, Data Sources, Queries, State, Actions, Forms, Auth, Administration, Resources.

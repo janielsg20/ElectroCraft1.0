@@ -1,0 +1,42 @@
+{
+  "status": "PASS_QUERY_ENGINE",
+  "versions": {
+    "rqb": "8.23.0",
+    "pglite": "0.5.5"
+  },
+  "checks": {
+    "indexedAndJsonBinding": true,
+    "nestedAndOrRealQuery": true,
+    "unsupportedOperatorBlocks": true,
+    "injectionRemainsParameter": true,
+    "facetCountUsesIndexer": true,
+    "multiSourceShapeCompatible": true,
+    "canonicalRoundTripPersistence": true
+  },
+  "latencyMs": {
+    "rqbFormatAverage50": 0.0442,
+    "electroCompileAverage50": 0.0479
+  },
+  "gap": {
+    "adapterOverheadMs": 0.0037,
+    "rqbOwns": [
+      "nested boolean tree",
+      "operator formatting",
+      "bind-value parameterization"
+    ],
+    "electroOwns": [
+      "fail-closed field/operator policy",
+      "canonical field binding",
+      "index-vs-json physical mapping",
+      "source/result normalization"
+    ]
+  },
+  "rqbEvidence": {
+    "parameterizedSql": "(__ecf0__ = $1 and (__ecf1__ = $2 or __ecf2__ = $3))",
+    "params": [
+      "power",
+      "Power Bank 20K",
+      "USB-C battery pack"
+    ]
+  }
+}

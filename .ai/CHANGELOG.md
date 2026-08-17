@@ -38,6 +38,7 @@
 - Preserved exact phase ownership: Puck runtime POC = M00.3; PGlite/Drizzle runtime POC = M00.4. No false package-runtime result was recorded when npm registry access was unavailable.
 - Advanced active execution to M00.3.
 
+
 ## 2026-08-17 — F00 / M00.3 completed
 
 - Pinned the reproducible Puck POC to `@puckeditor/core@0.22.4` / tag `v0.22.4` with exact Git-blob provenance and MIT license.
@@ -63,3 +64,17 @@
 - CI run 3 (`32061372828`, head `92a1a0b7f21d4db4ebad637e11084bd80415f640`) passed npm install, lint, typecheck-script, 12/12 tests, real PGlite/Drizzle integration, browser contract, build, real two-tab Chromium runtime and closure gate.
 - Real two-tab evidence proves A↔B visibility, distinct leader/follower clients and persistence after close/reopen.
 - Recorded ADR-0004 and `.ai/evidence/F00/M00.4/` artifacts; advanced active execution to M00.5 — POC Query portable.
+
+## 2026-08-17 — F00 / M00.5 completed
+
+- Added isolated `experiments/m00-5-query-portable/` POC with exact `@react-querybuilder/core@8.23.0` + `@electric-sql/pglite@0.5.5` pins and committed lockfile.
+- Added versioned `ElectroCraftQueryDefinition` wrapper for nested AND/OR rules without persisting RQB internals.
+- Added fail-closed model/field/operator/valueSource validation; unsupported semantics cannot degrade to fallback true/no-op.
+- Added RQB parameterized PostgreSQL-style `$n` output; injection payload remains separate from SQL text.
+- Added canonical physical binding: indexed/faceted fields -> `record_field_index`, non-indexed fields -> typed JSONB extraction from `content_records.data`.
+- Added real facet counts, normalized multi-source output and Project Object persistence close/reopen/re-execute on PGlite.
+- CI run 1 passed 7/7 tests but exposed PGlite package export-map inspection (`./package.json` not exported); manifest inspection was corrected without changing engine behavior.
+- CI run 2 became GREEN; run 3 committed the generated lockfile and repeated the full suite with `npm ci`.
+- Final run `32063065255`, head `2315f0f2f6d26c3ef45d22d5fd0914d8e26b0503`, passed registry, locked install, lint, 12-module syntax/type contract, 7/7 tests, real RQB/PGlite integration, build and closure gate.
+- Measured RQB format average/50 `0.0442 ms`, Electro compile average/50 `0.0479 ms`, adapter overhead `0.0037 ms`.
+- Recorded ADR-0005 and `.ai/evidence/F00/M00.5/`; advanced active execution to M00.6 — POC Action Flow Rete.

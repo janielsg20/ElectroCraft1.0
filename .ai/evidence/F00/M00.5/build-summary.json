@@ -1,0 +1,19 @@
+{
+  "status": "PASS_BUILD",
+  "dependencies": {
+    "@react-querybuilder/core": "8.23.0",
+    "@electric-sql/pglite": "0.5.5"
+  },
+  "compilerSha256": "67cfd4e8c0ecff290da04013193ee37bd470931594a1322aa917580cb49348f9",
+  "bindings": [
+    {
+      "fieldId": "category",
+      "kind": "record_field_index"
+    },
+    {
+      "fieldId": "title",
+      "kind": "json"
+    }
+  ],
+  "parameterCount": 2
+}

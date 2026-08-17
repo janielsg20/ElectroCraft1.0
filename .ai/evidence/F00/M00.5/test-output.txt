@@ -1,0 +1,28 @@
+M00.5 final reproducible GitHub Actions run
+run=32063065255
+job=95488578412
+head=2315f0f2f6d26c3ef45d22d5fd0914d8e26b0503
+
+npm ping -> PASS
+npm ci --no-audit --no-fund -> PASS, 8 packages
+lint -> PASS
+typecheck/syntax contract -> PASS, 12 ESM modules
+node --test -> PASS, 7/7
+integration -> PASS_QUERY_ENGINE
+build -> PASS_BUILD, compiler sha256 67cfd4e8c0ecff290da04013193ee37bd470931594a1322aa917580cb49348f9
+closure-gate -> PASS
+workflow -> SUCCESS
+
+integration checks:
+indexedAndJsonBinding=true
+nestedAndOrRealQuery=true
+unsupportedOperatorBlocks=true
+injectionRemainsParameter=true
+facetCountUsesIndexer=true
+multiSourceShapeCompatible=true
+canonicalRoundTripPersistence=true
+
+latency:
+rqbFormatAverage50=0.0442 ms
+electroCompileAverage50=0.0479 ms
+adapterOverhead=0.0037 ms

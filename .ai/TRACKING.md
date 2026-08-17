@@ -157,8 +157,67 @@ Adaptation/blockers:
 - CI run 2 exposed `Date.now()` overflow in `project_objects.version integer`; fixed by restoring version semantics to a small object/format version.
 - Run 3 is fully GREEN. No M00.4 blocker remains.
 
+## M00.5 — COMPLETADA
+State: GREEN.
+
+Evidence:
+- `.ai/adr/ADR-0005-query-portable-poc.md`
+- `.ai/evidence/F00/M00.5/README.md`
+- `.ai/evidence/F00/M00.5/source-audit.md`
+- `.ai/evidence/F00/M00.5/test-output.txt`
+- `.ai/evidence/F00/M00.5/integration-result.json`
+- `.ai/evidence/F00/M00.5/build-summary.json`
+- `.ai/evidence/F00/M00.5/ci-summary.json`
+- `experiments/m00-5-query-portable/`
+- GitHub Actions run `32063065255`, job `95488578412`, head `2315f0f2f6d26c3ef45d22d5fd0914d8e26b0503`, artifact `9298848789`.
+
+Files/areas modified:
+- `.github/workflows/verify-m00-5-query-portable.yml`
+- `experiments/m00-5-query-portable/*`
+- `.ai/adr/ADR-0005-query-portable-poc.md`
+- `.ai/evidence/F00/M00.5/*`
+- `.ai/MEMORY.md`
+- `.ai/STATE.md`
+- `.ai/TRACKING.md`
+- `.ai/CHANGELOG.md`
+- `.ai/HANDOFF.md`
+
+Engine/API evidence:
+- `@react-querybuilder/core@8.23.0`: real parameterized formatter with numbered PostgreSQL-style bind params.
+- `@electric-sql/pglite@0.5.5`: real query execution/persistence over the physical contract frozen by M00.4.
+- RQB owns nested boolean tree/operator formatting/value binding; ElectroCraft owns fail-closed policy, canonical field binding, index-vs-JSON mapping and result normalization.
+
+Tests exactos:
+- GitHub Actions npm registry/ping -> PASS.
+- locked package install with `npm ci` -> PASS.
+- `npm run lint` -> PASS.
+- `npm run typecheck` -> PASS, 12 ESM-module syntax/type contract.
+- `npm test` -> PASS, 7/7.
+- `npm run integration` -> `PASS_QUERY_ENGINE`.
+- `npm run build` -> `PASS_BUILD`, compiler SHA `67cfd4e8c0ecff290da04013193ee37bd470931594a1322aa917580cb49348f9`.
+- `npm run closure-gate` -> PASS.
+- Workflow run `32063065255` -> SUCCESS.
+
+Query/safety/persistence evidence:
+- nested AND/OR -> PASS.
+- indexed field -> `record_field_index`; unindexed fields -> JSONB extraction -> PASS.
+- deliberately unsupported operator -> blocker -> PASS.
+- injection payload remains in bind params and does not appear in SQL -> PASS.
+- facet count -> PASS (`cables=2`, `power=1`).
+- multi-source normalized shape -> PASS.
+- Project Object save/close/reopen/load/re-execute -> PASS.
+- RQB SQL evidence: `(__ecf0__ = $1 and (__ecf1__ = $2 or __ecf2__ = $3))`.
+- RQB format avg/50 -> `0.0442 ms`.
+- Electro compile avg/50 -> `0.0479 ms`.
+- measured adapter overhead -> `0.0037 ms`.
+
+Adaptation/blockers:
+- CI run 1 reached 7/7 tests but PGlite correctly rejected package subpath `./package.json`; installed-version inspection was changed to read the manifest file without altering engine semantics.
+- CI run 2 was GREEN. Run 3 versioned the generated lockfile and repeated the full gate with `npm ci` successfully.
+- No M00.5 blocker remains.
+
 ## Active
-F00 / M00.5 — EN_CURSO.
+F00 / M00.6 — EN_CURSO.
 
 Next microphase exact:
-M00.5 — POC Query portable.
+M00.6 — POC Action Flow Rete.

@@ -1,0 +1,20 @@
+{
+  "workflow": "Verify M00.5 Query Portable",
+  "runId": 32063065255,
+  "jobId": 95488578412,
+  "headSha": "2315f0f2f6d26c3ef45d22d5fd0914d8e26b0503",
+  "conclusion": "success",
+  "artifactId": 9298848789,
+  "artifactDigest": "sha256:cb0d7e6160d76992761fa20edfa1b33634ee25b18bf98af1b904f3d9d93a9042",
+  "install": "npm ci --no-audit --no-fund",
+  "gates": {
+    "registry": "PASS",
+    "lockedInstall": "PASS",
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "tests": "PASS_7_OF_7",
+    "integration": "PASS_QUERY_ENGINE",
+    "build": "PASS_BUILD",
+    "closureGate": "PASS"
+  }
+}
