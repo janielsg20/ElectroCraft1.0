@@ -1,0 +1,5 @@
+2026-08-17 M00.6 container network check
+- npm registry URL: https://registry.npmjs.org/
+- npm ping retry under a 12-second guard reached the PING attempt but timed out before a response.
+- result: container package-install gate remains BLOCKED_BY_ENVIRONMENT.
+- no published-package result is claimed PASS locally.

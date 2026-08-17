@@ -1,0 +1,47 @@
+name: Verify M00.6 Action Flow Rete
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'experiments/m00-6-action-flow-rete/**'
+      - '.github/workflows/verify-m00-6-action-flow-rete.yml'
+      - '.ai/adr/ADR-0006-action-flow-rete-poc.md'
+      - '.ai/evidence/F00/M00.6/**'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: experiments/m00-6-action-flow-rete
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Registry health
+        run: npm ping
+      - name: Generate deterministic lockfile
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Install from generated lockfile
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Full M00.6 gate
+        run: npm run verify
+      - name: Copy generated lockfile into evidence artifact
+        if: always()
+        run: cp package-lock.json artifacts/package-lock.generated.json || true
+      - name: Upload M00.6 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m00-6-action-flow-rete-evidence
+          path: |
+            experiments/m00-6-action-flow-rete/artifacts/
+            experiments/m00-6-action-flow-rete/dist/
+            experiments/m00-6-action-flow-rete/package-lock.json
+          if-no-files-found: warn

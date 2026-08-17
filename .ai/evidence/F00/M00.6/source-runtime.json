@@ -1,0 +1,20 @@
+{
+  "status": "PASS_SOURCE_TAG_RUNTIME",
+  "note": "Offline evidence executes runtime-transpiled official tagged source; product adapter still targets published npm packages.",
+  "trueTrace": [
+    "trigger-record-created",
+    "condition-priority",
+    "data-mark-processed",
+    "toast-processed"
+  ],
+  "falseTrace": [
+    "trigger-record-created",
+    "condition-priority"
+  ],
+  "trueOutput": {
+    "priority": "high",
+    "status": "processed"
+  },
+  "toastCount": 1,
+  "elapsedMs": 1.8652
+}

@@ -1,0 +1,92 @@
+
+> electrocraft-m00-6-action-flow-rete@0.0.0 verify-local
+> npm run lint && npm run typecheck && npm test && npm run source-runtime && npm run build
+
+
+> electrocraft-m00-6-action-flow-rete@0.0.0 lint
+> node scripts/lint.mjs
+
+PASS_LINT 18 modules
+
+> electrocraft-m00-6-action-flow-rete@0.0.0 typecheck
+> node scripts/typecheck.mjs
+
+PASS_SYNTAX_TYPE_CONTRACT 18 ESM modules
+
+> electrocraft-m00-6-action-flow-rete@0.0.0 test
+> node --test test/*.test.mjs
+
+TAP version 13
+# Subtest: canonical graph validates and remains plain JSON
+ok 1 - canonical graph validates and remains plain JSON
+  ---
+  duration_ms: 2.073884
+  type: 'test'
+  ...
+# Subtest: condition eq is deterministic
+ok 2 - condition eq is deterministic
+  ---
+  duration_ms: 0.28234
+  type: 'test'
+  ...
+# Subtest: data set is immutable against input payload
+ok 3 - data set is immutable against input payload
+  ---
+  duration_ms: 0.245635
+  type: 'test'
+  ...
+# Subtest: unsupported condition semantics fail closed
+ok 4 - unsupported condition semantics fail closed
+  ---
+  duration_ms: 0.471901
+  type: 'test'
+  ...
+# Subtest: unsafe data path fails closed
+ok 5 - unsafe data path fails closed
+  ---
+  duration_ms: 0.187048
+  type: 'test'
+  ...
+# Subtest: official-source history preset undoes/redoes node and connection
+ok 6 - official-source history preset undoes/redoes node and connection
+  ---
+  duration_ms: 6.641055
+  type: 'test'
+  ...
+# Subtest: official-source runtime follows true branch through ControlFlow/Dataflow
+ok 7 - official-source runtime follows true branch through ControlFlow/Dataflow
+  ---
+  duration_ms: 21.114044
+  type: 'test'
+  ...
+# Subtest: official-source runtime blocks false branch without side effects
+ok 8 - official-source runtime blocks false branch without side effects
+  ---
+  duration_ms: 6.431352
+  type: 'test'
+  ...
+# Subtest: canonical snapshot contains no engine instances
+ok 9 - canonical snapshot contains no engine instances
+  ---
+  duration_ms: 2.172711
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 107.751139
+
+> electrocraft-m00-6-action-flow-rete@0.0.0 source-runtime
+> node scripts/source-runtime.mjs
+
+{"status":"PASS_SOURCE_TAG_RUNTIME","note":"Offline evidence executes runtime-transpiled official tagged source; product adapter still targets published npm packages.","trueTrace":["trigger-record-created","condition-priority","data-mark-processed","toast-processed"],"falseTrace":["trigger-record-created","condition-priority"],"trueOutput":{"priority":"high","status":"processed"},"toastCount":1,"elapsedMs":1.8652}
+
+> electrocraft-m00-6-action-flow-rete@0.0.0 build
+> node scripts/build.mjs
+
+{"status":"PASS_BUILD","moduleCount":4,"adapterSha256":"e58dfaea25629933ce416175d4d12380d957ee9a9c1285f4ca4d33bef8ff1c65","canonicalSchemaVersion":1}

@@ -1,0 +1,2 @@
+npm notice PING https://registry.npmjs.org/
+exit_code=124

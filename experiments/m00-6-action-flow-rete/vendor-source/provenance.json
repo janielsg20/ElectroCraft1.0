@@ -1,0 +1,52 @@
+{
+  "purpose": "Offline evidence only; product runtime remains npm packages.",
+  "rete": {
+    "license": "MIT",
+    "files": {
+      "src/scope.ts": "a0c533bfc0a4931a07299998e6468437e002aeca",
+      "src/editor.ts": "285315b9dacc95c903bf33477846349a407455bb",
+      "src/presets/classic.ts": "36a6d0b2e782267e0212f1b7ca11901b075270cf",
+      "src/utils.ts": "dec3daf4cfbb8cb6767ce4de71a558c5c0efb598"
+    },
+    "tag": "v2.0.6",
+    "npmVersion": "2.0.6",
+    "tagManifestVersion": "2.0.5"
+  },
+  "rete-engine": {
+    "license": "MIT",
+    "files": {
+      "src/control-flow-engine.ts": "3951151f4725143ae9db00aa75afec53ee2db3dc",
+      "src/control-flow.ts": "5b86adc2b56d568ff5422e00c804fb7b785cfd5e",
+      "src/dataflow-engine.ts": "f8ba61a443113db23e7cb03f7266d998b277d9b9",
+      "src/dataflow.ts": "28b9070c8283b0c09d2446b41d3e9a08e4b3aac6"
+    },
+    "tag": "v2.1.1",
+    "npmVersion": "2.1.1",
+    "tagManifestVersion": "2.1.0"
+  },
+  "rete-history-plugin": {
+    "license": "MIT",
+    "files": {
+      "src/index.ts": "bf73963183a23d8133dd31940311b1c6c1eff9e6",
+      "src/history.ts": "e0c1e16768662fc5c39bd8d1a7d311e9a37c5f8a",
+      "src/presets/classic/index.ts": "59ebb7e0a5f9d9d5e11a6966f982643486e97f95",
+      "src/presets/classic/actions/node.ts": "c9c1a62f63dc89017f364bca3fc4245cf168832d",
+      "src/presets/classic/actions/connection.ts": "b5b9e8d75f6f07480ae96bc3026e4bc3475d23c1"
+    },
+    "tag": "v2.2.0",
+    "npmVersion": "2.2.0",
+    "tagManifestVersion": "2.2.0"
+  },
+  "rete-area-plugin": {
+    "license": "MIT",
+    "files": {
+      "src/base.ts": "44542ac69dbb373326ec2afc16999f9e53bda9e7"
+    },
+    "tag": "v2.3.2",
+    "npmVersion": "2.3.2",
+    "tagManifestVersion": "2.3.1"
+  },
+  "transitiveOverride": {
+    "@babel/runtime": "7.29.7"
+  }
+}

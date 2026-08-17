@@ -1,0 +1,32 @@
+{
+  "name": "electrocraft-m00-6-action-flow-rete",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "lint": "node scripts/lint.mjs",
+    "typecheck": "node scripts/typecheck.mjs",
+    "test": "node --test test/*.test.mjs",
+    "source-runtime": "node scripts/source-runtime.mjs",
+    "integration": "node scripts/integration.mjs",
+    "history": "node scripts/history.mjs",
+    "build": "node scripts/build.mjs",
+    "closure-gate": "node scripts/closure-gate.mjs",
+    "verify-local": "npm run lint && npm run typecheck && npm test && npm run source-runtime && npm run build",
+    "verify": "npm run versions && npm run lockfile && npm run lint && npm run typecheck && npm test && npm run source-runtime && npm run integration && npm run history && npm run build && npm run closure-gate",
+    "versions": "node scripts/verify-installed-versions.mjs",
+    "lockfile": "node scripts/verify-lockfile.mjs"
+  },
+  "dependencies": {
+    "rete": "2.0.6",
+    "rete-area-plugin": "2.3.2",
+    "rete-engine": "2.1.1",
+    "rete-history-plugin": "2.2.0"
+  },
+  "overrides": {
+    "@babel/runtime": "7.29.7"
+  }
+}

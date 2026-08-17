@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "action-flow-record-created",
+  "triggerNodeId": "trigger-record-created",
+  "nodes": [
+    { "id": "trigger-record-created", "kind": "trigger", "event": "record.created" },
+    { "id": "condition-priority", "kind": "condition", "predicate": { "field": "priority", "operator": "eq", "value": "high" } },
+    { "id": "data-mark-processed", "kind": "data", "operation": { "type": "set", "path": "status", "value": "processed" } },
+    { "id": "toast-processed", "kind": "toast", "message": "Registro procesado" }
+  ],
+  "edges": [
+    { "id": "flow-trigger-condition", "source": "trigger-record-created", "branch": "next", "target": "condition-priority" },
+    { "id": "flow-condition-data", "source": "condition-priority", "branch": "true", "target": "data-mark-processed" },
+    { "id": "flow-data-toast", "source": "data-mark-processed", "branch": "next", "target": "toast-processed" }
+  ]
+}

@@ -1,0 +1,5 @@
+Command: npm run integration
+Result: BLOCKED_BY_ENVIRONMENT
+Exit: 1
+Reason: ERR_MODULE_NOT_FOUND for package `rete` because dependencies could not be installed in this container.
+This result is intentionally NOT treated as PASS.
