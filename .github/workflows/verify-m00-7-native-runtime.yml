@@ -37,7 +37,7 @@ jobs:
         run: npm run verify
       - name: Preserve generated lockfile
         if: always()
-        run: cp package-lock.json artifacts/package-lock.generated.json || true
+        run: mkdir -p artifacts && cp package-lock.json artifacts/package-lock.generated.json || true
       - name: Upload source/build evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -75,8 +75,8 @@ jobs:
         run: npx expo prebuild --platform android --clean --no-install
       - name: Verify sensitive-permission pruning in generated source
         run: node scripts/prebuild-summary.mjs
-      - name: Build Android release APK
-        run: cd android && ./gradlew assembleRelease --no-daemon
+      - name: Build Android release APK for emulator ABI
+        run: cd android && ./gradlew assembleRelease -PreactNativeArchitectures=x86_64 --no-daemon
       - name: Run real Android SQLite/Drizzle/Zustand/Refine and deep-link guard
         uses: reactivecircus/android-emulator-runner@v2
         with:
