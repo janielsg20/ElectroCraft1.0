@@ -59,8 +59,40 @@ Adaptation/blockers:
 - The execution container cannot resolve `registry.npmjs.org` (`EAI_AGAIN`). No package-runtime result was fabricated.
 - This does not steal or waive the DB engine gate: the real PGlite/Drizzle POC is explicitly M00.4 and remains mandatory before F00 can close.
 
+## M00.3 — COMPLETADA
+State: GREEN.
+
+Evidence:
+- `.ai/adr/ADR-0003-puck-composition-poc.md`
+- `.ai/evidence/F00/M00.3/README.md`
+- `.ai/evidence/F00/M00.3/source-audit.md`
+- `.ai/evidence/F00/M00.3/test-output.txt`
+- `.ai/evidence/F00/M00.3/regression-output.txt`
+- `.ai/evidence/F00/M00.3/build-summary.json`
+- `experiments/m00-3-puck-composition/`
+
+Engine/API evidence:
+- `@puckeditor/core@0.22.4`, MIT, tag `v0.22.4`, commit `92585c44f95cd1422b175cfbcdd72283fe2b4a52`.
+- Exact official blobs SHA-checked for insert/reorder/replace/generateId/history.
+- Composition contract: Puck.Components / Outline / Preview / Fields + onAction.
+- Slot data contract: canonical `children[]` maps to a Puck slot prop.
+
+Tests exactos:
+- M00.3 `npm run lint` -> PASS, 9 official blobs verified.
+- M00.3 `npm run typecheck` -> PASS.
+- M00.3 `npm test` -> PASS, 16/16.
+- M00.3 `npm run integration` -> PASS: insert/reorder/replace/Slot/onAction canonical sync.
+- M00.3 `npm run build` -> PASS.
+- M00.3 `npm run e2e` -> PASS: end-to-end structural harness Request/Resultado/Validación.
+- M00.2 regression -> PASS, 21/21 + integration/build.
+- M00.1 regression -> PASS, 5/5 + lint/typecheck/build.
+
+Adaptation/blockers:
+- `registry.npmjs.org` remains unreachable from this container. Full published React bundle mount was not fabricated; exact engine mechanics/history and Composition source/type contract were verified. Studio workspace installation must re-run package mount smoke after a real lockfile install.
+- No architecture blocker remains for M00.4.
+
 ## Active
-F00 / M00.3 — EN_CURSO.
+F00 / M00.4 — EN_CURSO.
 
 Next microphase exact:
-M00.3 — POC Visual Editor con Puck Composition.
+M00.4 — POC Studio DB genérica.

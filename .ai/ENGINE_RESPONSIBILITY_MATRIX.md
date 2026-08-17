@@ -34,7 +34,8 @@ ElectroCraft owns artifact picker, context/privacy inspector, Draft Preview, Dif
 
 ## Puck
 Own: visual insertion/DnD, compositional `Puck.Components`, `Puck.Fields`, `Puck.Outline`, `Puck.Preview`, Slots, permissions, editor history, viewports and theming hooks.
-New nesting uses Slot. DropZone is migration-only. Puck AI remains separate/beta and is not the ElectroCraft AI architecture.
+M00.3 executable POC pins `@puckeditor/core@0.22.4`/MIT to tag `v0.22.4` for source provenance. New nesting uses Slot; `Container.children[]` maps to Puck slot content. DropZone is migration-only. Puck AI remains separate/beta and is not the ElectroCraft AI architecture.
+`onAction` is the synchronization boundary: ElectroCraft reconstructs canonical Document from public `newState.data`; Puck UI/index/history state is never persisted. `Section` remains a Palette preset producing `Container{semanticElement:"section"}`, not a parallel component type.
 ElectroCraft owns canonical Document, Screen context, Layout/Style, responsive/platform overrides, Bindings, Actions, accessibility and target mapping.
 
 # Studio/local data
@@ -156,3 +157,16 @@ Frozen ownership rules:
 - Auxiliary libraries are target-scoped: Lucide icons, ECharts web charts, Victory Native native charts, FullCalendar Standard web calendar, react-native-calendars native calendar, dnd-kit Studio-only interactions outside Puck-owned surfaces.
 
 Any future microphase that duplicates one of these engines must be rewritten before implementation.
+
+
+## M00.3 — Puck Composition POC closure (2026-08-17)
+
+Source of executable truth: `experiments/m00-3-puck-composition/`.
+
+Frozen results:
+- exact upstream Puck 0.22.4 blobs execute insert, reorder, replace, generateId and createHistorySlice; provenance is SHA-checked;
+- Composition shell contract includes Components/Outline/Preview/Fields and onAction;
+- new nested authoring maps Electro children to Puck Slots, never a second canonical tree;
+- undo/redo stays Puck-owned; ElectroCraft does not create a parallel history engine;
+- canonical snapshots reject Puck UI/index/zone/history internals;
+- full published React package mount is revalidated at Studio workspace install because the F00 container lacks npm-registry DNS; no mocked package mount is treated as evidence.

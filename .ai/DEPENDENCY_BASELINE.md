@@ -12,7 +12,9 @@ i18next/react-i18next with typed resources and mandatory Spanish fallback.
 AI Elements: install only named components required by AI Workbench. Never install the whole registry or graph/canvas pieces just because they exist.
 
 # Editor
-Puck current stable with compositional Components/Fields/Outline/Preview, Slots, permissions, PuckApi history and viewport APIs. New nesting = Slot; DropZone migration-only. Puck AI stays outside Core AI architecture.
+M00.3 POC baseline: `@puckeditor/core@0.22.4` (MIT), tag `v0.22.4`, exact source pinned for executable evidence. Reverify the product workspace version immediately before installation.
+Puck owns compositional Components/Fields/Outline/Preview, Slots, permissions, PuckApi history and viewport/theming APIs. New nesting = Slot; DropZone migration-only. `Container.children[]` canonical maps to a Puck `slot` prop; Puck Data remains edit representation, never the persisted ElectroCraft document. Puck AI stays outside Core AI architecture.
+The M00.3 container could not install the published React bundle because npm-registry DNS is unavailable; the Composition contract is typechecked against the pinned API/source and exact upstream insert/reorder/replace/history source is executed. The first real Studio workspace must smoke-mount the published package after lockfile installation; mocks are not accepted as substitute evidence.
 
 # Data
 PGlite stable line + Drizzle stable line.

@@ -1,0 +1,29 @@
+{
+  "package": "@puckeditor/core",
+  "version": "0.22.4",
+  "license": "MIT",
+  "tag": "v0.22.4",
+  "commit": "92585c44f95cd1422b175cfbcdd72283fe2b4a52",
+  "tree": "b29a30592e2ebfc8d222dee3fe8531c272e0b137",
+  "files": {
+    "lib/data/insert.ts": "83d50e3761e073e085a08b088b1055bb2ca2303d",
+    "lib/data/reorder.ts": "68f755828923811e167e99ebde509b964e5e5faa",
+    "lib/data/replace.ts": "440a1dcff7f89a04d07d4b06d3d96baf42f2a196",
+    "store/slices/history.ts": "bf38c8cd59b3260481b98f58a323ceb572001118",
+    "LICENSE": "53a1190127b706aae6111b8aa2b1df26d665862f",
+    "lib/generate-id.ts": "778c2157e6c982c5a9178580cd61fdb8026e95be",
+    "lib/uuid/index.ts": "34c4031b977b57a1005481df741ef7acac0fd6b7",
+    "lib/uuid/rng.ts": "65532065d435a1a26bd296223baa94e56177bde4",
+    "lib/uuid/stringify.ts": "b71fc25b23c6b7ae64d4e1dae332802a76712d2e"
+  },
+  "compositionSources": {
+    "Puck": "6159a838a53a2dd0ef1fbf819b4cf78fb905548c",
+    "Puck.Components": "88b90e426a2efee0d890b5bddb86fa01cd0b3c2a",
+    "Puck.Fields": "0c7b7cd57e9a2d48f7e07f810b15b83ddef440c4",
+    "Puck.Outline": "6b3f3227d006e3477beae3839050a7104c9417e7",
+    "Puck.Preview": "853ce8cedbe0b08c47fae92530ea5724f1fc42f8",
+    "Data": "a304da0f73373e44882ecc6d19d59703f2f78c37",
+    "slotTransform": "ecdb6d1f20ac298098e91a6308995177255019ab",
+    "reducer": "36680e7e7613805cf79f12a18bb6284b8dfd2d19"
+  }
+}

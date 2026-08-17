@@ -1,0 +1,68 @@
+{
+  "status": "GREEN",
+  "engine": "@puckeditor/core",
+  "version": "0.22.4",
+  "actions": [
+    "insert",
+    "slot-nesting",
+    "reorder",
+    "replace",
+    "onAction-sync"
+  ],
+  "canonicalNodeOrder": [
+    "section-offer",
+    "container-main"
+  ],
+  "canonicalSnapshot": {
+    "schemaVersion": 1,
+    "id": "screen-home",
+    "kind": "screen",
+    "nodes": [
+      {
+        "id": "section-offer",
+        "type": "Container",
+        "props": {
+          "semanticElement": "section",
+          "gap": 16
+        },
+        "children": [
+          {
+            "id": "offer-title",
+            "type": "Text",
+            "props": {
+              "text": "Oferta editada"
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "container-main",
+        "type": "Container",
+        "props": {
+          "semanticElement": "main",
+          "gap": 16
+        },
+        "children": [
+          {
+            "id": "text-title",
+            "type": "Text",
+            "props": {
+              "text": "ElectroCraft POC"
+            },
+            "children": []
+          },
+          {
+            "id": "button-continue",
+            "type": "Button",
+            "props": {
+              "label": "Continuar",
+              "actionId": "continue"
+            },
+            "children": []
+          }
+        ]
+      }
+    ]
+  }
+}

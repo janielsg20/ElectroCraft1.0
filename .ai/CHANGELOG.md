@@ -37,3 +37,17 @@
 - Re-ran M00.1 regression: lint, typecheck, 5/5 tests and build all passed.
 - Preserved exact phase ownership: Puck runtime POC = M00.3; PGlite/Drizzle runtime POC = M00.4. No false package-runtime result was recorded when npm registry access was unavailable.
 - Advanced active execution to M00.3.
+
+
+## 2026-08-17 — F00 / M00.3 completed
+
+- Pinned the reproducible Puck POC to `@puckeditor/core@0.22.4` / tag `v0.22.4` with exact Git-blob provenance and MIT license.
+- Added canonical Container/Text/Button fixture plus `Section` Palette preset as Container + `semanticElement=section`.
+- Added bidirectional ElectroCraftDocument <-> Puck Data adapter using Slots for canonical `children[]`.
+- Added Composition shell contract with Puck.Components, Puck.Outline, Puck.Preview, Puck.Fields and onAction synchronization.
+- Executed exact upstream Puck insert/reorder/replace/history source; undo/redo and canonical round-trip passed.
+- Added fail-fast guards preventing Puck UI/index/zone/history internals from entering persisted ElectroCraft snapshots.
+- M00.3 gates passed: lint, typecheck, 16/16 tests, integration, build and structural E2E harness.
+- Re-ran M00.2 (21/21 + integration/build) and M00.1 (5/5 + build) regressions successfully.
+- Documented npm-registry environment limitation instead of faking a React package mount; the real Studio workspace must smoke-test the published bundle after installation.
+- Advanced active execution to M00.4 — POC Studio DB genérica.

@@ -1,0 +1,18 @@
+{
+  "microphase": "M00.3",
+  "status": "GREEN",
+  "engine": "@puckeditor/core@0.22.4",
+  "upstreamCommit": "92585c44f95cd1422b175cfbcdd72283fe2b4a52",
+  "license": "MIT",
+  "exactVendoredBlobs": 9,
+  "compositionContract": true,
+  "mechanicsExecuted": [
+    "insert",
+    "slot-nesting",
+    "reorder",
+    "replace",
+    "onAction-sync"
+  ],
+  "canonicalInternalsPersisted": false,
+  "next": "M00.4 — POC Studio DB genérica"
+}

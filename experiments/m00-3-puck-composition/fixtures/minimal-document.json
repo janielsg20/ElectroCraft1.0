@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "screen-home",
+  "kind": "screen",
+  "nodes": [
+    {
+      "id": "container-main",
+      "type": "Container",
+      "props": { "semanticElement": "main", "gap": 16 },
+      "children": [
+        { "id": "text-title", "type": "Text", "props": { "text": "ElectroCraft POC" }, "children": [] },
+        { "id": "button-continue", "type": "Button", "props": { "label": "Continuar", "actionId": "continue" }, "children": [] }
+      ]
+    }
+  ]
+}

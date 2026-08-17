@@ -1,0 +1,17 @@
+{
+  "name": "electrocraft-m00-3-puck-composition",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "lint": "node scripts/lint.mjs",
+    "typecheck": "node scripts/typecheck.mjs",
+    "test": "node --test test/*.test.mjs",
+    "integration": "node scripts/integration.mjs",
+    "e2e": "python scripts/e2e.py",
+    "build": "node scripts/build.mjs"
+  }
+}

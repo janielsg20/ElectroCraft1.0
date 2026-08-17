@@ -1,0 +1,136 @@
+## M00.3 final gates
+
+> electrocraft-m00-3-puck-composition@0.0.0 lint
+> node scripts/lint.mjs
+
+PASS lint: 9 blobs Puck verificados, shell Composition completo, Slot-only nesting.
+
+> electrocraft-m00-3-puck-composition@0.0.0 typecheck
+> node scripts/typecheck.mjs
+
+PASS typecheck: contrato Puck Composition 0.22.4 compatible.
+
+> electrocraft-m00-3-puck-composition@0.0.0 test
+> node --test test/*.test.mjs
+
+TAP version 13
+# Subtest: fixture canónica contiene Container, Text y Button
+ok 1 - fixture canónica contiene Container, Text y Button
+  ---
+  duration_ms: 2.044836
+  type: 'test'
+  ...
+# Subtest: Section Palette preset produce Container semanticElement=section
+ok 2 - Section Palette preset produce Container semanticElement=section
+  ---
+  duration_ms: 0.277692
+  type: 'test'
+  ...
+# Subtest: Container declara children como Puck Slot
+ok 3 - Container declara children como Puck Slot
+  ---
+  duration_ms: 0.16298
+  type: 'test'
+  ...
+# Subtest: round-trip Electro -> Puck -> Electro conserva documento
+ok 4 - round-trip Electro -> Puck -> Electro conserva documento
+  ---
+  duration_ms: 1.011192
+  type: 'test'
+  ...
+# Subtest: Puck Slot se serializa como ComponentData[] en props.children
+ok 5 - Puck Slot se serializa como ComponentData[] en props.children
+  ---
+  duration_ms: 0.363501
+  type: 'test'
+  ...
+# Subtest: snapshot canónico no contiene internals de Puck
+ok 6 - snapshot canónico no contiene internals de Puck
+  ---
+  duration_ms: 0.559091
+  type: 'test'
+  ...
+# Subtest: adapter rechaza componente Puck fuera del modelo canónico
+ok 7 - adapter rechaza componente Puck fuera del modelo canónico
+  ---
+  duration_ms: 0.359071
+  type: 'test'
+  ...
+# Subtest: onAction reconstruye ElectroCraftDocument desde newState público
+ok 8 - onAction reconstruye ElectroCraftDocument desde newState público
+  ---
+  duration_ms: 1.06613
+  type: 'test'
+  ...
+# Subtest: validador rechaza IDs duplicados
+ok 9 - validador rechaza IDs duplicados
+  ---
+  duration_ms: 0.59187
+  type: 'test'
+  ...
+# Subtest: shell compone los cuatro primitives oficiales requeridos
+ok 10 - shell compone los cuatro primitives oficiales requeridos
+  ---
+  duration_ms: 0.977154
+  type: 'test'
+  ...
+# Subtest: shell cablea onAction y no usa DropZone
+ok 11 - shell cablea onAction y no usa DropZone
+  ---
+  duration_ms: 0.215324
+  type: 'test'
+  ...
+# Subtest: Puck insert real inserta Text dentro del Slot
+ok 12 - Puck insert real inserta Text dentro del Slot
+  ---
+  duration_ms: 880.688022
+  type: 'test'
+  ...
+# Subtest: Puck reorder real reordena el Slot
+ok 13 - Puck reorder real reordena el Slot
+  ---
+  duration_ms: 0.447001
+  type: 'test'
+  ...
+# Subtest: Puck replace real edita props sin cambiar id
+ok 14 - Puck replace real edita props sin cambiar id
+  ---
+  duration_ms: 0.271691
+  type: 'test'
+  ...
+# Subtest: secuencia Puck real vuelve a Electro sin internals
+ok 15 - secuencia Puck real vuelve a Electro sin internals
+  ---
+  duration_ms: 0.625511
+  type: 'test'
+  ...
+# Subtest: Puck history real registra, undo y redo
+ok 16 - Puck history real registra, undo y redo
+  ---
+  duration_ms: 601.470607
+  type: 'test'
+  ...
+1..16
+# tests 16
+# suites 0
+# pass 16
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1646.227873
+
+> electrocraft-m00-3-puck-composition@0.0.0 integration
+> node scripts/integration.mjs
+
+PASS integration: Puck 0.22.4 insert/reorder/replace + Slot + onAction canonical sync.
+
+> electrocraft-m00-3-puck-composition@0.0.0 build
+> node scripts/build.mjs
+
+PASS build: @puckeditor/core@0.22.4; Composition=true; next=M00.4 — POC Studio DB genérica
+
+> electrocraft-m00-3-puck-composition@0.0.0 e2e
+> python scripts/e2e.py
+
+PASS e2e-contract: fixture -> Puck mechanics -> canonical sync -> harness Request/Resultado/Validación GREEN.

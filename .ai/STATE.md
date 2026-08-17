@@ -2,20 +2,22 @@
 
 ## Estado actual
 - Fase activa: F00 — Reconocimiento, verificación y arquitectura.
-- Microfase activa: M00.3 — POC Visual Editor con Puck Composition.
-- Última microfase cerrada: M00.2 — Auditar responsabilidades OSS.
+- Microfase activa: M00.4 — POC Studio DB genérica.
+- Última microfase cerrada: M00.3 — POC Visual Editor con Puck Composition.
 - Estado: `IN_PROGRESS`.
-- Bloqueos: ninguno para iniciar M00.3.
+- Bloqueos: ninguno para iniciar M00.4.
 
-## M00.2 — cierre
-- 30 decisiones OSS auditadas con owner/API/estabilidad/licencia/targets/frontera/fuentes primarias.
-- 9/9 export targets siguen Core y de igual estatus.
-- Correcciones 2026 congeladas: shadcn Radix explícito, Gemini Interactions GA `v1`, TanStack Table v9 beta no implícito, dnd-kit en transición, Expo SQLite web alpha, PGlite 0.5.5 observado oficialmente.
-- Permission/SecretRef adapter deny-by-default: allow/deny/error/raw-secret/prototype tests verdes.
-- M00.2 `lint`/`typecheck`/21 tests/integration SQLite real/build: GREEN.
-- M00.1 regresión 5/5 + lint/typecheck/build: GREEN.
-- El POC runtime PGlite/Drizzle permanece correctamente en M00.4; M00.2 no lo duplicó ni falsificó.
-- Evidencia: `.ai/evidence/F00/M00.2/`.
+## M00.3 — cierre
+- POC fijado a `@puckeditor/core@0.22.4`/MIT, tag `v0.22.4`, con provenance de blobs oficiales.
+- Documento canónico Container/Text/Button y Palette Section -> Container semanticElement=section.
+- Adapter Electro <-> Puck usa Slot para `children`; no DropZone nuevo ni árbol canónico paralelo.
+- Composition shell contiene Components/Outline/Preview/Fields y cablea `onAction`.
+- Puck real source: insert/reorder/replace/history/undo/redo ejecutados; 16/16 tests verdes.
+- onAction sync y round-trip conservan `ElectroCraftDocument` sin ui/index/zone/history internals.
+- lint/typecheck/integration/build/E2E estructural: GREEN.
+- Regresiones: M00.2 21/21 + integration/build GREEN; M00.1 5/5 + build GREEN.
+- Limitación de entorno registrada: sin DNS a npm no se fingió un mount del bundle React publicado; el primer workspace Studio debe smoke-testearlo tras instalación real.
+- Evidencia: `.ai/evidence/F00/M00.3/`.
 
 ## Próximo paso
-Ejecutar M00.3 — POC Visual Editor con Puck Composition.
+Ejecutar M00.4 — POC Studio DB genérica, owner PGlite + Drizzle.
