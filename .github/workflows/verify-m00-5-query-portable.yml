@@ -1,0 +1,44 @@
+name: Verify M00.5 Query Portable
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "experiments/m00-5-query-portable/**"
+      - ".github/workflows/verify-m00-5-query-portable.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: experiments/m00-5-query-portable
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Setup Node 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org/
+      - name: Diagnose npm registry
+        run: |
+          npm config get registry
+          npm ping
+      - name: Install exact POC dependencies
+        run: npm install --no-audit --no-fund
+      - name: Verify M00.5 closure gates
+        run: npm run verify
+      - name: Upload M00.5 evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: m00-5-query-portable-evidence
+          path: |
+            experiments/m00-5-query-portable/artifacts/*.json
+            experiments/m00-5-query-portable/package-lock.json
+          if-no-files-found: warn

@@ -1,0 +1,20 @@
+{
+  "name": "electrocraft-m00-5-query-portable",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "lint": "node scripts/lint.mjs",
+    "typecheck": "node scripts/typecheck.mjs",
+    "test": "node --test test/*.test.mjs",
+    "integration": "node scripts/integration.mjs",
+    "build": "node scripts/build.mjs",
+    "closure-gate": "node scripts/closure-gate.mjs",
+    "verify": "npm run lint && npm run typecheck && npm test && npm run integration && npm run build && npm run closure-gate"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "0.5.5",
+    "@react-querybuilder/core": "8.23.0"
+  }
+}
