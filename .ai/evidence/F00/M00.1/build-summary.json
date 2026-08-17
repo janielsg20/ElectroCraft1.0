@@ -1,0 +1,42 @@
+{
+  "microphase": "M00.1",
+  "status": "green",
+  "requirements": 84,
+  "coreTargets": [
+    "local-project",
+    "react-web",
+    "static-web",
+    "pwa",
+    "android-expo",
+    "ios-expo",
+    "capacitor",
+    "lamp",
+    "wordpress"
+  ],
+  "requirementsByPhase": {
+    "F02": 1,
+    "F03": 7,
+    "F04": 1,
+    "F05-F06": 3,
+    "F16": 1,
+    "F07": 1,
+    "F08": 6,
+    "F09": 1,
+    "F11": 1,
+    "F13": 1,
+    "F14": 1,
+    "F12": 1,
+    "F15": 1,
+    "F10": 1,
+    "F17": 2,
+    "F18": 16,
+    "F20": 7,
+    "F21": 4,
+    "F23": 2,
+    "F24": 1,
+    "F25": 7,
+    "F26": 11,
+    "F27": 7
+  },
+  "generatedAt": "2026-08-17T15:03:48.211Z"
+}
