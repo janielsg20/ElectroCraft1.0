@@ -1,6 +1,6 @@
 # F00 / M00.6 evidence — POC Action Flow Rete
 
-State: `IN_PROGRESS — local/source-tag gates GREEN; published-package CI pending`.
+State: `COMPLETADA — GREEN`.
 
 ## Implemented
 
@@ -25,24 +25,26 @@ State: `IN_PROGRESS — local/source-tag gates GREEN; published-package CI pendi
 - canonical JSON round-trip/no engine instances -> PASS.
 - `npm run build` -> `PASS_BUILD`.
 
-## Network blocker
+## Original local-network limitation
 
-`getent hosts registry.npmjs.org` returned no resolution and `curl` timed out while resolving the npm registry. Therefore `node_modules` could not be installed in this container and `npm run integration` correctly fails with `ERR_MODULE_NOT_FOUND` for `rete`.
+The ChatGPT execution container could not resolve `registry.npmjs.org`, so published package installation was not fabricated locally. GitHub Actions is the mandatory package-runtime gate.
 
-This is a tooling/network blocker, not a passing package-runtime result. The included GitHub Actions workflow is the mandatory final gate.
+## Final CI closure
 
-## Required CI result before closure
+GitHub Actions run `32069130478` / job `95508045917` / head `a58870b9eadf512e353ad89ea5c12c44a5530ba5` completed SUCCESS.
 
-The workflow must prove:
+- registry health -> PASS;
+- lockfile v3 -> PASS;
+- exact installed versions -> PASS;
+- `npm ci` -> PASS;
+- lint -> PASS, 18 modules;
+- typecheck -> PASS, 18 ESM modules;
+- tests -> PASS, 9/9;
+- real Rete engine -> `PASS_REAL_RETE_ENGINE`;
+- real history -> `PASS_REAL_RETE_HISTORY`, node + connection undo/redo;
+- build -> `PASS_BUILD`;
+- closure -> `PASS_CLOSURE_GATE`;
+- artifact -> `9301037810`;
+- artifact digest -> `sha256:c18337a2ff70765d42bdc212e02c08fd317403bc351e222e9de7ef041851a0ce`.
 
-1. npm registry health;
-2. generated lockfile with exact direct pins plus `@babel/runtime@7.29.7`;
-3. exact installed versions;
-4. 9/9 or better tests;
-5. `PASS_REAL_RETE_ENGINE`;
-6. `PASS_REAL_RETE_HISTORY` with node + connection undo/redo;
-7. `PASS_BUILD`;
-8. `PASS_CLOSURE_GATE`;
-9. generated lockfile/evidence artifact captured.
-
-Do not start M00.7 until these are GREEN and continuity docs are closed.
+The first CI run `32068398640` failed only on the published `rete-history-plugin@2.2.0` CommonJS bundle requiring missing `rete-comment-plugin`; the final compatible runtime pin is `rete-history-plugin@2.1.1`. No unrelated comment plugin was added.

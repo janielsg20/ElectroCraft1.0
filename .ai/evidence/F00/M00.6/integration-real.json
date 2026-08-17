@@ -1,0 +1,15 @@
+{
+  "status": "PASS_REAL_RETE_ENGINE",
+  "elapsedMs": 3.1385,
+  "trueTrace": [
+    "trigger-record-created",
+    "condition-priority",
+    "data-mark-processed",
+    "toast-processed"
+  ],
+  "falseTrace": [
+    "trigger-record-created",
+    "condition-priority"
+  ],
+  "generatedConnections": 6
+}

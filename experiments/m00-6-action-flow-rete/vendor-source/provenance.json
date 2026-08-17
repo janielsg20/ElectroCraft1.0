@@ -27,15 +27,15 @@
   "rete-history-plugin": {
     "license": "MIT",
     "files": {
-      "src/index.ts": "bf73963183a23d8133dd31940311b1c6c1eff9e6",
-      "src/history.ts": "e0c1e16768662fc5c39bd8d1a7d311e9a37c5f8a",
+      "src/index.ts": "f5938b95fdf826ff146c56b26fccbd865db424f2",
+      "src/history.ts": "d387ab0f725245c3a53ae596c3e12fc7535bb399",
       "src/presets/classic/index.ts": "59ebb7e0a5f9d9d5e11a6966f982643486e97f95",
       "src/presets/classic/actions/node.ts": "c9c1a62f63dc89017f364bca3fc4245cf168832d",
       "src/presets/classic/actions/connection.ts": "b5b9e8d75f6f07480ae96bc3026e4bc3475d23c1"
     },
-    "tag": "v2.2.0",
-    "npmVersion": "2.2.0",
-    "tagManifestVersion": "2.2.0"
+    "tag": "v2.1.1",
+    "npmVersion": "2.1.1",
+    "tagManifestVersion": "2.1.0"
   },
   "rete-area-plugin": {
     "license": "MIT",

@@ -26,13 +26,11 @@ jobs:
           node-version: '22'
       - name: Registry health
         run: npm ping
-      - name: Generate deterministic lockfile
-        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
-      - name: Install from generated lockfile
+      - name: Install from committed lockfile
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Full M00.6 gate
         run: npm run verify
-      - name: Copy generated lockfile into evidence artifact
+      - name: Copy committed lockfile into evidence artifact
         if: always()
         run: cp package-lock.json artifacts/package-lock.generated.json || true
       - name: Upload M00.6 evidence
