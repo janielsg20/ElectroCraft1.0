@@ -24,7 +24,7 @@
     "rete": "2.0.6",
     "rete-area-plugin": "2.3.2",
     "rete-engine": "2.1.1",
-    "rete-history-plugin": "2.2.0"
+    "rete-history-plugin": "2.1.1"
   },
   "overrides": {
     "@babel/runtime": "7.29.7"
