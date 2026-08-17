@@ -24,7 +24,9 @@ async function writeProbe(payload = {}) {
     projectId: "m00-4-browser",
     objectId: "shared-worker-probe",
     kind: "diagnostic",
-    version: Date.now(),
+    // `version` is the small integer schema/object format version. Temporal or
+    // write-order data belongs in the canonical payload, never in this column.
+    version: 1,
     payload: {
       writerTabId: payload.writerTabId ?? tabId,
       sequence: payload.sequence ?? 0,
