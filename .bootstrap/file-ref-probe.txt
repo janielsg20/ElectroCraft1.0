@@ -1,0 +1,1 @@
+/mnt/data/ec_tail10k_rest/chunk01
