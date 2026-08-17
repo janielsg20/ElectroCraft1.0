@@ -25,6 +25,11 @@ poll_ui() {
     if [[ -f "$output" ]] && grep -Fq "$expected" "$output"; then
       return 0
     fi
+    if [[ -f "$output" ]] && grep -Fq "M00.7 runtime ERROR:" "$output"; then
+      echo "APP_RUNTIME_ERROR detected while waiting for: $expected" >&2
+      grep -o 'M00\.7 runtime ERROR:[^<]*' "$output" | head -1 >&2 || true
+      return 3
+    fi
     if [[ -f "$output" ]] && grep -Fq "System UI isn't responding" "$output"; then
       echo "INFRA_SYSTEM_UI_ANR detected while waiting for: $expected" >&2
       return 2

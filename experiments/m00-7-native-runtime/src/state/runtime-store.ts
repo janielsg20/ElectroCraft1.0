@@ -23,6 +23,7 @@ export const useNativeRuntimeStore = create<NativeRuntimeState>()(
       name: RUNTIME_STATE_KEY,
       storage: createJSONStorage(() => Storage),
       partialize: (state) => ({ authenticated: state.authenticated, draftCount: state.draftCount }),
+      skipHydration: true,
     },
   ),
 );

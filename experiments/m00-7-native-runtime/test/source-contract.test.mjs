@@ -18,11 +18,14 @@ test('native DB is Expo SQLite plus Drizzle generic tables', async () => {
   assert.match(runtime, /openDatabaseSync/);
   for (const table of ['content_records', 'relation_edges', 'record_field_index']) assert.match(schema, new RegExp(table));
 });
-test('Zustand persistence uses expo-sqlite kv-store', async () => {
+test('Zustand persistence uses expo-sqlite kv-store with ordered manual hydration', async () => {
   const store = await read('src/state/runtime-store.ts');
+  const selfTest = await read('src/poc/native-self-test.ts');
   assert.match(store, /expo-sqlite\/kv-store/);
   assert.match(store, /createJSONStorage/);
   assert.match(store, /persist\(/);
+  assert.match(store, /skipHydration:\s*true/);
+  assert.ok(selfTest.indexOf('await ensureNativeSchema()') < selfTest.indexOf('await useNativeRuntimeStore.persist.rehydrate()'));
 });
 test('Refine is headless and native UI does not use DOM table', async () => {
   const root = await read('app/_layout.tsx');
