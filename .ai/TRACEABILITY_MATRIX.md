@@ -84,7 +84,7 @@ M00.1 convierte la trazabilidad de áreas en trazabilidad atómica por requisito
 | R078 | WCAG 2.2 AA target | `ReleaseGate / Security / A11y / Performance` | F27 | local-project, react-web, static-web, pwa, android-expo, ios-expo, capacitor, lamp, wordpress |
 | R079 | secure imports/connectors/queries/uploads/AI/exports | `ReleaseGate / Security / A11y / Performance` | F27 | local-project, react-web, static-web, pwa, android-expo, ios-expo, capacitor, lamp, wordpress |
 | R080 | deterministic CI without mandatory AI network | `ReleaseGate / Security / A11y / Performance` | F27 | local-project, react-web, static-web, pwa, android-expo, ios-expo, capacitor, lamp, wordpress |
-| R081 | dependency pruning | `ReleaseGate / Security / A11y /Performance` | F27 | local-project, react-web, static-web, pwa, android-expo, ios-expo, capacitor, lamp, wordpress |
+| R081 | dependency pruning | `ReleaseGate / Security / A11y / Performance` | F27 | local-project, react-web, static-web, pwa, android-expo, ios-expo, capacitor, lamp, wordpress |
 | R082 | performance budgets | `ReleaseGate / Security / A11y / Performance` | F27 | local-project, react-web, static-web, pwa, android-expo, ios-expo, capacitor, lamp, wordpress |
 | R083 | no duplicate OSS-owned engines | `ReleaseGate / Security / A11y / Performance` | F27 | local-project, react-web, static-web, pwa, android-expo, ios-expo, capacitor, lamp, wordpress |
 | R084 | no P0/P1 gap | `ReleaseGate / Security / A11y / Performance` | F27 | local-project, react-web, static-web, pwa, android-expo, ios-expo, capacitor, lamp, wordpress |
