@@ -1,0 +1,153 @@
+name: F02 Canonical Model Gate
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/domain/**'
+      - 'packages/application/**'
+      - 'packages/editor-puck/**'
+      - 'packages/data-core/**'
+      - 'packages/query-rqb/**'
+      - 'packages/forms/**'
+      - 'packages/auth-core/**'
+      - 'packages/state-zustand/**'
+      - 'packages/workflow-rete/**'
+      - 'packages/export-ir/**'
+      - 'packages/media-tiptap/**'
+      - 'tooling/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.npmrc'
+      - '.ai/STATE.md'
+      - '.ai/TRACKING.md'
+      - '.ai/HANDOFF.md'
+      - '.ai/MODEL_OWNERSHIP.md'
+      - '.ai/ENGINE_PAYLOAD_POLICY.md'
+      - '.ai/evidence/F02/**'
+      - '.github/workflows/f02-canonical-model-gate.yml'
+
+permissions:
+  contents: read
+  statuses: write
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: f02-canonical-model-gate
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: F02 canonical model phase closure
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Publish pending status
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: 'pending',
+              context: 'electrocraft/F02',
+              description: 'F02 canonical model gate running',
+              target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Verify locked toolchain
+        run: |
+          test "$(node --version)" = 'v22.16.0'
+          test "$(npm --version)" = '10.9.2'
+          test "$(npm config get legacy-peer-deps)" = 'true'
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Verify F02 ownership and continuity preconditions
+        run: |
+          node -e "const p=require('./tooling/package-boundaries.json'); if(Object.keys(p.packages).length!==17) throw new Error('expected exactly 17 owner packages'); console.log('ownerPackages=17')"
+          test ! -d packages/contracts
+          grep -q 'M02.9.*ACTIVE' .ai/STATE.md
+          grep -q 'GREEN_THROUGH_M02.9' .ai/STATE.md
+          grep -q 'Gate F02.*IN_PROGRESS' .ai/STATE.md
+          grep -q 'F02 / M02.9' .ai/HANDOFF.md
+          test -f .ai/MODEL_OWNERSHIP.md
+          test -f .ai/ENGINE_PAYLOAD_POLICY.md
+          for n in 1 2 3 4 5 6 7 8 9; do test -f ".ai/evidence/F02/M02.${n}/CLOSURE_2026-08-18.md"; done
+
+      - name: Execute every F02 dedicated suite
+        run: npm run test:f02 | tee f02-dedicated-tests.log
+
+      - name: Execute full repository pipeline
+        run: npm run check | tee f02-check.log
+
+      - name: Verify F02 architectural invariants
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const ownership = fs.readFileSync('.ai/MODEL_OWNERSHIP.md', 'utf8');
+          const payloadPolicy = fs.readFileSync('.ai/ENGINE_PAYLOAD_POLICY.md', 'utf8');
+          const help = JSON.parse(fs.readFileSync('tooling/fixtures/help.architecture.models.json', 'utf8'));
+          const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          if (!ownership.includes('Application Registries') || !ownership.includes('Content / Runtime Entities')) throw new Error('ownership taxonomy documentation drift');
+          if (!payloadPolicy.includes('{ engine, schemaVersion, value }')) throw new Error('engine payload wrapper policy drift');
+          if (!payloadPolicy.includes('Puck AppState') || !payloadPolicy.includes('Rete `NodeEditor`')) throw new Error('runtime payload denylist drift');
+          if (!Array.isArray(help.details) || !help.details.some((line) => line.includes('Project Objects'))) throw new Error('Spanish architecture help drift');
+          for (let n = 1; n <= 9; n += 1) if (!packageJson.scripts[`test:m02-${n}`]) throw new Error(`missing test:m02-${n}`);
+          console.log('F02 invariants verified');
+          NODE
+
+      - name: Emit F02 closure candidate marker
+        run: echo PASS_F02_CANONICAL_MODEL_GATE | tee f02-closure.log
+
+      - name: Upload F02 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: f02-canonical-model-evidence
+          path: |
+            f02-dedicated-tests.log
+            f02-check.log
+            f02-closure.log
+            tooling/dist
+            .ai/STATE.md
+            .ai/TRACKING.md
+            .ai/HANDOFF.md
+            .ai/MODEL_OWNERSHIP.md
+            .ai/ENGINE_PAYLOAD_POLICY.md
+            .ai/evidence/F02/M02.9/CLOSURE_2026-08-18.md
+          if-no-files-found: error
+
+      - name: Publish final phase status
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: '${{ job.status }}' === 'success' ? 'success' : 'failure',
+              context: 'electrocraft/F02',
+              description: 'F02 canonical model phase gate',
+              target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });
