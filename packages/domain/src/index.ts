@@ -4,6 +4,7 @@ export * from './contracts/capability-report';
 export * from './contracts/component-definition';
 export * from './contracts/data-definition';
 export * from './contracts/document';
+export * from './contracts/engine-payload';
 export * from './contracts/export-ir';
 export * from './contracts/json-value';
 export * from './contracts/migration-registry';
