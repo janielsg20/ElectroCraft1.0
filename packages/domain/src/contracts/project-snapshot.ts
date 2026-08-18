@@ -39,6 +39,10 @@ function checksumFNV1a64(serialized: string): ElectroCraftCanonicalSnapshotCheck
   return electroCraftCanonicalSnapshotChecksumSchema.parse(`fnv1a64:${hash.toString(16).padStart(16, '0')}`);
 }
 
+export function createElectroCraftCanonicalSnapshotChecksum(input: unknown): ElectroCraftCanonicalSnapshotChecksum {
+  return checksumFNV1a64(stableCanonicalStringify(input));
+}
+
 export function createElectroCraftProjectSnapshot(
   projectInput: unknown,
   documentInputs: readonly unknown[],
@@ -65,7 +69,8 @@ export function serializeElectroCraftProjectSnapshot(snapshotInput: unknown): st
 export function createElectroCraftProjectSnapshotChecksum(
   snapshotInput: unknown,
 ): ElectroCraftCanonicalSnapshotChecksum {
-  return checksumFNV1a64(serializeElectroCraftProjectSnapshot(snapshotInput));
+  const snapshot = electroCraftProjectSnapshotSchema.parse(snapshotInput);
+  return createElectroCraftCanonicalSnapshotChecksum(snapshot);
 }
 
 export function createElectroCraftProjectSnapshotEnvelope(
