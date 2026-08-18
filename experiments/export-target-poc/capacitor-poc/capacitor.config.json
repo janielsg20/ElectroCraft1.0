@@ -1,0 +1,8 @@
+{
+  "appId": "com.electrocraft.poc",
+  "appName": "ElectroCraft POC",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

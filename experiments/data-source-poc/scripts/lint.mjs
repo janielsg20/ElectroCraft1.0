@@ -1,0 +1,3 @@
+import {readdir} from 'node:fs/promises';import {spawnSync} from 'node:child_process';import {join} from 'node:path';
+const roots=['src','public','server','test','scripts'];const files=[];for(const root of roots)await walk(root);let failed=false;for(const file of files.filter(f=>/\.(m?js)$/.test(f))){const r=spawnSync(process.execPath,['--check',file],{stdio:'inherit'});if(r.status!==0)failed=true;}if(failed)process.exit(1);console.log(`PASS_LINT ${files.length} JS files syntax-checked`);
+async function walk(dir){for(const e of await readdir(dir,{withFileTypes:true})){const p=join(dir,e.name);if(e.isDirectory())await walk(p);else files.push(p);}}

@@ -1,0 +1,122 @@
+
+> @electrocraft/data-source-poc@0.0.0-m00.9 lint
+> node scripts/lint.mjs
+
+PASS_LINT 21 JS files syntax-checked
+
+> @electrocraft/data-source-poc@0.0.0-m00.9 typecheck
+> tsc -p jsconfig.json
+
+
+> @electrocraft/data-source-poc@0.0.0-m00.9 test:offline
+> node --test test/*.test.mjs
+
+TAP version 13
+# Subtest: REST read fixture normalizes DataResult
+ok 1 - REST read fixture normalizes DataResult
+  ---
+  duration_ms: 21.12976
+  type: 'test'
+  ...
+# Subtest: REST write fixture
+ok 2 - REST write fixture
+  ---
+  duration_ms: 0.57082
+  type: 'test'
+  ...
+# Subtest: GraphQL query
+ok 3 - GraphQL query
+  ---
+  duration_ms: 0.88534
+  type: 'test'
+  ...
+# Subtest: GraphQL mutation variables
+ok 4 - GraphQL mutation variables
+  ---
+  duration_ms: 0.639283
+  type: 'test'
+  ...
+# Subtest: GraphQL errors normalize without throwing
+ok 5 - GraphQL errors normalize without throwing
+  ---
+  duration_ms: 0.728688
+  type: 'test'
+  ...
+# Subtest: Unsupported mutation capability returns normalized error
+ok 6 - Unsupported mutation capability returns normalized error
+  ---
+  duration_ms: 0.14813
+  type: 'test'
+  ...
+# Subtest: OpenAPI operation discovery finds GET and POST
+ok 7 - OpenAPI operation discovery finds GET and POST
+  ---
+  duration_ms: 7.81029
+  type: 'test'
+  ...
+# Subtest: OpenAPI discovery ignores non-method path fields
+ok 8 - OpenAPI discovery ignores non-method path fields
+  ---
+  duration_ms: 1.089727
+  type: 'test'
+  ...
+# Subtest: SecretRef is allowed but secret value config is rejected
+ok 9 - SecretRef is allowed but secret value config is rejected
+  ---
+  duration_ms: 1.197072
+  type: 'test'
+  ...
+# Subtest: SecretRef requires Gateway
+ok 10 - SecretRef requires Gateway
+  ---
+  duration_ms: 0.634403
+  type: 'test'
+  ...
+# Subtest: CORS direct-safe remains direct
+ok 11 - CORS direct-safe remains direct
+  ---
+  duration_ms: 0.110707
+  type: 'test'
+  ...
+# Subtest: CORS restricted requires Gateway
+ok 12 - CORS restricted requires Gateway
+  ---
+  duration_ms: 0.086904
+  type: 'test'
+  ...
+# Subtest: Forced Gateway wins
+ok 13 - Forced Gateway wins
+  ---
+  duration_ms: 0.09143
+  type: 'test'
+  ...
+# Subtest: Gateway resolves secret server-side and does not require secret in client envelope
+ok 14 - Gateway resolves secret server-side and does not require secret in client envelope
+  ---
+  duration_ms: 22.666707
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 137.383369
+
+> @electrocraft/data-source-poc@0.0.0-m00.9 secret-scan
+> node scripts/secret-scan.mjs
+
+PASS_SECRET_SCAN no credential-shaped literals in client/config surfaces
+
+> @electrocraft/data-source-poc@0.0.0-m00.9 metrics
+> node scripts/bundle-metrics.mjs
+
+{"pocOwnSourceBytes":21756,"pocOwnSourceFiles":12,"sqlDriverDependencies":0,"queryCacheDependencies":0,"openApiParserDependency":"@scalar/openapi-parser@0.28.11"}
+
+> @electrocraft/data-source-poc@0.0.0-m00.9 build
+> node scripts/build.mjs
+
+PASS_BUILD dist/ created

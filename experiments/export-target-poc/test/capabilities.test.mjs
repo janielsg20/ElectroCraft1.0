@@ -1,0 +1,2 @@
+import test from 'node:test'; import assert from 'node:assert/strict'; import { analyzeAllTargets } from '../src/capabilities.js';
+test('Capability report covers all equal Core targets without silent blockers',()=>{ const report=analyzeAllTargets(); assert.deepEqual(report.map(x=>x.target),['capacitor','lamp','wordpress']); for(const target of report){ assert.equal(target.summary.blocked,0); assert.equal(target.items.length,7); assert.ok(target.summary.exact+target.summary.adapted>0); } });

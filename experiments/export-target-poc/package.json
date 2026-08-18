@@ -1,0 +1,26 @@
+{
+  "name": "@electrocraft/export-target-poc",
+  "private": true,
+  "version": "0.0.0-m00.10",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "generate": "node scripts/generate.mjs",
+    "lint": "node scripts/lint.mjs",
+    "typecheck": "tsc -p jsconfig.json",
+    "test": "node --test test/*.test.mjs",
+    "verify:php": "node scripts/verify-php.mjs",
+    "verify:static": "node scripts/verify-static.mjs",
+    "build": "node scripts/build.mjs",
+    "check:static": "npm run generate && npm run lint && npm run typecheck && npm run test && npm run verify:php && npm run verify:static && npm run build",
+    "verify:capacitor-real": "node scripts/verify-capacitor-real.mjs",
+    "verify:lamp-real": "node scripts/verify-lamp-real.mjs",
+    "verify:wordpress-real": "node scripts/verify-wordpress-real.mjs",
+    "dev": "node scripts/serve.mjs"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2"
+  }
+}

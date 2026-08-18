@@ -1,0 +1,2 @@
+import assert from 'node:assert/strict';import {readFile} from 'node:fs/promises';import {parseOpenApiWithScalar,discoverOpenApiOperations} from '../src/openapi.js';
+const raw=await readFile(new URL('../fixtures/openapi.json',import.meta.url),'utf8');const schema=await parseOpenApiWithScalar(raw);const ops=discoverOpenApiOperations(schema);assert.deepEqual(ops.map(x=>x.operationId).sort(),['createProduct','listProducts']);console.log(`PASS_REAL_OPENAPI_PARSER scalar discovered ${ops.length} operations`);

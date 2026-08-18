@@ -1,0 +1,20 @@
+<?php
+declare(strict_types=1);
+session_start();
+use ElectroCraft\Poc\AppointmentRepository;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\Csrf\Guard;
+use Slim\Factory\AppFactory;
+use Slim\Psr7\Factory\ResponseFactory;
+require __DIR__ . '/../vendor/autoload.php';
+$pdo = new PDO(getenv('EC_DSN') ?: 'mysql:host=127.0.0.1;port=3306;dbname=electrocraft', getenv('EC_DB_USER') ?: 'electrocraft', getenv('EC_DB_PASSWORD') ?: 'electrocraft', [PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);
+$repo = new AppointmentRepository($pdo);
+$app = AppFactory::create();
+$app->addBodyParsingMiddleware();
+$csrf = new Guard(new ResponseFactory());
+$json = static function(Response $response, mixed $payload, int $status=200): Response { $response->getBody()->write(json_encode($payload, JSON_THROW_ON_ERROR)); return $response->withHeader('Content-Type','application/json')->withStatus($status); };
+$app->get('/appointments', function(Request $request, Response $response) use ($repo,$json): Response { return $json($response,['data'=>$repo->list(),'meta'=>['screen'=>'Citas','irFingerprint'=>'01faceab0d9309d7']]); });
+$app->get('/csrf', function(Request $request, Response $response) use ($json): Response { return $json($response,['csrf_name'=>$request->getAttribute('csrf_name'),'csrf_value'=>$request->getAttribute('csrf_value')]); })->add($csrf);
+$app->post('/appointments', function(Request $request, Response $response) use ($repo,$json): Response { $input=(array)$request->getParsedBody(); if (!is_string($input['clientName'] ?? null) || trim($input['clientName'])==='') return $json($response,['error'=>'clientName requerido'],422); if (!is_string($input['startsAt'] ?? null) || trim($input['startsAt'])==='') return $json($response,['error'=>'startsAt requerido'],422); $created=$repo->create($input); return $json($response,['data'=>$created,'meta'=>['actionGraph'=>'createAppointment']],201); })->add($csrf);
+$app->run();

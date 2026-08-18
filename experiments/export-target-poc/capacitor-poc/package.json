@@ -1,0 +1,17 @@
+{
+  "name": "electrocraft-capacitor-poc",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "dependencies": {
+    "@capacitor/core": "8.5.0",
+    "@capacitor/android": "8.5.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.0"
+  },
+  "scripts": {
+    "cap:add:android": "cap add android",
+    "cap:sync:android": "cap sync android"
+  }
+}

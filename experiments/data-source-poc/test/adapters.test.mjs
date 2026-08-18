@@ -1,0 +1,13 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import { GraphqlDataSourceAdapter, RestDataSourceAdapter } from '../src/index.js';
+const rows=[{id:1,name:'A'}];
+const mockFetch=async(url,init={})=>{
+ const u=String(url); if(u.includes('graphql')){const b=JSON.parse(String(init.body??'{}'));if(String(b.query).includes('fail'))return Response.json({data:null,errors:[{message:'fixture graphql error'}]});if(String(b.query).includes('createProduct'))return Response.json({data:{createProduct:{id:'2',name:b.variables.name}}});return Response.json({data:{products:rows}});}
+ if((init.method??'GET')==='POST'){const b=JSON.parse(String(init.body??'{}'));return Response.json({id:2,name:b.name},{status:201});} return Response.json(rows);
+};
+test('REST read fixture normalizes DataResult',async()=>{const a=new RestDataSourceAdapter({id:'r',baseUrl:'http://fixture',fetchImpl:mockFetch});const r=await a.execute({id:'read',kind:'read',resourceId:'products'});assert.deepEqual(r.data,rows);assert.equal(r.errors.length,0);assert.equal(r.meta.transport,'direct');});
+test('REST write fixture',async()=>{const a=new RestDataSourceAdapter({id:'r',baseUrl:'http://fixture',fetchImpl:mockFetch});const r=await a.execute({id:'write',kind:'write',resourceId:'products',input:{name:'B'}});assert.equal(r.data.name,'B');assert.equal(r.meta.status,201);});
+test('GraphQL query',async()=>{const a=new GraphqlDataSourceAdapter({id:'g',endpoint:'http://fixture/graphql',fetchImpl:mockFetch});const r=await a.execute({id:'q',kind:'read',resourceId:'graphql',input:{query:'query { products { id name } }'}});assert.deepEqual(r.data,{products:rows});});
+test('GraphQL mutation variables',async()=>{const a=new GraphqlDataSourceAdapter({id:'g',endpoint:'http://fixture/graphql',fetchImpl:mockFetch});const r=await a.execute({id:'m',kind:'write',resourceId:'graphql',input:{query:'mutation createProduct($name:String!){createProduct(name:$name){id name}}',variables:{name:'B'}}});assert.equal(r.data.createProduct.name,'B');});
+test('GraphQL errors normalize without throwing',async()=>{const a=new GraphqlDataSourceAdapter({id:'g',endpoint:'http://fixture/graphql',fetchImpl:mockFetch});const r=await a.execute({id:'q',kind:'read',resourceId:'graphql',input:{query:'query fail { fail }'}});assert.equal(r.errors[0].code,'GRAPHQL_ERROR');assert.match(r.errors[0].message,/fixture/);});
+test('Unsupported mutation capability returns normalized error',async()=>{const a=new GraphqlDataSourceAdapter({id:'g',endpoint:'http://fixture/graphql',fetchImpl:mockFetch,supportsMutation:false});const r=await a.execute({id:'m',kind:'write',resourceId:'graphql',input:{query:'mutation { x }'}});assert.equal(r.errors[0].code,'UNSUPPORTED_CAPABILITY');});

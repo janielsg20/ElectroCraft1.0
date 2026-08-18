@@ -1,0 +1,27 @@
+{
+  "name": "@electrocraft/data-source-poc",
+  "private": true,
+  "version": "0.0.0-m00.9",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "lint": "node scripts/lint.mjs",
+    "typecheck": "tsc -p jsconfig.json",
+    "test:offline": "node --test test/*.test.mjs",
+    "test:parser": "node scripts/parser-probe.mjs",
+    "test": "npm run test:offline && npm run test:parser",
+    "secret-scan": "node scripts/secret-scan.mjs",
+    "metrics": "node scripts/bundle-metrics.mjs",
+    "build": "node scripts/build.mjs",
+    "check": "npm run lint && npm run typecheck && npm run test && npm run secret-scan && npm run metrics && npm run build",
+    "dev": "node server/dev-server.mjs"
+  },
+  "dependencies": {
+    "@scalar/openapi-parser": "0.28.11"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2"
+  }
+}

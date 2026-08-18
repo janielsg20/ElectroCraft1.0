@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>POC técnico — cierre de arquitectura</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+<main>
+  <header><p class="eyebrow">POC técnico</p><h1>Cierre de arquitectura</h1><p>Harness aislado de M00.11. No es una ruta de producto.</p></header>
+  <section class="grid" aria-label="Validación de arquitectura">
+    <article><h2>Request</h2><label for="request">Validación</label><textarea id="request" rows="8" readonly>Revisar owners F00–F27, dependencias hacia atrás, engines, duplicaciones y nueve targets Core.</textarea><button id="validate" type="button">Validar</button></article>
+    <article><h2>Resultado</h2><pre id="result" tabindex="0">initial</pre></article>
+    <article><h2>Validación</h2><p id="status" role="status">initial</p><ul id="checks"></ul></article>
+  </section>
+</main><script type="module" src="app.js"></script>
+</body></html>

@@ -1,0 +1,15 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "ElectroCraft M00.9 Products Fixture", "version": "1.0.0" },
+  "paths": {
+    "/products": {
+      "get": { "operationId": "listProducts", "summary": "List products", "tags": ["products"], "responses": { "200": { "description": "OK" } } },
+      "post": { "operationId": "createProduct", "summary": "Create product", "tags": ["products"], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProductInput" } } } }, "responses": { "201": { "description": "Created" } } }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProductInput": { "type": "object", "required": ["name"], "properties": { "name": { "type": "string" } } }
+    }
+  }
+}

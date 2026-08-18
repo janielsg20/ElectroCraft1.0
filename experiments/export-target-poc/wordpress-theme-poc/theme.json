@@ -1,0 +1,31 @@
+{
+  "$schema": "https://schemas.wp.org/wp/7.0/theme.json",
+  "version": 3,
+  "settings": {
+    "appearanceTools": true,
+    "layout": {
+      "contentSize": "720px",
+      "wideSize": "1100px"
+    },
+    "typography": {
+      "fluid": true
+    }
+  },
+  "styles": {
+    "typography": {
+      "fontFamily": "system-ui, sans-serif"
+    },
+    "spacing": {
+      "blockGap": "1.25rem"
+    }
+  },
+  "customTemplates": [
+    {
+      "name": "appointments",
+      "title": "Citas",
+      "postTypes": [
+        "page"
+      ]
+    }
+  ]
+}

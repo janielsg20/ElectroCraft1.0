@@ -1,0 +1,13 @@
+{
+  "core": "WordPress/WordPress#7.0.2",
+  "themes": [
+    "./wordpress-theme-poc"
+  ],
+  "plugins": [
+    "./wordpress-plugin-poc"
+  ],
+  "config": {
+    "WP_DEBUG": true,
+    "SCRIPT_DEBUG": true
+  }
+}

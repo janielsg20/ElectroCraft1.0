@@ -1,0 +1,51 @@
+name: M00.9 Data Source POC
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'experiments/data-source-poc/**'
+      - '.ai/adr/ADR-DATA-SOURCES.md'
+      - '.ai/OPENAPI_PARSER_EVALUATION.md'
+      - '.github/workflows/data-source-poc.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'experiments/data-source-poc/**'
+      - '.ai/adr/ADR-DATA-SOURCES.md'
+      - '.ai/OPENAPI_PARSER_EVALUATION.md'
+      - '.github/workflows/data-source-poc.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: experiments/data-source-poc
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install exact POC dependency
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Verify installed tool versions
+        run: |
+          node -e "const p=require('./node_modules/@scalar/openapi-parser/package.json'); if(p.version!=='0.28.11') throw new Error('Unexpected parser '+p.version); console.log('Scalar',p.version)"
+          node -e "const p=require('./node_modules/typescript/package.json'); if(p.version!=='7.0.2') throw new Error('Unexpected TypeScript '+p.version); console.log('TypeScript',p.version)"
+      - name: Full M00.9 check
+        run: npm run check
+      - name: Persist evidence logs
+        if: always()
+        run: |
+          mkdir -p ci-evidence
+          npm run test:parser > ci-evidence/parser.log 2>&1 || true
+          npm run metrics > ci-evidence/metrics.log 2>&1 || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m00-9-data-source-evidence
+          path: experiments/data-source-poc/ci-evidence

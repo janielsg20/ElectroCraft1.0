@@ -1,0 +1,20 @@
+{
+  "verifiedAt": "2026-08-17",
+  "sources": [
+    {"engine":"Puck","url":"https://puckeditor.com/docs/api-reference/components/puck","apis":["Puck","onAction","permissions","viewports"]},
+    {"engine":"Puck Slot","url":"https://puckeditor.com/docs/api-reference/fields/slot","apis":["Slot","type=slot","allow","disallow"]},
+    {"engine":"PGlite","url":"https://pglite.dev/docs/multi-tab-worker","apis":["PGliteWorker","worker","isLeader"]},
+    {"engine":"Rete Engine","url":"https://retejs.org/docs/api/rete-engine/","apis":["DataflowEngine","ControlFlowEngine"]},
+    {"engine":"i18next","url":"https://www.i18next.com/overview/api","apis":["createInstance","init","t"]},
+    {"engine":"Refine","url":"https://refine.dev/core/docs/data/data-provider/","apis":["Refine","dataProvider"]},
+    {"engine":"TanStack Query","url":"https://tanstack.com/query/v5/docs/reference/QueryClient","apis":["QueryClient","invalidateQueries"]},
+    {"engine":"TanStack Table","url":"https://tanstack.com/table/latest/docs/api/core/table","apis":["getCoreRowModel"]},
+    {"engine":"Tiptap","url":"https://tiptap.dev/docs/editor/extensions/functionality/starterkit","apis":["StarterKit"]},
+    {"engine":"Tiptap HTML","url":"https://tiptap.dev/docs/editor/api/utilities/html","apis":["generateHTML"]},
+    {"engine":"Zustand","url":"https://zustand.docs.pmnd.rs/reference/apis/create-store","apis":["createStore"]},
+    {"engine":"Zustand persist","url":"https://zustand.docs.pmnd.rs/reference/middlewares/persist","apis":["persist"]},
+    {"engine":"shadcn CLI","url":"https://ui.shadcn.com/docs/cli","apis":["init --base radix"]},
+    {"engine":"AI SDK","url":"https://ai-sdk.dev/docs/reference/ai-sdk-core","apis":["generateText","streamText","Output","tool"]},
+    {"engine":"Expo Router","url":"https://docs.expo.dev/versions/latest/sdk/router/","apis":["Expo Router"]}
+  ]
+}

@@ -1,0 +1,196 @@
+name: M00.10 Export Target Parity POC
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'experiments/data-source-poc/**'
+      - 'experiments/export-target-poc/**'
+      - '.ai/adr/ADR-DATA-SOURCES.md'
+      - '.ai/adr/ADR-EXPORT-TARGET-PARITY.md'
+      - '.ai/EXPORT_TARGET_ARCHITECTURE_POC.md'
+      - '.github/workflows/export-target-poc.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'experiments/data-source-poc/**'
+      - 'experiments/export-target-poc/**'
+      - '.ai/adr/ADR-DATA-SOURCES.md'
+      - '.ai/adr/ADR-EXPORT-TARGET-PARITY.md'
+      - '.ai/EXPORT_TARGET_ARCHITECTURE_POC.md'
+      - '.github/workflows/export-target-poc.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  m00_9_precondition:
+    name: M00.9 real parser precondition
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: experiments/data-source-poc
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install exact M00.9 toolchain
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Verify parser and TypeScript pins
+        run: |
+          node -e "const p=require('./node_modules/@scalar/openapi-parser/package.json'); if(p.version!=='0.28.11') throw new Error('Unexpected parser '+p.version)"
+          node -e "const p=require('./node_modules/typescript/package.json'); if(p.version!=='7.0.2') throw new Error('Unexpected TypeScript '+p.version)"
+      - name: Full M00.9 gate
+        run: npm run check
+
+  static:
+    name: M00.10 static parity
+    needs: m00_9_precondition
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: experiments/export-target-poc
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install exact POC tooling
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Verify TypeScript pin
+        run: node -e "const p=require('./node_modules/typescript/package.json'); if(p.version!=='7.0.2') throw new Error('Unexpected TypeScript '+p.version)"
+      - name: Static POC gate
+        run: npm run check:static
+      - uses: actions/upload-artifact@v4
+        with:
+          name: m00-10-static-artifacts
+          path: |
+            experiments/export-target-poc/artifacts
+            experiments/export-target-poc/capability-report.json
+            experiments/export-target-poc/ir-fingerprint.txt
+            experiments/export-target-poc/toolchain-lock.json
+
+  capacitor_real:
+    name: Capacitor 8 real sync
+    needs: [m00_9_precondition, static]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: experiments/export-target-poc
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Generate target source
+        run: node scripts/generate.mjs
+      - name: Execute official Capacitor CLI
+        run: node scripts/verify-capacitor-real.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m00-10-capacitor-source
+          path: experiments/export-target-poc/capacitor-poc
+
+  lamp_real:
+    name: Slim 4 PDO CSRF real runtime
+    needs: [m00_9_precondition, static]
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: electrocraft
+          MYSQL_USER: electrocraft
+          MYSQL_PASSWORD: electrocraft
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+    defaults:
+      run:
+        working-directory: experiments/export-target-poc
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_mysql
+          tools: composer:v2
+      - name: Generate LAMP source
+        run: node scripts/generate.mjs
+      - name: Apply MySQL migration with PDO
+        env:
+          EC_DSN: mysql:host=127.0.0.1;port=3306;dbname=electrocraft
+          EC_DB_USER: electrocraft
+          EC_DB_PASSWORD: electrocraft
+        run: php -r '$pdo=new PDO(getenv("EC_DSN"),getenv("EC_DB_USER"),getenv("EC_DB_PASSWORD"),[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]); $pdo->exec(file_get_contents("lamp-poc/database/migrations/001_create_appointments.sql")); echo "PASS_MYSQL_MIGRATION\n";'
+      - name: Execute Slim/PDO/CSRF runtime
+        env:
+          EC_DSN: mysql:host=127.0.0.1;port=3306;dbname=electrocraft
+          EC_DB_USER: electrocraft
+          EC_DB_PASSWORD: electrocraft
+        run: node scripts/verify-lamp-real.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m00-10-lamp-source
+          path: experiments/export-target-poc/lamp-poc
+
+  wordpress_real:
+    name: WordPress 7.0.2 wp-env real runtime
+    needs: [m00_9_precondition, static]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: experiments/export-target-poc
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Generate WordPress source
+        run: node scripts/generate.mjs
+      - name: Install exact wp-env
+        run: npm install --no-save --ignore-scripts --no-audit --no-fund @wordpress/env@11.11.0
+      - name: Verify wp-env version
+        run: node -e "const p=require('./node_modules/@wordpress/env/package.json'); if(p.version!=='11.11.0') throw new Error('Unexpected wp-env '+p.version)"
+      - name: Execute WordPress recognition and activation fixture
+        run: node scripts/verify-wordpress-real.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m00-10-wordpress-source
+          path: |
+            experiments/export-target-poc/wordpress-theme-poc
+            experiments/export-target-poc/wordpress-plugin-poc
+
+  closure:
+    name: M00.10 closure gate
+    needs: [m00_9_precondition, static, capacitor_real, lamp_real, wordpress_real]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every target green
+        env:
+          M009: ${{ needs.m00_9_precondition.result }}
+          STATIC: ${{ needs.static.result }}
+          CAP: ${{ needs.capacitor_real.result }}
+          LAMP: ${{ needs.lamp_real.result }}
+          WP: ${{ needs.wordpress_real.result }}
+        run: |
+          printf 'M00.9=%s static=%s capacitor=%s lamp=%s wordpress=%s\n' "$M009" "$STATIC" "$CAP" "$LAMP" "$WP"
+          test "$M009" = success
+          test "$STATIC" = success
+          test "$CAP" = success
+          test "$LAMP" = success
+          test "$WP" = success
+          echo PASS_M00_10_CLOSURE_GATE

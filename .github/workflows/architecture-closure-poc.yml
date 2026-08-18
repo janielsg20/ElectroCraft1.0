@@ -1,0 +1,54 @@
+name: M00.11 Architecture Closure POC
+
+on:
+  workflow_run:
+    workflows: ["M00.10 Export Target Parity POC"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  closure:
+    name: F00 architecture closure
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: experiments/architecture-closure-poc
+    steps:
+      - name: Checkout exact M00.10 green head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Record upstream precondition
+        run: |
+          printf 'M00.10 run=%s\nhead=%s\nconclusion=%s\n' \
+            '${{ github.event.workflow_run.id }}' \
+            '${{ github.event.workflow_run.head_sha }}' \
+            '${{ github.event.workflow_run.conclusion }}' | tee m00-11-precondition.log
+          test '${{ github.event.workflow_run.conclusion }}' = success
+      - name: Install exact closure probe dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Execute architecture closure gate
+        run: npm run check:ci | tee m00-11-ci.log
+      - name: Require real engine marker
+        run: grep -q 'PASS_REAL_ENGINE_MATRIX' m00-11-ci.log
+      - name: Emit closure marker
+        run: |
+          echo PASS_M00_11_ARCHITECTURE_CLOSURE | tee m00-11-closure.log
+          printf '{"m00_10_run":%s,"head":"%s","status":"PASS_M00_11_ARCHITECTURE_CLOSURE"}\n' \
+            '${{ github.event.workflow_run.id }}' \
+            '${{ github.event.workflow_run.head_sha }}' > dist/ci-closure.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m00-11-architecture-closure-evidence
+          path: |
+            experiments/architecture-closure-poc/dist
+            experiments/architecture-closure-poc/m00-11-precondition.log
+            experiments/architecture-closure-poc/m00-11-ci.log
+            experiments/architecture-closure-poc/m00-11-closure.log

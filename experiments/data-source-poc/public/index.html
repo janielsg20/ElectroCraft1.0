@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>POC de fuentes de datos</title><link rel="stylesheet" href="./styles.css"></head>
+<body>
+<main class="shell">
+  <header><p class="eyebrow">ElectroCraft · M00.9</p><h1>POC de fuentes de datos</h1><p>REST/OpenAPI, GraphQL y Gateway con resultados normalizados y credenciales por referencia.</p></header>
+  <div class="tabs" role="tablist" aria-label="Fuentes de datos">
+    <button role="tab" aria-selected="true" data-tab="rest">REST</button><button role="tab" aria-selected="false" data-tab="graphql">GraphQL</button><button role="tab" aria-selected="false" data-tab="gateway">Gateway</button>
+  </div>
+  <section class="panel" aria-live="polite">
+    <form id="probe-form">
+      <label>Operación<select id="operation"></select></label>
+      <label>Parámetros<textarea id="params" rows="7" spellcheck="false"></textarea></label>
+      <button id="run" type="submit">Probar</button>
+    </form>
+    <aside><div class="status"><span id="status-dot"></span><strong id="status">POC inicial.</strong></div><h2>Resultado</h2><pre id="result">—</pre><p id="credential" hidden>Credencial oculta</p></aside>
+  </section>
+</main><script type="module" src="./app.js"></script>
+</body></html>
