@@ -19,7 +19,7 @@ export class GeminiNativeCapabilityAdapter {
     return {
       status: interaction.status,
       outputText: interaction.output_text ?? "",
-      interactionIdPresent: interaction.id.length > 0,
+      stateless: true,
     };
   }
 }

@@ -24,6 +24,8 @@ const native = await read('src/server/gemini-native-capability-adapter.ts');
 assert.match(native, /apiVersion:\s*"v1"/);
 assert.match(native, /interactions\.create/);
 assert.match(native, /POC_INTERACTIONS_CODE_OK/);
+assert.match(native, /store:\s*false/);
+assert.ok(!native.includes('interaction.id'));
 const client = await read('src/client/gateway-contract.ts');
 for (const forbidden of ['@ai-sdk/google', '@google/genai', 'GEMINI_API_KEY', 'apiKey']) assert.ok(!client.includes(forbidden), forbidden);
 const policy = await read('src/shared/tool-policy.ts');

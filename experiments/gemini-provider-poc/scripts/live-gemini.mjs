@@ -58,7 +58,7 @@ if (!cancellation) throw new Error('Cancellation gate did not fail closed');
 
 const native = new GeminiNativeCapabilityAdapter(apiKey);
 const interaction = await native.probeStableInteractions();
-if (interaction.status !== 'completed' || !interaction.outputText.includes('POC_INTERACTIONS_CODE_OK') || !interaction.outputText.includes('electrocraft') || !interaction.interactionIdPresent) {
+if (interaction.status !== 'completed' || !interaction.outputText.includes('POC_INTERACTIONS_CODE_OK') || !interaction.outputText.includes('electrocraft') || interaction.stateless !== true) {
   throw new Error(`Interactions v1 code probe failed: ${JSON.stringify(interaction)}`);
 }
 
@@ -70,6 +70,7 @@ const result = {
   streaming: true,
   cancellation: true,
   interactionsV1: true,
+  interactionsStateless: true,
   logicalProfiles: Object.keys(CURRENT_RUNTIME_MODELS),
   resolvedModelsSessionOnly: CURRENT_RUNTIME_MODELS,
   codeEvidence: {
