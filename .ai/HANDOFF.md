@@ -1,7 +1,7 @@
 # HANDOFF — Eighth Final
 
 Current:
-F00 / M00.8 / EN_CURSO.
+F00 / M00.9 / EN_CURSO.
 
 Completed:
 - M00.1 GREEN — capability/ownership map.
@@ -11,31 +11,22 @@ Completed:
 - M00.5 GREEN — RQB portable query adapter with real PGlite execution.
 - M00.6 GREEN — canonical Action Flow mapped to real Rete ControlFlow/Dataflow + real node/connection undo/redo.
 - M00.7 GREEN — Expo Native runtime with real Android SQLite/Drizzle/Zustand/Refine + deep-link guard evidence.
+- M00.8 GREEN — Gemini code-generation gateway POC for components/plugins/sections.
 
-M00.7 closure source of truth:
-- final run `32078336103`, head `c6e05a475fa0df7fd7ba2a8138e1392bcf6df797`, SUCCESS;
-- source/build job `95536145137`; Android runtime job `95536362004`;
-- 13/13 tests, strict TS, lockfile v3, Android+iOS target exports, Android prebuild pruning and x86_64 release APK GREEN;
-- visible Android runtime `M00.7 runtime OK` with SQLite/Drizzle/DataProvider/Zustand persistence;
-- guarded deep link -> `Inicio de sesión requerido`;
-- final Android artifact `9304563117`; source/build artifact `9304237635`;
-- final fix serializes SQLite-backed Zustand hydration with `skipHydration` + explicit `rehydrate()` after DB initialization.
-
-M00.8 current:
-- isolated `experiments/gemini-provider-poc/` is on main;
-- deterministic lockfile committed in `1c09876e4f59911d9cd1af95f012c07595c59d3f`;
-- AI SDK + `@ai-sdk/google` primary; Zod validation;
-- direct `@google/genai` restricted to Interactions `v1` probe;
-- server gateway only; client has no provider/key fields;
-- allowed read/draft/validate policy; Apply/DB/SQL/files/install/deploy/secrets denied;
-- AI SDK structured output, bounded tools, stream/cancel, Gemini image;
-- model IDs runtime-only; canonical data stores logical profile only;
-- run `32082944290`: verify-static job `95549362334` GREEN across registry/npm ci/versions/lock/lint/strict TS/build/tests/integration/security/static closure;
-- live job `95549443577` fails only at `Require server-only Gemini secret` because repository Actions secret `GEMINI_API_KEY` is absent;
-- no live Gemini request has been executed yet, so M00.8 is not DONE.
+M00.8 closure source of truth:
+- final run `32088311808`, head `9f732e1715da3f6b953dec05223d22b2773b3225`, SUCCESS;
+- static job `95565335277`; live Gemini job `95565379219`; report status `95565541151`;
+- `PASS_LIVE_GEMINI_CODE` and `PASS_LIVE_CLOSURE_GATE`;
+- real component code artifact: TSX, 1609 bytes, SHA-256 `6805458a7e430a6ce49c664397b4514ed2ec325adb5a7c3e23ed8c6515cb6d18`;
+- structured plan + code artifact + bounded tool loop + streaming + cancellation + stateless Interactions `v1` all GREEN;
+- live artifact `9307469682` digest `sha256:4f85501c817461cdd1964f4dcc5ce06886fc32ef3be571e80a1757dbf1a32694`;
+- static artifact `9307452584` digest `sha256:624c5ee51052e1de73877ee68e940bdcc421dce8d1aee8298a703266298819e6`;
+- Gemini product scope is **code generation for components, plugins and sections**; image generation is not part of M00.8;
+- canonical profile set is `Automático | Rápido | Calidad | Código`; model IDs remain runtime-only;
+- generated code is Draft-only and cannot directly Apply/write DB/files/install/deploy/access secrets.
 
 Read next:
-AGENTS -> RULES -> MEMORY -> STATE -> TRACKING -> `.ai/microphases/M00_8.md` -> AI_ARCHITECTURE -> AI_PROVIDER_GEMINI -> AI_TOOL_CATALOG -> AI_SECURITY_PRIVACY.
+AGENTS -> RULES -> MEMORY -> STATE -> TRACKING -> `.ai/microphases/M00_9.md` -> PRODUCT_DIRECTION/DataSource architecture -> relevant dependency/OSS baselines.
 
 Next:
-Add `GEMINI_API_KEY` as a GitHub Actions repository secret and rerun `Verify M00.8 Gemini Provider`. Only after live structured/tools/stream/cancel/image/Interactions and final commit status are GREEN may M00.8 close. Do not begin M00.9 before that.
+Implement M00.9 POC Data Sources with one common `DataSourceAdapter`, REST/OpenAPI + GraphQL fixtures, normalized `DataResult`, `SecretRef` and a Gateway fake/server adapter proving the secret value never reaches the client. Keep all work isolated under `experiments/data-source-poc/` until its own gate is GREEN.

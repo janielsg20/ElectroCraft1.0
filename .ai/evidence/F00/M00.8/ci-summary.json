@@ -1,0 +1,42 @@
+{
+  "microphase": "M00.8",
+  "status": "GREEN",
+  "purpose": "Gemini code generation for components, plugins and sections",
+  "imageGenerationRequired": false,
+  "runId": 32088311808,
+  "headSha": "9f732e1715da3f6b953dec05223d22b2773b3225",
+  "jobs": {
+    "lockfileBootstrap": 95565311706,
+    "verifyStatic": 95565335277,
+    "liveGemini": 95565379219,
+    "reportStatus": 95565541151
+  },
+  "gates": {
+    "static": true,
+    "structuredOutput": true,
+    "codeArtifact": true,
+    "toolLoop": true,
+    "streaming": true,
+    "cancellation": true,
+    "interactionsV1Stateless": true,
+    "liveClosure": true
+  },
+  "generatedCodeEvidence": {
+    "artifactType": "component",
+    "entryFile": "./StatusBadge.tsx",
+    "fileCount": 1,
+    "languages": ["tsx"],
+    "byteLength": 1609,
+    "sha256": "6805458a7e430a6ce49c664397b4514ed2ec325adb5a7c3e23ed8c6515cb6d18"
+  },
+  "artifacts": {
+    "live": {
+      "id": 9307469682,
+      "digest": "sha256:4f85501c817461cdd1964f4dcc5ce06886fc32ef3be571e80a1757dbf1a32694"
+    },
+    "static": {
+      "id": 9307452584,
+      "digest": "sha256:624c5ee51052e1de73877ee68e940bdcc421dce8d1aee8298a703266298819e6"
+    }
+  }
+}

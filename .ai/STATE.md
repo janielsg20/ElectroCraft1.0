@@ -2,36 +2,36 @@
 
 ## Estado actual
 - Fase activa: F00 — Reconocimiento, verificación y arquitectura.
-- Microfase activa: M00.8 — POC AI SDK + Gemini.
-- Última microfase cerrada: M00.7 — POC Native runtime.
+- Microfase activa: M00.9 — POC Data Sources: REST/OpenAPI, GraphQL y Gateway.
+- Última microfase cerrada: M00.8 — POC AI SDK + Gemini para generación de código.
 - Estado: `IN_PROGRESS`.
 - Bloqueo de producto: ninguno.
-- Bloqueo de cierre M00.8: falta GitHub Actions secret server-side `GEMINI_API_KEY` para ejecutar el gate Gemini real.
 
-## M00.7 — cierre GREEN
-- Expo Router Stack + Tabs JS, Expo SQLite + Drizzle, renderer Native canónico, Zustand persisted state y Refine Core headless quedaron probados en Android real emulado con KVM.
-- Fix final: `skipHydration: true` en Zustand y `rehydrate()` ordenado después de `ensureNativeSchema()` elimina la carrera de creación del directorio SQLite.
-- Final run: `32078336103`, head `c6e05a475fa0df7fd7ba2a8138e1392bcf6df797`, SUCCESS.
-- Jobs: lockfile `95536121263`; source/build `95536145137`; Android runtime `95536362004`; report status `95539234874`.
-- Tests: 13/13 PASS; typecheck PASS; lockfile v3 PASS; config pruning PASS; Android/iOS target exports PASS; x86_64 Android release APK PASS.
-- Runtime visible: `M00.7 runtime OK`; SQLite/Drizzle/DataProvider/Zustand persistence PASS; `electrocraft://guarded` redirige a `Inicio de sesión requerido`.
-- Artifacts: Android `9304563117` digest `sha256:ef6bcc5fe1eb7750a3731a89b5daa0c7af7c1fbe7c550cb81bb277041141f3d8`; source/build `9304237635` digest `sha256:c7be19042662e0845bd650af2da8e157bd8a0493d2d51981836fd7c913c46f63`.
-- Lockfile SHA-256: `1eeb7b543cbc3876c5467fedfa21bd6d8f84466b5dbff9dd71ec340337c17882`.
+## M00.8 — cierre GREEN
+- Propósito congelado: Gemini genera/refina **código para componentes, plugins y secciones**. La generación de imágenes queda fuera del requisito y del gate M00.8.
+- Stack: `ai@7.0.48` + `@ai-sdk/google@4.0.31` + `zod@4.4.3`; `@google/genai@2.15.0` solo para probe estrecho Interactions `v1`.
+- Perfiles canónicos: `Automático | Rápido | Calidad | Código`; IDs concretos de modelo son metadata runtime/session y no datos canónicos.
+- `CodeArtifactPoc` admite `component | plugin | section`, uno o más archivos, `entryFile`, dependencias propuestas y checks; siempre Draft antes de cualquier Apply futuro.
+- Seguridad fail-closed: rutas absolutas/traversal/duplicadas, `entryFile` inválido, referencias a credenciales y `draftOnly=false` se rechazan; tools no pueden Apply, DB/SQL, filesystem write, ejecutar código arbitrario, instalar, desplegar ni leer secretos.
+- `GEMINI_API_KEY` existe solo como GitHub Actions/server secret y nunca llega al contrato cliente.
 
-## M00.8 — CI estático GREEN
-- POC aislado: `experiments/gemini-provider-poc/`.
-- Baseline exacto bajo prueba: `ai@7.0.48`, `@ai-sdk/google@4.0.31`, `@google/genai@2.15.0`, `zod@4.4.3`, `typescript@6.0.3`.
-- Lockfile reproducible generado y comprometido en `1c09876e4f59911d9cd1af95f012c07595c59d3f`.
-- Run `32082944290`, head `2442940b5dc6628de249e734e59e8bcd931ad516`:
-  - lockfile-bootstrap `95549335511` -> SUCCESS;
-  - verify-static `95549362334` -> SUCCESS;
-  - live-gemini `95549443577` -> FAILURE únicamente en `Require server-only Gemini secret`;
-  - report-status `95549484894` -> SUCCESS publicando failure global.
-- Gates estáticos GREEN: registry, `npm ci`, exact versions, lockfile, lint, strict TypeScript, build, tests, real package API contract, gateway/security scan y static closure gate.
-- Correcciones de tipado: `skipLibCheck:true` limita el typecheck a fuentes del POC sin relajar `strict`, `noUncheckedIndexedAccess` ni `exactOptionalPropertyTypes`; `declaration:false` evita emisión `.d.ts` no necesaria para este POC runtime.
-- AI SDK + Google provider = stack principal; `@google/genai` solo prueba Interactions `v1`.
-- Perfiles canónicos: `Automático | Rápido | Calidad | Imagen`; IDs de modelos solo metadata runtime/session.
-- No marcar M00.8 DONE hasta ejecutar structured output, tools, streaming/cancel, image e Interactions contra Gemini real.
+### CI final
+- Run: `32088311808`.
+- Head probado: `9f732e1715da3f6b953dec05223d22b2773b3225`.
+- Resultado global/status `M00.8 Gemini Provider`: SUCCESS.
+- Jobs:
+  - lockfile-bootstrap `95565311706` -> SUCCESS;
+  - verify-static `95565335277` -> SUCCESS;
+  - live-gemini `95565379219` -> SUCCESS;
+  - report-status `95565541151` -> SUCCESS.
+- Static GREEN: registry, `npm ci`, exact versions, lockfile, lint, strict TypeScript, build, tests, real package API contract, gateway/security scan y static closure.
+- Live GREEN: `PASS_LIVE_GEMINI_CODE` + `PASS_LIVE_CLOSURE_GATE`.
+- Live probó structured plan, artifact de código real, bounded tool loop, streaming, cancelación e Interactions `v1` stateless.
+- Artifact generado en el run final: `component`, 1 archivo TSX, `entryFile=./StatusBadge.tsx`, 1609 bytes, SHA-256 `6805458a7e430a6ce49c664397b4514ed2ec325adb5a7c3e23ed8c6515cb6d18`.
+- Plan: 3 pasos; tools solicitadas `get_app_summary`, `get_current_screen`, `draft_create_component`, `validate_code_draft`; tool loop ejecutó únicamente `get_app_summary` en 2 pasos.
+- Artifacts CI:
+  - live `9307469682`, digest `sha256:4f85501c817461cdd1964f4dcc5ce06886fc32ef3be571e80a1757dbf1a32694`;
+  - static `9307452584`, digest `sha256:624c5ee51052e1de73877ee68e940bdcc421dce8d1aee8298a703266298819e6`.
 
 ## Próximo paso exacto
-Configurar `GEMINI_API_KEY` como GitHub Actions repository secret y volver a ejecutar `Verify M00.8 Gemini Provider`. No iniciar M00.9 antes de que el job `live-gemini` y el status `M00.8 Gemini Provider` queden GREEN.
+Implementar M00.9 únicamente en `experiments/data-source-poc/`: contrato común `DataSourceAdapter`, REST/OpenAPI, GraphQL, `DataResult` normalizado y Gateway/SecretRef sin exponer valores de credenciales. No añadir drivers SQL server al Core ni crear un segundo query cache.
