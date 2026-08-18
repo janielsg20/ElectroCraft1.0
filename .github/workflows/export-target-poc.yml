@@ -18,7 +18,14 @@ on:
       - '.ai/adr/ADR-DATA-SOURCES.md'
       - '.ai/adr/ADR-EXPORT-TARGET-PARITY.md'
       - '.ai/EXPORT_TARGET_ARCHITECTURE_POC.md'
+      - '.ai/STATE.md'
+      - '.ai/TRACKING.md'
+      - '.github/workflows/data-source-poc.yml'
       - '.github/workflows/export-target-poc.yml'
+      - '.github/workflows/architecture-closure-poc.yml'
+      - '.github/workflows/m01-1-monorepo.yml'
+      - '.github/workflows/m01-2-typescript-boundaries.yml'
+      - '.github/workflows/m01-3-quality-toolchain.yml'
 
 permissions:
   contents: read
