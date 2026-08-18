@@ -18,10 +18,7 @@ import { resolvePortableFieldBinding, type PortableFieldBinding } from '@electro
 const fallbackMarker = '__ELECTROCRAFT_BLOCKED__';
 
 export type PortableQueryBlockedCode =
-  | 'INVALID_QUERY_REFERENCE'
-  | 'RQB_FORMATTER_CONTRACT'
-  | 'RQB_FALLBACK_BLOCKED'
-  | 'UNBOUND_QUERY_FIELD';
+  'INVALID_QUERY_REFERENCE' | 'RQB_FORMATTER_CONTRACT' | 'RQB_FALLBACK_BLOCKED' | 'UNBOUND_QUERY_FIELD';
 
 export class PortableQueryBlockedError extends Error {
   constructor(

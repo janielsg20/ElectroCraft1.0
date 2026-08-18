@@ -17,7 +17,8 @@ export const electroCraftDataSourceCapabilitySchema = z.enum([
   'subscribe',
 ]);
 
-const forbiddenConfigKeyPattern = /^(?:password|passwd|secret|clientsecret|accesstoken|refreshtoken|apikey|authorization|credential)$/i;
+const forbiddenConfigKeyPattern =
+  /^(?:password|passwd|secret|clientsecret|accesstoken|refreshtoken|apikey|authorization|credential)$/i;
 
 function findSecretLikeConfigPath(value: unknown, path: string[] = []): string[] | null {
   if (Array.isArray(value)) {
@@ -54,7 +55,9 @@ export const electroCraftDataSourceDefinitionSchema = z
     metadata: electroCraftMetadataSchema,
   })
   .superRefine((source, context) => {
-    const duplicates = source.capabilities.filter((capability, index) => source.capabilities.indexOf(capability) !== index);
+    const duplicates = source.capabilities.filter(
+      (capability, index) => source.capabilities.indexOf(capability) !== index,
+    );
     if (duplicates.length > 0) {
       context.addIssue({ code: 'custom', path: ['capabilities'], message: 'data source capabilities must be unique' });
     }
@@ -70,7 +73,15 @@ export const electroCraftDataSourceDefinitionSchema = z
 
 export type ElectroCraftDataSourceDefinition = z.infer<typeof electroCraftDataSourceDefinitionSchema>;
 
-export const electroCraftDataFieldTypeSchema = z.enum(['text', 'number', 'boolean', 'date', 'datetime', 'json', 'relation']);
+export const electroCraftDataFieldTypeSchema = z.enum([
+  'text',
+  'number',
+  'boolean',
+  'date',
+  'datetime',
+  'json',
+  'relation',
+]);
 export type ElectroCraftDataFieldType = z.infer<typeof electroCraftDataFieldTypeSchema>;
 
 export const electroCraftDataFieldSchema = z
@@ -90,7 +101,11 @@ export const electroCraftDataFieldSchema = z
       context.addIssue({ code: 'custom', path: ['faceted'], message: 'faceted fields must be indexed' });
     }
     if (field.type === 'relation' && field.relationModelRef === null) {
-      context.addIssue({ code: 'custom', path: ['relationModelRef'], message: 'relation field requires relationModelRef' });
+      context.addIssue({
+        code: 'custom',
+        path: ['relationModelRef'],
+        message: 'relation field requires relationModelRef',
+      });
     }
     if (field.type !== 'relation' && field.relationModelRef !== null) {
       context.addIssue({
@@ -190,10 +205,16 @@ export function validateDataSchemaReferences(
   return [];
 }
 
-export function getDataModel(schema: ElectroCraftDataSchema, modelRef: ElectroCraftObjectId): ElectroCraftDataModel | null {
+export function getDataModel(
+  schema: ElectroCraftDataSchema,
+  modelRef: ElectroCraftObjectId,
+): ElectroCraftDataModel | null {
   return schema.models.find(({ id }) => id === modelRef) ?? null;
 }
 
-export function getDataField(model: ElectroCraftDataModel, fieldRef: ElectroCraftObjectId): ElectroCraftDataField | null {
+export function getDataField(
+  model: ElectroCraftDataModel,
+  fieldRef: ElectroCraftObjectId,
+): ElectroCraftDataField | null {
   return model.fields.find(({ id }) => id === fieldRef) ?? null;
 }

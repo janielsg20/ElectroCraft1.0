@@ -53,8 +53,8 @@ describe('M02.3 data/query/form boundaries', () => {
     expect(electroCraftDataSourceDefinitionSchema.safeParse({ ...source, config: { clientSecret: 'x' } }).success).toBe(
       false,
     );
-    expect(electroCraftDataSourceDefinitionSchema.safeParse({ ...source, authRef: 'ec_auth_000000000000g' }).success).toBe(
-      true,
-    );
+    expect(
+      electroCraftDataSourceDefinitionSchema.safeParse({ ...source, authRef: 'ec_auth_000000000000g' }).success,
+    ).toBe(true);
   });
 });

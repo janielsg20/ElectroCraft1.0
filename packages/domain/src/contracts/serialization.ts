@@ -48,7 +48,9 @@ function parseJson(serialized: string): unknown {
   return JSON.parse(serialized) as unknown;
 }
 
-function validateImportedProject(result: ElectroCraftProjectDefinitionImportResult): ElectroCraftProjectDefinitionImportResult {
+function validateImportedProject(
+  result: ElectroCraftProjectDefinitionImportResult,
+): ElectroCraftProjectDefinitionImportResult {
   const diagnostics = validateProjectDefinitionSemantics(result.project);
   if (diagnostics.length > 0) {
     throw new TypeError(`invalid project semantics: ${diagnostics.map(({ code }) => code).join(', ')}`);
@@ -141,7 +143,9 @@ export function canonicalComponentDefinitionRoundTrip(
   return deserializeElectroCraftComponentDefinition(serializeElectroCraftComponentDefinition(definition)).definition;
 }
 
-export function canonicalDataSourceRoundTrip(source: ElectroCraftDataSourceDefinition): ElectroCraftDataSourceDefinition {
+export function canonicalDataSourceRoundTrip(
+  source: ElectroCraftDataSourceDefinition,
+): ElectroCraftDataSourceDefinition {
   return deserializeElectroCraftDataSourceDefinition(serializeElectroCraftDataSourceDefinition(source));
 }
 

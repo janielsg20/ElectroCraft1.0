@@ -9,10 +9,7 @@ import {
 } from '@electrocraft/domain';
 
 export type FormContractDiagnosticCode =
-  | 'NOT_A_FORM_DOCUMENT'
-  | 'MISSING_FORM_META'
-  | 'FORM_SCHEMA_MISMATCH'
-  | 'FORM_MODEL_MISMATCH';
+  'NOT_A_FORM_DOCUMENT' | 'MISSING_FORM_META' | 'FORM_SCHEMA_MISMATCH' | 'FORM_MODEL_MISMATCH';
 
 export interface FormContractDiagnostic {
   code: FormContractDiagnosticCode;

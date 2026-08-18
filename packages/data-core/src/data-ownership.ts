@@ -44,7 +44,9 @@ export interface DataOwnershipGraph {
   forms: ElectroCraftDocument[];
 }
 
-function collectFormBindingRefs(document: ElectroCraftDocument): Array<{ ref: ElectroCraftObjectId; path: string; source: string }> {
+function collectFormBindingRefs(
+  document: ElectroCraftDocument,
+): Array<{ ref: ElectroCraftObjectId; path: string; source: string }> {
   if (document.kind !== 'form' || document.formMeta === null) return [];
   const refs: Array<{ ref: ElectroCraftObjectId; path: string; source: string }> = [];
   if (document.formMeta.initialValuesBinding) {
@@ -85,7 +87,11 @@ export function validateDataOwnershipGraph(input: DataOwnershipGraph): DataOwner
 
   for (const schema of schemas) {
     for (const schemaDiagnostic of validateDataSchemaReferences(schema, sources)) {
-      diagnostics.push({ code: 'schema-source-ref-invalid', ownerId: schemaDiagnostic.ownerId, ref: schemaDiagnostic.ref });
+      diagnostics.push({
+        code: 'schema-source-ref-invalid',
+        ownerId: schemaDiagnostic.ownerId,
+        ref: schemaDiagnostic.ref,
+      });
     }
   }
 
@@ -113,9 +119,19 @@ export function validateDataOwnershipGraph(input: DataOwnershipGraph): DataOwner
     if (schemaRef !== null) {
       const schema = schemaById.get(schemaRef);
       if (!schema) {
-        diagnostics.push({ code: 'form-schema-ref-invalid', ownerId: form.id, ref: schemaRef, path: 'formMeta.dataSchemaRef' });
+        diagnostics.push({
+          code: 'form-schema-ref-invalid',
+          ownerId: form.id,
+          ref: schemaRef,
+          path: 'formMeta.dataSchemaRef',
+        });
       } else if (modelRef !== null && !getDataModel(schema, modelRef)) {
-        diagnostics.push({ code: 'form-model-ref-invalid', ownerId: form.id, ref: modelRef, path: 'formMeta.modelRef' });
+        diagnostics.push({
+          code: 'form-model-ref-invalid',
+          ownerId: form.id,
+          ref: modelRef,
+          path: 'formMeta.modelRef',
+        });
       }
     }
 

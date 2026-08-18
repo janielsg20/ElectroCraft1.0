@@ -95,7 +95,9 @@ export class ProjectDocumentService {
 
     const referenceDiagnostics = validateProjectDocumentReferences(project, documents);
     if (referenceDiagnostics.length > 0) {
-      return blocked('REFERENCE_ERROR', 'project document references are invalid', { diagnostics: referenceDiagnostics });
+      return blocked('REFERENCE_ERROR', 'project document references are invalid', {
+        diagnostics: referenceDiagnostics,
+      });
     }
 
     const records: CanonicalProjectObjectRecord[] = [
@@ -164,7 +166,9 @@ export class ProjectDocumentService {
         return blocked('PERSISTENCE_ERROR', errorMessage(error), { ref: documentId });
       }
       if (record === null) {
-        return blocked('MISSING_DOCUMENT_REF', 'referenced canonical document record was not found', { ref: documentId });
+        return blocked('MISSING_DOCUMENT_REF', 'referenced canonical document record was not found', {
+          ref: documentId,
+        });
       }
 
       try {

@@ -21,7 +21,8 @@ export interface ElectroCraftDataConnector {
   execute(request: DataConnectorExecutionRequest): Promise<ElectroCraftQueryResult>;
 }
 
-export type ConnectorRegistryBlockedCode = 'CONNECTOR_NOT_REGISTERED' | 'ADAPTER_ID_MISMATCH' | 'CONNECTOR_EXECUTION_FAILED';
+export type ConnectorRegistryBlockedCode =
+  'CONNECTOR_NOT_REGISTERED' | 'ADAPTER_ID_MISMATCH' | 'CONNECTOR_EXECUTION_FAILED';
 
 export class ConnectorRegistryError extends Error {
   constructor(
