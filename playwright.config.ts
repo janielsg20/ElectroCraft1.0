@@ -7,5 +7,5 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: [['list']],
-  outputDir: 'test-results/m01-3',
+  outputDir: 'test-results/m01-4',
 });
