@@ -1,0 +1,109 @@
+name: M01.4 Studio Vite PWA Bootstrap Gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'apps/studio/**'
+      - 'tooling/**'
+      - 'package.json'
+      - 'tsconfig*.json'
+      - 'vitest.config.ts'
+      - 'playwright.config.ts'
+      - '.github/workflows/m01-4-studio-bootstrap.yml'
+      - '.ai/HELP_ARCHITECTURE_REPOSITORY.md'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/studio/**'
+      - 'tooling/**'
+      - 'package.json'
+      - 'tsconfig*.json'
+      - 'vitest.config.ts'
+      - 'playwright.config.ts'
+      - '.github/workflows/m01-4-studio-bootstrap.yml'
+      - '.ai/STATE.md'
+      - '.ai/TRACKING.md'
+      - '.ai/HELP_ARCHITECTURE_REPOSITORY.md'
+
+permissions:
+  contents: read
+  statuses: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  verify:
+    name: M01.4 React/Vite/PWA bootstrap
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish pending status
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: 'pending',
+              context: 'electrocraft/M01.4',
+              description: 'M01.4 Studio Vite/PWA bootstrap running',
+              target_url: '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+            });
+
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install exact workspace dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund --package-lock=false
+
+      - name: Verify M01.4 engine pins
+        run: |
+          node -e "for (const [n,v] of Object.entries({react:'19.2.8','react-dom':'19.2.8','@vitejs/plugin-react':'6.0.5','vite-plugin-pwa':'1.3.0'})) { const p=require('./node_modules/'+n+'/package.json'); if(p.version!==v) throw new Error(n+': expected '+v+', got '+p.version); console.log(n+'@'+p.version) }"
+
+      - name: Execute full repository pipeline
+        run: npm run check | tee m01-4-check.log
+
+      - name: Verify generated Studio target artifact
+        run: |
+          node tooling/scripts/verify-studio-bootstrap.mjs | tee m01-4-artifact.log
+          test -f apps/studio/dist/index.html
+          test -f apps/studio/dist/manifest.webmanifest
+          test -f apps/studio/dist/sw.js
+          test -f tooling/dist/m01-4-studio-bootstrap-report.json
+
+      - name: Emit closure candidate marker
+        run: echo PASS_M01_4_STUDIO_BOOTSTRAP | tee m01-4-closure.log
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m01-4-studio-bootstrap-evidence
+          path: |
+            apps/studio/dist
+            tooling/dist
+            m01-4-check.log
+            m01-4-artifact.log
+            m01-4-closure.log
+
+      - name: Publish final commit status
+        if: ${{ always() && github.event_name != 'pull_request' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: '${{ job.status }}' === 'success' ? 'success' : 'failure',
+              context: 'electrocraft/M01.4',
+              description: 'M01.4 Studio Vite/PWA bootstrap gate',
+              target_url: '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+            });

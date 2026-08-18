@@ -16,7 +16,7 @@ ElectroCraft usa un monorepo con límites explícitos para que cada engine OSS c
 - `exporters` consume `export-ir`/contratos y nunca la UI del Studio.
 - `apps/studio` y `apps/native-preview` son composition roots; no son owners del modelo canónico.
 
-La misma información queda disponible como fixture estructurado en `tooling/fixtures/help.architecture.repository.json` para el futuro `HelpRegistry` de F03; M01.1 no crea un registro de ayuda paralelo.
+La misma información queda disponible como fixture estructurado en `tooling/fixtures/help.architecture.repository.json` para el futuro `HelpRegistry` de F03; F01 no crea un registro de ayuda paralelo.
 
 ## M01.2 — TypeScript y límites de importación
 - TypeScript se ejecuta con `strict: true` desde `tsconfig.base.json`.
@@ -33,3 +33,10 @@ La misma información queda disponible como fixture estructurado en `tooling/fix
 - Vitest separa unit/contract/integration.
 - Playwright Test ejecuta el gate E2E/QA.
 - `npm run check` es el pipeline completo antes de avanzar.
+
+## M01.4 — Studio Vite/PWA bootstrap
+- `apps/studio` pasa de artifact arquitectónico a composition root React/Vite real.
+- La ruta `/` contiene únicamente Project Home temporal de desarrollo; no crea el modelo final de navegación.
+- La PWA es un shell técnico: manifiesto + service worker generado, sin runtime caching ni estrategia avanzada en esta microfase.
+- El Studio referencia este descriptor mediante `help.architecture.repository`; F01 no introduce un HelpRegistry paralelo antes de F03.
+- El bootstrap no persiste datos demo, internals de Vite/Workbox ni un segundo modelo canónico.

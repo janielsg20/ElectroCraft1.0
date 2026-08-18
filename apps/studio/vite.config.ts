@@ -1,18 +1,51 @@
 import { defineConfig } from 'vite';
-import { dirname, resolve } from 'node:path';
+import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
+import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   root: here,
+  plugins: [
+    react(),
+    VitePWA({
+      injectRegister: 'script',
+      registerType: 'prompt',
+      includeAssets: ['electrocraft-dev.svg'],
+      manifest: {
+        id: '/',
+        name: 'ElectroCraft — Desarrollo',
+        short_name: 'ElectroCraft',
+        description: 'Bootstrap técnico de ElectroCraft Studio.',
+        lang: 'es',
+        start_url: '/',
+        scope: '/',
+        display: 'standalone',
+        theme_color: '#111318',
+        background_color: '#0c0e12',
+        icons: [
+          {
+            src: '/electrocraft-dev.svg',
+            sizes: 'any',
+            type: 'image/svg+xml',
+            purpose: 'any maskable',
+          },
+        ],
+      },
+      workbox: {
+        globPatterns: [],
+        runtimeCaching: [],
+        cleanupOutdatedCaches: false,
+      },
+      devOptions: {
+        enabled: false,
+      },
+    }),
+  ],
   build: {
     target: 'baseline-widely-available',
-    lib: {
-      entry: resolve(here, 'src/index.ts'),
-      formats: ['es'],
-      fileName: 'studio-architecture',
-    },
     outDir: 'dist',
     emptyOutDir: true,
     sourcemap: true,
