@@ -1,0 +1,21 @@
+{
+  "engine": "react-querybuilder",
+  "schemaVersion": 1,
+  "value": {
+    "combinator": "and",
+    "rules": [
+      {
+        "field": "status",
+        "operator": "=",
+        "value": "active",
+        "valueSource": "value"
+      },
+      {
+        "field": "price",
+        "operator": ">=",
+        "value": 25,
+        "valueSource": "value"
+      }
+    ]
+  }
+}
