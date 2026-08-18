@@ -15,6 +15,9 @@ describe('M01.3 contract — public package surfaces', () => {
   it('keeps exactly 17 packages and two composition roots', () => {
     const snapshot = collectWorkspace(root);
     expect(Object.keys(snapshot.boundaries.packages)).toHaveLength(17);
-    expect(Object.keys(snapshot.boundaries.apps).sort()).toEqual(['@electrocraft/native-preview', '@electrocraft/studio']);
+    expect(Object.keys(snapshot.boundaries.apps).sort()).toEqual([
+      '@electrocraft/native-preview',
+      '@electrocraft/studio',
+    ]);
   });
 });

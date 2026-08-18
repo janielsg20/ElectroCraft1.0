@@ -19,7 +19,7 @@
     "test:boundaries": "node tooling/scripts/verify-typescript-boundaries.mjs",
     "test:node": "node --test tooling/test/*.test.mjs",
     "test:vitest": "vitest run --config vitest.config.ts",
-    "test": "npm run test:node && npm run test:vitest",
+    "test": "npm run test:node && npm run build:offline && npm run test:vitest",
     "test:e2e": "playwright test --config playwright.config.ts",
     "test:empty-repo": "node tooling/scripts/verify-empty-repo-toolchain.mjs",
     "build:offline": "node tooling/scripts/build-workspace.mjs && node tooling/scripts/build-typescript-boundaries.mjs && node tooling/scripts/build-quality-report.mjs",

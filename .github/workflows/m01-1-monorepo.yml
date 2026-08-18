@@ -9,6 +9,10 @@ permissions:
   contents: read
   statuses: write
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   announce_statuses:
     name: Publish F01 pending statuses
@@ -65,7 +69,7 @@ jobs:
       - name: Typecheck package surfaces
         run: npm run typecheck | tee m01-1-typecheck.log
       - name: Execute Node contract/negative tests
-        run: npm test | tee m01-1-node-test.log
+        run: npm run test:node | tee m01-1-node-test.log
       - name: Build architecture report
         run: npm run build | tee m01-1-build.log
       - name: Execute real Vitest gate
@@ -73,7 +77,7 @@ jobs:
       - name: Execute real Vite library build
         run: npm run build:studio | tee m01-1-vite.log
       - name: Execute Playwright Test architecture gate
-        run: npm run e2e | tee m01-1-playwright.log
+        run: npm run test:e2e | tee m01-1-playwright.log
       - name: Emit M01.1 closure candidate marker
         run: |
           test -f tooling/dist/workspace-report.json

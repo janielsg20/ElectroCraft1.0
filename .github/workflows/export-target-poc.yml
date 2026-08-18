@@ -221,6 +221,22 @@ jobs:
           test "$LAMP" = success
           test "$WP" = success
           echo PASS_M00_10_CLOSURE_GATE
+      - name: Publish M00.9 precondition status
+        if: ${{ always() && github.event_name != 'pull_request' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const result = '${{ needs.m00_9_precondition.result }}';
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: result === 'success' ? 'success' : 'failure',
+              context: 'electrocraft/M00.9',
+              description: result === 'success' ? 'M00.9 real parser precondition' : `M00.9 real parser precondition: ${result}`,
+              target_url: '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+            })
       - name: Publish M00.10 final commit status
         if: ${{ always() && github.event_name != 'pull_request' }}
         uses: actions/github-script@v7
