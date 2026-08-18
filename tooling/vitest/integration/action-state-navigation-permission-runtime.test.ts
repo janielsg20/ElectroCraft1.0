@@ -5,6 +5,7 @@ import {
   electroCraftActionGraphSchema,
   electroCraftDocumentSchema,
   electroCraftNavigationDefinitionSchema,
+  electroCraftObjectIdSchema,
   electroCraftPermissionPolicySchema,
   electroCraftRoleSchema,
   electroCraftRouteDefinitionSchema,
@@ -79,7 +80,7 @@ describe('M02.4 runtime adapters and reference integration', () => {
 
     const unknownRole = evaluatePermission(
       {
-        roleRefs: ['ec_role_000000000000z'],
+        roleRefs: [electroCraftObjectIdSchema.parse('ec_role_000000000000z')],
         capability: 'navigate',
         target: { kind: 'route', resourceRef: route.id, fieldRef: null },
       },
