@@ -1,26 +1,22 @@
 # HANDOFF — ElectroCraft
 
 ## Current
-F02 / M02.7 — Definir `ElectroCraftExportIR` — `ACTIVE`.
+F02 / M02.8 — Clasificar ownership: Project Objects vs Registries vs Content Entities — `ACTIVE`.
 
 ## Siguiente acción exacta
-1. Mantener `packages/domain/src/contracts/` como ubicación efectiva de contracts; no crear package 18 `@electrocraft/contracts`.
-2. Reutilizar Zod `4.4.3` como boundary owner y la ruta determinista/checksum de M02.6; no crear otro serializer.
-3. Auditar `packages/export-ir`, `packages/domain` y `packages/application` para no duplicar manifests/target contracts existentes.
-4. Definir `ElectroCraftExportIR` como snapshot immutable/versionado neutral a target, con Documents, Navigation, Data Sources sanitizadas, DataSchema, Queries, State, Actions, Forms, Roles, Theme, Media manifest y required capabilities.
-5. Excluir Studio workspace state, Puck/Rete histories, TanStack cache, AI history/prompts y secret values; los secretos se representan solo mediante refs.
-6. Definir el closed set `ExportTargetId`: local-project, react-web, static-web, pwa, android-expo, ios-expo, capacitor, lamp, wordpress.
-7. Definir `TargetCompileContext` y `ExportValidationReport` sin importar engines ni tipos target-specific al IR.
-8. Reutilizar serialización/checksum deterministas para garantizar que dos exporters reciban exactamente la misma revisión.
-9. Añadir fixture round-trip, negative/boundary tests y target/native fixture que demuestre que Slim/WP/Expo/Capacitor internals no entran al IR.
-10. Actualizar `help.architecture.models`, scripts/gate M02.7 y ejecutar suite dedicada + `npm run check` + gates heredados; fusionar solo verde.
-11. Validar nuevamente M02.7 sobre `main`, registrar artifact/digest y solo entonces activar M02.8.
-
-## Engine/API verificado
-- Zod 4 estable; `z.object`/schemas siguen siendo el boundary canónico.
-- Zod 4 ofrece `z.toJSONSchema()` como conversión oficial cuando se necesite una representación JSON Schema; no sustituye el snapshot/checksum determinista de ElectroCraft.
+1. Leer `.ai/microphases/M02_8.md` y auditar la clasificación implícita ya presente en domain/application/export-ir antes de crear documentación o código.
+2. Mantener exactamente 17 owner packages y `packages/domain/src/contracts/` como ubicación canónica; no introducir un package/registry paralelo.
+3. Crear una taxonomía versionada/verificable con las categorías `project-object`, `registry-definition` y `content-entity`.
+4. Clasificar ProjectDefinition/Documents/Components/DataSource/DataSchema/Query/State/Action/Route/Navigation/Role/Policy/Theme y cualquier metadata portable según ownership real.
+5. Clasificar Component/Field/Action/Provider/Capability registries como definitions/registries disponibles; el proyecto solo puede guardar refs/overrides/definitions de usuario explícitas, nunca el registry runtime completo.
+6. Clasificar records/content data y futuros user/content entities como contenido administrado/runtime; no pueden convertirse en ProjectDefinition config ni copiarse al snapshot por defecto.
+7. Documentar owner package, storage authority, serializer/migration access y ExportIR participation en `.ai/MODEL_OWNERSHIP.md` o el documento exacto indicado por el spec.
+8. Añadir helpers/tests que detecten category drift, IDs duplicados, registry snapshots persistidos y content entities embebidas en Project Objects.
+9. Verificar que M02.7 ExportIR solo toma project objects + manifests/refs permitidas y nunca un registry vivo o content records arbitrarios.
+10. Actualizar ayuda arquitectónica y gate M02.8; ejecutar suite dedicada, `npm run check`, gates heredados y export parity cuando aplique.
+11. Fusionar solo verde; validar M02.8 nuevamente en `main`, registrar artifact/digest y solo entonces activar M02.9.
 
 ## Read set
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M02_7.md`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M02_8.md`.
 
-M02.1–M02.6 están cerradas; no reabrirlas salvo regresión reproducible.
+M02.1–M02.7 están cerradas; no reabrirlas salvo regresión reproducible.
