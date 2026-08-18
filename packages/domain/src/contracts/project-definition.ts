@@ -1,7 +1,11 @@
 import * as z from 'zod';
 import { electroCraftDocumentSchema, type ElectroCraftDocument } from './document';
 import { electroCraftMetadataSchema } from './json-value';
-import { ElectroCraftMigrationRegistry, type ElectroCraftMigrationResult } from './migration-registry';
+import {
+  cloneElectroCraftMigrationValue,
+  ElectroCraftMigrationRegistry,
+  type ElectroCraftMigrationResult,
+} from './migration-registry';
 import { electroCraftObjectIdSchema, type ElectroCraftObjectId } from './object-id';
 import {
   electroCraftCapabilityIdSchema,
@@ -137,7 +141,8 @@ export function migrateElectroCraftProjectDefinitionPayload(
     throw new TypeError(`unsupported project migration target v${targetVersion}`);
   }
   if (header.schemaVersion === targetVersion) {
-    const value = targetVersion === 3 ? electroCraftProjectDefinitionSchema.parse(input) : structuredClone(input);
+    const value =
+      targetVersion === 3 ? electroCraftProjectDefinitionSchema.parse(input) : cloneElectroCraftMigrationValue(input);
     return {
       value,
       fromVersion: header.schemaVersion,
