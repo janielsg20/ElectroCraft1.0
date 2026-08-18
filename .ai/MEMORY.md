@@ -21,6 +21,9 @@ Solo contiene hechos estables y decisiones vigentes. Progreso y siguiente paso p
 - ExportIR puede transportar Project Objects y manifests/refs portables permitidos, pero nunca registries runtime completos, caches/histories/prompts, internals de compiladores ni secret values.
 - El ownership canónico se divide en exactamente tres categorías: Project Objects, Application Registries y Content Entities. Registries core/extension se versionan con la app y no se copian al proyecto; content entities viven en su storage y se consumen por refs/resolver/manifest.
 - Un reusable component específico del proyecto sigue siendo `ElectroCraftDocument kind=reusable-component`; un ComponentDefinition core pertenece al registry de aplicación. Solo definitions `origin=user` pueden persistirse separadas y referenciarse desde el proyecto.
+- Un payload OSS persistible usa el wrapper JSON portable `{ engine, schemaVersion, value }`; `domain` no importa tipos del engine y cada adapter owner valida/interpreta/migra su `value`.
+- Los wrappers iniciales aprobados son React Query Builder rules y Tiptap rich-text JSON. RQB usa `@react-querybuilder/core@8.23.0`; el baseline Tiptap usa un grafo mínimo coherente `3.29.2` de core/html/Document/Paragraph/Text.
+- Puck AppState/history, Rete NodeEditor/sockets/history, Zustand store instances y TanStack Query cache permanecen prohibidos como payload persistido; se reconstruyen desde definiciones ElectroCraft canónicas.
 
 ## AI
 - AI SDK + `@ai-sdk/google` es la abstracción primaria; direct `@google/genai` solo para gaps estrechos y probados.
