@@ -1,24 +1,19 @@
 name: M02.2 Bootstrap
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - '.github/workflows/m02-2-bootstrap.yml'
-      - 'package.json'
-      - 'packages/editor-puck/package.json'
+  push:
+    branches:
+      - agent/m02-2-component-layout-style
 
 permissions:
   contents: write
 
 jobs:
   bootstrap:
-    if: ${{ github.head_ref == 'agent/m02-2-component-layout-style' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
           persist-credentials: true
       - uses: actions/setup-node@v7
         with:
