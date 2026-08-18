@@ -11,6 +11,7 @@
   ],
   "dependencies": {
     "@electrocraft/domain": "0.0.0-m01.3",
-    "@electrocraft/application": "0.0.0-m01.3"
+    "@electrocraft/application": "0.0.0-m01.3",
+    "rete": "2.0.6"
   }
 }

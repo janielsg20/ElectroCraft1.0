@@ -2,7 +2,7 @@
   "id": "help.architecture.models",
   "locale": "es",
   "title": "Modelo canónico del proyecto",
-  "summary": "Explica ownership portable de proyecto, documentos, componentes, datos, queries, formularios y adapters sin persistir internals de engines.",
+  "summary": "Explica ownership portable de proyecto, documentos, componentes, datos, queries, formularios, acciones, estado, navegación, permisos y adapters sin persistir internals de engines.",
   "details": [
     "ElectroCraftProjectDefinition guarda identidad, settings y referencias por ID; no embebe todos los documentos en un mega JSON.",
     "ElectroCraftDocument usa screen, template, form, admin-screen o reusable-component; page solo existe como entrada legacy migrable a screen.",
@@ -15,6 +15,10 @@
     "ConnectorRegistry vive en application como registry efímero y nunca dentro del proyecto persistido.",
     "Form sigue siendo ElectroCraftDocument kind=form con formMeta y bindings portables; no existe un árbol Form paralelo.",
     "Los bindings pueden apuntar por ID+path a DataSource, Query, State, Route, User, Form o Action output.",
-    "Los schemas canónicos usan Zod strictObject/schemaVersion y los application services escriben migraciones reparables al reabrir."
+    "ElectroCraftActionGraph persiste nodos, edges y refs como JSON; Rete NodeEditor, sockets e history solo existen en workflow-rete durante runtime.",
+    "ElectroCraftStateDefinition declara scope, tipo, default, persistence y sensibilidad; la instancia Zustand nunca forma parte del proyecto.",
+    "ElectroCraftRouteDefinition y ElectroCraftNavigationDefinition usan refs estables y nunca persisten RouteObject, hooks o componentes de React Router/Expo Router.",
+    "ElectroCraftRole referencia PermissionPolicy IDs; las policies son declarativas, fail-closed y deny prevalece sobre allow.",
+    "Los schemas canónicos usan Zod strictObject/schemaVersion y application valida referencias cruzadas reparables."
   ]
 }

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "ec_policy_000000000000k",
+  "version": 1,
+  "key": "navigateHome",
+  "label": "Permitir navegación a Inicio",
+  "effect": "allow",
+  "capabilities": ["navigate"],
+  "targets": [
+    {
+      "kind": "route",
+      "resourceRef": "ec_route_0000000000005",
+      "fieldRef": null
+    }
+  ],
+  "metadata": {
+    "fixture": "m02.4"
+  }
+}

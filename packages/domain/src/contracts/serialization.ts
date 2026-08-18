@@ -1,4 +1,18 @@
 import {
+  electroCraftActionGraphSchema,
+  electroCraftNavigationDefinitionSchema,
+  electroCraftPermissionPolicySchema,
+  electroCraftRoleSchema,
+  electroCraftRouteDefinitionSchema,
+  electroCraftStateDefinitionSchema,
+  type ElectroCraftActionGraph,
+  type ElectroCraftNavigationDefinition,
+  type ElectroCraftPermissionPolicy,
+  type ElectroCraftRole,
+  type ElectroCraftRouteDefinition,
+  type ElectroCraftStateDefinition,
+} from './app-behavior';
+import {
   electroCraftComponentDefinitionSchema,
   importElectroCraftComponentDefinition,
   validateComponentDefinitionReferences,
@@ -129,6 +143,54 @@ export function deserializeElectroCraftQueryDefinition(serialized: string): Elec
   return electroCraftQueryDefinitionSchema.parse(parseJson(serialized));
 }
 
+export function serializeElectroCraftActionGraph(input: unknown): string {
+  return stableCanonicalStringify(electroCraftActionGraphSchema.parse(input));
+}
+
+export function deserializeElectroCraftActionGraph(serialized: string): ElectroCraftActionGraph {
+  return electroCraftActionGraphSchema.parse(parseJson(serialized));
+}
+
+export function serializeElectroCraftStateDefinition(input: unknown): string {
+  return stableCanonicalStringify(electroCraftStateDefinitionSchema.parse(input));
+}
+
+export function deserializeElectroCraftStateDefinition(serialized: string): ElectroCraftStateDefinition {
+  return electroCraftStateDefinitionSchema.parse(parseJson(serialized));
+}
+
+export function serializeElectroCraftRouteDefinition(input: unknown): string {
+  return stableCanonicalStringify(electroCraftRouteDefinitionSchema.parse(input));
+}
+
+export function deserializeElectroCraftRouteDefinition(serialized: string): ElectroCraftRouteDefinition {
+  return electroCraftRouteDefinitionSchema.parse(parseJson(serialized));
+}
+
+export function serializeElectroCraftNavigationDefinition(input: unknown): string {
+  return stableCanonicalStringify(electroCraftNavigationDefinitionSchema.parse(input));
+}
+
+export function deserializeElectroCraftNavigationDefinition(serialized: string): ElectroCraftNavigationDefinition {
+  return electroCraftNavigationDefinitionSchema.parse(parseJson(serialized));
+}
+
+export function serializeElectroCraftRole(input: unknown): string {
+  return stableCanonicalStringify(electroCraftRoleSchema.parse(input));
+}
+
+export function deserializeElectroCraftRole(serialized: string): ElectroCraftRole {
+  return electroCraftRoleSchema.parse(parseJson(serialized));
+}
+
+export function serializeElectroCraftPermissionPolicy(input: unknown): string {
+  return stableCanonicalStringify(electroCraftPermissionPolicySchema.parse(input));
+}
+
+export function deserializeElectroCraftPermissionPolicy(serialized: string): ElectroCraftPermissionPolicy {
+  return electroCraftPermissionPolicySchema.parse(parseJson(serialized));
+}
+
 export function canonicalProjectRoundTrip(project: ElectroCraftProjectDefinition): ElectroCraftProjectDefinition {
   return deserializeElectroCraftProjectDefinition(serializeElectroCraftProjectDefinition(project));
 }
@@ -155,4 +217,32 @@ export function canonicalDataSchemaRoundTrip(schema: ElectroCraftDataSchema): El
 
 export function canonicalQueryRoundTrip(query: ElectroCraftQueryDefinition): ElectroCraftQueryDefinition {
   return deserializeElectroCraftQueryDefinition(serializeElectroCraftQueryDefinition(query));
+}
+
+export function canonicalActionGraphRoundTrip(graph: ElectroCraftActionGraph): ElectroCraftActionGraph {
+  return deserializeElectroCraftActionGraph(serializeElectroCraftActionGraph(graph));
+}
+
+export function canonicalStateDefinitionRoundTrip(
+  definition: ElectroCraftStateDefinition,
+): ElectroCraftStateDefinition {
+  return deserializeElectroCraftStateDefinition(serializeElectroCraftStateDefinition(definition));
+}
+
+export function canonicalRouteDefinitionRoundTrip(route: ElectroCraftRouteDefinition): ElectroCraftRouteDefinition {
+  return deserializeElectroCraftRouteDefinition(serializeElectroCraftRouteDefinition(route));
+}
+
+export function canonicalNavigationDefinitionRoundTrip(
+  navigation: ElectroCraftNavigationDefinition,
+): ElectroCraftNavigationDefinition {
+  return deserializeElectroCraftNavigationDefinition(serializeElectroCraftNavigationDefinition(navigation));
+}
+
+export function canonicalRoleRoundTrip(role: ElectroCraftRole): ElectroCraftRole {
+  return deserializeElectroCraftRole(serializeElectroCraftRole(role));
+}
+
+export function canonicalPermissionPolicyRoundTrip(policy: ElectroCraftPermissionPolicy): ElectroCraftPermissionPolicy {
+  return deserializeElectroCraftPermissionPolicy(serializeElectroCraftPermissionPolicy(policy));
 }

@@ -10,6 +10,7 @@
     "src"
   ],
   "dependencies": {
-    "@electrocraft/domain": "0.0.0-m01.3"
+    "@electrocraft/domain": "0.0.0-m01.3",
+    "zustand": "5.0.14"
   }
 }

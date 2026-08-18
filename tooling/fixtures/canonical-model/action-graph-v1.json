@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "ec_action-graph_000000000000f",
+  "version": 1,
+  "key": "onOpen",
+  "label": "Al abrir Inicio",
+  "entryNodeRef": "ec_action-node_000000000000g",
+  "nodes": [
+    {
+      "id": "ec_action-node_000000000000g",
+      "kind": "trigger",
+      "type": "event.route-enter",
+      "config": {},
+      "stateRefs": ["ec_state_000000000000j"],
+      "routeRefs": ["ec_route_0000000000005"],
+      "metadata": {}
+    },
+    {
+      "id": "ec_action-node_000000000000h",
+      "kind": "action",
+      "type": "navigation.go",
+      "config": {
+        "mode": "replace"
+      },
+      "stateRefs": ["ec_state_000000000000j"],
+      "routeRefs": ["ec_route_0000000000005"],
+      "metadata": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "ec_action-edge_000000000000i",
+      "sourceNodeRef": "ec_action-node_000000000000g",
+      "targetNodeRef": "ec_action-node_000000000000h",
+      "sourcePort": "next",
+      "targetPort": "exec"
+    }
+  ],
+  "metadata": {
+    "fixture": "m02.4"
+  }
+}

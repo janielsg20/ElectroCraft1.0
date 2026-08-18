@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "ec_role_000000000000m",
+  "version": 1,
+  "key": "member",
+  "label": "Miembro",
+  "permissionPolicyRefs": ["ec_policy_000000000000k"],
+  "metadata": {
+    "fixture": "m02.4"
+  }
+}

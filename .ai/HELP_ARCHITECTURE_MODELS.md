@@ -6,7 +6,7 @@
 Modelo canónico del proyecto
 
 ## Resumen
-ElectroCraft separa proyecto, documentos, componentes, datos, queries, formularios, layout y estilo de los engines de edición/render/storage para conservar portabilidad, referencias estables y ownership neutral a targets.
+ElectroCraft separa proyecto, documentos, componentes, datos, queries, formularios, acciones, estado, navegación, permisos, layout y estilo de los engines de edición/render/runtime/storage para conservar portabilidad, referencias estables y ownership neutral a targets.
 
 ## M02.1 — ProjectDefinition y Document
 - `ElectroCraftProjectDefinition` contiene identidad, `schemaVersion`, versión de objeto, settings de app, targets por defecto, refs y feature flags.
@@ -31,5 +31,15 @@ ElectroCraft separa proyecto, documentos, componentes, datos, queries, formulari
 - Form no crea otro árbol: sigue siendo `ElectroCraftDocument kind=form` y usa `formMeta` para schema/model/action/bindings.
 - Los bindings portables pueden referenciar DataSource, Query, State, Route, User, Form o Action output mediante IDs + path.
 - `data-core`, `query-rqb` y `forms` son los owners existentes; F02 no crea un segundo subsystem de datos/query/forms.
+
+## M02.4 — Action, State, Navigation y Permission
+- `ElectroCraftActionGraph` persiste nodos/edges/refs como datos JSON versionados; `NodeEditor`, sockets, history y clases de Rete solo existen en `workflow-rete` durante runtime.
+- `ElectroCraftStateDefinition` declara scope, tipo, valor inicial, persistence y sensibilidad. La instancia Zustand nunca se persiste como proyecto.
+- Estado sensible no puede degradarse a `local`/`session`; `secure` requiere un storage/target seguro y `component` no se persiste.
+- `ElectroCraftRouteDefinition` referencia Screen, ActionGraph, State y PermissionPolicy por IDs; no contiene RouteObject, loader, hook o componente de React Router/Expo Router.
+- `ElectroCraftNavigationDefinition` es una estructura portable de items que apunta a Route IDs; la navegación visual/runtime se deriva mediante adapters.
+- `ElectroCraftRole` solo agrupa PermissionPolicy refs. `ElectroCraftPermissionPolicy` expresa allow/deny por capability y target; no persiste callbacks de autorización.
+- `auth-core` evalúa policies fail-closed y `deny` prevalece sobre `allow`.
+- `application` valida las referencias cruzadas; missing refs quedan como diagnósticos reparables y nunca se ignoran silenciosamente.
 
 La versión estructurada para el futuro HelpRegistry vive en `tooling/fixtures/help.architecture.models.json`; F02 no introduce un HelpRegistry paralelo.

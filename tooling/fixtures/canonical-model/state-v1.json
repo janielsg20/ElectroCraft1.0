@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "ec_state_000000000000j",
+  "version": 1,
+  "key": "visitCount",
+  "label": "Visitas de sesión",
+  "scope": "session",
+  "valueType": "number",
+  "defaultValue": 0,
+  "persistence": "session",
+  "sensitive": false,
+  "metadata": {
+    "fixture": "m02.4"
+  }
+}
