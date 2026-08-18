@@ -1,6 +1,6 @@
 {
   "name": "@electrocraft/editor-puck",
-  "version": "0.0.0-m01.3",
+  "version": "0.0.0-m02.2",
   "private": true,
   "type": "module",
   "exports": {
@@ -11,6 +11,7 @@
   ],
   "dependencies": {
     "@electrocraft/domain": "0.0.0-m01.3",
-    "@electrocraft/application": "0.0.0-m01.3"
+    "@electrocraft/application": "0.0.0-m01.3",
+    "@puckeditor/core": "0.22.4"
   }
 }
