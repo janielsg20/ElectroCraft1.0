@@ -21,18 +21,21 @@ M00.7 closure source of truth:
 - final Android artifact `9304563117`; source/build artifact `9304237635`;
 - final fix serializes SQLite-backed Zustand hydration with `skipHydration` + explicit `rehydrate()` after DB initialization.
 
-M00.8 prepared:
-- isolated `experiments/gemini-provider-poc/`;
+M00.8 current:
+- isolated `experiments/gemini-provider-poc/` is on main;
+- deterministic lockfile committed in `1c09876e4f59911d9cd1af95f012c07595c59d3f`;
 - AI SDK + `@ai-sdk/google` primary; Zod validation;
-- direct `@google/genai` restricted to stable Interactions `v1` probe;
+- direct `@google/genai` restricted to Interactions `v1` probe;
 - server gateway only; client has no provider/key fields;
 - allowed read/draft/validate policy; Apply/DB/SQL/files/install/deploy/secrets denied;
 - AI SDK structured output, bounded tools, stream/cancel, Gemini image;
 - model IDs runtime-only; canonical data stores logical profile only;
-- local no-registry contract gate GREEN; published-package/live CI pending.
+- run `32082944290`: verify-static job `95549362334` GREEN across registry/npm ci/versions/lock/lint/strict TS/build/tests/integration/security/static closure;
+- live job `95549443577` fails only at `Require server-only Gemini secret` because repository Actions secret `GEMINI_API_KEY` is absent;
+- no live Gemini request has been executed yet, so M00.8 is not DONE.
 
 Read next:
 AGENTS -> RULES -> MEMORY -> STATE -> TRACKING -> `.ai/microphases/M00_8.md` -> AI_ARCHITECTURE -> AI_PROVIDER_GEMINI -> AI_TOOL_CATALOG -> AI_SECURITY_PRIVACY.
 
 Next:
-Run `Verify M00.8 Gemini Provider` after this package is uploaded. Lockfile bootstrap may create one Actions-bot lock commit. Do not close M00.8 unless both static and live Gemini jobs are GREEN. Do not begin M00.9 before M00.8 is GREEN.
+Add `GEMINI_API_KEY` as a GitHub Actions repository secret and rerun `Verify M00.8 Gemini Provider`. Only after live structured/tools/stream/cancel/image/Interactions and final commit status are GREEN may M00.8 close. Do not begin M00.9 before that.
