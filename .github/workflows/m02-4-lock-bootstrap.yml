@@ -10,6 +10,13 @@ on:
       - 'packages/state-zustand/package.json'
       - 'package.json'
       - '.github/workflows/m02-4-lock-bootstrap.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'packages/workflow-rete/package.json'
+      - 'packages/state-zustand/package.json'
+      - 'package.json'
+      - '.github/workflows/m02-4-lock-bootstrap.yml'
 
 permissions:
   contents: read
