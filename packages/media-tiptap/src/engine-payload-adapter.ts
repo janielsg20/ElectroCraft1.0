@@ -1,5 +1,8 @@
+import type { JSONContent } from '@tiptap/core';
+import Document from '@tiptap/extension-document';
+import Paragraph from '@tiptap/extension-paragraph';
+import Text from '@tiptap/extension-text';
 import { generateHTML } from '@tiptap/html';
-import StarterKit from '@tiptap/starter-kit';
 import {
   createElectroCraftEnginePayload,
   electroCraftEnginePayloadSchema,
@@ -17,6 +20,8 @@ export class TiptapEnginePayloadBlockedError extends Error {
   }
 }
 
+const minimalRichTextExtensions = [Document, Paragraph, Text];
+
 function assertTiptapRoot(value: JsonValue): asserts value is JsonValue & { type: 'doc'; content?: JsonValue[] } {
   if (value === null || Array.isArray(value) || typeof value !== 'object') {
     throw new TiptapEnginePayloadBlockedError('INVALID_TIPTAP_VALUE', 'Tiptap JSON must be a document object');
@@ -31,7 +36,7 @@ function assertTiptapRoot(value: JsonValue): asserts value is JsonValue & { type
 
 function renderTiptapJson(value: JsonValue): string {
   assertTiptapRoot(value);
-  return generateHTML(value as Parameters<typeof generateHTML>[0], [StarterKit]);
+  return generateHTML(value as JSONContent, minimalRichTextExtensions);
 }
 
 export function validateTiptapEnginePayload(input: unknown): ElectroCraftEnginePayload {
