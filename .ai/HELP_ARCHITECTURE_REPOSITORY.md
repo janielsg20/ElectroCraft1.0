@@ -47,4 +47,12 @@ La misma información queda disponible como fixture estructurado en `tooling/fix
 - `actions/setup-node` cachea el cache global de npm usando el hash del lockfile; `node_modules` no es el artifact cacheado.
 - El job ejecuta lint, typecheck, tests, build y Playwright de forma explícita antes de emitir evidencia.
 - Los permisos del workflow son de solo lectura y M01.5 no contiene deploys, publicación ni cloud secrets.
-- `.npmrc` fija `legacy-peer-deps=true` porque el lockfile raíz requiere la misma política usada para sortear el fallo vigente de npm/Arborist durante resolución de peers; no se relaja TypeScript, lint ni los gates de arquitectura.
+- `.npmrc` fija `legacy-peer-deps=true` para reproducir la política de resolución del lockfile.
+
+## M01.6 — Convenciones documentales
+- `AGENTS.md` es un entry point corto y `.ai/README.md` contiene el mapa documental.
+- `MEMORY.md` conserva solo invariantes estables; el progreso vive en `STATE`, `TRACKING`, `HANDOFF` y `evidence`.
+- `STATE.md` declara exactamente una microfase `ACTIVE`; `HANDOFF.md` debe apuntar a esa misma microfase.
+- Review reports y previews históricos se conservan bajo `.ai/archive/` y no compiten como fuente de verdad.
+- `npm run test:docs` falla cerrado si faltan documentos/templates, si un ID Fxx/Mxx.y no tiene spec o si existe drift de continuidad.
+- `npm run build:docs` genera un reporte reparable en `tooling/dist/m01-6-doc-conventions-report.json`.

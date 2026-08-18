@@ -1,4 +1,4 @@
-# DECISIONS — ElectroCraft Eighth Final
+# DECISIONS — ElectroCraft
 
 D001 ElectroCraft = No-Code App Builder.
 
@@ -44,8 +44,7 @@ D021 AI Draft only; explicit Apply.
 
 D022 generated code quarantined.
 
-D023 all nine export targets are Core:
-Local, React, Static, PWA, Android, iOS, Capacitor, LAMP, WordPress.
+D023 all nine export targets are Core: Local, React, Static, PWA, Android, iOS, Capacitor, LAMP, WordPress.
 
 D024 all targets implement shared Export Target Contract.
 
@@ -60,3 +59,5 @@ D028 WordPress native APIs precede custom implementations.
 D029 CPTs/data registrations live in Companion Plugin, not Theme.
 
 D030 final release requires parity evidence for all nine targets.
+
+D031 documentation continuity has single ownership: AGENTS=entry point, README=map, MEMORY=stable facts, STATE=current state/one ACTIVE, TRACKING=position, HANDOFF=next action; detailed decision in `adr/ADR-DOCUMENT-CONVENTIONS.md`.

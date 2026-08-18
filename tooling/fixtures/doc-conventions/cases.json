@@ -1,0 +1,14 @@
+{
+  "ready": {
+    "active": ["M01.6"],
+    "expected": "ready"
+  },
+  "multipleActive": {
+    "active": ["M01.6", "M02.1"],
+    "expected": "blocked"
+  },
+  "staleMemory": {
+    "memory": "M00.9 active gate: pending run 32000000000",
+    "expected": "blocked"
+  }
+}
