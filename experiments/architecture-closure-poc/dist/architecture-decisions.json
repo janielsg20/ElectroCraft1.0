@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "status": "PROPOSED_PENDING_M00_10_SUCCESS",
+  "canonicalProduct": {
+    "root": "No-Code App Builder",
+    "coreModels": ["Screens", "Navigation", "Data Sources"],
+    "internalData": "DataSourceDefinition(kind=internal)",
+    "singleDocumentModel": true,
+    "singleExportTargetContract": true
+  },
+  "engines": [
+    {"id":"puck","decision":"accept","owner":"screen-composition","electrocraftOwns":"canonical mapping, adapters, UX, target semantics","evidence":"M00.3"},
+    {"id":"shadcn-radix","decision":"accept","owner":"studio primitives/components","electrocraftOwns":"density, tokens, composition","evidence":"M00.2 + official CLI --base radix"},
+    {"id":"ai-elements","decision":"accept-selected-only","owner":"AI Workbench presentation","electrocraftOwns":"AI state, draft/apply semantics","evidence":"M00.2 source audit"},
+    {"id":"i18next","decision":"accept","owner":"i18n catalog/language/fallback","electrocraftOwns":"Spanish resources and typed keys","evidence":"M00.2 + M00.11 real API"},
+    {"id":"pglite-drizzle","decision":"accept","owner":"Studio/Internal Data storage + typed SQL/migrations","electrocraftOwns":"canonical data model and mapping","evidence":"M00.4 + M00.11 real API"},
+    {"id":"data-sources-gateway","decision":"conditional","owner":"Fetch/OpenAPI/GraphQL + ConnectorGateway","electrocraftOwns":"DataSourceAdapter, DataResult, SecretRef policy","evidence":"M00.9 workflow gate"},
+    {"id":"rqb-tanstack-query","decision":"accept","owner":"condition authoring + sole async query cache","electrocraftOwns":"portable QueryDefinition/compiler","evidence":"M00.5 + M00.11 real API"},
+    {"id":"refine-tanstack-table","decision":"accept-admin-only","owner":"admin orchestration + headless table engine","electrocraftOwns":"AdminDocument/Resource mapping and UI","evidence":"M00.2 + M00.11 real API"},
+    {"id":"rete","decision":"accept","owner":"workflow graph editing/processing/history","electrocraftOwns":"ActionGraph mapping/runtime target semantics","evidence":"M00.6 + M00.11 real API"},
+    {"id":"tiptap","decision":"accept-oss-core","owner":"rich-text editing and JSON/HTML semantics","electrocraftOwns":"portable rich-text field contract","evidence":"M00.2 + M00.11 real API"},
+    {"id":"zustand","decision":"accept-runtime-state-only","owner":"JS runtime local state","electrocraftOwns":"StateDefinition/scopes/persistence policy","evidence":"M00.7 + M00.11 real API"},
+    {"id":"expo","decision":"accept","owner":"native runtime/router/sqlite/device integration","electrocraftOwns":"canonical mapping/capabilities/export semantics","evidence":"M00.7"},
+    {"id":"ai-sdk-google","decision":"accept-primary","owner":"AI invocation/orchestration/provider adapter","electrocraftOwns":"context policy, draft/apply, allowlisted tools","evidence":"M00.8"},
+    {"id":"gemini-native-capability-adapter","decision":"accept-narrow","owner":"Gemini-native Interactions v1 only","electrocraftOwns":"capability gate","evidence":"M00.8 live probe","allowedCapabilities":["interactions-v1"],"forbidden":["generic-provider-abstraction","duplicate-generateText","client-secret"]},
+    {"id":"export-targets","decision":"conditional","owner":"official target runtimes under shared Export Target Contract","electrocraftOwns":"ExportIR mapping, capabilities, compilers, verification","evidence":"M00.10 workflow gate"}
+  ],
+  "rejectedAlternatives": [
+    {"id":"craftjs","reason":"would overlap the selected Puck Screen Composer ownership"},
+    {"id":"grapesjs","reason":"would introduce a second editor/document/runtime representation"},
+    {"id":"react-flow","reason":"would overlap Rete workflow graph ownership"},
+    {"id":"full-low-code-platform","reason":"would own too much project/editor/runtime state and break ElectroCraft canonical ownership"},
+    {"id":"parallel-ai-provider-layer","reason":"AI SDK already owns provider abstraction"},
+    {"id":"second-query-cache","reason":"TanStack Query is the sole JS async query cache"}
+  ],
+  "eliminatedDuplications": [
+    "parallel-screen-editor",
+    "parallel-editor-history",
+    "cms-centered-canonical-model",
+    "custom-ai-provider-abstraction",
+    "dynamic-ddl-per-logical-model",
+    "universal-crud-runtime",
+    "second-query-cache",
+    "target-specific-canonical-project-model"
+  ],
+  "targets": ["local-project","react-web","static-web","pwa","android-expo","ios-expo","capacitor","lamp","wordpress"]
+}

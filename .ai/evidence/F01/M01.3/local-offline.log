@@ -1,0 +1,160 @@
+
+> electrocraft@0.0.0-m01.3 check:offline
+> npm run lint:offline && npm run typecheck && npm run test:boundaries && npm run test:node && npm run build:offline
+
+
+> electrocraft@0.0.0-m01.3 lint:offline
+> node tooling/scripts/lint-workspace.mjs && node tooling/scripts/verify-quality-config.mjs
+
+PASS_LINT_WORKSPACE packages=17 apps=2 scripts=12
+PASS_M01_3_QUALITY_CONFIG scripts=6 toolchain=7 vitestProjects=3
+
+> electrocraft@0.0.0-m01.3 typecheck
+> tsc -p tsconfig.json --noEmit && tsc -p packages/domain/tsconfig.json --noEmit
+
+
+> electrocraft@0.0.0-m01.3 test:boundaries
+> node tooling/scripts/verify-typescript-boundaries.mjs
+
+PASS_M01_2_TYPESCRIPT_BOUNDARIES strict=true aliases=19 packages=17 apps=2
+
+> electrocraft@0.0.0-m01.3 test:node
+> node --test tooling/test/*.test.mjs
+
+TAP version 13
+# Subtest: root exposes the six required M01.3 quality scripts
+ok 1 - root exposes the six required M01.3 quality scripts
+  ---
+  duration_ms: 2.654162
+  type: 'test'
+  ...
+# Subtest: toolchain pins are exact and typescript-eslint is intentionally absent with TypeScript 7
+ok 2 - toolchain pins are exact and typescript-eslint is intentionally absent with TypeScript 7
+  ---
+  duration_ms: 0.375723
+  type: 'test'
+  ...
+# Subtest: ESLint owns correctness rules while Prettier owns formatting
+ok 3 - ESLint owns correctness rules while Prettier owns formatting
+  ---
+  duration_ms: 0.4535
+  type: 'test'
+  ...
+# Subtest: Vitest is split into unit, contract and integration projects
+ok 4 - Vitest is split into unit, contract and integration projects
+  ---
+  duration_ms: 0.470203
+  type: 'test'
+  ...
+# Subtest: Playwright CI policy forbids accidental focused tests and is deterministic
+ok 5 - Playwright CI policy forbids accidental focused tests and is deterministic
+  ---
+  duration_ms: 0.222718
+  type: 'test'
+  ...
+# Subtest: negative: no second TypeScript lint engine is introduced behind ESLint
+ok 6 - negative: no second TypeScript lint engine is introduced behind ESLint
+  ---
+  duration_ms: 0.227699
+  type: 'test'
+  ...
+# Subtest: empty functional repository fixture contains all engine entrypoints
+ok 7 - empty functional repository fixture contains all engine entrypoints
+  ---
+  duration_ms: 0.275832
+  type: 'test'
+  ...
+# Subtest: root TypeScript configuration is strict and aliases only public workspace roots
+ok 8 - root TypeScript configuration is strict and aliases only public workspace roots
+  ---
+  duration_ms: 8.732674
+  type: 'test'
+  ...
+# Subtest: negative: domain cannot import React, Puck, Drizzle, Expo, DOM or filesystem engines
+ok 9 - negative: domain cannot import React, Puck, Drizzle, Expo, DOM or filesystem engines
+  ---
+  duration_ms: 2.778383
+  type: 'test'
+  ...
+# Subtest: negative: deep workspace imports are rejected even when the package root is allowed
+ok 10 - negative: deep workspace imports are rejected even when the package root is allowed
+  ---
+  duration_ms: 1.117962
+  type: 'test'
+  ...
+# Subtest: negative: cross-package relative imports are rejected
+ok 11 - negative: cross-package relative imports are rejected
+  ---
+  duration_ms: 1.321756
+  type: 'test'
+  ...
+# Subtest: negative: application cannot depend on runtime or adapter packages
+ok 12 - negative: application cannot depend on runtime or adapter packages
+  ---
+  duration_ms: 1.407426
+  type: 'test'
+  ...
+# Subtest: every workspace package exposes only its public root entry
+ok 13 - every workspace package exposes only its public root entry
+  ---
+  duration_ms: 0.98748
+  type: 'test'
+  ...
+# Subtest: workspace owns exactly 17 stable packages and two apps
+ok 14 - workspace owns exactly 17 stable packages and two apps
+  ---
+  duration_ms: 7.007576
+  type: 'test'
+  ...
+# Subtest: domain remains framework-free and dependency-free
+ok 15 - domain remains framework-free and dependency-free
+  ---
+  duration_ms: 0.931705
+  type: 'test'
+  ...
+# Subtest: negative: a domain to editor dependency is rejected
+ok 16 - negative: a domain to editor dependency is rejected
+  ---
+  duration_ms: 2.165142
+  type: 'test'
+  ...
+# Subtest: native runtime and native preview do not depend on DOM/editor packages
+ok 17 - native runtime and native preview do not depend on DOM/editor packages
+  ---
+  duration_ms: 0.972134
+  type: 'test'
+  ...
+# Subtest: exporters depend on ExportIR/contracts, not Studio UI or runtimes
+ok 18 - exporters depend on ExportIR/contracts, not Studio UI or runtimes
+  ---
+  duration_ms: 1.038106
+  type: 'test'
+  ...
+# Subtest: native source/build/config fixture is complete and reproducible
+ok 19 - native source/build/config fixture is complete and reproducible
+  ---
+  duration_ms: 0.232092
+  type: 'test'
+  ...
+# Subtest: Spanish architecture help descriptor is registered as a fixture
+ok 20 - Spanish architecture help descriptor is registered as a fixture
+  ---
+  duration_ms: 0.1932
+  type: 'test'
+  ...
+1..20
+# tests 20
+# suites 0
+# pass 20
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 80.444872
+
+> electrocraft@0.0.0-m01.3 build:offline
+> node tooling/scripts/build-workspace.mjs && node tooling/scripts/build-typescript-boundaries.mjs && node tooling/scripts/build-quality-report.mjs
+
+PASS_BUILD_WORKSPACE packages=17 apps=2 graph=bf72f2a3dbf72a7a59deb26eaea4b0414459973a6a37184785ebeb029d47601d
+PASS_BUILD_M01_2 strict=true aliases=19 sha=427541b4a1c3c656db564e417e3188430d0190e7cd2421a07ac1f3a07776882d
+PASS_BUILD_M01_3 scripts=6 vitestProjects=3

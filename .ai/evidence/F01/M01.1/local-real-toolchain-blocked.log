@@ -1,0 +1,7 @@
+Local real toolchain installation attempt
+UTC 2026-08-18T03:21:56Z
+$ getent hosts registry.npmjs.org
+NO_DNS_RESULT
+$ npm config get registry
+https://registry.npmjs.org/
+npm install attempt: timed out after 18s in this execution environment; no PASS fabricated.

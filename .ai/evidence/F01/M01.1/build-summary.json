@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "microphase": "M01.1",
+  "status": "static-green-entry-gate-pending",
+  "packageCount": 17,
+  "appCount": 2,
+  "dependencyGraphSha256": "bf72f2a3dbf72a7a59deb26eaea4b0414459973a6a37184785ebeb029d47601d",
+  "nativeFixture": "apps/native-preview/fixtures/native-source-build-config.json",
+  "nextMicrophase": "M01.2"
+}

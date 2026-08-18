@@ -1,0 +1,70 @@
+name: M01.1 Monorepo Ownership Gate
+
+on:
+  workflow_run:
+    workflows: ["M00.11 Architecture Closure POC"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  monorepo:
+    name: M01.1 workspace and package boundaries
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact F00 green head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Record F01 entry gate
+        run: |
+          printf 'M00.11 run=%s\nhead=%s\nconclusion=%s\n' \
+            '${{ github.event.workflow_run.id }}' \
+            '${{ github.event.workflow_run.head_sha }}' \
+            '${{ github.event.workflow_run.conclusion }}' | tee m01-1-entry-gate.log
+          test '${{ github.event.workflow_run.conclusion }}' = success
+      - name: Install exact root toolchain and workspaces
+        run: npm install --ignore-scripts --no-audit --no-fund --package-lock=false
+      - name: Verify exact toolchain pins
+        run: node tooling/scripts/verify-toolchain.mjs | tee m01-1-toolchain.log
+      - name: Lint workspace architecture
+        run: npm run lint | tee m01-1-lint.log
+      - name: Typecheck package surfaces
+        run: npm run typecheck | tee m01-1-typecheck.log
+      - name: Execute Node contract/negative tests
+        run: npm test | tee m01-1-node-test.log
+      - name: Build architecture report
+        run: npm run build | tee m01-1-build.log
+      - name: Execute real Vitest gate
+        run: npm run test:vitest | tee m01-1-vitest.log
+      - name: Execute real Vite library build
+        run: npm run build:studio | tee m01-1-vite.log
+      - name: Execute Playwright Test architecture gate
+        run: npm run e2e | tee m01-1-playwright.log
+      - name: Emit M01.1 closure candidate marker
+        run: |
+          test -f tooling/dist/workspace-report.json
+          test -f apps/studio/dist/studio-architecture.js
+          echo PASS_M01_1_MONOREPO | tee m01-1-closure.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m01-1-monorepo-evidence
+          path: |
+            tooling/dist
+            apps/studio/dist
+            m01-1-entry-gate.log
+            m01-1-toolchain.log
+            m01-1-lint.log
+            m01-1-typecheck.log
+            m01-1-node-test.log
+            m01-1-build.log
+            m01-1-vitest.log
+            m01-1-vite.log
+            m01-1-playwright.log
+            m01-1-closure.log

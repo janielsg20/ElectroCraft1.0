@@ -1,0 +1,18 @@
+{
+  "id": "help.architecture.repository",
+  "locale": "es",
+  "title": "Arquitectura del repositorio",
+  "summary": "Explica qué responsabilidad pertenece a cada app y package de ElectroCraft.",
+  "details": [
+    "Domain permanece libre de frameworks.",
+    "Application depende de Domain y ports.",
+    "Los adapters dependen de contratos y del engine OSS propietario.",
+    "Los exporters consumen ExportIR y no la UI del Studio.",
+    "Runtime Native no depende del DOM ni del editor visual.",
+    "TypeScript usa strict: true y aliases exactos a cada export público.",
+    "Los deep imports y cruces relativos entre owners fallan el architecture gate.",
+    "ESLint valida JavaScript/tooling; Prettier es el único owner de formato.",
+    "Vitest separa unit, contract e integration; Playwright reserva E2E/QA.",
+    "El script check ejecuta lint, typecheck, boundaries, tests, build y E2E en ese orden."
+  ]
+}

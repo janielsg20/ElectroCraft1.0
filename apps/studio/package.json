@@ -1,0 +1,26 @@
+{
+  "name": "@electrocraft/studio",
+  "version": "0.0.0-m01.3",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@electrocraft/domain": "0.0.0-m01.3",
+    "@electrocraft/application": "0.0.0-m01.3",
+    "@electrocraft/design-system": "0.0.0-m01.3",
+    "@electrocraft/editor-puck": "0.0.0-m01.3",
+    "@electrocraft/data-core": "0.0.0-m01.3",
+    "@electrocraft/query-rqb": "0.0.0-m01.3",
+    "@electrocraft/media-tiptap": "0.0.0-m01.3",
+    "@electrocraft/state-zustand": "0.0.0-m01.3",
+    "@electrocraft/auth-core": "0.0.0-m01.3",
+    "@electrocraft/workflow-rete": "0.0.0-m01.3",
+    "@electrocraft/forms": "0.0.0-m01.3",
+    "@electrocraft/admin-refine": "0.0.0-m01.3",
+    "@electrocraft/runtime-web": "0.0.0-m01.3",
+    "@electrocraft/export-ir": "0.0.0-m01.3",
+    "@electrocraft/exporters": "0.0.0-m01.3"
+  }
+}

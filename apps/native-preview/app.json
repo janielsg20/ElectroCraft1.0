@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "ElectroCraft Native Preview",
+    "slug": "electrocraft-native-preview",
+    "version": "0.0.0",
+    "orientation": "default",
+    "platforms": [
+      "android",
+      "ios"
+    ],
+    "extra": {
+      "architectureFixture": true
+    }
+  }
+}

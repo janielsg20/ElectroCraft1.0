@@ -1,0 +1,15 @@
+{
+  "name": "@electrocraft/export-ir",
+  "version": "0.0.0-m01.3",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "dependencies": {
+    "@electrocraft/domain": "0.0.0-m01.3"
+  }
+}

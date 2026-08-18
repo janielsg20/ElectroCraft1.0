@@ -1,0 +1,16 @@
+{
+  "name": "@electrocraft/native-preview",
+  "version": "0.0.0-m01.3",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@electrocraft/domain": "0.0.0-m01.3",
+    "@electrocraft/application": "0.0.0-m01.3",
+    "@electrocraft/runtime-native": "0.0.0-m01.3",
+    "@electrocraft/export-ir": "0.0.0-m01.3",
+    "@electrocraft/testing": "0.0.0-m01.3"
+  }
+}

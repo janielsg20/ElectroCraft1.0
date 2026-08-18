@@ -1,0 +1,74 @@
+
+> @electrocraft/architecture-closure-poc@0.0.0-m00.11 check:offline
+> npm run lint && npm run typecheck && npm test && npm run report && npm run build
+
+
+> @electrocraft/architecture-closure-poc@0.0.0-m00.11 lint
+> node scripts/lint.mjs
+
+PASS_LINT 9 JS files syntax-checked
+
+> @electrocraft/architecture-closure-poc@0.0.0-m00.11 typecheck
+> tsc -p jsconfig.json
+
+
+> @electrocraft/architecture-closure-poc@0.0.0-m00.11 test
+> node --test test/*.test.mjs
+
+TAP version 13
+# Subtest: F00-F27 have owners and dependencies only point backward
+ok 1 - F00-F27 have owners and dependencies only point backward
+  ---
+  duration_ms: 5.030597
+  type: 'test'
+  ...
+# Subtest: Navigation precedes Data Sources; Data Sources precede Queries and Admin
+ok 2 - Navigation precedes Data Sources; Data Sources precede Queries and Admin
+  ---
+  duration_ms: 1.823006
+  type: 'test'
+  ...
+# Subtest: architecture matrix covers required engines and nine Core targets
+ok 3 - architecture matrix covers required engines and nine Core targets
+  ---
+  duration_ms: 2.140696
+  type: 'test'
+  ...
+# Subtest: Internal Data remains a first-class Data Source
+ok 4 - Internal Data remains a first-class Data Source
+  ---
+  duration_ms: 1.125807
+  type: 'test'
+  ...
+# Subtest: Gemini native adapter is narrow, not a second provider abstraction
+ok 5 - Gemini native adapter is narrow, not a second provider abstraction
+  ---
+  duration_ms: 1.184236
+  type: 'test'
+  ...
+# Subtest: closure remains blocked until M00.9 and M00.10 conditional engines are green
+ok 6 - closure remains blocked until M00.9 and M00.10 conditional engines are green
+  ---
+  duration_ms: 1.042205
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 80.982214
+
+> @electrocraft/architecture-closure-poc@0.0.0-m00.11 report
+> node scripts/closure-report.mjs
+
+{"generatedAt":"2026-08-18T03:22:12.140Z","phaseCount":28,"engineDecisionCount":15,"targetCount":9,"rejectedAlternativeCount":6,"eliminatedDuplicationCount":8,"closure":{"state":"blocked","conditional":["data-sources-gateway","export-targets"]},"matrixSha256":"c13507449a3c7dc55228a30d218543dec36121c487193d9df461502972e5b615"}
+PASS_ARCHITECTURE_MATRIX
+
+> @electrocraft/architecture-closure-poc@0.0.0-m00.11 build
+> node scripts/build.mjs
+
+PASS_BUILD dist/ architecture harness created

@@ -1,0 +1,7 @@
+M01.3 real root toolchain local attempt
+Date: 2026-08-17 America/New_York
+Command: npm install --ignore-scripts --no-audit --no-fund --package-lock=false
+Result: BLOCKED — command exceeded the 45 second execution timeout while registry.npmjs.org remained unresolved/unresponsive in this environment.
+Post-condition: node_modules absent; package-lock.json absent.
+No ESLint/Prettier/Vitest/Vite/Playwright published-package gate is claimed as locally GREEN.
+GitHub Actions workflow .github/workflows/m01-3-quality-toolchain.yml remains the required real-toolchain gate.

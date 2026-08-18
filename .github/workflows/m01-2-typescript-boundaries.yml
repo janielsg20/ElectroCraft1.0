@@ -1,0 +1,56 @@
+name: M01.2 TypeScript Boundaries Gate
+
+on:
+  workflow_run:
+    workflows: ["M01.1 Monorepo Ownership Gate"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  boundaries:
+    name: M01.2 strict TypeScript and import boundaries
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact M01.1 green head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.sha || github.event.workflow_run.head_sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install exact workspace toolchain
+        run: npm install --ignore-scripts --no-audit --no-fund --package-lock=false
+      - name: Verify exact toolchain pins
+        run: node tooling/scripts/verify-toolchain.mjs | tee m01-2-toolchain.log
+      - name: Lint architecture tooling
+        run: npm run lint | tee m01-2-lint.log
+      - name: TypeScript strict compilation
+        run: npm run typecheck | tee m01-2-typecheck.log
+      - name: Verify aliases and architecture boundaries
+        run: npm run test:boundaries | tee m01-2-boundaries.log
+      - name: Execute contract and negative tests
+        run: npm test | tee m01-2-tests.log
+      - name: Build deterministic architecture reports
+        run: npm run build | tee m01-2-build.log
+      - name: Emit M01.2 closure marker
+        run: |
+          test -f tooling/dist/typescript-boundary-report.json
+          grep -q '"strict": true' tooling/dist/typescript-boundary-report.json
+          echo PASS_M01_2_TYPESCRIPT_BOUNDARIES | tee m01-2-closure.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m01-2-typescript-boundaries-evidence
+          path: |
+            tooling/dist
+            m01-2-toolchain.log
+            m01-2-lint.log
+            m01-2-typecheck.log
+            m01-2-boundaries.log
+            m01-2-tests.log
+            m01-2-build.log
+            m01-2-closure.log

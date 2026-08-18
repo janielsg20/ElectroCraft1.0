@@ -1,0 +1,6 @@
+PASS_YAML architecture-closure-poc.yml
+PASS_YAML data-source-poc.yml
+PASS_YAML export-target-poc.yml
+PASS_YAML m01-1-monorepo.yml
+PASS_YAML m01-2-typescript-boundaries.yml
+PASS_YAML m01-3-quality-toolchain.yml

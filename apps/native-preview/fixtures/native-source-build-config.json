@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "source": "src/native-adapter.ts",
+  "runtimeOwner": "expo",
+  "runtimePackage": "@electrocraft/runtime-native",
+  "platforms": [
+    "android",
+    "ios"
+  ],
+  "config": "app.json",
+  "buildConfig": "eas.json",
+  "canonicalTargetContract": "@electrocraft/export-ir",
+  "status": "architecture-fixture"
+}

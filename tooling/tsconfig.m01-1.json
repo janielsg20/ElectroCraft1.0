@@ -1,0 +1,76 @@
+{
+  "compilerOptions": {
+    "target": "ES2024",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "noEmit": true,
+    "strict": false,
+    "skipLibCheck": true,
+    "paths": {
+      "@electrocraft/domain": [
+        "../packages/domain/src/index.ts"
+      ],
+      "@electrocraft/application": [
+        "../packages/application/src/index.ts"
+      ],
+      "@electrocraft/design-system": [
+        "../packages/design-system/src/index.ts"
+      ],
+      "@electrocraft/editor-puck": [
+        "../packages/editor-puck/src/index.ts"
+      ],
+      "@electrocraft/data-core": [
+        "../packages/data-core/src/index.ts"
+      ],
+      "@electrocraft/query-rqb": [
+        "../packages/query-rqb/src/index.ts"
+      ],
+      "@electrocraft/media-tiptap": [
+        "../packages/media-tiptap/src/index.ts"
+      ],
+      "@electrocraft/state-zustand": [
+        "../packages/state-zustand/src/index.ts"
+      ],
+      "@electrocraft/auth-core": [
+        "../packages/auth-core/src/index.ts"
+      ],
+      "@electrocraft/workflow-rete": [
+        "../packages/workflow-rete/src/index.ts"
+      ],
+      "@electrocraft/forms": [
+        "../packages/forms/src/index.ts"
+      ],
+      "@electrocraft/admin-refine": [
+        "../packages/admin-refine/src/index.ts"
+      ],
+      "@electrocraft/runtime-web": [
+        "../packages/runtime-web/src/index.ts"
+      ],
+      "@electrocraft/runtime-native": [
+        "../packages/runtime-native/src/index.ts"
+      ],
+      "@electrocraft/export-ir": [
+        "../packages/export-ir/src/index.ts"
+      ],
+      "@electrocraft/exporters": [
+        "../packages/exporters/src/index.ts"
+      ],
+      "@electrocraft/testing": [
+        "../packages/testing/src/index.ts"
+      ],
+      "@electrocraft/native-preview": [
+        "../apps/native-preview/src/index.ts"
+      ],
+      "@electrocraft/studio": [
+        "../apps/studio/src/index.ts"
+      ]
+    }
+  },
+  "include": [
+    "../packages/*/src/**/*.ts",
+    "../apps/*/src/**/*.ts"
+  ],
+  "exclude": [
+    "../apps/studio/vite.config.ts"
+  ]
+}

@@ -1,0 +1,9 @@
+node_modules/
+**/dist/
+**/artifacts/
+playwright-report/
+test-results/
+*.zip
+FILES.sha256
+.ai/evidence/**/regression-*.log
+.ai/evidence/**/local-*.log

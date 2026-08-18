@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 2,
+  "packageVersion": "0.0.0-m01.3",
+  "packages": {
+    "@electrocraft/domain": [],
+    "@electrocraft/application": [
+      "@electrocraft/domain"
+    ],
+    "@electrocraft/design-system": [
+      "@electrocraft/domain"
+    ],
+    "@electrocraft/editor-puck": [
+      "@electrocraft/domain",
+      "@electrocraft/application"
+    ],
+    "@electrocraft/data-core": [
+      "@electrocraft/domain",
+      "@electrocraft/application"
+    ],
+    "@electrocraft/query-rqb": [
+      "@electrocraft/domain",
+      "@electrocraft/application",
+      "@electrocraft/data-core"
+    ],
+    "@electrocraft/media-tiptap": [
+      "@electrocraft/domain"
+    ],
+    "@electrocraft/state-zustand": [
+      "@electrocraft/domain"
+    ],
+    "@electrocraft/auth-core": [
+      "@electrocraft/domain",
+      "@electrocraft/application"
+    ],
+    "@electrocraft/workflow-rete": [
+      "@electrocraft/domain",
+      "@electrocraft/application"
+    ],
+    "@electrocraft/forms": [
+      "@electrocraft/domain",
+      "@electrocraft/application"
+    ],
+    "@electrocraft/admin-refine": [
+      "@electrocraft/domain",
+      "@electrocraft/application",
+      "@electrocraft/data-core",
+      "@electrocraft/query-rqb",
+      "@electrocraft/forms"
+    ],
+    "@electrocraft/runtime-web": [
+      "@electrocraft/domain",
+      "@electrocraft/application",
+      "@electrocraft/data-core",
+      "@electrocraft/query-rqb",
+      "@electrocraft/media-tiptap",
+      "@electrocraft/state-zustand",
+      "@electrocraft/auth-core",
+      "@electrocraft/forms"
+    ],
+    "@electrocraft/runtime-native": [
+      "@electrocraft/domain",
+      "@electrocraft/application",
+      "@electrocraft/data-core",
+      "@electrocraft/state-zustand",
+      "@electrocraft/auth-core",
+      "@electrocraft/forms"
+    ],
+    "@electrocraft/export-ir": [
+      "@electrocraft/domain"
+    ],
+    "@electrocraft/exporters": [
+      "@electrocraft/domain",
+      "@electrocraft/application",
+      "@electrocraft/export-ir"
+    ],
+    "@electrocraft/testing": [
+      "@electrocraft/domain",
+      "@electrocraft/export-ir"
+    ]
+  },
+  "apps": {
+    "@electrocraft/studio": [
+      "@electrocraft/domain",
+      "@electrocraft/application",
+      "@electrocraft/design-system",
+      "@electrocraft/editor-puck",
+      "@electrocraft/data-core",
+      "@electrocraft/query-rqb",
+      "@electrocraft/media-tiptap",
+      "@electrocraft/state-zustand",
+      "@electrocraft/auth-core",
+      "@electrocraft/workflow-rete",
+      "@electrocraft/forms",
+      "@electrocraft/admin-refine",
+      "@electrocraft/runtime-web",
+      "@electrocraft/export-ir",
+      "@electrocraft/exporters"
+    ],
+    "@electrocraft/native-preview": [
+      "@electrocraft/domain",
+      "@electrocraft/application",
+      "@electrocraft/runtime-native",
+      "@electrocraft/export-ir",
+      "@electrocraft/testing"
+    ]
+  },
+  "invariants": {
+    "domainForbiddenImports": [
+      "react",
+      "@puckeditor/core",
+      "drizzle-orm",
+      "expo",
+      "react-native",
+      "node:fs",
+      "fs",
+      "node:path",
+      "path",
+      "window",
+      "document"
+    ],
+    "nativeForbiddenPackages": [
+      "@electrocraft/design-system",
+      "@electrocraft/editor-puck",
+      "@electrocraft/admin-refine",
+      "@electrocraft/runtime-web"
+    ],
+    "exportersForbiddenPackages": [
+      "@electrocraft/design-system",
+      "@electrocraft/editor-puck",
+      "@electrocraft/admin-refine",
+      "@electrocraft/runtime-web",
+      "@electrocraft/runtime-native"
+    ],
+    "forbidDeepPackageImports": true,
+    "forbidCrossPackageRelativeImports": true,
+    "applicationAllowedPackages": [
+      "@electrocraft/domain"
+    ]
+  },
+  "publicAliases": {
+    "@electrocraft/domain": "packages/domain/src/index.ts",
+    "@electrocraft/application": "packages/application/src/index.ts",
+    "@electrocraft/design-system": "packages/design-system/src/index.ts",
+    "@electrocraft/editor-puck": "packages/editor-puck/src/index.ts",
+    "@electrocraft/data-core": "packages/data-core/src/index.ts",
+    "@electrocraft/query-rqb": "packages/query-rqb/src/index.ts",
+    "@electrocraft/media-tiptap": "packages/media-tiptap/src/index.ts",
+    "@electrocraft/state-zustand": "packages/state-zustand/src/index.ts",
+    "@electrocraft/auth-core": "packages/auth-core/src/index.ts",
+    "@electrocraft/workflow-rete": "packages/workflow-rete/src/index.ts",
+    "@electrocraft/forms": "packages/forms/src/index.ts",
+    "@electrocraft/admin-refine": "packages/admin-refine/src/index.ts",
+    "@electrocraft/runtime-web": "packages/runtime-web/src/index.ts",
+    "@electrocraft/runtime-native": "packages/runtime-native/src/index.ts",
+    "@electrocraft/export-ir": "packages/export-ir/src/index.ts",
+    "@electrocraft/exporters": "packages/exporters/src/index.ts",
+    "@electrocraft/testing": "packages/testing/src/index.ts",
+    "@electrocraft/studio": "apps/studio/src/index.ts",
+    "@electrocraft/native-preview": "apps/native-preview/src/index.ts"
+  }
+}

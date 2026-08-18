@@ -1,0 +1,22 @@
+{
+  "name": "@electrocraft/runtime-web",
+  "version": "0.0.0-m01.3",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "dependencies": {
+    "@electrocraft/domain": "0.0.0-m01.3",
+    "@electrocraft/application": "0.0.0-m01.3",
+    "@electrocraft/data-core": "0.0.0-m01.3",
+    "@electrocraft/query-rqb": "0.0.0-m01.3",
+    "@electrocraft/media-tiptap": "0.0.0-m01.3",
+    "@electrocraft/state-zustand": "0.0.0-m01.3",
+    "@electrocraft/auth-core": "0.0.0-m01.3",
+    "@electrocraft/forms": "0.0.0-m01.3"
+  }
+}

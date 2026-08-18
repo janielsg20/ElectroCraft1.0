@@ -1,0 +1,137 @@
+[
+  {
+    "target": "capacitor",
+    "items": [
+      {
+        "capability": "screen.container-text",
+        "level": "exact",
+        "note": "El Web runtime conserva Container/Text."
+      },
+      {
+        "capability": "form",
+        "level": "exact",
+        "note": "Formulario HTML del runtime web."
+      },
+      {
+        "capability": "route",
+        "level": "adapted",
+        "note": "La ruta vive dentro del WebView de Capacitor."
+      },
+      {
+        "capability": "internal-data",
+        "level": "adapted",
+        "note": "El POC conserva contrato; persistencia final depende del perfil Web elegido."
+      },
+      {
+        "capability": "screen-state",
+        "level": "exact",
+        "note": "Estado de pantalla permanece en JavaScript."
+      },
+      {
+        "capability": "action-graph",
+        "level": "adapted",
+        "note": "Los nodos se compilan a handlers del runtime web."
+      },
+      {
+        "capability": "role",
+        "level": "adapted",
+        "note": "La autorización real se resuelve en el boundary de datos/servidor."
+      }
+    ],
+    "summary": {
+      "exact": 3,
+      "adapted": 4,
+      "blocked": 0
+    }
+  },
+  {
+    "target": "lamp",
+    "items": [
+      {
+        "capability": "screen.container-text",
+        "level": "exact",
+        "note": "HTML semántico renderizado por PHP."
+      },
+      {
+        "capability": "form",
+        "level": "adapted",
+        "note": "POST server-side protegido por Slim-CSRF."
+      },
+      {
+        "capability": "route",
+        "level": "exact",
+        "note": "ElectroCraftRouteDefinition se mapea a Slim 4."
+      },
+      {
+        "capability": "internal-data",
+        "level": "adapted",
+        "note": "Appointment se persiste con PDO/MySQL y statements preparados."
+      },
+      {
+        "capability": "screen-state",
+        "level": "adapted",
+        "note": "Draft de pantalla permanece en cliente/request, no se fuerza a PHP global."
+      },
+      {
+        "capability": "action-graph",
+        "level": "adapted",
+        "note": "Validar/crear/refrescar se divide en handler + respuesta HTTP."
+      },
+      {
+        "capability": "role",
+        "level": "adapted",
+        "note": "Capability de rol se aplica como policy/middleware en el runtime final."
+      }
+    ],
+    "summary": {
+      "exact": 2,
+      "adapted": 5,
+      "blocked": 0
+    }
+  },
+  {
+    "target": "wordpress",
+    "items": [
+      {
+        "capability": "screen.container-text",
+        "level": "adapted",
+        "note": "Container/Text se mapean a bloques core."
+      },
+      {
+        "capability": "form",
+        "level": "adapted",
+        "note": "Form requiere bloque dinámico del Companion Plugin por semántica server-side."
+      },
+      {
+        "capability": "route",
+        "level": "adapted",
+        "note": "La pantalla pública se expresa como template; API usa REST nativa."
+      },
+      {
+        "capability": "internal-data",
+        "level": "adapted",
+        "note": "Appointment se mapea a CPT con show_in_rest."
+      },
+      {
+        "capability": "screen-state",
+        "level": "adapted",
+        "note": "Draft interactivo queda en JS/HTML; contenido persistente en WordPress."
+      },
+      {
+        "capability": "action-graph",
+        "level": "adapted",
+        "note": "Mutation usa REST/nonce/capability checks."
+      },
+      {
+        "capability": "role",
+        "level": "adapted",
+        "note": "Role capability se mapea a capacidades nativas de WordPress."
+      }
+    ],
+    "summary": {
+      "exact": 0,
+      "adapted": 7,
+      "blocked": 0
+    }
+  }
+]

@@ -1,0 +1,119 @@
+# Local M01.2 verification (final)
+UTC 2026-08-18T03:30:31Z
+$ npm run check
+
+> electrocraft@0.0.0-m01.2 check
+> npm run lint && npm run typecheck && npm run test:boundaries && npm test && npm run build
+
+
+> electrocraft@0.0.0-m01.2 lint
+> node tooling/scripts/lint-workspace.mjs
+
+PASS_LINT_WORKSPACE packages=17 apps=2 scripts=8
+
+> electrocraft@0.0.0-m01.2 typecheck
+> tsc -p tsconfig.json --noEmit && tsc -p packages/domain/tsconfig.json --noEmit
+
+
+> electrocraft@0.0.0-m01.2 test:boundaries
+> node tooling/scripts/verify-typescript-boundaries.mjs
+
+PASS_M01_2_TYPESCRIPT_BOUNDARIES strict=true aliases=19 packages=17 apps=2
+
+> electrocraft@0.0.0-m01.2 test
+> node --test tooling/test/*.test.mjs
+
+TAP version 13
+# Subtest: root TypeScript configuration is strict and aliases only public workspace roots
+ok 1 - root TypeScript configuration is strict and aliases only public workspace roots
+  ---
+  duration_ms: 7.271823
+  type: 'test'
+  ...
+# Subtest: negative: domain cannot import React, Puck, Drizzle, Expo, DOM or filesystem engines
+ok 2 - negative: domain cannot import React, Puck, Drizzle, Expo, DOM or filesystem engines
+  ---
+  duration_ms: 1.87684
+  type: 'test'
+  ...
+# Subtest: negative: deep workspace imports are rejected even when the package root is allowed
+ok 3 - negative: deep workspace imports are rejected even when the package root is allowed
+  ---
+  duration_ms: 0.907156
+  type: 'test'
+  ...
+# Subtest: negative: cross-package relative imports are rejected
+ok 4 - negative: cross-package relative imports are rejected
+  ---
+  duration_ms: 0.947086
+  type: 'test'
+  ...
+# Subtest: negative: application cannot depend on runtime or adapter packages
+ok 5 - negative: application cannot depend on runtime or adapter packages
+  ---
+  duration_ms: 1.343577
+  type: 'test'
+  ...
+# Subtest: every workspace package exposes only its public root entry
+ok 6 - every workspace package exposes only its public root entry
+  ---
+  duration_ms: 1.419836
+  type: 'test'
+  ...
+# Subtest: workspace owns exactly 17 stable packages and two apps
+ok 7 - workspace owns exactly 17 stable packages and two apps
+  ---
+  duration_ms: 7.401167
+  type: 'test'
+  ...
+# Subtest: domain remains framework-free and dependency-free
+ok 8 - domain remains framework-free and dependency-free
+  ---
+  duration_ms: 1.214096
+  type: 'test'
+  ...
+# Subtest: negative: a domain to editor dependency is rejected
+ok 9 - negative: a domain to editor dependency is rejected
+  ---
+  duration_ms: 1.81506
+  type: 'test'
+  ...
+# Subtest: native runtime and native preview do not depend on DOM/editor packages
+ok 10 - native runtime and native preview do not depend on DOM/editor packages
+  ---
+  duration_ms: 1.106293
+  type: 'test'
+  ...
+# Subtest: exporters depend on ExportIR/contracts, not Studio UI or runtimes
+ok 11 - exporters depend on ExportIR/contracts, not Studio UI or runtimes
+  ---
+  duration_ms: 0.992207
+  type: 'test'
+  ...
+# Subtest: native source/build/config fixture is complete and reproducible
+ok 12 - native source/build/config fixture is complete and reproducible
+  ---
+  duration_ms: 0.187215
+  type: 'test'
+  ...
+# Subtest: Spanish architecture help descriptor is registered as a fixture
+ok 13 - Spanish architecture help descriptor is registered as a fixture
+  ---
+  duration_ms: 0.157844
+  type: 'test'
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 76.669035
+
+> electrocraft@0.0.0-m01.2 build
+> node tooling/scripts/build-workspace.mjs && node tooling/scripts/build-typescript-boundaries.mjs
+
+PASS_BUILD_WORKSPACE packages=17 apps=2 graph=bf72f2a3dbf72a7a59deb26eaea4b0414459973a6a37184785ebeb029d47601d
+PASS_BUILD_M01_2 strict=true aliases=19 sha=427541b4a1c3c656db564e417e3188430d0190e7cd2421a07ac1f3a07776882d

@@ -1,0 +1,48 @@
+name: M01.3 Quality Toolchain Gate
+
+on:
+  workflow_run:
+    workflows: ['M01.2 TypeScript Boundaries Gate']
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: M01.3 lint test build and empty-repo verification
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact M01.2 green head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.sha || github.event.workflow_run.head_sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+      - name: Install exact root toolchain
+        run: npm install --ignore-scripts --no-audit --no-fund --package-lock=false
+      - name: Verify exact toolchain pins
+        run: node tooling/scripts/verify-toolchain.mjs | tee m01-3-toolchain.log
+      - name: Run required root pipeline
+        run: npm run check | tee m01-3-check.log
+      - name: Run empty functional repository toolchain fixture
+        run: npm run test:empty-repo | tee m01-3-empty-repo.log
+      - name: Emit M01.3 closure marker
+        run: |
+          test -f tooling/dist/quality-toolchain-report.json
+          grep -q '"microphase": "M01.3"' tooling/dist/quality-toolchain-report.json
+          echo PASS_M01_3_QUALITY_TOOLCHAIN | tee m01-3-closure.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m01-3-quality-toolchain-evidence
+          path: |
+            tooling/dist
+            apps/studio/dist
+            m01-3-toolchain.log
+            m01-3-check.log
+            m01-3-empty-repo.log
+            m01-3-closure.log

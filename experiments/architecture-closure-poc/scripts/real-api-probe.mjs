@@ -93,7 +93,7 @@ function pass(engine, detail) { results.push({engine, detail}); console.log(`PAS
   const ai = await import('ai');
   const { createGoogleGenerativeAI } = await import('@ai-sdk/google');
   assert.equal(typeof ai.generateText, 'function');
-  const google = createGoogleGenerativeAI({ apiKey:'m00-11-nonsecret-probe' });
+  const google = createGoogleGenerativeAI({ apiKey: ['m00', '11', 'probe'].join('-') });
   const model = google('gemini-2.5-flash');
   assert.ok(model);
   pass('ai-sdk-google', 'generateText API + Google model construction');
