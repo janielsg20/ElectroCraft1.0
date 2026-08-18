@@ -1,0 +1,145 @@
+name: M02.9 Engine Payload Wrappers Gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'packages/domain/**'
+      - 'packages/application/**'
+      - 'packages/query-rqb/**'
+      - 'packages/media-tiptap/**'
+      - '.ai/ENGINE_PAYLOAD_POLICY.md'
+      - 'tooling/fixtures/canonical-model/engine-payload-*.json'
+      - 'tooling/fixtures/help.architecture.models.json'
+      - 'tooling/vitest/unit/engine-payload.test.ts'
+      - 'tooling/vitest/contract/engine-payload-boundary.test.ts'
+      - 'tooling/vitest/integration/engine-payload-runtime.test.ts'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/m02-9-engine-payload-wrappers.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'packages/domain/**'
+      - 'packages/application/**'
+      - 'packages/query-rqb/**'
+      - 'packages/media-tiptap/**'
+      - '.ai/ENGINE_PAYLOAD_POLICY.md'
+      - 'tooling/fixtures/canonical-model/engine-payload-*.json'
+      - 'tooling/fixtures/help.architecture.models.json'
+      - 'tooling/vitest/unit/engine-payload.test.ts'
+      - 'tooling/vitest/contract/engine-payload-boundary.test.ts'
+      - 'tooling/vitest/integration/engine-payload-runtime.test.ts'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/m02-9-engine-payload-wrappers.yml'
+
+permissions:
+  contents: read
+  statuses: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  m02-9:
+    name: M02.9 versioned engine payload wrappers
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Publish pending status
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: 'pending',
+              context: 'electrocraft/M02.9',
+              description: 'M02.9 engine payload gate running',
+              target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Verify locked toolchain
+        run: |
+          test "$(node --version)" = 'v22.16.0'
+          test "$(npm --version)" = '10.9.2'
+          test "$(npm config get legacy-peer-deps)" = 'true'
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Verify engine pins and owner count
+        run: |
+          node -e "const p=require('./node_modules/@react-querybuilder/core/package.json'); if(p.version!=='8.23.0') throw new Error('expected RQB 8.23.0, got '+p.version); console.log('rqb@'+p.version)"
+          node -e "for(const n of ['@tiptap/core','@tiptap/html','@tiptap/starter-kit']){const p=require('./node_modules/'+n+'/package.json'); if(p.version!=='3.29.2') throw new Error('expected '+n+' 3.29.2, got '+p.version); console.log(n+'@'+p.version)}"
+          node -e "const p=require('./tooling/package-boundaries.json'); if(Object.keys(p.packages).length!==17) throw new Error('F01 owner package count drift'); console.log('ownerPackages='+Object.keys(p.packages).length)"
+          test -f .ai/ENGINE_PAYLOAD_POLICY.md
+
+      - name: Execute M02.9 tests with generated evidence
+        run: |
+          mkdir -p .evidence/m02-9
+          ELECTROCRAFT_EVIDENCE_DIR=.evidence/m02-9 npm run test:m02-9 | tee m02-9-tests.log
+
+      - name: Execute full repository pipeline
+        run: npm run check | tee m02-9-check.log
+
+      - name: Verify generated M02.9 evidence
+        run: |
+          test -f .evidence/m02-9/m02-9-rqb-wrapper.json
+          test -f .evidence/m02-9/m02-9-tiptap-wrapper.json
+          test -f .evidence/m02-9/m02-9-boundary-report.json
+          node -e "const r=require('./.evidence/m02-9/m02-9-rqb-wrapper.json'); if(r.engine!=='react-querybuilder'||r.schemaVersion!==1||!r.formatterValidated) throw new Error('RQB wrapper evidence drift'); console.log('rqbWrapper=v1')"
+          node -e "const r=require('./.evidence/m02-9/m02-9-tiptap-wrapper.json'); if(r.engine!=='tiptap'||r.schemaVersion!==1||!r.starterKitValidated) throw new Error('Tiptap wrapper evidence drift'); console.log('tiptapWrapper=v1')"
+          node -e "const r=require('./.evidence/m02-9/m02-9-boundary-report.json'); if(!r.portableJson||!r.rqbVersion2Blocked||!r.tiptapVersion2Blocked||r.reteAppStateAllowed||r.puckAppStateAllowed) throw new Error('engine payload boundary drift'); console.log('runtimeInternalsBlocked=true')"
+          grep -q 'react-querybuilder' .ai/ENGINE_PAYLOAD_POLICY.md
+          grep -q 'Tiptap rich text JSON' .ai/ENGINE_PAYLOAD_POLICY.md
+          grep -q 'Puck AppState' .ai/ENGINE_PAYLOAD_POLICY.md
+          grep -q 'Rete `NodeEditor`' .ai/ENGINE_PAYLOAD_POLICY.md
+
+      - name: Emit M02.9 closure candidate marker
+        run: echo PASS_M02_9_ENGINE_PAYLOAD_WRAPPERS | tee m02-9-closure.log
+
+      - name: Upload M02.9 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: m02-9-engine-payload-wrappers-evidence
+          path: |
+            m02-9-tests.log
+            m02-9-check.log
+            m02-9-closure.log
+            .evidence/m02-9/*.json
+            .ai/ENGINE_PAYLOAD_POLICY.md
+            tooling/fixtures/canonical-model/engine-payload-*.json
+          if-no-files-found: error
+
+      - name: Publish final commit status
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: '${{ job.status }}' === 'success' ? 'success' : 'failure',
+              context: 'electrocraft/M02.9',
+              description: 'M02.9 engine payload wrappers gate',
+              target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });
