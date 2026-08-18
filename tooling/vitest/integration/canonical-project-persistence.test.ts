@@ -43,9 +43,7 @@ class FileProjectObjectRepository implements CanonicalProjectObjectRepository {
 
 const tempRoots: string[] = [];
 afterEach(() => {
-  for (const root of tempRoots.splice(0)) {
-    rmSync(root, { recursive: true, force: true });
-  }
+  for (const root of tempRoots.splice(0)) rmSync(root, { recursive: true, force: true });
 });
 
 function repository(): FileProjectObjectRepository {
@@ -54,18 +52,19 @@ function repository(): FileProjectObjectRepository {
   return new FileProjectObjectRepository(root);
 }
 
+function singleDocumentFixture() {
+  const document = electroCraftDocumentSchema.parse(fixture('screen-v2'));
+  const project = electroCraftProjectDefinitionSchema.parse(fixture('project-v2'));
+  return { document, project: { ...project, documentRefs: [document.id] } };
+}
+
 describe('M02.1 canonical persistence/reopen/recovery', () => {
   it('persists and reopens the same canonical project with a fresh repository instance', async () => {
-    const project = electroCraftProjectDefinitionSchema.parse(fixture('project-v1'));
-    const document = electroCraftDocumentSchema.parse(fixture('screen-v1'));
+    const { project, document } = singleDocumentFixture();
     const firstRepository = repository();
     const save = await new ProjectDocumentService(firstRepository).save(project, [document]);
 
-    expect(save).toEqual({
-      status: 'saved',
-      projectId: project.id,
-      documentCount: 1,
-    });
+    expect(save).toEqual({ status: 'saved', projectId: project.id, documentCount: 1 });
 
     const reopened = await new ProjectDocumentService(new FileProjectObjectRepository(firstRepository.root)).reopen(
       project.id,
@@ -75,38 +74,30 @@ describe('M02.1 canonical persistence/reopen/recovery', () => {
     if (reopened.status === 'ready') {
       expect(reopened.project).toEqual(project);
       expect(reopened.documents).toEqual([document]);
+      expect(reopened.migratedProject).toBe(false);
       expect(reopened.migratedDocumentIds).toEqual([]);
     }
   });
 
   it('fails closed when a referenced document disappears after persistence', async () => {
-    const project = electroCraftProjectDefinitionSchema.parse(fixture('project-v1'));
-    const document = electroCraftDocumentSchema.parse(fixture('screen-v1'));
+    const { project, document } = singleDocumentFixture();
     const repo = repository();
     await new ProjectDocumentService(repo).save(project, [document]);
     rmSync(repo.recordPath('document', document.id));
 
     const reopened = await new ProjectDocumentService(repo).reopen(project.id);
     expect(reopened).toEqual(
-      expect.objectContaining({
-        status: 'blocked',
-        code: 'MISSING_DOCUMENT_REF',
-        ref: document.id,
-      }),
+      expect.objectContaining({ status: 'blocked', code: 'MISSING_DOCUMENT_REF', ref: document.id }),
     );
   });
 
   it('reopens a legacy page record only through the explicit page to screen migration', async () => {
-    const project = electroCraftProjectDefinitionSchema.parse(fixture('project-v1'));
-    const document = electroCraftDocumentSchema.parse(fixture('screen-v1'));
+    const { project, document } = singleDocumentFixture();
     const repo = repository();
     await new ProjectDocumentService(repo).save(project, [document]);
 
-    const legacyPage = {
-      ...document,
-      schemaVersion: 0,
-      kind: 'page',
-    };
+    const { formMeta: _formMeta, ...legacyBase } = document;
+    const legacyPage = { ...legacyBase, schemaVersion: 0, kind: 'page' };
     const record: CanonicalProjectObjectRecord = {
       kind: 'document',
       id: document.id,
@@ -119,6 +110,7 @@ describe('M02.1 canonical persistence/reopen/recovery', () => {
     expect(reopened.status).toBe('ready');
     if (reopened.status === 'ready') {
       expect(reopened.documents[0]?.kind).toBe('screen');
+      expect(reopened.documents[0]?.schemaVersion).toBe(2);
       expect(reopened.migratedDocumentIds).toEqual([document.id]);
     }
   });
