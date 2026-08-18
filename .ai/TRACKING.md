@@ -10,9 +10,9 @@ El tracking histórico previo a M00.9 se conserva íntegro en `.ai/TRACKING_HIST
 - F00: `COMPLETADA`.
 - M00.9, M00.10 y M00.11: `COMPLETADAS` con evidencia real de GitHub Actions.
 - F01 activa.
-- M01.1, M01.2, M01.3 y M01.4: `COMPLETADAS` con evidencia real de GitHub Actions.
-- Gate actual: `GREEN_THROUGH_M01.4`.
-- Próxima microfase exacta: M01.5 — Crear CI base.
+- M01.1, M01.2, M01.3, M01.4 y M01.5: `COMPLETADAS` con evidencia real de GitHub Actions.
+- Gate actual: `GREEN_THROUGH_M01.5`.
+- Próxima microfase exacta: M01.6 — Documentar conventions.
 
 ## M00.9 — Data Sources — COMPLETADA
 - Engine/API: `@scalar/openapi-parser@0.28.11` real + REST/GraphQL/Gateway fixtures.
@@ -111,6 +111,64 @@ Head: `ed4e9f12486b3ddf4f3351517867a6ee9cd73a15`.
 
 La evidencia formal se conserva en `.ai/evidence/F01/M01.4/CLOSURE_2026-08-18.md`.
 
+## M01.5 — CI base reproducible — COMPLETADA
+### Implementación
+- Squash merge a `main`: `9fb64b7890ae92660d8d494d706245e800782e86`.
+- PR validation head: `0a4a5f46758cbed23ead055dfab3a636884ead63`.
+- PR head y commit fusionado comparten tree SHA `23bc994e19902830148650601656492a17dc7824`.
+- `package-lock.json` raíz con `lockfileVersion: 3`.
+- `package.json` raíz identifica `0.0.0-m01.5` y `packageManager: npm@10.9.2`.
+- `.npmrc` fija `legacy-peer-deps=true`.
+- `.github/workflows/ci.yml` ejecuta push a `main` + pull request, con permisos `contents: read`.
+- Instalación bloqueada con `npm ci --ignore-scripts --no-audit --no-fund`.
+- Cache segura mediante `actions/setup-node` + `cache: npm` + `cache-dependency-path: package-lock.json`; no se cachea `node_modules` como artifact propio.
+- El workflow no contiene deploy, publish, Cloudflare/Vercel, secrets de nube ni permisos write de deployment.
+
+### Engine/API utilizado
+- GitHub Actions.
+- `actions/checkout@v6` con `persist-credentials: false`.
+- `actions/setup-node@v7`.
+- Node `22.16.0`.
+- npm `10.9.2`.
+- npm lockfile v3 + `npm ci`.
+- ESLint, Prettier, TypeScript, Vitest, Vite y Playwright existentes continúan siendo los owners de sus gates.
+
+### Tooling y pruebas añadidas
+- `tooling/src/ci-base.mjs`: evaluator fail-closed del contrato CI.
+- `tooling/scripts/verify-ci-base.mjs`: genera `tooling/dist/m01-5-ci-base-report.json`.
+- `tooling/test/ci-base.test.mjs`: caso ready, negativo unlocked+secret y negativo stale-lock.
+- `tooling/vitest/contract/ci-base-workflow.test.ts`: valida el workflow real, comandos obligatorios, cache/lock, ausencia de deep-source/deploy/secret.
+- `tooling/vitest/integration/ci-base-report.test.ts`: valida el reporte real generado por build.
+- Help descriptor `help.architecture.repository` actualizado en español.
+
+### Adaptación registrada
+- Primer intento de generar lockfile: run `32157236793`, fallo interno npm/Arborist `Cannot read properties of null (reading 'edgesOut')`.
+- No se desactivó lint, typecheck, tests, boundaries ni ningún gate para sortearlo.
+- El lockfile se generó con `legacy-peer-deps`; la misma política quedó persistida en `.npmrc` para que `npm ci` reproduzca la resolución.
+
+### Evidencia dedicada M01.5
+- Base CI PR run: `32158198590`.
+- Validated head: `0a4a5f46758cbed23ead055dfab3a636884ead63`.
+- Validated tree: `23bc994e19902830148650601656492a17dc7824`, idéntico al árbol del squash merge en `main`.
+- Job `Locked lint typecheck test build`: `success`.
+- Gates verdes: locked toolchain, `npm ci`, lint, typecheck, tests, build, Playwright, empty-repo fixture, CI report verification y closure marker.
+- Marker: `PASS_M01_5_BASE_CI`.
+- Artifact `9332533012` — `m01-5-base-ci-evidence`.
+- Digest: `sha256:439631825171a8316e5b850051ea63f3eb693f3235a8cd71e803a6a04afe5758`.
+
+### Revalidación heredada sobre `main`
+Head: `9fb64b7890ae92660d8d494d706245e800782e86`.
+
+- M01.4 — `success`; run `32158500101`.
+- M00.9 — `success`; run `32158500161`.
+- M00.10 — `success`; run `32158500161`, incluidos static parity, Capacitor, LAMP/MySQL/PDO/CSRF, WordPress wp-env y closure gate.
+- M00.11 — `success`; run `32158786503`.
+- M01.1 — `success`; run `32158875745`.
+- M01.2 — `success`; run `32158875745`.
+- M01.3 — `success`; run `32158875745`.
+
+La evidencia formal se conserva en `.ai/evidence/F01/M01.5/CLOSURE_2026-08-18.md`.
+
 ## Correcciones de CI incorporadas durante el cierre
 1. Los workflows publican commit statuses `pending`/`success`/`failure` con `target_url`; el conector ya no depende de una lista de checks vacía.
 2. M00.9/M00.10 tienen cobertura de paths suficiente para revalidar cambios de F01/estado/workflows relevantes.
@@ -120,6 +178,7 @@ La evidencia formal se conserva en `.ai/evidence/F01/M01.4/CLOSURE_2026-08-18.md
 6. TypeScript 7 eliminó `baseUrl`; el validador propio quedó alineado.
 7. Vite usa `apps/studio` como root y Playwright valida el artifact del owner correcto.
 8. Desde M01.4, M01.1 valida el artifact PWA vigente en vez del artifact temporal de librería usado antes de que existiera la app real.
+9. Desde M01.5, el CI base usa lockfile + `npm ci` y cache npm por lockfile; no muta dependencias durante el gate ni posee permisos de deploy.
 
 ## Regla de continuación
-M01.4 está formalmente `COMPLETADA`. La siguiente y única microfase activa debe ser M01.5 — **Crear CI base** siguiendo `.ai/microphases/M01_5.md`.
+M01.5 está formalmente `COMPLETADA`. La siguiente y única microfase activa debe ser M01.6 — **Documentar conventions** siguiendo `.ai/microphases/M01_6.md`.
