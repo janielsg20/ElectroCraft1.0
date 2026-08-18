@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "installerVersion": 1,
+  "successfulInstalledBefore": [
+    {
+      "objectId": "ec_theme_0000000000006",
+      "contentHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "originBlueprint": null
+    }
+  ],
+  "conflictingInstalledBefore": [
+    {
+      "objectId": "ec_theme_0000000000006",
+      "contentHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "originBlueprint": null
+    },
+    {
+      "objectId": "ec_document_000000000000t",
+      "contentHash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "originBlueprint": null
+    }
+  ],
+  "expectedConflictCodes": ["create-object-exists"],
+  "expectedAfterApply": {
+    "ec_theme_0000000000006": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "ec_document_000000000000t": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "expectedAfterRollback": {
+    "ec_theme_0000000000006": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  }
+}
