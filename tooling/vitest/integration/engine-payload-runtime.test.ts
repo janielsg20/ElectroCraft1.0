@@ -39,7 +39,7 @@ describe('M02.9 real engine payload adapters', () => {
     });
   });
 
-  it('validates Tiptap JSON with the real Tiptap 3.29.2 StarterKit and renders HTML', () => {
+  it('validates Tiptap JSON with the real pinned minimal extension set and renders HTML', () => {
     const fixturePayload = fixture('engine-payload-tiptap-v1');
     const wrapped = createTiptapEnginePayload(fixturePayload.value);
     const migrated = migrateTiptapEnginePayload(wrapped);
@@ -53,7 +53,8 @@ describe('M02.9 real engine payload adapters', () => {
       schemaVersion: validated.schemaVersion,
       migration: 'identity-v1',
       renderedHtml: html,
-      starterKitValidated: true,
+      extensionSet: ['document', 'paragraph', 'text'],
+      extensionSetValidated: true,
     });
   });
 
