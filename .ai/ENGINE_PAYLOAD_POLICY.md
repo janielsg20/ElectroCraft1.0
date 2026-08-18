@@ -13,7 +13,7 @@ Every approved engine payload uses exactly this canonical envelope:
 }
 ```
 
-`@electrocraft/domain` owns only the JSON wrapper, deterministic serialization and the approved/prohibited engine identifiers. Domain never imports engine types.
+`@electrocraft/domain` owns the JSON wrapper, deterministic serialization and portable engine identifiers/policy metadata. Domain never imports engine types.
 
 ## Approved initial payloads
 
@@ -32,10 +32,13 @@ The canonical `ElectroCraftQueryDefinition.conditions` remains the primary porta
 - `engine`: `tiptap`
 - wrapper `schemaVersion`: `1`
 - adapter owner: `@electrocraft/media-tiptap`
-- current engine pin: Tiptap `3.29.2` (`@tiptap/core`, `@tiptap/html`, `@tiptap/starter-kit`).
+- exact architecture pins: `@tiptap/html@3.29.2` and `@tiptap/starter-kit@3.29.2`.
+- `@tiptap/core` is the shared compatible peer resolved by those packages; it is not independently pinned as an ElectroCraft architecture contract.
 - allowed value: Tiptap/ProseMirror JSON document rooted at `{ type: "doc" }` using extensions available in the pinned adapter.
 - adapter validation: structural root validation plus real Tiptap JSON-to-HTML generation using StarterKit.
 - migration owner: `@electrocraft/media-tiptap`; current v1 payload is identity-migrated and future wrapper revisions must be migrated there.
+
+Tiptap JSON is used as the persisted engine payload rather than HTML so the editor can reconstruct structured rich text while keeping the wrapper JSON-portable.
 
 ## Compatibility Analyzer
 `@electrocraft/application` checks wrapper shape, engine allowlist and wrapper schema version before an adapter is selected. Unknown engines or versions are `blocked`, never silently accepted.
