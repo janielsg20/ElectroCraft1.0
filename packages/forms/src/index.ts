@@ -1,6 +1,8 @@
 import { packageDescriptor as dep0 } from '@electrocraft/domain';
 import { packageDescriptor as dep1 } from '@electrocraft/application';
 
+export * from './form-contract';
+
 export const packageDescriptor = Object.freeze({
   name: '@electrocraft/forms',
   responsibility: 'contratos de formularios y validación portable',
