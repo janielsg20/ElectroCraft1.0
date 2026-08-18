@@ -12,6 +12,7 @@
   "dependencies": {
     "@electrocraft/domain": "0.0.0-m01.3",
     "@electrocraft/application": "0.0.0-m01.3",
-    "@electrocraft/data-core": "0.0.0-m01.3"
+    "@electrocraft/data-core": "0.0.0-m01.3",
+    "@react-querybuilder/core": "8.23.0"
   }
 }
