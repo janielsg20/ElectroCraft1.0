@@ -1,6 +1,6 @@
 import {
   deserializeElectroCraftDocument,
-  deserializeElectroCraftProjectDefinition,
+  deserializeElectroCraftProjectDefinitionWithMigration,
   electroCraftDocumentSchema,
   electroCraftProjectDefinitionSchema,
   serializeElectroCraftDocument,
@@ -55,11 +55,11 @@ export interface CanonicalProjectReadyResult {
   status: 'ready';
   project: ElectroCraftProjectDefinition;
   documents: ElectroCraftDocument[];
+  migratedProject: boolean;
   migratedDocumentIds: ElectroCraftObjectId[];
 }
 
 export type CanonicalProjectSaveResult = CanonicalProjectSavedResult | CanonicalProjectBlockedResult;
-
 export type CanonicalProjectReopenResult = CanonicalProjectReadyResult | CanonicalProjectBlockedResult;
 
 function blocked(
@@ -79,31 +79,23 @@ export class ProjectDocumentService {
 
   async save(projectInput: unknown, documentInputs: readonly unknown[]): Promise<CanonicalProjectSaveResult> {
     const projectResult = electroCraftProjectDefinitionSchema.safeParse(projectInput);
-    if (!projectResult.success) {
-      return blocked('INVALID_PROJECT', projectResult.error.message);
-    }
+    if (!projectResult.success) return blocked('INVALID_PROJECT', projectResult.error.message);
     const project = projectResult.data;
     const semanticDiagnostics = validateProjectDefinitionSemantics(project);
     if (semanticDiagnostics.length > 0) {
-      return blocked('REFERENCE_ERROR', 'project semantics are invalid', {
-        diagnostics: semanticDiagnostics,
-      });
+      return blocked('REFERENCE_ERROR', 'project semantics are invalid', { diagnostics: semanticDiagnostics });
     }
 
     const documents: ElectroCraftDocument[] = [];
     for (const input of documentInputs) {
       const result = electroCraftDocumentSchema.safeParse(input);
-      if (!result.success) {
-        return blocked('INVALID_DOCUMENT', result.error.message);
-      }
+      if (!result.success) return blocked('INVALID_DOCUMENT', result.error.message);
       documents.push(result.data);
     }
 
     const referenceDiagnostics = validateProjectDocumentReferences(project, documents);
     if (referenceDiagnostics.length > 0) {
-      return blocked('REFERENCE_ERROR', 'project document references are invalid', {
-        diagnostics: referenceDiagnostics,
-      });
+      return blocked('REFERENCE_ERROR', 'project document references are invalid', { diagnostics: referenceDiagnostics });
     }
 
     const records: CanonicalProjectObjectRecord[] = [
@@ -123,11 +115,7 @@ export class ProjectDocumentService {
 
     try {
       await this.repository.putMany(records);
-      return {
-        status: 'saved',
-        projectId: project.id,
-        documentCount: documents.length,
-      };
+      return { status: 'saved', projectId: project.id, documentCount: documents.length };
     } catch (error) {
       return blocked('PERSISTENCE_ERROR', errorMessage(error));
     }
@@ -142,35 +130,41 @@ export class ProjectDocumentService {
     }
 
     if (projectRecord === null) {
-      return blocked('PROJECT_NOT_FOUND', 'canonical project record was not found', {
-        ref: projectId,
-      });
+      return blocked('PROJECT_NOT_FOUND', 'canonical project record was not found', { ref: projectId });
     }
 
     let project: ElectroCraftProjectDefinition;
+    let migratedProject = false;
     try {
-      project = deserializeElectroCraftProjectDefinition(projectRecord.payload);
+      const imported = deserializeElectroCraftProjectDefinitionWithMigration(projectRecord.payload);
+      project = imported.project;
+      migratedProject = imported.migratedFrom !== null;
     } catch (error) {
-      return blocked('INVALID_PROJECT_RECORD', errorMessage(error), {
-        ref: projectId,
-      });
+      return blocked('INVALID_PROJECT_RECORD', errorMessage(error), { ref: projectId });
     }
 
     const documents: ElectroCraftDocument[] = [];
     const migratedDocumentIds: ElectroCraftObjectId[] = [];
+    const migrationWrites: CanonicalProjectObjectRecord[] = [];
+
+    if (migratedProject) {
+      migrationWrites.push({
+        kind: 'project',
+        id: project.id,
+        schemaVersion: 1,
+        payload: serializeElectroCraftProjectDefinition(project),
+      });
+    }
+
     for (const documentId of project.documentRefs) {
       let record: CanonicalProjectObjectRecord | null;
       try {
         record = await this.repository.get('document', documentId);
       } catch (error) {
-        return blocked('PERSISTENCE_ERROR', errorMessage(error), {
-          ref: documentId,
-        });
+        return blocked('PERSISTENCE_ERROR', errorMessage(error), { ref: documentId });
       }
       if (record === null) {
-        return blocked('MISSING_DOCUMENT_REF', 'referenced canonical document record was not found', {
-          ref: documentId,
-        });
+        return blocked('MISSING_DOCUMENT_REF', 'referenced canonical document record was not found', { ref: documentId });
       }
 
       try {
@@ -178,21 +172,31 @@ export class ProjectDocumentService {
         documents.push(imported.document);
         if (imported.migratedFrom !== null) {
           migratedDocumentIds.push(imported.document.id);
+          migrationWrites.push({
+            kind: 'document',
+            id: imported.document.id,
+            schemaVersion: 1,
+            payload: serializeElectroCraftDocument(imported.document),
+          });
         }
       } catch (error) {
-        return blocked('INVALID_DOCUMENT_RECORD', errorMessage(error), {
-          ref: documentId,
-        });
+        return blocked('INVALID_DOCUMENT_RECORD', errorMessage(error), { ref: documentId });
       }
     }
 
     const diagnostics = validateProjectDocumentReferences(project, documents);
     if (diagnostics.length > 0) {
-      return blocked('REFERENCE_ERROR', 'reopened project references are invalid', {
-        diagnostics,
-      });
+      return blocked('REFERENCE_ERROR', 'reopened project references are invalid', { diagnostics });
     }
 
-    return { status: 'ready', project, documents, migratedDocumentIds };
+    if (migrationWrites.length > 0) {
+      try {
+        await this.repository.putMany(migrationWrites);
+      } catch (error) {
+        return blocked('PERSISTENCE_ERROR', errorMessage(error));
+      }
+    }
+
+    return { status: 'ready', project, documents, migratedProject, migratedDocumentIds };
   }
 }
