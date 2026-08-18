@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "ec_registry-definition_000000000000r",
+  "version": 1,
+  "kind": "component",
+  "key": "userPromoCard",
+  "label": "Tarjeta promocional de usuario",
+  "origin": "user",
+  "capabilityRefs": ["navigation.basic"],
+  "metadata": {
+    "fixture": "m02.5"
+  }
+}
