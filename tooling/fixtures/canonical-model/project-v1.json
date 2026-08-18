@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "ec_project_0000000000001",
+  "version": 1,
+  "name": "Proyecto canónico de prueba",
+  "appSettings": {
+    "displayName": "ElectroCraft Fixture",
+    "locale": "es"
+  },
+  "defaultTargets": ["local", "react", "pwa"],
+  "documentRefs": ["ec_document_0000000000002"],
+  "routeRefs": ["ec_route_0000000000005"],
+  "navigationRefs": ["ec_navigation_0000000000004"],
+  "rootNavigationRef": "ec_navigation_0000000000004",
+  "themeRef": "ec_theme_0000000000006",
+  "featureFlags": {
+    "canonicalModel": true
+  },
+  "metadata": {
+    "fixture": "m02.1"
+  }
+}
