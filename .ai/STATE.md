@@ -13,20 +13,21 @@
 - M02.5 — Definir Theme, Blueprint, Registries y Capability ownership: `COMPLETADA`.
 - M02.6 — Serializer y migrations de proyecto: `COMPLETADA`.
 - M02.7 — Definir `ElectroCraftExportIR`: `COMPLETADA`.
-- M02.8 — Clasificar ownership: Project Objects vs Registries vs Content Entities: `ACTIVE`.
-- Gate acumulado: `GREEN_THROUGH_M02.7`.
+- M02.8 — Clasificar ownership: Project Objects vs Registries vs Content Entities: `COMPLETADA`.
+- M02.9 — Definir wrappers versionados para payloads de engines: `ACTIVE`.
+- Gate acumulado: `GREEN_THROUGH_M02.8`.
 - Blockers P0/P1: `0`.
 
 ## Microfase activa
-`M02.8` — Clasificar ownership: Project Objects vs Registries vs Content Entities.
+`M02.9` — Definir wrappers versionados para payloads de engines.
 
-Objetivo actual: fijar una taxonomía explícita y verificable para cada entidad del modelo; definir qué se serializa como Project Object, qué vive como Registry/Definition disponible y qué pertenece a Content Entities/records runtime, documentando owner, almacenamiento, serializer/migration access y participación en ExportIR sin crear una segunda fuente de verdad.
+Objetivo actual: definir el patrón portable `{ engine, schemaVersion, value }`, aplicarlo inicialmente a RQB rules y Tiptap richtext mediante validators/migrations en sus adapters, detectar engines/versiones no soportados y documentar qué payloads OSS pueden persistirse sin convertir AppState/classes/runtime internals de Rete/Puck en modelo canónico.
 
 ## Referencias
-- Spec: `.ai/microphases/M02_8.md`.
+- Spec: `.ai/microphases/M02_9.md`.
 - Fase: `.ai/phases/F02.md`.
 - Tracking: `.ai/TRACKING.md`.
 - Handoff: `.ai/HANDOFF.md`.
-- Cierre M02.7: `.ai/evidence/F02/M02.7/CLOSURE_2026-08-18.md`.
+- Cierre M02.8: `.ai/evidence/F02/M02.8/CLOSURE_2026-08-18.md`.
 
-No iniciar M02.9 hasta cerrar M02.8 con tests/build/evidencia.
+No cerrar F02 ni iniciar F03 hasta cerrar M02.9 con tests/build/evidencia y ejecutar el gate final de F02.
