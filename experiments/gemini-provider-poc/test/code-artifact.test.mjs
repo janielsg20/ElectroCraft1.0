@@ -12,6 +12,14 @@ test('multi-file code artifact validates as Draft', async () => {
   assert.ok(artifact.files.some((file) => file.path === artifact.entryFile));
 });
 
+test('provider schema accepts boolean but ElectroCraft rejects draftOnly=false', async () => {
+  const raw = await fixture();
+  raw.draftOnly = false;
+  const artifact = codeArtifactSchema.parse(raw);
+  assert.equal(artifact.draftOnly, false);
+  assert.throws(() => validateGeneratedCodeArtifact(artifact), UnsafeGeneratedCodeError);
+});
+
 test('code artifact rejects parent traversal', async () => {
   const artifact = codeArtifactSchema.parse(await fixture());
   artifact.files[0].path = '../escape.tsx';

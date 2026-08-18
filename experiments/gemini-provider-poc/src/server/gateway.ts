@@ -37,6 +37,10 @@ function assertNotAborted(signal?: AbortSignal) {
 }
 
 export function validateGeneratedCodeArtifact(artifact: CodeArtifactPoc): CodeArtifactPoc {
+  if (artifact.draftOnly !== true) {
+    throw new UnsafeGeneratedCodeError("El artifact generado debe permanecer Draft-only");
+  }
+
   const paths = new Set<string>();
   for (const file of artifact.files) {
     const segments = file.path.split("/");
@@ -84,7 +88,7 @@ export function createGeminiGateway(config: GeminiGatewayConfig) {
           description: "Borrador multiarchivo de código para component, plugin o section. Nunca aplica cambios por sí mismo.",
           schema: codeArtifactSchema,
         }),
-        system: "Genera únicamente un Draft de código para ElectroCraft. Usa rutas relativas, no escribas archivos, no instales paquetes, no uses secretos y no apliques cambios al proyecto. El artifact debe ser autocontenido, revisable y validable antes de cualquier Apply posterior por el usuario.",
+        system: "Genera únicamente un Draft de código para ElectroCraft. Usa rutas relativas, no escribas archivos, no instales paquetes, no uses secretos y no apliques cambios al proyecto. Devuelve draftOnly=true. El artifact debe ser autocontenido, revisable y validable antes de cualquier Apply posterior por el usuario.",
         prompt: input.prompt,
         ...(input.abortSignal ? { abortSignal: input.abortSignal } : {}),
         maxRetries: 1,

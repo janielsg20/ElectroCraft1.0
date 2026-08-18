@@ -50,7 +50,7 @@ export const codeArtifactSchema = z.object({
     }),
   ).max(8),
   validationChecks: z.array(z.enum(["syntax", "types", "imports", "policy"])).min(2).max(4),
-  draftOnly: z.literal(true),
+  draftOnly: z.boolean(),
 });
 export type CodeArtifactPoc = z.infer<typeof codeArtifactSchema>;
 
