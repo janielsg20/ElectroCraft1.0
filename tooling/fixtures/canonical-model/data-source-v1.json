@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "ec_source_0000000000007",
+  "version": 1,
+  "key": "studioContent",
+  "label": "Contenido local de Studio",
+  "kind": "internal",
+  "adapterId": "electrocraft.internal",
+  "authRef": null,
+  "config": {
+    "database": "studio-content",
+    "namespace": "fixture"
+  },
+  "capabilities": ["read", "create", "update", "delete", "filter", "sort", "paginate", "aggregate"],
+  "metadata": {
+    "fixture": "m02.3"
+  }
+}
