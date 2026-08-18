@@ -6,6 +6,7 @@ import { packageDescriptor as exporters } from '@electrocraft/exporters';
 export const studioWorkspaceDescriptor = Object.freeze({
   id: 'studio',
   kind: 'app',
-  uiStatus: 'architecture-only',
+  uiStatus: 'vite-pwa-development-bootstrap',
+  helpId: 'help.architecture.repository',
   dependencies: [domain.name, application.name, runtimeWeb.name, exporters.name] as const,
 });
