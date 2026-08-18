@@ -1,22 +1,21 @@
 # HANDOFF — ElectroCraft
 
 ## Current
-F02 / M02.8 — Clasificar ownership: Project Objects vs Registries vs Content Entities — `ACTIVE`.
+F02 / M02.9 — Definir wrappers versionados para payloads de engines — `ACTIVE`.
 
 ## Siguiente acción exacta
-1. Leer `.ai/microphases/M02_8.md` y auditar la clasificación implícita ya presente en domain/application/export-ir antes de crear documentación o código.
-2. Mantener exactamente 17 owner packages y `packages/domain/src/contracts/` como ubicación canónica; no introducir un package/registry paralelo.
-3. Crear una taxonomía versionada/verificable con las categorías `project-object`, `registry-definition` y `content-entity`.
-4. Clasificar ProjectDefinition/Documents/Components/DataSource/DataSchema/Query/State/Action/Route/Navigation/Role/Policy/Theme y cualquier metadata portable según ownership real.
-5. Clasificar Component/Field/Action/Provider/Capability registries como definitions/registries disponibles; el proyecto solo puede guardar refs/overrides/definitions de usuario explícitas, nunca el registry runtime completo.
-6. Clasificar records/content data y futuros user/content entities como contenido administrado/runtime; no pueden convertirse en ProjectDefinition config ni copiarse al snapshot por defecto.
-7. Documentar owner package, storage authority, serializer/migration access y ExportIR participation en `.ai/MODEL_OWNERSHIP.md` o el documento exacto indicado por el spec.
-8. Añadir helpers/tests que detecten category drift, IDs duplicados, registry snapshots persistidos y content entities embebidas en Project Objects.
-9. Verificar que M02.7 ExportIR solo toma project objects + manifests/refs permitidas y nunca un registry vivo o content records arbitrarios.
-10. Actualizar ayuda arquitectónica y gate M02.8; ejecutar suite dedicada, `npm run check`, gates heredados y export parity cuando aplique.
-11. Fusionar solo verde; validar M02.8 nuevamente en `main`, registrar artifact/digest y solo entonces activar M02.9.
+1. Leer `.ai/microphases/M02_9.md` y conservar exactamente 17 owner packages; contracts siguen en `packages/domain/src/contracts/`.
+2. Definir en domain el wrapper JSON portable `{ engine, schemaVersion, value }` sin importar tipos de RQB, Tiptap, Rete o Puck.
+3. Aplicar inicialmente el wrapper a React Query Builder rules y Tiptap richtext; el engine adapter valida/interpreta `value` y posee sus migraciones de formato.
+4. Mantener Rete/Puck como definiciones Electro portables; no persistir NodeEditor, sockets, histories, AppState, React nodes, classes ni callbacks.
+5. Crear Compatibility Analyzer application-facing que reporte `supported` o `blocked` para engine/schemaVersion desconocidos con diagnostics reparables.
+6. Documentar allowlist/denylist en `.ai/ENGINE_PAYLOAD_POLICY.md`, incluyendo serializer/migration ownership.
+7. Añadir fixtures round-trip y negative cases para engine/version/value inválidos; comprobar que domain solo ve JSON.
+8. Conectar adapters reales de query-rqb/media-tiptap sin crear subsystem paralelo ni mover ownership.
+9. Añadir gate M02.9, ejecutar suite dedicada, `npm run check`, gates M02.1–M02.8, Studio y export parity cuando corresponda.
+10. Fusionar solo verde; volver a validar M02.9 en `main`, registrar artifact/digest y ejecutar el gate final de F02 antes de activar F03.
 
 ## Read set
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M02_8.md`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M02_9.md`.
 
-M02.1–M02.7 están cerradas; no reabrirlas salvo regresión reproducible.
+M02.1–M02.8 están cerradas; no reabrirlas salvo regresión reproducible.
