@@ -1,6 +1,6 @@
 {
   "name": "electrocraft",
-  "version": "0.0.0-m01.4",
+  "version": "0.0.0-m01.5",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -10,11 +10,12 @@
   "engines": {
     "node": ">=22.13.0"
   },
+  "packageManager": "npm@10.9.2",
   "scripts": {
     "lint": "eslint \"tooling/**/*.{js,mjs,cjs}\" eslint.config.mjs && npm run format:check",
     "lint:offline": "node tooling/scripts/lint-workspace.mjs && node tooling/scripts/verify-quality-config.mjs",
-    "format": "prettier --write package.json tsconfig.json tsconfig.base.json eslint.config.mjs .prettierrc.json vitest.config.ts playwright.config.ts apps/studio/index.html apps/studio/package.json apps/studio/vite.config.ts \"apps/studio/src/**/*.{ts,tsx,css}\" \"tooling/vitest/**/*.ts\" \"tooling/playwright/**/*.ts\" \"tooling/fixtures/empty-repo/**/*.{ts,mjs,json}\"",
-    "format:check": "prettier --check package.json tsconfig.json tsconfig.base.json eslint.config.mjs .prettierrc.json vitest.config.ts playwright.config.ts apps/studio/index.html apps/studio/package.json apps/studio/vite.config.ts \"apps/studio/src/**/*.{ts,tsx,css}\" \"tooling/vitest/**/*.ts\" \"tooling/playwright/**/*.ts\" \"tooling/fixtures/empty-repo/**/*.{ts,mjs,json}\"",
+    "format": "prettier --write package.json package-lock.json tsconfig.json tsconfig.base.json eslint.config.mjs .prettierrc.json vitest.config.ts playwright.config.ts .github/workflows/ci.yml apps/studio/index.html apps/studio/package.json apps/studio/vite.config.ts \"apps/studio/src/**/*.{ts,tsx,css}\" \"tooling/vitest/**/*.ts\" \"tooling/playwright/**/*.ts\" \"tooling/fixtures/empty-repo/**/*.{ts,mjs,json}\"",
+    "format:check": "prettier --check package.json package-lock.json tsconfig.json tsconfig.base.json eslint.config.mjs .prettierrc.json vitest.config.ts playwright.config.ts .github/workflows/ci.yml apps/studio/index.html apps/studio/package.json apps/studio/vite.config.ts \"apps/studio/src/**/*.{ts,tsx,css}\" \"tooling/vitest/**/*.ts\" \"tooling/playwright/**/*.ts\" \"tooling/fixtures/empty-repo/**/*.{ts,mjs,json}\"",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p packages/domain/tsconfig.json --noEmit",
     "test:boundaries": "node tooling/scripts/verify-typescript-boundaries.mjs",
     "test:node": "node --test tooling/test/*.test.mjs",
@@ -22,12 +23,13 @@
     "test": "npm run test:node && npm run build:offline && npm run build:studio && npm run test:vitest",
     "test:e2e": "playwright test --config playwright.config.ts",
     "test:empty-repo": "node tooling/scripts/verify-empty-repo-toolchain.mjs",
-    "build:offline": "node tooling/scripts/build-workspace.mjs && node tooling/scripts/build-typescript-boundaries.mjs && node tooling/scripts/build-quality-report.mjs",
+    "build:ci": "node tooling/scripts/verify-ci-base.mjs",
+    "build:offline": "node tooling/scripts/build-workspace.mjs && node tooling/scripts/build-typescript-boundaries.mjs && node tooling/scripts/build-quality-report.mjs && npm run build:ci",
     "build:studio": "vite build --config apps/studio/vite.config.ts && node tooling/scripts/verify-studio-bootstrap.mjs",
     "build": "npm run build:offline && npm run build:studio",
     "check:offline": "npm run lint:offline && npm run typecheck && npm run test:boundaries && npm run test:node && npm run build:offline",
     "check": "npm run lint && npm run typecheck && npm run test:boundaries && npm run test && npm run build && npm run test:e2e",
-    "check:ci": "npm run check && npm run test:empty-repo"
+    "check:ci": "npm run check && npm run test:empty-repo && npm run build:ci"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
