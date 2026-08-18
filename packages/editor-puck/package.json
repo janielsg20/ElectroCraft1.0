@@ -1,6 +1,6 @@
 {
   "name": "@electrocraft/editor-puck",
-  "version": "0.0.0-m02.2",
+  "version": "0.0.0-m01.3",
   "private": true,
   "type": "module",
   "exports": {
