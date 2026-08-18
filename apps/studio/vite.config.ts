@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 const here = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
+  root: here,
   build: {
     target: 'baseline-widely-available',
     lib: {
