@@ -1,15 +1,10 @@
 import * as z from 'zod';
 
-const objectIdNamespaceSchema = z
-  .string()
-  .regex(/^[a-z][a-z0-9-]{1,31}$/, 'invalid ElectroCraft object ID namespace');
+const objectIdNamespaceSchema = z.string().regex(/^[a-z][a-z0-9-]{1,31}$/, 'invalid ElectroCraft object ID namespace');
 
 export const electroCraftObjectIdSchema = z
   .string()
-  .regex(
-    /^ec_[a-z][a-z0-9-]{1,31}_[0-9a-z]{13}$/,
-    'invalid ElectroCraft object ID',
-  )
+  .regex(/^ec_[a-z][a-z0-9-]{1,31}_[0-9a-z]{13}$/, 'invalid ElectroCraft object ID')
   .brand<'ElectroCraftObjectId'>();
 
 export type ElectroCraftObjectId = z.infer<typeof electroCraftObjectIdSchema>;
@@ -17,13 +12,8 @@ export type ElectroCraftObjectId = z.infer<typeof electroCraftObjectIdSchema>;
 const FNV64_OFFSET = 0xcbf29ce484222325n;
 const FNV64_PRIME = 0x100000001b3n;
 
-export function createDeterministicObjectId(
-  namespace: string,
-  seed: string,
-): ElectroCraftObjectId {
-  const normalizedNamespace = objectIdNamespaceSchema.parse(
-    namespace.trim().toLowerCase(),
-  );
+export function createDeterministicObjectId(namespace: string, seed: string): ElectroCraftObjectId {
+  const normalizedNamespace = objectIdNamespaceSchema.parse(namespace.trim().toLowerCase());
   const normalizedSeed = seed.normalize('NFKC').trim();
   if (!normalizedSeed) {
     throw new TypeError('ElectroCraft deterministic ID seed cannot be empty');
@@ -37,7 +27,5 @@ export function createDeterministicObjectId(
   }
 
   const encoded = hash.toString(36).padStart(13, '0');
-  return electroCraftObjectIdSchema.parse(
-    `ec_${normalizedNamespace}_${encoded}`,
-  );
+  return electroCraftObjectIdSchema.parse(`ec_${normalizedNamespace}_${encoded}`);
 }

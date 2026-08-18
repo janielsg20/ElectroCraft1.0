@@ -1,11 +1,4 @@
-import {
-  existsSync,
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -23,9 +16,7 @@ import {
 } from '@electrocraft/application';
 
 function fixture(name: string): unknown {
-  return JSON.parse(
-    readFileSync(resolve(`tooling/fixtures/canonical-model/${name}.json`), 'utf8'),
-  ) as unknown;
+  return JSON.parse(readFileSync(resolve(`tooling/fixtures/canonical-model/${name}.json`), 'utf8')) as unknown;
 }
 
 class FileProjectObjectRepository implements CanonicalProjectObjectRepository {
@@ -39,18 +30,11 @@ class FileProjectObjectRepository implements CanonicalProjectObjectRepository {
 
   async putMany(records: readonly CanonicalProjectObjectRecord[]): Promise<void> {
     for (const record of records) {
-      writeFileSync(
-        this.recordPath(record.kind, record.id),
-        `${JSON.stringify(record)}\n`,
-        'utf8',
-      );
+      writeFileSync(this.recordPath(record.kind, record.id), `${JSON.stringify(record)}\n`, 'utf8');
     }
   }
 
-  async get(
-    kind: CanonicalProjectObjectKind,
-    id: ElectroCraftObjectId,
-  ): Promise<CanonicalProjectObjectRecord | null> {
+  async get(kind: CanonicalProjectObjectKind, id: ElectroCraftObjectId): Promise<CanonicalProjectObjectRecord | null> {
     const file = this.recordPath(kind, id);
     if (!existsSync(file)) return null;
     return JSON.parse(readFileSync(file, 'utf8')) as CanonicalProjectObjectRecord;
@@ -83,9 +67,9 @@ describe('M02.1 canonical persistence/reopen/recovery', () => {
       documentCount: 1,
     });
 
-    const reopened = await new ProjectDocumentService(
-      new FileProjectObjectRepository(firstRepository.root),
-    ).reopen(project.id);
+    const reopened = await new ProjectDocumentService(new FileProjectObjectRepository(firstRepository.root)).reopen(
+      project.id,
+    );
 
     expect(reopened.status).toBe('ready');
     if (reopened.status === 'ready') {

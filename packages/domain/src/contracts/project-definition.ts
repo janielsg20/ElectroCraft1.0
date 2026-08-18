@@ -1,10 +1,7 @@
 import * as z from 'zod';
 import { electroCraftDocumentSchema, type ElectroCraftDocument } from './document';
 import { electroCraftMetadataSchema } from './json-value';
-import {
-  electroCraftObjectIdSchema,
-  type ElectroCraftObjectId,
-} from './object-id';
+import { electroCraftObjectIdSchema, type ElectroCraftObjectId } from './object-id';
 
 export const electroCraftTargetIdSchema = z.enum([
   'local',
@@ -41,9 +38,7 @@ export const electroCraftProjectDefinitionSchema = z.strictObject({
   metadata: electroCraftMetadataSchema,
 });
 
-export type ElectroCraftProjectDefinition = z.infer<
-  typeof electroCraftProjectDefinitionSchema
->;
+export type ElectroCraftProjectDefinition = z.infer<typeof electroCraftProjectDefinitionSchema>;
 
 export type CanonicalReferenceDiagnosticCode =
   | 'duplicate-default-target'
@@ -87,10 +82,7 @@ export function validateProjectDefinitionSemantics(
     }
   }
 
-  if (
-    project.rootNavigationRef !== null &&
-    !project.navigationRefs.includes(project.rootNavigationRef)
-  ) {
+  if (project.rootNavigationRef !== null && !project.navigationRefs.includes(project.rootNavigationRef)) {
     diagnostics.push({
       code: 'root-navigation-not-listed',
       ownerId: project.id,
@@ -106,9 +98,7 @@ export function validateProjectDocumentReferences(
   documentInputs: readonly unknown[],
 ): CanonicalReferenceDiagnostic[] {
   const project = electroCraftProjectDefinitionSchema.parse(projectInput);
-  const documents = documentInputs.map((document) =>
-    electroCraftDocumentSchema.parse(document),
-  );
+  const documents = documentInputs.map((document) => electroCraftDocumentSchema.parse(document));
   const diagnostics = validateProjectDefinitionSemantics(project);
   const documentsById = new Map<ElectroCraftObjectId, ElectroCraftDocument>();
 

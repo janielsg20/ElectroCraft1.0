@@ -9,9 +9,7 @@ import {
 } from '@electrocraft/domain';
 
 function fixture(name: string): unknown {
-  return JSON.parse(
-    readFileSync(resolve(`tooling/fixtures/canonical-model/${name}.json`), 'utf8'),
-  ) as unknown;
+  return JSON.parse(readFileSync(resolve(`tooling/fixtures/canonical-model/${name}.json`), 'utf8')) as unknown;
 }
 
 describe('M02.1 canonical model boundaries', () => {

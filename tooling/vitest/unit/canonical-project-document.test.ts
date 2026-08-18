@@ -14,9 +14,7 @@ import {
 } from '@electrocraft/domain';
 
 function fixture(name: string): unknown {
-  return JSON.parse(
-    readFileSync(resolve(`tooling/fixtures/canonical-model/${name}.json`), 'utf8'),
-  ) as unknown;
+  return JSON.parse(readFileSync(resolve(`tooling/fixtures/canonical-model/${name}.json`), 'utf8')) as unknown;
 }
 
 describe('M02.1 canonical project/document model', () => {
@@ -72,8 +70,6 @@ describe('M02.1 canonical project/document model', () => {
     const diagnostics = validateProjectDefinitionSemantics(invalid);
 
     expect(diagnostics.map(({ code }) => code)).toContain('duplicate-document-ref');
-    expect(diagnostics.map(({ code }) => code)).toContain(
-      'root-navigation-not-listed',
-    );
+    expect(diagnostics.map(({ code }) => code)).toContain('root-navigation-not-listed');
   });
 });

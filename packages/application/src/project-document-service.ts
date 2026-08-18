@@ -24,10 +24,7 @@ export interface CanonicalProjectObjectRecord {
 
 export interface CanonicalProjectObjectRepository {
   putMany(records: readonly CanonicalProjectObjectRecord[]): Promise<void>;
-  get(
-    kind: CanonicalProjectObjectKind,
-    id: ElectroCraftObjectId,
-  ): Promise<CanonicalProjectObjectRecord | null>;
+  get(kind: CanonicalProjectObjectKind, id: ElectroCraftObjectId): Promise<CanonicalProjectObjectRecord | null>;
 }
 
 export type CanonicalProjectBlockedCode =
@@ -61,13 +58,9 @@ export interface CanonicalProjectReadyResult {
   migratedDocumentIds: ElectroCraftObjectId[];
 }
 
-export type CanonicalProjectSaveResult =
-  | CanonicalProjectSavedResult
-  | CanonicalProjectBlockedResult;
+export type CanonicalProjectSaveResult = CanonicalProjectSavedResult | CanonicalProjectBlockedResult;
 
-export type CanonicalProjectReopenResult =
-  | CanonicalProjectReadyResult
-  | CanonicalProjectBlockedResult;
+export type CanonicalProjectReopenResult = CanonicalProjectReadyResult | CanonicalProjectBlockedResult;
 
 function blocked(
   code: CanonicalProjectBlockedCode,
@@ -84,10 +77,7 @@ function errorMessage(error: unknown): string {
 export class ProjectDocumentService {
   constructor(private readonly repository: CanonicalProjectObjectRepository) {}
 
-  async save(
-    projectInput: unknown,
-    documentInputs: readonly unknown[],
-  ): Promise<CanonicalProjectSaveResult> {
+  async save(projectInput: unknown, documentInputs: readonly unknown[]): Promise<CanonicalProjectSaveResult> {
     const projectResult = electroCraftProjectDefinitionSchema.safeParse(projectInput);
     if (!projectResult.success) {
       return blocked('INVALID_PROJECT', projectResult.error.message);
@@ -109,10 +99,7 @@ export class ProjectDocumentService {
       documents.push(result.data);
     }
 
-    const referenceDiagnostics = validateProjectDocumentReferences(
-      project,
-      documents,
-    );
+    const referenceDiagnostics = validateProjectDocumentReferences(project, documents);
     if (referenceDiagnostics.length > 0) {
       return blocked('REFERENCE_ERROR', 'project document references are invalid', {
         diagnostics: referenceDiagnostics,
@@ -146,9 +133,7 @@ export class ProjectDocumentService {
     }
   }
 
-  async reopen(
-    projectId: ElectroCraftObjectId,
-  ): Promise<CanonicalProjectReopenResult> {
+  async reopen(projectId: ElectroCraftObjectId): Promise<CanonicalProjectReopenResult> {
     let projectRecord: CanonicalProjectObjectRecord | null;
     try {
       projectRecord = await this.repository.get('project', projectId);
@@ -183,11 +168,9 @@ export class ProjectDocumentService {
         });
       }
       if (record === null) {
-        return blocked(
-          'MISSING_DOCUMENT_REF',
-          'referenced canonical document record was not found',
-          { ref: documentId },
-        );
+        return blocked('MISSING_DOCUMENT_REF', 'referenced canonical document record was not found', {
+          ref: documentId,
+        });
       }
 
       try {

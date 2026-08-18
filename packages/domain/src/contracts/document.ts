@@ -1,13 +1,6 @@
 import * as z from 'zod';
-import {
-  electroCraftMetadataSchema,
-  jsonValueSchema,
-  type JsonValue,
-} from './json-value';
-import {
-  electroCraftObjectIdSchema,
-  type ElectroCraftObjectId,
-} from './object-id';
+import { electroCraftMetadataSchema, jsonValueSchema, type JsonValue } from './json-value';
+import { electroCraftObjectIdSchema, type ElectroCraftObjectId } from './object-id';
 
 export const electroCraftDocumentKindSchema = z.enum([
   'screen',
@@ -17,9 +10,7 @@ export const electroCraftDocumentKindSchema = z.enum([
   'reusable-component',
 ]);
 
-export type ElectroCraftDocumentKind = z.infer<
-  typeof electroCraftDocumentKindSchema
->;
+export type ElectroCraftDocumentKind = z.infer<typeof electroCraftDocumentKindSchema>;
 
 export interface ElectroCraftDocumentNode {
   id: ElectroCraftObjectId;
@@ -28,15 +19,14 @@ export interface ElectroCraftDocumentNode {
   children: ElectroCraftDocumentNode[];
 }
 
-export const electroCraftDocumentNodeSchema: z.ZodType<ElectroCraftDocumentNode> =
-  z.lazy(() =>
-    z.strictObject({
-      id: electroCraftObjectIdSchema,
-      componentRef: z.string().trim().min(1).max(200),
-      props: z.record(z.string(), jsonValueSchema),
-      children: z.array(electroCraftDocumentNodeSchema),
-    }),
-  );
+export const electroCraftDocumentNodeSchema: z.ZodType<ElectroCraftDocumentNode> = z.lazy(() =>
+  z.strictObject({
+    id: electroCraftObjectIdSchema,
+    componentRef: z.string().trim().min(1).max(200),
+    props: z.record(z.string(), jsonValueSchema),
+    children: z.array(electroCraftDocumentNodeSchema),
+  }),
+);
 
 export const electroCraftDocumentReferencesSchema = z.strictObject({
   documentRefs: z.array(electroCraftObjectIdSchema),
@@ -71,9 +61,7 @@ export interface ElectroCraftDocumentImportResult {
   migratedFrom: 'page' | null;
 }
 
-export function importElectroCraftDocument(
-  input: unknown,
-): ElectroCraftDocumentImportResult {
+export function importElectroCraftDocument(input: unknown): ElectroCraftDocumentImportResult {
   const canonical = electroCraftDocumentSchema.safeParse(input);
   if (canonical.success) {
     return { document: canonical.data, migratedFrom: null };

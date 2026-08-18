@@ -36,28 +36,20 @@ function parseJson(serialized: string): unknown {
   return JSON.parse(serialized) as unknown;
 }
 
-export function serializeElectroCraftProjectDefinition(
-  input: unknown,
-): string {
+export function serializeElectroCraftProjectDefinition(input: unknown): string {
   const project = electroCraftProjectDefinitionSchema.parse(input);
   const diagnostics = validateProjectDefinitionSemantics(project);
   if (diagnostics.length > 0) {
-    throw new TypeError(
-      `invalid project semantics: ${diagnostics.map(({ code }) => code).join(', ')}`,
-    );
+    throw new TypeError(`invalid project semantics: ${diagnostics.map(({ code }) => code).join(', ')}`);
   }
   return stableCanonicalStringify(project);
 }
 
-export function deserializeElectroCraftProjectDefinition(
-  serialized: string,
-): ElectroCraftProjectDefinition {
+export function deserializeElectroCraftProjectDefinition(serialized: string): ElectroCraftProjectDefinition {
   const project = electroCraftProjectDefinitionSchema.parse(parseJson(serialized));
   const diagnostics = validateProjectDefinitionSemantics(project);
   if (diagnostics.length > 0) {
-    throw new TypeError(
-      `invalid project semantics: ${diagnostics.map(({ code }) => code).join(', ')}`,
-    );
+    throw new TypeError(`invalid project semantics: ${diagnostics.map(({ code }) => code).join(', ')}`);
   }
   return project;
 }
@@ -66,24 +58,14 @@ export function serializeElectroCraftDocument(input: unknown): string {
   return stableCanonicalStringify(electroCraftDocumentSchema.parse(input));
 }
 
-export function deserializeElectroCraftDocument(
-  serialized: string,
-): ElectroCraftDocumentImportResult {
+export function deserializeElectroCraftDocument(serialized: string): ElectroCraftDocumentImportResult {
   return importElectroCraftDocument(parseJson(serialized));
 }
 
-export function canonicalProjectRoundTrip(
-  project: ElectroCraftProjectDefinition,
-): ElectroCraftProjectDefinition {
-  return deserializeElectroCraftProjectDefinition(
-    serializeElectroCraftProjectDefinition(project),
-  );
+export function canonicalProjectRoundTrip(project: ElectroCraftProjectDefinition): ElectroCraftProjectDefinition {
+  return deserializeElectroCraftProjectDefinition(serializeElectroCraftProjectDefinition(project));
 }
 
-export function canonicalDocumentRoundTrip(
-  document: ElectroCraftDocument,
-): ElectroCraftDocument {
-  return deserializeElectroCraftDocument(
-    serializeElectroCraftDocument(document),
-  ).document;
+export function canonicalDocumentRoundTrip(document: ElectroCraftDocument): ElectroCraftDocument {
+  return deserializeElectroCraftDocument(serializeElectroCraftDocument(document)).document;
 }
