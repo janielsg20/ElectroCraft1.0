@@ -87,7 +87,7 @@ jobs:
       - name: Verify engine pins and owner count
         run: |
           node -e "const p=require('./node_modules/@react-querybuilder/core/package.json'); if(p.version!=='8.23.0') throw new Error('expected RQB 8.23.0, got '+p.version); console.log('rqb@'+p.version)"
-          node -e "for(const n of ['@tiptap/core','@tiptap/html','@tiptap/starter-kit']){const p=require('./node_modules/'+n+'/package.json'); if(p.version!=='3.29.2') throw new Error('expected '+n+' 3.29.2, got '+p.version); console.log(n+'@'+p.version)}"
+          npm ls @tiptap/core@3.29.2 @tiptap/html@3.29.2 @tiptap/starter-kit@3.29.2 --workspace @electrocraft/media-tiptap --depth=0
           node -e "const p=require('./tooling/package-boundaries.json'); if(Object.keys(p.packages).length!==17) throw new Error('F01 owner package count drift'); console.log('ownerPackages='+Object.keys(p.packages).length)"
           test -f .ai/ENGINE_PAYLOAD_POLICY.md
 
