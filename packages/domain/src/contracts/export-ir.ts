@@ -128,7 +128,8 @@ export const electroCraftExportIrSchema = z
       context.addIssue({
         code: 'custom',
         path: forbiddenPath,
-        message: 'ExportIR cannot contain Studio/engine history, target-specific internals, prompts, caches, or secret values',
+        message:
+          'ExportIR cannot contain Studio/engine history, target-specific internals, prompts, caches, or secret values',
       });
     }
   });
@@ -154,7 +155,10 @@ export const electroCraftTargetCapabilityFactSchema = z.strictObject({
 const forbiddenCompileConfigKeyPattern =
   /^(?:password|passwd|secret|clientsecret|accesstoken|refreshtoken|apikey|authorization|credential)$/i;
 
-function findSecretLikeCompileConfigPath(value: unknown, path: Array<string | number> = []): Array<string | number> | null {
+function findSecretLikeCompileConfigPath(
+  value: unknown,
+  path: Array<string | number> = [],
+): Array<string | number> | null {
   if (Array.isArray(value)) {
     for (let index = 0; index < value.length; index += 1) {
       const found = findSecretLikeCompileConfigPath(value[index], [...path, index]);

@@ -88,7 +88,9 @@ function extractIssuePath(error: unknown): Array<string | number> {
   if (error === null || typeof error !== 'object' || !('issues' in error)) return [];
   const issues = (error as { issues?: Array<{ path?: PropertyKey[] }> }).issues;
   const firstPath = issues?.[0]?.path ?? [];
-  return firstPath.filter((segment): segment is string | number => typeof segment === 'string' || typeof segment === 'number');
+  return firstPath.filter(
+    (segment): segment is string | number => typeof segment === 'string' || typeof segment === 'number',
+  );
 }
 
 function parseSource(input: ElectroCraftExportIRSource): ParsedExportIRSource {
@@ -207,7 +209,12 @@ function collectReferenceDiagnostics(source: ParsedExportIRSource): ElectroCraft
     source.project.dataSchemaRefs,
     new Set(source.dataSchemas.map(({ id }) => id)),
   );
-  addMissingProjectRefs(diagnostics, 'queryRefs', source.project.queryRefs, new Set(source.queries.map(({ id }) => id)));
+  addMissingProjectRefs(
+    diagnostics,
+    'queryRefs',
+    source.project.queryRefs,
+    new Set(source.queries.map(({ id }) => id)),
+  );
 
   if (source.project.themeRef === null && source.theme !== null) {
     diagnostics.push(
@@ -311,7 +318,9 @@ function toCanonicalIrInput(source: ParsedExportIRSource) {
   };
 }
 
-export function validateElectroCraftExportIRSource(input: ElectroCraftExportIRSource): ElectroCraftExportValidationReport {
+export function validateElectroCraftExportIRSource(
+  input: ElectroCraftExportIRSource,
+): ElectroCraftExportValidationReport {
   let source: ParsedExportIRSource;
   try {
     source = parseSource(input);

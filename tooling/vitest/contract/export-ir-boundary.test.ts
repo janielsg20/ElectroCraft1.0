@@ -31,7 +31,9 @@ describe('M02.7 ExportIR boundaries', () => {
       root: { props: Record<string, unknown> };
     };
     screen.root.props.capacitorConfig = { webDir: 'dist' };
-    const documents = source.documents.map((value) => ((value as { kind?: string }).kind === 'screen' ? screen : value));
+    const documents = source.documents.map((value) =>
+      (value as { kind?: string }).kind === 'screen' ? screen : value,
+    );
     const report = validateElectroCraftExportIRSource({ ...source, documents });
 
     expect(report.status).toBe('blocked');
@@ -59,8 +61,8 @@ describe('M02.7 ExportIR boundaries', () => {
 
   it('fails closed when the frozen revision checksum is changed', () => {
     const envelope = buildElectroCraftExportIR(canonicalExportIrSource());
-    expect(() =>
-      verifyElectroCraftExportIREnvelope({ ...envelope, checksum: 'fnv1a64:0000000000000000' }),
-    ).toThrow(/checksum mismatch/i);
+    expect(() => verifyElectroCraftExportIREnvelope({ ...envelope, checksum: 'fnv1a64:0000000000000000' })).toThrow(
+      /checksum mismatch/i,
+    );
   });
 });
