@@ -1,6 +1,8 @@
 import { packageDescriptor as dep0 } from '@electrocraft/domain';
 import { packageDescriptor as dep1 } from '@electrocraft/application';
 
+export * from './data-ownership';
+
 export const packageDescriptor = Object.freeze({
   name: '@electrocraft/data-core',
   responsibility: 'Data Sources e Internal Data contracts',
