@@ -2,6 +2,7 @@ import { packageDescriptor as dep0 } from '@electrocraft/domain';
 import { packageDescriptor as dep1 } from '@electrocraft/application';
 import { packageDescriptor as dep2 } from '@electrocraft/data-core';
 
+export * from './engine-payload-adapter';
 export * from './portable-query-adapter';
 
 export const packageDescriptor = Object.freeze({
