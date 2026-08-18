@@ -9,20 +9,21 @@
 - M02.1 — Definir `ElectroCraftProjectDefinition` y `ElectroCraftDocument`: `COMPLETADA`.
 - M02.2 — Definir Component/Layout/Style: `COMPLETADA`.
 - M02.3 — Definir ownership de Data Sources, Data Models, Queries y Forms: `COMPLETADA`.
-- M02.4 — Definir Action, State, Navigation y Permission contracts: `ACTIVE`.
-- Gate acumulado: `GREEN_THROUGH_M02.3`.
+- M02.4 — Definir Action, State, Navigation y Permission contracts: `COMPLETADA`.
+- M02.5 — Definir Theme, Blueprint, Registries y Capability ownership: `ACTIVE`.
+- Gate acumulado: `GREEN_THROUGH_M02.4`.
 - Blockers P0/P1: `0`.
 
 ## Microfase activa
-`M02.4` — Definir Action, State, Navigation y Permission contracts.
+`M02.5` — Definir Theme, Blueprint, Registries y Capability ownership.
 
-Objetivo actual: definir contratos canónicos portables/versionados para ActionGraph, State, Route/Navigation y Role/PermissionPolicy; conservar refs estables entre screens/routes/actions/state, reutilizar owners existentes detrás de application adapters y evitar persistir internals de Rete, React Router, Expo, Refine u otros engines.
+Objetivo actual: definir Theme como datos visuales portables; conservar template como `ElectroCraftDocument kind=template`; definir BlueprintPackage instalable con conflictos/rollback; mantener Capability y Component/Field/Action/Provider registries como registries versionados de aplicación y persistir solo `requiredCapabilities`, overrides por target y definitions creadas por usuario cuando corresponda.
 
 ## Referencias
-- Spec: `.ai/microphases/M02_4.md`.
+- Spec: `.ai/microphases/M02_5.md`.
 - Fase: `.ai/phases/F02.md`.
 - Tracking: `.ai/TRACKING.md`.
 - Handoff: `.ai/HANDOFF.md`.
-- Cierre M02.3: `.ai/evidence/F02/M02.3/CLOSURE_2026-08-18.md`.
+- Cierre M02.4: `.ai/evidence/F02/M02.4/CLOSURE_2026-08-18.md`.
 
-No iniciar M02.5 hasta cerrar M02.4 con tests/build/evidencia.
+No iniciar M02.6 hasta cerrar M02.5 con tests/build/evidencia.
