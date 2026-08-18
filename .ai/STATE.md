@@ -12,20 +12,21 @@
 - M02.4 — Definir Action, State, Navigation y Permission contracts: `COMPLETADA`.
 - M02.5 — Definir Theme, Blueprint, Registries y Capability ownership: `COMPLETADA`.
 - M02.6 — Serializer y migrations de proyecto: `COMPLETADA`.
-- M02.7 — Definir `ElectroCraftExportIR`: `ACTIVE`.
-- Gate acumulado: `GREEN_THROUGH_M02.6`.
+- M02.7 — Definir `ElectroCraftExportIR`: `COMPLETADA`.
+- M02.8 — Clasificar ownership: Project Objects vs Registries vs Content Entities: `ACTIVE`.
+- Gate acumulado: `GREEN_THROUGH_M02.7`.
 - Blockers P0/P1: `0`.
 
 ## Microfase activa
-`M02.7` — Definir `ElectroCraftExportIR`.
+`M02.8` — Clasificar ownership: Project Objects vs Registries vs Content Entities.
 
-Objetivo actual: definir un snapshot immutable/versionado neutral a targets que incluya Documents, Navigation, Data Sources sanitizadas, DataSchema, Queries, State, Actions, Forms, Roles, Theme, Media manifest y capability requirements; fijar los nueve `ExportTargetId`, `TargetCompileContext`, serialización/checksum deterministas y `ExportValidationReport`, excluyendo internals de Studio/engines, caches, historial AI y secret values.
+Objetivo actual: fijar una taxonomía explícita y verificable para cada entidad del modelo; definir qué se serializa como Project Object, qué vive como Registry/Definition disponible y qué pertenece a Content Entities/records runtime, documentando owner, almacenamiento, serializer/migration access y participación en ExportIR sin crear una segunda fuente de verdad.
 
 ## Referencias
-- Spec: `.ai/microphases/M02_7.md`.
+- Spec: `.ai/microphases/M02_8.md`.
 - Fase: `.ai/phases/F02.md`.
 - Tracking: `.ai/TRACKING.md`.
 - Handoff: `.ai/HANDOFF.md`.
-- Cierre M02.6: `.ai/evidence/F02/M02.6/CLOSURE_2026-08-18.md`.
+- Cierre M02.7: `.ai/evidence/F02/M02.7/CLOSURE_2026-08-18.md`.
 
-No iniciar M02.8 hasta cerrar M02.7 con tests/build/evidencia.
+No iniciar M02.9 hasta cerrar M02.8 con tests/build/evidencia.
