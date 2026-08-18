@@ -17,16 +17,19 @@ El changelog histórico original hasta M00.8 se preserva sin modificaciones en `
 - M01.6 normalizó `AGENTS/.ai`, separó MEMORY/STATE/TRACKING/HANDOFF, archivó reviews históricos, añadió ADR y un gate documental fail-closed.
 - F01 quedó cerrada y la ejecución pasó a F02.
 
-## 2026-08-18 — F02 progreso técnico M02.1–M02.9
+## 2026-08-18 — F02 completada
 - M02.1 fijó `ElectroCraftProjectDefinition`, `ElectroCraftDocument`, IDs/refs y boundary Zod canónico.
 - M02.2 fijó Component/Layout/Style portables y el adapter real de Puck.
 - M02.3 fijó ownership de DataSource/DataSchema/DataModel/Query/Form y adapters RQB/PGlite.
 - M02.4 fijó ActionGraph/State/Route/Navigation/Role/PermissionPolicy con Rete/Zustand y permisos fail-closed.
 - M02.5 fijó Theme, Blueprint, registries y capability analysis, manteniendo exactamente 17 owner packages y schema v3.
 - M02.6 consolidó serialización JSON determinista, checksum portable, `ElectroCraftMigrationRegistry` v1→v2→v3 e import transaccional sin mutación de storage ante errores.
-- M02.7 añadió `ElectroCraftExportIR` immutable/versionado y neutral a targets, los nueve `ExportTargetId`, `TargetCompileContext` separado, `ExportValidationReport` fail-closed, Media manifest portable y boundary común de revisión para web/native.
-- M02.8 fijó una taxonomía ejecutable de 26 modelos: 14 Project Objects, 6 Application Registries y 6 Content Entities; documentó storage/serializer/migration/export ownership y añadió un boundary fail-closed contra registries completos o content collections embebidos en ProjectDefinition/ExportIR.
-- M02.9 añadió wrappers OSS portables `{ engine, schemaVersion, value }`, Compatibility Analyzer fail-closed, RQB rules v1 con `@react-querybuilder/core@8.23.0` y Tiptap rich-text JSON v1 con un grafo mínimo exacto `3.29.2` de core/html/Document/Paragraph/Text.
-- M02.9 mantiene Puck AppState/history, Rete NodeEditor/history, Zustand store y TanStack Query cache fuera del proyecto canónico; ProjectDefinition/Document siguen en schema v3 sin migración adicional.
-- M02.9 cerró técnicamente en `main` con suite dedicada `11/11`, acumulada Node `27/27`, Vitest `128/128`, Playwright `1/1`, run `32196416073`, artifact `9346006290`, digest `sha256:0083bf96e88e0935a9876a37d8fc465b8315e03ec836dcd1d8bd8609c0d8770b`.
-- La transición a F03 queda retenida exclusivamente por el Gate final de F02.
+- M02.7 añadió `ElectroCraftExportIR` immutable/versionado y neutral a targets, nueve `ExportTargetId`, `TargetCompileContext` separado y validación fail-closed.
+- M02.8 fijó la taxonomía ejecutable 14 Project Objects + 6 Application Registries + 6 Content Entities y bloqueó registries/content collections embebidos.
+- M02.9 añadió wrappers OSS `{ engine, schemaVersion, value }`, RQB rules v1 y Tiptap rich-text JSON v1, manteniendo runtime internals fuera del modelo canónico.
+- Gate final F02 ejecutó las nueve suites dedicadas + `npm run check`: Node `27/27`, Vitest `128/128`, Playwright `1/1`, 17 owners, P0/P1 `0`.
+- Gate F02 run `32197039836`: `success`; artifact `9346213452`; digest `sha256:160658d864ba742265c958ecab629fe855e5d425a78a3f643ecfce908c0aaa12`.
+- F02 quedó cerrada y la ejecución pasó a F03 / M03.1.
+
+## 2026-08-18 — F03 iniciada
+- M03.1 activa: inicialización del design system con shadcn/ui sobre Radix, Lucide, Tailwind/tokens semánticos ElectroCraft, temas light/dark/system, i18n/help y galería técnica accesible.
