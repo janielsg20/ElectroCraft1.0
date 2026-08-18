@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "assets": [
+    {
+      "assetId": "ec_media_000000000000s",
+      "checksum": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "mimeType": "image/png",
+      "sizeBytes": 4096,
+      "filename": "hero.png",
+      "altText": "Imagen principal de prueba",
+      "width": 1280,
+      "height": 720,
+      "durationMs": null
+    }
+  ]
+}
