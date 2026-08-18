@@ -2,17 +2,19 @@
   "id": "help.architecture.models",
   "locale": "es",
   "title": "Modelo canónico del proyecto",
-  "summary": "Explica qué datos pertenecen al ProjectDefinition, Documents y ComponentDefinition sin persistir internals de engines.",
+  "summary": "Explica ownership portable de proyecto, documentos, componentes, datos, queries, formularios y adapters sin persistir internals de engines.",
   "details": [
     "ElectroCraftProjectDefinition guarda identidad, settings y referencias por ID; no embebe todos los documentos en un mega JSON.",
     "ElectroCraftDocument usa screen, template, form, admin-screen o reusable-component; page solo existe como entrada legacy migrable a screen.",
-    "Cada Document conserva un árbol portable mínimo de nodes con componentRef, props JSON y children; nunca Puck AppState.",
-    "ElectroCraftComponentDefinition guarda metadata, campos, props por defecto, layout, style y refs; nunca un React component o renderer persistido.",
-    "ElectroCraftLayout usa modos semánticos flow, stack, row, grid y overlay en lugar de CSS o payloads internos de Puck.",
-    "ElectroCraftStyle usa valores estructurados/tokens y overrides responsive/platform; Tailwind o NativeWind solo pueden existir como salida de adapters.",
-    "Los schemas canónicos usan Zod strictObject y schemaVersion; claves desconocidas fallan cerrado.",
-    "Los IDs canónicos se generan de forma determinista por namespace y seed.",
-    "Los application services reabren objetos mediante repository ports y bloquean refs o payloads inválidos en vez de perder datos silenciosamente.",
-    "El adapter @electrocraft/editor-puck traduce ComponentDefinition a Config/ComponentConfig de Puck e inyecta renderers fuera del modelo persistido."
+    "ElectroCraftComponentDefinition guarda metadata, campos, props, layout, style y refs; nunca un React component o renderer persistido.",
+    "ElectroCraftLayout y ElectroCraftStyle son semánticos/estructurados; Tailwind, NativeWind y Puck permanecen adapters.",
+    "ElectroCraftDataSourceDefinition persiste adapter/capabilities/config no sensible; credenciales se referencian con authRef.",
+    "ElectroCraftDataSchema mantiene models, fields, relations, indexed y faceted con refs validadas.",
+    "ElectroCraftQueryDefinition referencia source/schema/model y conserva condiciones/sort/pagination/cache sin estado interno de React Query Builder.",
+    "@electrocraft/query-rqb compila con React Query Builder de forma parametrizada: valores de usuario permanecen en params.",
+    "ConnectorRegistry vive en application como registry efímero y nunca dentro del proyecto persistido.",
+    "Form sigue siendo ElectroCraftDocument kind=form con formMeta y bindings portables; no existe un árbol Form paralelo.",
+    "Los bindings pueden apuntar por ID+path a DataSource, Query, State, Route, User, Form o Action output.",
+    "Los schemas canónicos usan Zod strictObject/schemaVersion y los application services escriben migraciones reparables al reabrir."
   ]
 }

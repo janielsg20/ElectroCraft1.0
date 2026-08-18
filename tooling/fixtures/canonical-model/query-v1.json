@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "ec_query_000000000000d",
+  "version": 1,
+  "name": "Artículos por categoría y precio",
+  "sourceRef": "ec_source_0000000000007",
+  "dataSchemaRef": "ec_schema_0000000000008",
+  "modelRef": "ec_model_0000000000009",
+  "operation": "list",
+  "resource": "article",
+  "params": {},
+  "conditions": {
+    "combinator": "and",
+    "rules": [
+      {
+        "fieldRef": "ec_field_000000000000a",
+        "operator": "=",
+        "value": "power",
+        "valueSource": "value"
+      },
+      {
+        "fieldRef": "ec_field_000000000000c",
+        "operator": ">=",
+        "value": 10,
+        "valueSource": "value"
+      }
+    ]
+  },
+  "sort": [
+    {
+      "fieldRef": "ec_field_000000000000c",
+      "direction": "asc"
+    }
+  ],
+  "pagination": {
+    "mode": "offset",
+    "limit": 50,
+    "offset": 0
+  },
+  "cache": {
+    "policy": "memory",
+    "ttlSeconds": 60
+  },
+  "metadata": {
+    "fixture": "m02.3"
+  }
+}

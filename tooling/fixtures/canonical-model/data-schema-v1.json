@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "id": "ec_schema_0000000000008",
+  "version": 1,
+  "sourceRef": "ec_source_0000000000007",
+  "name": "Catálogo",
+  "models": [
+    {
+      "id": "ec_model_0000000000009",
+      "key": "article",
+      "label": "Artículo",
+      "fields": [
+        {
+          "id": "ec_field_000000000000a",
+          "key": "category",
+          "label": "Categoría",
+          "type": "text",
+          "nullable": false,
+          "indexed": true,
+          "faceted": true,
+          "relationModelRef": null,
+          "metadata": {}
+        },
+        {
+          "id": "ec_field_000000000000b",
+          "key": "title",
+          "label": "Título",
+          "type": "text",
+          "nullable": false,
+          "indexed": false,
+          "faceted": false,
+          "relationModelRef": null,
+          "metadata": {}
+        },
+        {
+          "id": "ec_field_000000000000c",
+          "key": "price",
+          "label": "Precio",
+          "type": "number",
+          "nullable": false,
+          "indexed": true,
+          "faceted": false,
+          "relationModelRef": null,
+          "metadata": {}
+        }
+      ],
+      "metadata": {}
+    }
+  ],
+  "metadata": {
+    "fixture": "m02.3"
+  }
+}

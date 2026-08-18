@@ -22,8 +22,7 @@ export const electroCraftAppSettingsSchema = z.strictObject({
   locale: z.string().regex(/^[a-z]{2}(?:-[A-Z]{2})?$/),
 });
 
-export const electroCraftProjectDefinitionSchema = z.strictObject({
-  schemaVersion: z.literal(1),
+const projectBaseShape = {
   id: electroCraftObjectIdSchema,
   version: z.number().int().positive(),
   name: z.string().trim().min(1).max(160),
@@ -36,15 +35,55 @@ export const electroCraftProjectDefinitionSchema = z.strictObject({
   themeRef: electroCraftObjectIdSchema.nullable(),
   featureFlags: z.record(z.string().min(1), z.boolean()),
   metadata: electroCraftMetadataSchema,
+} as const;
+
+export const electroCraftProjectDefinitionSchema = z.strictObject({
+  schemaVersion: z.literal(2),
+  ...projectBaseShape,
+  dataSourceRefs: z.array(electroCraftObjectIdSchema),
+  dataSchemaRefs: z.array(electroCraftObjectIdSchema),
+  queryRefs: z.array(electroCraftObjectIdSchema),
 });
 
 export type ElectroCraftProjectDefinition = z.infer<typeof electroCraftProjectDefinitionSchema>;
+
+const legacyProjectDefinitionV1Schema = z.strictObject({
+  schemaVersion: z.literal(1),
+  ...projectBaseShape,
+});
+
+export interface ElectroCraftProjectDefinitionImportResult {
+  project: ElectroCraftProjectDefinition;
+  migratedFrom: 1 | null;
+}
+
+export function importElectroCraftProjectDefinition(input: unknown): ElectroCraftProjectDefinitionImportResult {
+  const canonical = electroCraftProjectDefinitionSchema.safeParse(input);
+  if (canonical.success) return { project: canonical.data, migratedFrom: null };
+
+  const legacy = legacyProjectDefinitionV1Schema.safeParse(input);
+  if (!legacy.success) throw canonical.error;
+
+  return {
+    project: electroCraftProjectDefinitionSchema.parse({
+      ...legacy.data,
+      schemaVersion: 2,
+      dataSourceRefs: [],
+      dataSchemaRefs: [],
+      queryRefs: [],
+    }),
+    migratedFrom: 1,
+  };
+}
 
 export type CanonicalReferenceDiagnosticCode =
   | 'duplicate-default-target'
   | 'duplicate-document-ref'
   | 'duplicate-route-ref'
   | 'duplicate-navigation-ref'
+  | 'duplicate-data-source-ref'
+  | 'duplicate-data-schema-ref'
+  | 'duplicate-query-ref'
   | 'root-navigation-not-listed'
   | 'duplicate-document-id'
   | 'missing-document-ref';
@@ -74,6 +113,9 @@ export function validateProjectDefinitionSemantics(
     ['duplicate-document-ref', project.documentRefs],
     ['duplicate-route-ref', project.routeRefs],
     ['duplicate-navigation-ref', project.navigationRefs],
+    ['duplicate-data-source-ref', project.dataSourceRefs],
+    ['duplicate-data-schema-ref', project.dataSchemaRefs],
+    ['duplicate-query-ref', project.queryRefs],
   ] as const;
 
   for (const [code, values] of lists) {
@@ -115,18 +157,12 @@ export function validateProjectDocumentReferences(
 
   const requiredDocumentRefs = new Set<ElectroCraftObjectId>(project.documentRefs);
   for (const document of documents) {
-    for (const ref of document.references.documentRefs) {
-      requiredDocumentRefs.add(ref);
-    }
+    for (const ref of document.references.documentRefs) requiredDocumentRefs.add(ref);
   }
 
   for (const ref of [...requiredDocumentRefs].sort()) {
     if (!documentsById.has(ref)) {
-      diagnostics.push({
-        code: 'missing-document-ref',
-        ownerId: project.id,
-        ref,
-      });
+      diagnostics.push({ code: 'missing-document-ref', ownerId: project.id, ref });
     }
   }
 

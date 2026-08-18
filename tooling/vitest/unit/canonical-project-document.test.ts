@@ -9,6 +9,7 @@ import {
   electroCraftObjectIdSchema,
   electroCraftProjectDefinitionSchema,
   importElectroCraftDocument,
+  importElectroCraftProjectDefinition,
   serializeElectroCraftProjectDefinition,
   validateProjectDefinitionSemantics,
 } from '@electrocraft/domain';
@@ -28,9 +29,9 @@ describe('M02.1 canonical project/document model', () => {
     expect(electroCraftObjectIdSchema.parse(first)).toBe(first);
   });
 
-  it('validates and round-trips the canonical fixtures', () => {
-    const project = electroCraftProjectDefinitionSchema.parse(fixture('project-v1'));
-    const document = electroCraftDocumentSchema.parse(fixture('screen-v1'));
+  it('validates and round-trips the current canonical fixtures', () => {
+    const project = electroCraftProjectDefinitionSchema.parse(fixture('project-v2'));
+    const document = electroCraftDocumentSchema.parse(fixture('screen-v2'));
 
     expect(validateProjectDefinitionSemantics(project)).toEqual([]);
     expect(canonicalProjectRoundTrip(project)).toEqual(project);
@@ -41,27 +42,37 @@ describe('M02.1 canonical project/document model', () => {
   });
 
   it('rejects unknown keys instead of silently accepting a mega project JSON', () => {
-    const project = fixture('project-v1') as Record<string, unknown>;
+    const project = fixture('project-v2') as Record<string, unknown>;
     const result = electroCraftProjectDefinitionSchema.safeParse({
       ...project,
-      documents: [fixture('screen-v1')],
+      documents: [fixture('screen-v2')],
     });
 
     expect(result.success).toBe(false);
   });
 
-  it('keeps page out of the canonical kinds but migrates legacy imports to screen', () => {
+  it('keeps page out of canonical kinds but migrates legacy imports to screen v2', () => {
     const legacy = fixture('legacy-page-v0');
     expect(electroCraftDocumentSchema.safeParse(legacy).success).toBe(false);
 
     const imported = importElectroCraftDocument(legacy);
     expect(imported.migratedFrom).toBe('page');
     expect(imported.document.kind).toBe('screen');
-    expect(imported.document.schemaVersion).toBe(1);
+    expect(imported.document.schemaVersion).toBe(2);
+    expect(imported.document.formMeta).toBeNull();
+  });
+
+  it('migrates ProjectDefinition v1 without inventing data refs', () => {
+    const imported = importElectroCraftProjectDefinition(fixture('project-v1'));
+    expect(imported.migratedFrom).toBe(1);
+    expect(imported.project.schemaVersion).toBe(2);
+    expect(imported.project.dataSourceRefs).toEqual([]);
+    expect(imported.project.dataSchemaRefs).toEqual([]);
+    expect(imported.project.queryRefs).toEqual([]);
   });
 
   it('detects duplicate refs and root navigation drift as semantic errors', () => {
-    const project = electroCraftProjectDefinitionSchema.parse(fixture('project-v1'));
+    const project = electroCraftProjectDefinitionSchema.parse(fixture('project-v2'));
     const invalid = {
       ...project,
       documentRefs: [...project.documentRefs, project.documentRefs[0]],

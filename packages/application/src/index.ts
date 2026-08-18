@@ -1,6 +1,7 @@
 import { packageDescriptor as dep0 } from '@electrocraft/domain';
 
 export * from './component-definition-service';
+export * from './connector-registry';
 export * from './project-document-service';
 
 export const packageDescriptor = Object.freeze({
