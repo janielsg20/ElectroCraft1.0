@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 3,
+  "id": "ec_document_000000000000e",
+  "version": 2,
+  "name": "Formulario de artículo",
+  "kind": "form",
+  "root": {
+    "id": "ec_node_000000000000f",
+    "componentRef": "core.form-root",
+    "props": {
+      "submitLabel": "Guardar"
+    },
+    "children": []
+  },
+  "references": {
+    "documentRefs": []
+  },
+  "metadata": {
+    "fixture": "m02.5"
+  },
+  "formMeta": {
+    "dataSchemaRef": "ec_schema_0000000000008",
+    "modelRef": "ec_model_0000000000009",
+    "submitActionRef": null,
+    "initialValuesBinding": {
+      "source": "query",
+      "ref": "ec_query_000000000000d",
+      "path": ["rows", "0"],
+      "fallback": {}
+    },
+    "fieldBindings": {
+      "title": {
+        "source": "query",
+        "ref": "ec_query_000000000000d",
+        "path": ["rows", "0", "data", "title"],
+        "fallback": ""
+      }
+    },
+    "validationMode": "submit"
+  },
+  "templateMeta": null
+}
