@@ -12,6 +12,7 @@ import {
   type ElectroCraftRouteDefinition,
   type ElectroCraftStateDefinition,
 } from './app-behavior';
+import { parseCanonicalJson, stableCanonicalStringify } from './canonical-json';
 import {
   electroCraftComponentDefinitionSchema,
   importElectroCraftComponentDefinition,
@@ -50,27 +51,7 @@ import {
   type ElectroPlatformCapabilityDefinition,
 } from './theme-blueprint';
 
-function sortJsonValue(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map((item) => sortJsonValue(item));
-  if (value !== null && typeof value === 'object') {
-    const record = value as Record<string, unknown>;
-    return Object.fromEntries(
-      Object.keys(record)
-        .sort()
-        .map((key) => [key, sortJsonValue(record[key])]),
-    );
-  }
-  return value;
-}
-
-export function stableCanonicalStringify(value: unknown): string {
-  return JSON.stringify(sortJsonValue(value));
-}
-
-function parseJson(serialized: string): unknown {
-  if (!serialized.trim()) throw new SyntaxError('canonical payload cannot be empty');
-  return JSON.parse(serialized) as unknown;
-}
+export { stableCanonicalStringify } from './canonical-json';
 
 function validateImportedProject(
   result: ElectroCraftProjectDefinitionImportResult,
@@ -94,7 +75,7 @@ export function serializeElectroCraftProjectDefinition(input: unknown): string {
 export function deserializeElectroCraftProjectDefinitionWithMigration(
   serialized: string,
 ): ElectroCraftProjectDefinitionImportResult {
-  return validateImportedProject(importElectroCraftProjectDefinition(parseJson(serialized)));
+  return validateImportedProject(importElectroCraftProjectDefinition(parseCanonicalJson(serialized)));
 }
 
 export function deserializeElectroCraftProjectDefinition(serialized: string): ElectroCraftProjectDefinition {
@@ -106,7 +87,7 @@ export function serializeElectroCraftDocument(input: unknown): string {
 }
 
 export function deserializeElectroCraftDocument(serialized: string): ElectroCraftDocumentImportResult {
-  return importElectroCraftDocument(parseJson(serialized));
+  return importElectroCraftDocument(parseCanonicalJson(serialized));
 }
 
 export function serializeElectroCraftComponentDefinition(input: unknown): string {
@@ -121,7 +102,7 @@ export function serializeElectroCraftComponentDefinition(input: unknown): string
 export function deserializeElectroCraftComponentDefinition(
   serialized: string,
 ): ElectroCraftComponentDefinitionImportResult {
-  const result = importElectroCraftComponentDefinition(parseJson(serialized));
+  const result = importElectroCraftComponentDefinition(parseCanonicalJson(serialized));
   const diagnostics = validateComponentDefinitionReferences(result.definition);
   if (diagnostics.length > 0) {
     throw new TypeError(`invalid component references: ${diagnostics.map(({ code }) => code).join(', ')}`);
@@ -134,7 +115,7 @@ export function serializeElectroCraftDataSourceDefinition(input: unknown): strin
 }
 
 export function deserializeElectroCraftDataSourceDefinition(serialized: string): ElectroCraftDataSourceDefinition {
-  return electroCraftDataSourceDefinitionSchema.parse(parseJson(serialized));
+  return electroCraftDataSourceDefinitionSchema.parse(parseCanonicalJson(serialized));
 }
 
 export function serializeElectroCraftDataSchema(input: unknown): string {
@@ -142,7 +123,7 @@ export function serializeElectroCraftDataSchema(input: unknown): string {
 }
 
 export function deserializeElectroCraftDataSchema(serialized: string): ElectroCraftDataSchema {
-  return electroCraftDataSchemaSchema.parse(parseJson(serialized));
+  return electroCraftDataSchemaSchema.parse(parseCanonicalJson(serialized));
 }
 
 export function serializeElectroCraftQueryDefinition(input: unknown): string {
@@ -150,7 +131,7 @@ export function serializeElectroCraftQueryDefinition(input: unknown): string {
 }
 
 export function deserializeElectroCraftQueryDefinition(serialized: string): ElectroCraftQueryDefinition {
-  return electroCraftQueryDefinitionSchema.parse(parseJson(serialized));
+  return electroCraftQueryDefinitionSchema.parse(parseCanonicalJson(serialized));
 }
 
 export function serializeElectroCraftActionGraph(input: unknown): string {
@@ -158,7 +139,7 @@ export function serializeElectroCraftActionGraph(input: unknown): string {
 }
 
 export function deserializeElectroCraftActionGraph(serialized: string): ElectroCraftActionGraph {
-  return electroCraftActionGraphSchema.parse(parseJson(serialized));
+  return electroCraftActionGraphSchema.parse(parseCanonicalJson(serialized));
 }
 
 export function serializeElectroCraftStateDefinition(input: unknown): string {
@@ -166,7 +147,7 @@ export function serializeElectroCraftStateDefinition(input: unknown): string {
 }
 
 export function deserializeElectroCraftStateDefinition(serialized: string): ElectroCraftStateDefinition {
-  return electroCraftStateDefinitionSchema.parse(parseJson(serialized));
+  return electroCraftStateDefinitionSchema.parse(parseCanonicalJson(serialized));
 }
 
 export function serializeElectroCraftRouteDefinition(input: unknown): string {
@@ -174,7 +155,7 @@ export function serializeElectroCraftRouteDefinition(input: unknown): string {
 }
 
 export function deserializeElectroCraftRouteDefinition(serialized: string): ElectroCraftRouteDefinition {
-  return electroCraftRouteDefinitionSchema.parse(parseJson(serialized));
+  return electroCraftRouteDefinitionSchema.parse(parseCanonicalJson(serialized));
 }
 
 export function serializeElectroCraftNavigationDefinition(input: unknown): string {
@@ -182,7 +163,7 @@ export function serializeElectroCraftNavigationDefinition(input: unknown): strin
 }
 
 export function deserializeElectroCraftNavigationDefinition(serialized: string): ElectroCraftNavigationDefinition {
-  return electroCraftNavigationDefinitionSchema.parse(parseJson(serialized));
+  return electroCraftNavigationDefinitionSchema.parse(parseCanonicalJson(serialized));
 }
 
 export function serializeElectroCraftRole(input: unknown): string {
@@ -190,7 +171,7 @@ export function serializeElectroCraftRole(input: unknown): string {
 }
 
 export function deserializeElectroCraftRole(serialized: string): ElectroCraftRole {
-  return electroCraftRoleSchema.parse(parseJson(serialized));
+  return electroCraftRoleSchema.parse(parseCanonicalJson(serialized));
 }
 
 export function serializeElectroCraftPermissionPolicy(input: unknown): string {
@@ -198,7 +179,7 @@ export function serializeElectroCraftPermissionPolicy(input: unknown): string {
 }
 
 export function deserializeElectroCraftPermissionPolicy(serialized: string): ElectroCraftPermissionPolicy {
-  return electroCraftPermissionPolicySchema.parse(parseJson(serialized));
+  return electroCraftPermissionPolicySchema.parse(parseCanonicalJson(serialized));
 }
 
 export function serializeElectroCraftTheme(input: unknown): string {
@@ -206,7 +187,7 @@ export function serializeElectroCraftTheme(input: unknown): string {
 }
 
 export function deserializeElectroCraftTheme(serialized: string): ElectroCraftTheme {
-  return electroCraftThemeSchema.parse(parseJson(serialized));
+  return electroCraftThemeSchema.parse(parseCanonicalJson(serialized));
 }
 
 export function serializeElectroCraftBlueprintPackage(input: unknown): string {
@@ -214,7 +195,7 @@ export function serializeElectroCraftBlueprintPackage(input: unknown): string {
 }
 
 export function deserializeElectroCraftBlueprintPackage(serialized: string): ElectroCraftBlueprintPackage {
-  return electroCraftBlueprintPackageSchema.parse(parseJson(serialized));
+  return electroCraftBlueprintPackageSchema.parse(parseCanonicalJson(serialized));
 }
 
 export function serializeElectroCraftRegistryDefinition(input: unknown): string {
@@ -222,7 +203,7 @@ export function serializeElectroCraftRegistryDefinition(input: unknown): string 
 }
 
 export function deserializeElectroCraftRegistryDefinition(serialized: string): ElectroCraftRegistryDefinition {
-  return electroCraftRegistryDefinitionSchema.parse(parseJson(serialized));
+  return electroCraftRegistryDefinitionSchema.parse(parseCanonicalJson(serialized));
 }
 
 export function serializeElectroPlatformCapabilityDefinition(input: unknown): string {
@@ -232,7 +213,7 @@ export function serializeElectroPlatformCapabilityDefinition(input: unknown): st
 export function deserializeElectroPlatformCapabilityDefinition(
   serialized: string,
 ): ElectroPlatformCapabilityDefinition {
-  return electroPlatformCapabilityDefinitionSchema.parse(parseJson(serialized));
+  return electroPlatformCapabilityDefinitionSchema.parse(parseCanonicalJson(serialized));
 }
 
 export function canonicalProjectRoundTrip(project: ElectroCraftProjectDefinition): ElectroCraftProjectDefinition {
