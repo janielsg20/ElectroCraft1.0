@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "id": "ec_component_0000000000003",
+  "version": 1,
+  "key": "HeadingBlock",
+  "label": "Encabezado",
+  "category": "Contenido",
+  "fields": [
+    {
+      "key": "title",
+      "label": "Título",
+      "kind": "text",
+      "required": true,
+      "options": []
+    },
+    {
+      "key": "emphasis",
+      "label": "Énfasis",
+      "kind": "boolean",
+      "required": false,
+      "options": []
+    }
+  ],
+  "defaultProps": {
+    "title": "ElectroCraft",
+    "emphasis": false
+  },
+  "layout": {
+    "mode": "stack",
+    "gap": { "kind": "token", "token": "space.3" },
+    "align": "stretch",
+    "justify": "start",
+    "wrap": false,
+    "columns": null
+  },
+  "style": {
+    "schemaVersion": 1,
+    "base": {
+      "width": null,
+      "height": null,
+      "minWidth": null,
+      "maxWidth": null,
+      "gap": null,
+      "padding": { "kind": "token", "token": "space.4" },
+      "margin": null,
+      "fontSize": { "kind": "value", "value": 2, "unit": "rem" },
+      "fontWeight": 700,
+      "textAlign": "start",
+      "foreground": { "kind": "token", "token": "color.foreground" },
+      "background": null,
+      "opacity": 1
+    },
+    "responsive": {
+      "mobile": {
+        "fontSize": { "kind": "value", "value": 1.5, "unit": "rem" }
+      }
+    },
+    "platform": {
+      "native": {
+        "fontSize": { "kind": "value", "value": 1.75, "unit": "rem" }
+      }
+    }
+  },
+  "references": {
+    "componentRefs": [],
+    "assetRefs": [],
+    "actionRefs": []
+  },
+  "metadata": {
+    "description": "Componente portable de encabezado"
+  }
+}
