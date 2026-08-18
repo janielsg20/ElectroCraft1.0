@@ -17,10 +17,17 @@ test('workspace owns exactly 17 stable packages and two apps', () => {
   assert.deepEqual(validateWorkspaceSnapshot(snapshot), { ok: true, errors: [] });
 });
 
-test('domain remains framework-free and dependency-free', () => {
+test('domain remains framework-free with Zod as its only external boundary dependency', () => {
   const snapshot = collectWorkspace(root);
   assert.deepEqual(snapshot.boundaries.packages['@electrocraft/domain'], []);
-  assert.deepEqual(snapshot.imports['@electrocraft/domain'], []);
+
+  const externalImports = [
+    ...new Set(
+      snapshot.imports['@electrocraft/domain'].filter((specifier) => !specifier.startsWith('.')),
+    ),
+  ].sort();
+  assert.deepEqual(externalImports, ['zod']);
+  assert.deepEqual(snapshot.manifests['@electrocraft/domain'].dependencies, { zod: '4.4.3' });
 });
 
 test('negative: a domain to editor dependency is rejected', () => {
