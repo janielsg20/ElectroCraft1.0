@@ -109,7 +109,8 @@ jobs:
           const help = JSON.parse(fs.readFileSync('tooling/fixtures/help.architecture.models.json', 'utf8'));
           const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
           if (!ownership.includes('Application Registries') || !ownership.includes('Content / Runtime Entities')) throw new Error('ownership taxonomy documentation drift');
-          if (!payloadPolicy.includes('{ engine, schemaVersion, value }')) throw new Error('engine payload wrapper policy drift');
+          const wrapperFields = ['engine: string;', 'schemaVersion: number;', 'value: JsonValue;'];
+          if (!wrapperFields.every((field) => payloadPolicy.includes(field))) throw new Error('engine payload wrapper policy drift');
           if (!payloadPolicy.includes('Puck AppState') || !payloadPolicy.includes('Rete `NodeEditor`')) throw new Error('runtime payload denylist drift');
           if (!Array.isArray(help.details) || !help.details.some((line) => line.includes('Project Objects'))) throw new Error('Spanish architecture help drift');
           for (let n = 1; n <= 9; n += 1) if (!packageJson.scripts[`test:m02-${n}`]) throw new Error(`missing test:m02-${n}`);
