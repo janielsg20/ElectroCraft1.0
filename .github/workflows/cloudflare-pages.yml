@@ -91,9 +91,6 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          preCommands: |
-            wrangler pages project list --json > "$RUNNER_TEMP/cloudflare-pages-projects.json"
-            node -e "const fs=require('fs'); const raw=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP + '/cloudflare-pages-projects.json','utf8')); const projects=Array.isArray(raw)?raw:(raw.result||[]); process.exit(projects.some((p)=>p.name==='electrocraft1-0')?0:1)" || npx wrangler pages project create electrocraft1-0 --production-branch=main
           command: pages deploy apps/studio/dist --project-name=electrocraft1-0 --branch=main
 
       - name: Deployment URL
