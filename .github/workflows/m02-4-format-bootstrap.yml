@@ -6,6 +6,10 @@ on:
       - agent/m02-4-action-state-navigation-permission
     paths:
       - '.github/workflows/m02-4-format-bootstrap.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/m02-4-format-bootstrap.yml'
 
 permissions:
   contents: write
