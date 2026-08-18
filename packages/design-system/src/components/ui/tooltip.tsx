@@ -14,7 +14,12 @@ export function TooltipTrigger(props: React.ComponentProps<typeof TooltipPrimiti
   return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />;
 }
 
-export function TooltipContent({ className, sideOffset = 6, children, ...props }: React.ComponentProps<typeof TooltipPrimitive.Content>) {
+export function TooltipContent({
+  className,
+  sideOffset = 6,
+  children,
+  ...props
+}: React.ComponentProps<typeof TooltipPrimitive.Content>) {
   return (
     <TooltipPrimitive.Portal>
       <TooltipPrimitive.Content
@@ -22,7 +27,7 @@ export function TooltipContent({ className, sideOffset = 6, children, ...props }
         sideOffset={sideOffset}
         className={cn(
           'z-50 w-fit max-w-72 rounded-md bg-foreground px-2.5 py-1.5 text-xs text-background shadow-md',
-          'data-[state=delayed-open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=delayed-open]:fade-in-0',
+          'transition-opacity data-[state=closed]:opacity-0',
           className,
         )}
         {...props}
