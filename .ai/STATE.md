@@ -11,20 +11,21 @@
 - M02.3 — Definir ownership de Data Sources, Data Models, Queries y Forms: `COMPLETADA`.
 - M02.4 — Definir Action, State, Navigation y Permission contracts: `COMPLETADA`.
 - M02.5 — Definir Theme, Blueprint, Registries y Capability ownership: `COMPLETADA`.
-- M02.6 — Serializer y migrations de proyecto: `ACTIVE`.
-- Gate acumulado: `GREEN_THROUGH_M02.5`.
+- M02.6 — Serializer y migrations de proyecto: `COMPLETADA`.
+- M02.7 — Definir `ElectroCraftExportIR`: `ACTIVE`.
+- Gate acumulado: `GREEN_THROUGH_M02.6`.
 - Blockers P0/P1: `0`.
 
 ## Microfase activa
-`M02.6` — Serializer y migrations de proyecto.
+`M02.7` — Definir `ElectroCraftExportIR`.
 
-Objetivo actual: consolidar serialización determinista y checksum de snapshots canónicos; introducir un MigrationRegistry de schemaVersion que use Zod como boundary owner; probar una migración real mínima y asegurar que un import inválido devuelve diagnostics reparables sin mutar storage.
+Objetivo actual: definir un snapshot immutable/versionado neutral a targets que incluya Documents, Navigation, Data Sources sanitizadas, DataSchema, Queries, State, Actions, Forms, Roles, Theme, Media manifest y capability requirements; fijar los nueve `ExportTargetId`, `TargetCompileContext`, serialización/checksum deterministas y `ExportValidationReport`, excluyendo internals de Studio/engines, caches, historial AI y secret values.
 
 ## Referencias
-- Spec: `.ai/microphases/M02_6.md`.
+- Spec: `.ai/microphases/M02_7.md`.
 - Fase: `.ai/phases/F02.md`.
 - Tracking: `.ai/TRACKING.md`.
 - Handoff: `.ai/HANDOFF.md`.
-- Cierre M02.5: `.ai/evidence/F02/M02.5/CLOSURE_2026-08-18.md`.
+- Cierre M02.6: `.ai/evidence/F02/M02.6/CLOSURE_2026-08-18.md`.
 
-No iniciar M02.7 hasta cerrar M02.6 con tests/build/evidencia.
+No iniciar M02.8 hasta cerrar M02.7 con tests/build/evidencia.
