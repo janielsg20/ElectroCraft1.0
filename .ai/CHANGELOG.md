@@ -17,7 +17,7 @@ El changelog histórico original hasta M00.8 se preserva sin modificaciones en `
 - M01.6 normalizó `AGENTS/.ai`, separó MEMORY/STATE/TRACKING/HANDOFF, archivó reviews históricos, añadió ADR y un gate documental fail-closed.
 - F01 quedó cerrada y la ejecución pasó a F02.
 
-## 2026-08-18 — F02 progreso hasta M02.8
+## 2026-08-18 — F02 progreso técnico M02.1–M02.9
 - M02.1 fijó `ElectroCraftProjectDefinition`, `ElectroCraftDocument`, IDs/refs y boundary Zod canónico.
 - M02.2 fijó Component/Layout/Style portables y el adapter real de Puck.
 - M02.3 fijó ownership de DataSource/DataSchema/DataModel/Query/Form y adapters RQB/PGlite.
@@ -26,6 +26,7 @@ El changelog histórico original hasta M00.8 se preserva sin modificaciones en `
 - M02.6 consolidó serialización JSON determinista, checksum portable, `ElectroCraftMigrationRegistry` v1→v2→v3 e import transaccional sin mutación de storage ante errores.
 - M02.7 añadió `ElectroCraftExportIR` immutable/versionado y neutral a targets, los nueve `ExportTargetId`, `TargetCompileContext` separado, `ExportValidationReport` fail-closed, Media manifest portable y boundary común de revisión para web/native.
 - M02.8 fijó una taxonomía ejecutable de 26 modelos: 14 Project Objects, 6 Application Registries y 6 Content Entities; documentó storage/serializer/migration/export ownership y añadió un boundary fail-closed contra registries completos o content collections embebidos en ProjectDefinition/ExportIR.
-- M02.8 mantuvo ProjectDefinition/Document v3 sin nueva migración; solo definitions `origin=user` pueden persistirse por ref y el contenido runtime se obtiene por resolver/manifest.
-- M02.8 cerró con suite dedicada `9/9`, gate main `32193738411`, artifact `9345132952` y digest `sha256:7751ba52ff3cf167dad37e604617a1ac2fef808491952394bdb83023c825af1f`.
-- La ejecución activa pasa a F02 / M02.9 para wrappers versionados de payloads OSS permitidos antes del gate final de F02.
+- M02.9 añadió wrappers OSS portables `{ engine, schemaVersion, value }`, Compatibility Analyzer fail-closed, RQB rules v1 con `@react-querybuilder/core@8.23.0` y Tiptap rich-text JSON v1 con un grafo mínimo exacto `3.29.2` de core/html/Document/Paragraph/Text.
+- M02.9 mantiene Puck AppState/history, Rete NodeEditor/history, Zustand store y TanStack Query cache fuera del proyecto canónico; ProjectDefinition/Document siguen en schema v3 sin migración adicional.
+- M02.9 cerró técnicamente en `main` con suite dedicada `11/11`, acumulada Node `27/27`, Vitest `128/128`, Playwright `1/1`, run `32196416073`, artifact `9346006290`, digest `sha256:0083bf96e88e0935a9876a37d8fc465b8315e03ec836dcd1d8bd8609c0d8770b`.
+- La transición a F03 queda retenida exclusivamente por el Gate final de F02.
