@@ -7,7 +7,6 @@ import {
   type ElectroCraftEnginePayload,
   type JsonValue,
 } from '@electrocraft/domain';
-import { analyzeElectroCraftEnginePayloadCompatibility } from '@electrocraft/application';
 
 export class TiptapEnginePayloadBlockedError extends Error {
   constructor(
@@ -36,11 +35,10 @@ export function validateTiptapEnginePayload(input: unknown): ElectroCraftEngineP
   if (!wrapper.success || wrapper.data.engine !== 'tiptap') {
     throw new TiptapEnginePayloadBlockedError('INVALID_TIPTAP_WRAPPER', 'Expected tiptap engine payload wrapper');
   }
-  const compatibility = analyzeElectroCraftEnginePayloadCompatibility(wrapper.data);
-  if (compatibility.status === 'blocked') {
+  if (wrapper.data.schemaVersion !== 1) {
     throw new TiptapEnginePayloadBlockedError(
       'UNSUPPORTED_TIPTAP_WRAPPER_VERSION',
-      compatibility.diagnostics[0]?.cause ?? 'Unsupported Tiptap wrapper version',
+      `Tiptap wrapper schemaVersion ${wrapper.data.schemaVersion} is not supported`,
     );
   }
   assertTiptapRoot(wrapper.data.value);
