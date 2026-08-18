@@ -10,6 +10,33 @@ permissions:
   statuses: write
 
 jobs:
+  announce_statuses:
+    name: Publish F01 pending statuses
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const sha = '${{ github.event.workflow_run.head_sha }}';
+            const target_url = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
+            for (const [gateContext, description] of [
+              ['electrocraft/M01.1', 'M01.1 monorepo ownership running'],
+              ['electrocraft/M01.2', 'M01.2 TypeScript boundaries queued'],
+              ['electrocraft/M01.3', 'M01.3 quality toolchain queued']
+            ]) {
+              await github.rest.repos.createCommitStatus({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                sha,
+                state: 'pending',
+                context: gateContext,
+                description,
+                target_url
+              });
+            }
+
   monorepo:
     name: M01.1 workspace and package boundaries
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -85,7 +112,7 @@ jobs:
       head_sha: ${{ github.event.workflow_run.head_sha }}
 
   publish_statuses:
-    name: Publish F01 commit statuses
+    name: Publish F01 final commit statuses
     if: always()
     needs: [monorepo, m01_2, m01_3]
     runs-on: ubuntu-latest
@@ -96,6 +123,7 @@ jobs:
           github-token: ${{ github.token }}
           script: |
             const sha = '${{ github.event.workflow_run.head_sha }}';
+            const target_url = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
             const gates = [
               ['electrocraft/M01.1', '${{ needs.monorepo.result }}', 'M01.1 monorepo ownership gate'],
               ['electrocraft/M01.2', '${{ needs.m01_2.result }}', 'M01.2 TypeScript boundaries gate'],
@@ -108,6 +136,7 @@ jobs:
                 sha,
                 state: result === 'success' ? 'success' : 'failure',
                 context: gateContext,
-                description: result === 'success' ? description : `${description}: ${result}`
+                description: result === 'success' ? description : `${description}: ${result}`,
+                target_url
               });
             }

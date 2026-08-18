@@ -30,6 +30,21 @@ jobs:
       run:
         working-directory: experiments/data-source-poc
     steps:
+      - name: Publish M00.9 pending status
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: 'pending',
+              context: 'electrocraft/M00.9',
+              description: 'M00.9 Data Source POC running',
+              target_url: '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+            })
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
@@ -53,7 +68,7 @@ jobs:
         with:
           name: m00-9-data-source-evidence
           path: experiments/data-source-poc/ci-evidence
-      - name: Publish M00.9 commit status
+      - name: Publish M00.9 final commit status
         if: ${{ always() && github.event_name != 'pull_request' }}
         uses: actions/github-script@v7
         with:
@@ -65,5 +80,6 @@ jobs:
               sha: context.sha,
               state: '${{ job.status }}' === 'success' ? 'success' : 'failure',
               context: 'electrocraft/M00.9',
-              description: 'M00.9 Data Source POC'
+              description: 'M00.9 Data Source POC',
+              target_url: '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
             })
