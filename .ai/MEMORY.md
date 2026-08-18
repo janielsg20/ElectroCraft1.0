@@ -16,6 +16,9 @@ Solo contiene hechos estables y decisiones vigentes. Progreso y siguiente paso p
 - `Rete` posee graph/processing/history de workflows; `ElectroCraftActionGraph` es la definición persistida.
 - `TanStack Query` posee async cache; `Refine` solo Administración; `RHF/Zod` Forms; `Tiptap` RichText; `Zustand` runtime state.
 - Snapshots canónicos usan una única serialización JSON determinista y checksum portable; las migraciones de schema se encadenan mediante un registry explícito/fail-closed, no por rutas paralelas inline.
+- `ElectroCraftExportIR` es generado, immutable, versionado y neutral a target; no es una segunda fuente persistida de verdad.
+- Los nueve `ExportTargetId` viven fuera del IR en `TargetCompileContext`; cambiar de target no puede cambiar el checksum de la revisión congelada.
+- ExportIR puede transportar Project Objects y manifests/refs portables permitidos, pero nunca registries runtime completos, caches/histories/prompts, internals de compiladores ni secret values.
 
 ## AI
 - AI SDK + `@ai-sdk/google` es la abstracción primaria; direct `@google/genai` solo para gaps estrechos y probados.
