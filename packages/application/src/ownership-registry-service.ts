@@ -1,34 +1,18 @@
 import {
+  electroCraftCapabilityAnalysisReportSchema,
   electroCraftProjectDefinitionSchema,
   electroCraftRegistryDefinitionSchema,
   electroCraftTargetIdSchema,
   electroPlatformCapabilityDefinitionSchema,
+  type ElectroCraftCapabilityAnalysisEntry,
+  type ElectroCraftCapabilityAnalysisReport,
   type ElectroCraftCapabilityId,
-  type ElectroCraftCapabilitySupportMode,
   type ElectroCraftObjectId,
   type ElectroCraftProjectDefinition,
   type ElectroCraftRegistryDefinition,
   type ElectroCraftRegistryDefinitionKind,
-  type ElectroCraftTargetId,
   type ElectroPlatformCapabilityDefinition,
 } from '@electrocraft/domain';
-
-export interface CapabilityAnalysisEntry {
-  capabilityId: ElectroCraftCapabilityId;
-  target: ElectroCraftTargetId;
-  mode: ElectroCraftCapabilitySupportMode;
-  source: 'registry' | 'project-override' | 'missing';
-  adapter: string | null;
-  reason: string | null;
-}
-
-export interface CapabilityAnalysisReport {
-  schemaVersion: 1;
-  registryVersion: number;
-  projectId: ElectroCraftObjectId;
-  entries: CapabilityAnalysisEntry[];
-  blocked: boolean;
-}
 
 export class ElectroPlatformCapabilityRegistry {
   readonly version: number;
@@ -54,9 +38,9 @@ export class ElectroPlatformCapabilityRegistry {
     return this.#definitions.get(id);
   }
 
-  analyze(projectInput: unknown): CapabilityAnalysisReport {
+  analyze(projectInput: unknown): ElectroCraftCapabilityAnalysisReport {
     const project = electroCraftProjectDefinitionSchema.parse(projectInput);
-    const entries: CapabilityAnalysisEntry[] = [];
+    const entries: ElectroCraftCapabilityAnalysisEntry[] = [];
 
     for (const target of project.defaultTargets) {
       for (const capabilityId of project.requiredCapabilities) {
@@ -75,13 +59,13 @@ export class ElectroPlatformCapabilityRegistry {
       }
     }
 
-    return {
+    return electroCraftCapabilityAnalysisReportSchema.parse({
       schemaVersion: 1,
       registryVersion: this.version,
       projectId: project.id,
       entries,
       blocked: entries.some(({ mode }) => mode === 'blocked'),
-    };
+    });
   }
 }
 
