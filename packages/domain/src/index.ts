@@ -7,6 +7,7 @@ export * from './contracts/object-id';
 export * from './contracts/project-definition';
 export * from './contracts/query-definition';
 export * from './contracts/serialization';
+export * from './contracts/theme-blueprint';
 
 export const packageDescriptor = Object.freeze({
   name: '@electrocraft/domain',
