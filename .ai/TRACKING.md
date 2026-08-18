@@ -18,7 +18,8 @@ Historial detallado:
 | M02.4 | COMPLETADA | `.ai/evidence/F02/M02.4/CLOSURE_2026-08-18.md` |
 | M02.5 | COMPLETADA | `.ai/evidence/F02/M02.5/CLOSURE_2026-08-18.md` |
 | M02.6 | COMPLETADA | `.ai/evidence/F02/M02.6/CLOSURE_2026-08-18.md` |
-| M02.7 | ACTIVE | `.ai/microphases/M02_7.md` |
+| M02.7 | COMPLETADA | `.ai/evidence/F02/M02.7/CLOSURE_2026-08-18.md` |
+| M02.8 | ACTIVE | `.ai/microphases/M02_8.md` |
 
 ## Cierre M02.1
 - PR `#3`; squash merge `cf4649d98f96a553daa020581a918d9559131137`.
@@ -45,19 +46,28 @@ Historial detallado:
 
 ## Cierre M02.6
 - PR `#8`; squash merge `c74fc8284a56487dc56b9dbb90775fb592f803d8`.
-- Una sola ruta de JSON canónico determinista compartida por serialización de objetos y snapshots; checksum portable `fnv1a64` con fixture fijo.
-- `ElectroCraftMigrationRegistry` encadena project v1→v2→v3 de forma explícita/fail-closed; no existe una ruta inline paralela.
-- `ProjectImportService` valida JSON/Zod/refs/checksum antes de `putMany`; imports inválidos devuelven diagnostics reparables y no mutan storage.
-- `export-ir` recibe manifest neutral de snapshot, sin repository/import runtime internals.
-- Suite dedicada M02.6: `14/14` verdes; suite acumulada en `main`: Node `27/27`, Vitest `97/97`, Playwright `1/1`; lint/Prettier, typecheck, boundaries, Studio/PWA y build verdes.
-- Gate definitivo main `32186495673` — `success`.
-- Marker: `PASS_M02_6_SERIALIZER_MIGRATION_REGISTRY`.
-- Artifact final: `9342646837` — `m02-6-serializer-migration-registry-evidence`.
-- Digest: `sha256:35ce99bc90392494dd1d0e6a276a41ec245e4b62a849a6d6f59fb454404121cc`.
+- JSON canónico determinista compartido, checksum `fnv1a64`, MigrationRegistry v1→v2→v3 e import transaccional fail-closed.
+- Suite dedicada `14/14`; suite acumulada: Node `27/27`, Vitest `97/97`, Playwright `1/1`.
+- Gate main `32186495673` success; artifact `9342646837`; digest `sha256:35ce99bc90392494dd1d0e6a276a41ec245e4b62a849a6d6f59fb454404121cc`.
+
+## Cierre M02.7
+- PR `#9`; squash merge `572baebbd6aa5bb62b57d085f7d178d49dd699e2`.
+- `ElectroCraftExportIR` immutable/versionado y neutral a targets; no es source of truth persistida.
+- Closed set de nueve `ExportTargetId`: local-project, react-web, static-web, pwa, android-expo, ios-expo, capacitor, lamp y wordpress.
+- `TargetCompileContext` queda separado del IR y lleva target/config/capabilities/environment/toolchain/SecretRefs.
+- `ExportValidationReport` bloquea refs rotas, secret values, caches/histories/prompts e internals target-specific antes de compilación.
+- Forms se representan por refs a `ElectroCraftDocument kind=form`; Media se representa por manifest portable, no por blobs/runtime storage.
+- Checksum de fixture congelado: `fnv1a64:3f5ab54591022ac0`; React Web y Android/Expo reciben exactamente esa misma revisión.
+- Suite dedicada M02.7: `11/11` verdes; suite acumulada en `main`: Node `27/27`, Vitest `108/108`, Playwright `1/1`; lint/Prettier, typecheck, boundaries, Studio/PWA y build verdes.
+- Gate PR final `32190889315` success; export parity static/Capacitor/LAMP/WordPress verde.
+- Gate definitivo main `32191193359` — `success`.
+- Marker: `PASS_M02_7_CANONICAL_EXPORT_IR`.
+- Artifact final: `9344256616` — `m02-7-canonical-export-ir-evidence`.
+- Digest: `sha256:52f1fd78d673b8094bf29be9d1b47e8aa7a1b92aa8f8c4b9e6f219687a3d375b`.
 - P0/P1: `0`.
 
 ## Gate actual
-F02 continúa activa con `GREEN_THROUGH_M02.6`.
+F02 continúa activa con `GREEN_THROUGH_M02.7`.
 
 ## Siguiente transición permitida
-Implementar y cerrar exclusivamente M02.7: `ElectroCraftExportIR` immutable/versionado, los nueve `ExportTargetId`, `TargetCompileContext`, snapshot/checksum determinista, `ExportValidationReport` y fixtures/boundaries que excluyan internals target-specific; después avanzar a M02.8.
+Implementar y cerrar exclusivamente M02.8: clasificar Project Objects, Registries y Content Entities; documentar owner/storage/serialización/migrations/export access y añadir tests de invariantes que impidan serializar registries completos o confundir content records con configuración de proyecto; después avanzar a M02.9.
