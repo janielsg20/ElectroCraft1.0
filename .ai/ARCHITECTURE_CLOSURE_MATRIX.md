@@ -1,8 +1,9 @@
 # M00.11 — Architecture Closure Matrix
 
-Status: **PROPOSED — awaiting automatic M00.10-success-triggered CI gate**.
+Status: **ACCEPTED — GREEN**.
+Closed: 2026-08-18.
 
-This matrix closes ownership decisions without creating replacement engines. Formal `ACCEPTED — GREEN` requires the M00.11 workflow marker `PASS_M00_11_ARCHITECTURE_CLOSURE`.
+This matrix closes ownership decisions without creating replacement engines. Formal closure was verified by GitHub Actions run `32100737146` on exact head `3fe3815824d7847e88c7f91006d7a6236f00e527`, with `PASS_M00_11_ARCHITECTURE_CLOSURE` and artifact `9311457041`.
 
 ## Canonical product decisions
 
@@ -16,12 +17,12 @@ This matrix closes ownership decisions without creating replacement engines. For
 
 | Area | Decision | Engine owner | ElectroCraft ownership | Evidence |
 |---|---|---|---|---|
-| Screen composition | ACCEPT | Puck | canonical mapping, adapter, UX, target semantics | M00.3 + M00.11 published-package smoke |
-| Studio primitives | ACCEPT | shadcn/ui with explicit Radix base | density, tokens, composition | M00.2 + current CLI `--base radix` contract |
+| Screen composition | ACCEPT | Puck | canonical mapping, adapter, UX, target semantics | M00.3 + M00.11 real package smoke |
+| Studio primitives | ACCEPT | shadcn/ui with explicit Radix base | density, tokens, composition | M00.2 + CLI base contract |
 | AI UI | ACCEPT SELECTED ONLY | AI Elements | AI state, Draft/Apply semantics | M00.2 source audit |
 | i18n | ACCEPT | i18next/react-i18next | Spanish resources, typed keys | M00.2 + M00.11 real i18next API |
 | Studio/Internal Data | ACCEPT | PGlite + Drizzle | canonical data schema/mapping | M00.4 + M00.11 real SQL/ORM probe |
-| External Data Sources | CONDITIONAL | Fetch/OpenAPI/GraphQL + Gateway | DataSourceAdapter/DataResult/SecretRef | M00.9 real Scalar gate |
+| External Data Sources | ACCEPT | Fetch/OpenAPI/GraphQL + Gateway | DataSourceAdapter/DataResult/SecretRef | M00.9 real Scalar gate |
 | Query authoring/cache | ACCEPT | RQB + TanStack Query | portable QueryDefinition/compiler | M00.5 + M00.11 QueryClient probe |
 | Administration | ACCEPT, ADMIN ONLY | Refine + TanStack Table | AdminDocument/resource mapping/UI | M00.2 + M00.11 real package probes |
 | Workflows | ACCEPT | Rete | ActionGraph mapping/runtime/export semantics | M00.6 + M00.11 Rete probe |
@@ -30,7 +31,7 @@ This matrix closes ownership decisions without creating replacement engines. For
 | Native runtime | ACCEPT | Expo/Expo Router/Expo SQLite | capability mapping/export semantics | M00.7 |
 | AI invocation | ACCEPT PRIMARY | AI SDK + `@ai-sdk/google` | context policy, drafts, tools, Apply | M00.8 |
 | Gemini narrow native gap | ACCEPT NARROW | `@google/genai` behind adapter | capability gate only | M00.8 live Interactions v1 evidence |
-| Capacitor/LAMP/WordPress | CONDITIONAL | official runtimes | ExportIR mapping/compiler/verifier | M00.10 real runtime gate |
+| Capacitor/LAMP/WordPress | ACCEPT | official runtimes | ExportIR mapping/compiler/verifier | M00.10 real runtime gate |
 
 ## GeminiNativeCapabilityAdapter decision
 
@@ -71,6 +72,13 @@ AI SDK + `@ai-sdk/google` remains the primary invocation/orchestration stack.
 - F09 depends on F08 Data Sources;
 - F15 Administration depends on F08 Data Sources.
 
-## Formal closure condition
+## Formal closure evidence
 
-M00.11 cannot close on local-only evidence. The workflow is triggered by `workflow_run` only after **M00.10 Export Target Parity POC = success**, checks out that exact head SHA, installs exact closure-probe dependencies and executes real OSS APIs. Only `PASS_M00_11_ARCHITECTURE_CLOSURE` authorizes the documentation/state closure patch and transition to F01.
+- M00.10 run `32100542215`: success.
+- M00.11 run `32100737146`: success.
+- Exact head shared by both: `3fe3815824d7847e88c7f91006d7a6236f00e527`.
+- `PASS_REAL_ENGINE_MATRIX 11`: PASS.
+- `PASS_M00_11_ARCHITECTURE_CLOSURE`: PASS.
+- Commit status: `electrocraft/M00.11 = success`.
+
+F00 is closed. F01 is authorized; M01.1–M01.3 subsequently completed successfully on the same baseline.

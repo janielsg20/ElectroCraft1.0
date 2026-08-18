@@ -1,10 +1,11 @@
 # EXPORT_TARGET_ARCHITECTURE_POC — M00.10
 
 Date: 2026-08-17
-Status: `CANDIDATE — STATIC GREEN / REAL RUNTIME GATES REQUIRED`
+Closed: 2026-08-18
+Status: `ACCEPTED — GREEN`
 Owner: F00 / M00.10
 
-## Decision candidate
+## Decision
 ElectroCraft keeps **one canonical ExportIR** and compiles it through target-specific adapters. Capacitor, LAMP and WordPress are equal Core targets, but they are not the same runtime and must not share a fake Web-only artifact.
 
 The POC proves one `ExportIrPoc` containing:
@@ -52,8 +53,6 @@ POC pin:
 
 Theme output uses core blocks wherever semantics fit. The Appointment form is an adapted dynamic block in the Companion Plugin because server mutation semantics are not representable as a static theme block alone. `Appointment` maps to a CPT with `show_in_rest`; the protected REST route uses `permission_callback` and `current_user_can('edit_posts')`.
 
-Real gate: wp-env start, theme activation, plugin activation, activation option/migration check, CPT recognition, unauthenticated protected REST denial and front-end render smoke.
-
 ## Capability semantics
 Every target emits `CapabilityResult` using only:
 - `exact`
@@ -76,13 +75,21 @@ Target-specific:
 - WordPress block/CPT/REST/lifecycle mapping;
 - runtime verification commands.
 
-## Closure rule
-This document becomes `ACCEPTED — GREEN` only after:
-1. M00.9 real Scalar parser gate passes;
-2. static M00.10 gate passes;
-3. real Capacitor sync passes;
-4. real Slim/PDO/CSRF/MySQL runtime passes;
-5. real wp-env WordPress theme/plugin activation fixture passes;
-6. combined workflow prints `PASS_M00_10_CLOSURE_GATE`.
+## Executed closure evidence
+GitHub Actions run `32100542215` on head `3fe3815824d7847e88c7f91006d7a6236f00e527` completed successfully with:
+1. M00.9 real Scalar parser precondition: PASS;
+2. static M00.10 parity: PASS;
+3. real Capacitor sync: PASS;
+4. real Slim/PDO/CSRF/MySQL runtime: PASS;
+5. real wp-env WordPress theme/plugin activation fixture: PASS;
+6. combined closure gate: `PASS_M00_10_CLOSURE_GATE`.
 
-Until then M00.11 is not permitted.
+Artifacts:
+- `9311394160` — static artifacts;
+- `9311399715` — Capacitor source;
+- `9311407473` — LAMP source;
+- `9311441488` — WordPress source.
+
+Commit status: `electrocraft/M00.10 = success`.
+
+M00.10 is formally closed and authorized M00.11 on the exact same head.

@@ -1,27 +1,31 @@
 # STATE — ElectroCraft Eighth Final
 
 ## Estado actual
-- Fase formal activa: F00 — Reconocimiento, verificación y arquitectura.
-- Última microfase cerrada con evidencia CI verificada en el repositorio: M00.8 — POC AI SDK + Gemini para generación de código.
-- Código presente/preparado en `main`: M00.9, M00.10, M00.11 y F01/M01.1–M01.3.
+- F00 — Reconocimiento, verificación y arquitectura: `COMPLETADA`.
+- Fase formal activa: F01 — Monorepo, límites, documentación y CI.
+- Última microfase cerrada con evidencia GitHub Actions: M01.3 — Quality Toolchain Gate.
 - Estado: `IN_PROGRESS`.
-- Gate actual: `CI_GATES_PENDING`.
-- Bloqueo de producto: M01.4 no puede iniciarse formalmente hasta verificar la cadena M00.9 → M00.10 → M00.11 → M01.1 → M01.2 → M01.3.
+- Gate actual: `GREEN_THROUGH_M01.3`.
+- M01.4 — Crear Studio Vite/PWA bootstrap: `READY`.
 
-## Sincronización del repositorio — 2026-08-18
-- Head auditado antes de este ajuste: `3fba1a4c0033b346b78969f3fc118a99ebd36b3c`.
-- El código físico está adelantado respecto al cierre formal documentado.
-- No se inventan run IDs, artifacts, conclusions ni markers de GitHub Actions.
-- Los ADR/evidencias de M01.1–M01.3 permanecen `IMPLEMENTED` con cierre CI pendiente hasta disponer de evidencia real.
-- Los archivos de transporte y outputs regenerables del paquete acumulativo no forman parte del estado canónico del repositorio.
+## Evidencia de cierre — 2026-08-18
+Baseline funcional validada: `3fe3815824d7847e88c7f91006d7a6236f00e527`.
 
-## Cadena de cierre requerida
-1. M00.9 — Data Sources: `PASS_REAL_OPENAPI_PARSER`.
-2. M00.10 — Export parity: `PASS_STATIC_PARITY`, `PASS_REAL_CAPACITOR_SYNC`, `PASS_REAL_LAMP`, `PASS_REAL_WORDPRESS`, `PASS_M00_10_CLOSURE_GATE`.
-3. M00.11 — Architecture closure: `PASS_REAL_ENGINE_MATRIX 11`, `PASS_M00_11_ARCHITECTURE_CLOSURE`.
-4. M01.1 — Monorepo: `PASS_M01_1_MONOREPO`.
-5. M01.2 — TypeScript boundaries: `PASS_M01_2_TYPESCRIPT_BOUNDARIES`.
-6. M01.3 — Quality toolchain: `PASS_M01_3_QUALITY_TOOLCHAIN`.
+- M00.9 — `success`; marker `PASS_REAL_OPENAPI_PARSER`; validado dentro del run M00.10 `32100542215` y publicado como `electrocraft/M00.9`.
+- M00.10 — `success`; run `32100542215`; static parity + Capacitor + LAMP/MySQL/PDO/CSRF + WordPress wp-env + closure gate verdes; status `electrocraft/M00.10`.
+- M00.11 — `success`; run `32100737146`; real engine matrix + architecture closure verdes; status `electrocraft/M00.11`.
+- M01.1 — `success`; run `32100786113`; lint/typecheck/tests/build/Vitest/Vite/Playwright + `PASS_M01_1_MONOREPO`; status `electrocraft/M01.1`.
+- M01.2 — `success`; mismo run `32100786113`; strict TypeScript/import boundaries + `PASS_M01_2_TYPESCRIPT_BOUNDARIES`; status `electrocraft/M01.2`.
+- M01.3 — `success`; mismo run `32100786113`; root quality pipeline + empty-repo fixture + `PASS_M01_3_QUALITY_TOOLCHAIN`; status `electrocraft/M01.3`.
+
+Los seis contextos de commit fueron observados simultáneamente como `success` sobre la misma baseline. La evidencia detallada queda en `.ai/evidence/CI_CHAIN_M00_9_M01_3_2026-08-18.md` y `.ai/TRACKING.md`.
+
+## Decisiones de ejecución cerradas
+- La visibilidad CI ya no depende del endpoint vacío de checks: los workflows publican commit statuses `electrocraft/M00.9`…`electrocraft/M01.3` con URL al run real.
+- M01.2 y M01.3 son reusable workflows invocados desde M01.1; esto evita exceder el límite de profundidad de `workflow_run`.
+- Los pipelines F01 usan Bash con `pipefail`; `tee` ya no puede ocultar un exit code no-cero.
+- TypeScript 7 usa aliases relativos y no `baseUrl`.
+- Vite construye `apps/studio` desde su propio root, por lo que Playwright valida el artifact del owner correcto.
 
 ## Próximo paso exacto
-Verificar y registrar evidencia real de GitHub Actions para la cadena M00.9–M01.3. Solo después de una cadena GREEN puede cerrarse formalmente F00, formalizarse F01/M01.1–M01.3 y activarse M01.4 — Studio Vite/PWA bootstrap.
+Iniciar M01.4 — **Crear Studio Vite/PWA bootstrap** siguiendo `.ai/microphases/M01_4.md`. La microfase debe crear la app React/Vite TypeScript, shell PWA técnico, Project Home temporal, tooling/CI y pipeline completo sin datos demo permanentes.

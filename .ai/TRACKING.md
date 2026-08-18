@@ -2,50 +2,78 @@
 
 Date: 2026-08-18.
 
-El tracking histórico previo se conserva íntegro en `.ai/TRACKING_HISTORY_THROUGH_M00.8.md`.
+El tracking histórico previo a M00.9 se conserva íntegro en `.ai/TRACKING_HISTORY_THROUGH_M00.8.md`.
 
-## Sincronización del repositorio
+## Estado formal
 - Branch: `main`.
-- Head auditado antes de la sincronización: `3fba1a4c0033b346b78969f3fc118a99ebd36b3c`.
-- Código presente: M00.9, M00.10, M00.11, M01.1, M01.2 y M01.3.
-- Última microfase con cierre CI verificado en la evidencia histórica: M00.8.
-- M00.9–M01.3: `IMPLEMENTED / CI EVIDENCE PENDING` hasta verificar los runs reales.
-- M01.4: `BLOCKED` hasta completar la cadena de cierre.
+- Baseline funcional de cierre: `3fe3815824d7847e88c7f91006d7a6236f00e527`.
+- F00: `COMPLETADA`.
+- M00.9, M00.10 y M00.11: `COMPLETADAS` con evidencia real de GitHub Actions.
+- F01 activa.
+- M01.1, M01.2 y M01.3: `COMPLETADAS` con evidencia real de GitHub Actions.
+- Próxima microfase: M01.4 — Crear Studio Vite/PWA bootstrap.
 
-## Cadena de evidencia esperada
-### M00.9 — Data Sources
-Workflow: `.github/workflows/data-source-poc.yml`.
-Marker requerido: `PASS_REAL_OPENAPI_PARSER`.
+## M00.9 — Data Sources — COMPLETADA
+- Engine/API: `@scalar/openapi-parser@0.28.11` real + REST/GraphQL/Gateway fixtures.
+- Run de evidencia exact-head: `32100542215`.
+- Head: `3fe3815824d7847e88c7f91006d7a6236f00e527`.
+- Job: `M00.9 real parser precondition` — `success`.
+- Resultado: 14/14 tests offline, parser real, secret scan, metrics y build verdes.
+- Marker observado en log: `PASS_REAL_OPENAPI_PARSER scalar discovered 2 operations`.
+- Commit status: `electrocraft/M00.9 = success`.
 
-### M00.10 — Export Target Parity
-Workflow: `.github/workflows/export-target-poc.yml`.
-Markers requeridos:
-- `PASS_STATIC_PARITY`;
-- `PASS_REAL_CAPACITOR_SYNC`;
-- `PASS_REAL_LAMP`;
-- `PASS_REAL_WORDPRESS`;
-- `PASS_M00_10_CLOSURE_GATE`.
+## M00.10 — Export Target Parity — COMPLETADA
+- Run: `32100542215`.
+- Head: `3fe3815824d7847e88c7f91006d7a6236f00e527`.
+- Jobs verdes: M00.9 precondition, static parity, Capacitor 8 real sync, Slim 4/PDO/CSRF/MySQL runtime, WordPress 7.0.2 wp-env runtime y closure gate.
+- Markers requeridos cubiertos: `PASS_STATIC_PARITY`, `PASS_REAL_CAPACITOR_SYNC`, `PASS_REAL_LAMP`, `PASS_REAL_WORDPRESS`, `PASS_M00_10_CLOSURE_GATE`.
+- Artifacts:
+  - `9311394160` — `m00-10-static-artifacts`;
+  - `9311399715` — `m00-10-capacitor-source`;
+  - `9311407473` — `m00-10-lamp-source`;
+  - `9311441488` — `m00-10-wordpress-source`.
+- Commit status: `electrocraft/M00.10 = success`.
 
-### M00.11 — Architecture Closure
-Workflow: `.github/workflows/architecture-closure-poc.yml`.
-Markers requeridos:
-- `PASS_REAL_ENGINE_MATRIX 11`;
-- `PASS_M00_11_ARCHITECTURE_CLOSURE`.
+## M00.11 — Architecture Closure — COMPLETADA
+- Run: `32100737146`.
+- Head exacto heredado de M00.10: `3fe3815824d7847e88c7f91006d7a6236f00e527`.
+- `F00 architecture closure`: `success`.
+- Real engine matrix y marker `PASS_M00_11_ARCHITECTURE_CLOSURE`: verdes.
+- Artifact `9311457041` — `m00-11-architecture-closure-evidence`.
+- Commit status: `electrocraft/M00.11 = success`.
 
-### M01.1 — Monorepo Ownership
-Workflow: `.github/workflows/m01-1-monorepo.yml`.
-Marker requerido: `PASS_M01_1_MONOREPO`.
+## M01.1 — Monorepo Ownership — COMPLETADA
+- Run: `32100786113`.
+- Head: `3fe3815824d7847e88c7f91006d7a6236f00e527`.
+- Gates reales: install, exact toolchain, lint, TypeScript, Node contract/negative tests, build, Vitest, Vite y Playwright: `success`.
+- Marker: `PASS_M01_1_MONOREPO`.
+- Artifact `9311468160` — `m01-1-monorepo-evidence`.
+- Commit status: `electrocraft/M01.1 = success`.
 
-### M01.2 — TypeScript Boundaries
-Workflow: `.github/workflows/m01-2-typescript-boundaries.yml`.
-Marker requerido: `PASS_M01_2_TYPESCRIPT_BOUNDARIES`.
+## M01.2 — TypeScript Boundaries — COMPLETADA
+- Run reutilizable dentro de `32100786113`.
+- Gates: lint, TypeScript strict, aliases/boundaries, contract/negative tests, deterministic reports: `success`.
+- TypeScript 7 contract: `baseUrl` ausente; aliases workspace relativos `./...`; regresión impide reintroducir `baseUrl`.
+- Marker: `PASS_M01_2_TYPESCRIPT_BOUNDARIES`.
+- Artifact `9311475315` — `m01-2-typescript-boundaries-evidence`.
+- Commit status: `electrocraft/M01.2 = success`.
 
-### M01.3 — Quality Toolchain
-Workflow: `.github/workflows/m01-3-quality-toolchain.yml`.
-Marker requerido: `PASS_M01_3_QUALITY_TOOLCHAIN`.
+## M01.3 — Quality Toolchain — COMPLETADA
+- Run reutilizable dentro de `32100786113`.
+- Root pipeline `lint → typecheck → boundaries → tests → build → Playwright`: `success`.
+- Empty functional repository fixture: `success`.
+- Marker: `PASS_M01_3_QUALITY_TOOLCHAIN`.
+- Artifact `9311487017` — `m01-3-quality-toolchain-evidence`.
+- Commit status: `electrocraft/M01.3 = success`.
 
-## Regla de cierre
-La presencia del código o de evidencia local no sustituye GitHub Actions cuando la microfase exige ejecución real del engine/toolchain. No se promueve ninguna microfase a `COMPLETADA` ni se activa M01.4 hasta registrar run, head, conclusión y artifacts/markers requeridos.
+## Correcciones de CI incorporadas durante el cierre
+1. Los workflows publican commit statuses `pending`/`success`/`failure` con `target_url`; el conector ya no depende de una lista de checks vacía.
+2. M00.9/M00.10 tienen cobertura de paths suficiente para revalidar cambios de F01/estado/workflows relevantes.
+3. M01.2 y M01.3 usan `workflow_call` desde M01.1 para no exceder la profundidad permitida de `workflow_run`.
+4. Workflows F01 usan Bash/`pipefail`; `| tee` no puede convertir fallos reales en falsos verdes.
+5. LAMP Composer valida el manifiesto real sin confundir los pins exactos del POC con errores.
+6. TypeScript 7 eliminó `baseUrl`; el validador propio quedó alineado.
+7. Vite usa `apps/studio` como root y Playwright valida `apps/studio/dist/studio-architecture.js`.
 
-## Higiene del repositorio
-En esta sincronización se retiran del árbol canónico archivos de transporte (`APPLY.md`, `PATCH_BASE.txt`, `FILES.sha256`, `COMPLETE_PACKAGE_MANIFEST.md`) y outputs regenerables bajo `experiments/*/dist` y `experiments/*/artifacts`. El source, tests, workflows, ADRs, fixtures y evidencia `.ai/evidence` se conservan.
+## Regla de continuación
+M01.4 puede iniciarse porque M01.3 está formalmente COMPLETADA y no quedan P0/P1 en la dependencia inmediata. No avanzar de M01.4 sin ejecutar y registrar sus gates obligatorios.

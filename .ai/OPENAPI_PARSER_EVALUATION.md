@@ -1,7 +1,8 @@
 # M00.9 — OpenAPI parser OSS evaluation
 
 Date: 2026-08-17
-Status: `SELECTED — CI EXECUTION PENDING`
+Closed: 2026-08-18
+Status: `SELECTED — EXECUTED / GREEN`
 
 ## Candidates
 
@@ -13,17 +14,26 @@ Status: `SELECTED — CI EXECUTION PENDING`
 ## Decision
 Select `@scalar/openapi-parser@0.28.11` for M00.9. It covers the OpenAPI versions ElectroCraft is likely to ingest and exposes the two narrow primitives needed by the POC: validation and dereference. ElectroCraft still owns operation/resource normalization; the parser does not become the DataSourceAdapter contract.
 
-`@apidevtools/swagger-parser` remains a viable fallback, but its documented scope centers on Swagger 2.0/OpenAPI 3.0 and its repository had a July 2026 open issue about a vulnerable transitive ref-parser version. That is not used as a claim that the package is unusable; it simply removes any reason to prefer it for this POC.
+`@apidevtools/swagger-parser` remains a viable fallback. It is not selected because Scalar better matches the evaluated scope; no claim is made that the alternative is unusable.
 
 ## API actually wired
 `src/openapi.js::parseOpenApiWithScalar()` dynamically imports:
 - `validate` from `@scalar/openapi-parser`;
 - `dereference` from `@scalar/openapi-parser`.
 
-There is intentionally no JSON-only fallback. `scripts/parser-probe.mjs` must execute the real installed dependency and discover both fixture operations.
+There is intentionally no JSON-only fallback. `scripts/parser-probe.mjs` executes the real installed dependency and discovers both fixture operations.
 
 ## Bundle/dependency boundary
 The selected parser is one optional POC dependency. ElectroCraft Core receives only normalized source/operation semantics. No PostgreSQL/MySQL browser/server driver and no query-cache package is introduced by this POC.
 
-## Environment limitation
-The current local execution environment cannot resolve npm, so the selected package cannot be installed here. Local typecheck/lint/offline tests/build are green, but the real-parser gate remains red locally with `ERR_MODULE_NOT_FOUND`. `.github/workflows/data-source-poc.yml` installs the real package and runs the full `npm run check` after the overlay is uploaded.
+## Executed CI evidence
+- GitHub Actions run: `32100542215`.
+- Head: `3fe3815824d7847e88c7f91006d7a6236f00e527`.
+- Exact installed parser: `@scalar/openapi-parser@0.28.11`.
+- Exact TypeScript pin: `7.0.2`.
+- Offline tests: 14/14 PASS.
+- Real parser marker: `PASS_REAL_OPENAPI_PARSER scalar discovered 2 operations`.
+- Secret scan, metrics and build: PASS.
+- Commit status: `electrocraft/M00.9 = success`.
+
+The former local npm/DNS limitation is retained only as historical context; GitHub Actions provided the required real OSS execution and closed the gate.
