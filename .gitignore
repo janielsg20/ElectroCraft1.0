@@ -2,6 +2,13 @@ node_modules/
 apps/*/dist/
 packages/*/dist/
 tooling/dist/
+experiments/*/dist/
+experiments/*/artifacts/
 playwright-report/
 test-results/
+.upload/
+/APPLY.md
+/COMPLETE_PACKAGE_MANIFEST.md
+/FILES.sha256
+/PATCH_BASE.txt
 *.tsbuildinfo

@@ -1,4 +1,0 @@
-8c6f13e776db9b26cffef8a04651bf11950d8795981e6b87b6dd3eb5367654ba  capacitor-poc-source.zip
-90cae255b5bb20d4c768990dd4f770f5625e7b02700c1262156b39bae48c4d34  lamp-poc-source.zip
-4886a164d7be8a6b3d2a5e4696d3dda17aa4f6960f2a4efc67b32f74a41132aa  wordpress-theme-poc.zip
-a88fcf85f20dea922b607b4f84ca6d80df7a920994ececaff5ea347ff441ce9b  wordpress-plugin-poc.zip
