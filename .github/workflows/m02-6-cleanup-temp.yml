@@ -1,0 +1,31 @@
+name: M02.6 Cleanup Temporary Workflows
+
+on:
+  push:
+    branches:
+      - agent/m02-6-serializer-migration-registry
+    paths:
+      - '.github/workflows/m02-6-cleanup-temp.yml'
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: agent/m02-6-serializer-migration-registry
+      - name: Remove temporary workflows
+        run: |
+          git rm -f .github/workflows/m02-6-format-one-shot.yml .github/workflows/m02-6-cleanup-temp.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Remove temporary M02.6 workflows"
+          git push origin HEAD:agent/m02-6-serializer-migration-registry
