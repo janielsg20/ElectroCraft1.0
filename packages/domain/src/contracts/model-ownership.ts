@@ -44,20 +44,10 @@ export const electroCraftModelStorageAuthoritySchema = z.enum([
 ]);
 export type ElectroCraftModelStorageAuthority = z.infer<typeof electroCraftModelStorageAuthoritySchema>;
 
-export const electroCraftModelExportAccessSchema = z.enum([
-  'embedded',
-  'reference',
-  'manifest',
-  'resolver',
-  'none',
-]);
+export const electroCraftModelExportAccessSchema = z.enum(['embedded', 'reference', 'manifest', 'resolver', 'none']);
 export type ElectroCraftModelExportAccess = z.infer<typeof electroCraftModelExportAccessSchema>;
 
-export const electroCraftModelVersioningAuthoritySchema = z.enum([
-  'project-schema',
-  'app-version',
-  'content-schema',
-]);
+export const electroCraftModelVersioningAuthoritySchema = z.enum(['project-schema', 'app-version', 'content-schema']);
 export type ElectroCraftModelVersioningAuthority = z.infer<typeof electroCraftModelVersioningAuthoritySchema>;
 
 const ownerPackageSchema = z.enum([
@@ -286,7 +276,8 @@ const catalogInput: ElectroCraftModelOwnershipDescriptor[] = [
     exportAccess: 'reference',
     versioningAuthority: 'app-version',
     canonicalShape: 'ElectroCraftRegistryDefinition kind=component',
-    notes: 'Core/extension definitions stay in the app registry; only explicit user definitions may be referenced by project ID.',
+    notes:
+      'Core/extension definitions stay in the app registry; only explicit user definitions may be referenced by project ID.',
   },
   {
     key: 'field-type',
@@ -310,7 +301,8 @@ const catalogInput: ElectroCraftModelOwnershipDescriptor[] = [
     exportAccess: 'reference',
     versioningAuthority: 'app-version',
     canonicalShape: 'ElectroCraftRegistryDefinition kind=action',
-    notes: 'Action-node catalog is runtime/application availability; ActionGraphs persist only portable node refs/config.',
+    notes:
+      'Action-node catalog is runtime/application availability; ActionGraphs persist only portable node refs/config.',
   },
   {
     key: 'provider',
@@ -346,7 +338,8 @@ const catalogInput: ElectroCraftModelOwnershipDescriptor[] = [
     exportAccess: 'none',
     versioningAuthority: 'app-version',
     canonicalShape: 'ElectroCraftBlueprintPackage catalog',
-    notes: 'Blueprint packages are external/catalog inputs; installed project objects become normal canonical objects and only originBlueprint remains.',
+    notes:
+      'Blueprint packages are external/catalog inputs; installed project objects become normal canonical objects and only originBlueprint remains.',
   },
   {
     key: 'record',
@@ -358,7 +351,8 @@ const catalogInput: ElectroCraftModelOwnershipDescriptor[] = [
     exportAccess: 'resolver',
     versioningAuthority: 'content-schema',
     canonicalShape: 'content record',
-    notes: 'Runtime/admin content row; referenced through model/record IDs and exported only when target content packaging requires it.',
+    notes:
+      'Runtime/admin content row; referenced through model/record IDs and exported only when target content packaging requires it.',
   },
   {
     key: 'term',
@@ -394,7 +388,8 @@ const catalogInput: ElectroCraftModelOwnershipDescriptor[] = [
     exportAccess: 'manifest',
     versioningAuthority: 'content-schema',
     canonicalShape: 'media metadata record',
-    notes: 'ExportIR receives only the portable MediaManifest required by the frozen revision, not MediaBlobStore/runtime records.',
+    notes:
+      'ExportIR receives only the portable MediaManifest required by the frozen revision, not MediaBlobStore/runtime records.',
   },
   {
     key: 'user-profile',
@@ -418,7 +413,8 @@ const catalogInput: ElectroCraftModelOwnershipDescriptor[] = [
     exportAccess: 'none',
     versioningAuthority: 'content-schema',
     canonicalShape: 'audit event record',
-    notes: 'Operational audit history stays in runtime storage and never enters ProjectDefinition or ExportIR snapshots.',
+    notes:
+      'Operational audit history stays in runtime storage and never enters ProjectDefinition or ExportIR snapshots.',
   },
 ];
 
@@ -498,7 +494,8 @@ function scanOwnershipBoundary(
         code: 'CORE_REGISTRY_EMBEDDED',
         path: [...path, key],
         cause: `Application registry ${key} cannot be embedded in canonical project data.`,
-        repair: 'Persist only stable registry definition refs/allowed user definitions; resolve core registries from application ownership.',
+        repair:
+          'Persist only stable registry definition refs/allowed user definitions; resolve core registries from application ownership.',
       });
       continue;
     }
@@ -507,7 +504,8 @@ function scanOwnershipBoundary(
         code: 'CONTENT_ENTITY_EMBEDDED',
         path: [...path, key],
         cause: `Runtime/content collection ${key} cannot be embedded in canonical project configuration.`,
-        repair: 'Store content in its content authority and reference it by IDs, resolver, or the allowed export manifest.',
+        repair:
+          'Store content in its content authority and reference it by IDs, resolver, or the allowed export manifest.',
       });
       continue;
     }

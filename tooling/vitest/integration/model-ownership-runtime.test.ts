@@ -2,10 +2,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { serializeElectroCraftExportIREnvelope } from '@electrocraft/domain';
-import {
-  buildElectroCraftExportIR,
-  createElectroCraftModelOwnershipReport,
-} from '@electrocraft/application';
+import { buildElectroCraftExportIR, createElectroCraftModelOwnershipReport } from '@electrocraft/application';
 import { canonicalExportIrSource, canonicalModelFixture } from '../helpers/export-ir-fixture';
 
 function evidence(name: string, value: unknown): void {

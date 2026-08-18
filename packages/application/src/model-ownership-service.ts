@@ -45,9 +45,10 @@ export function createElectroCraftModelOwnershipReport(
         ...boundaryDiagnostics,
         {
           code: 'INVALID_PROJECT',
-          path: projectResult.error.issues[0]?.path.filter(
-            (part): part is string | number => typeof part === 'string' || typeof part === 'number',
-          ) ?? [],
+          path:
+            projectResult.error.issues[0]?.path.filter(
+              (part): part is string | number => typeof part === 'string' || typeof part === 'number',
+            ) ?? [],
           cause: projectResult.error.issues[0]?.message ?? 'ProjectDefinition schema validation failed.',
           repair: 'Repair the canonical ProjectDefinition before applying ownership classification.',
         },
@@ -55,20 +56,21 @@ export function createElectroCraftModelOwnershipReport(
     };
   }
 
-  const registryDiagnostics = validateProjectRegistryDefinitions(projectResult.data, projectRegistryDefinitionInputs).map(
-    (diagnostic) => ({
-      code: 'INVALID_USER_REGISTRY_DEFINITION' as const,
-      path: ['userRegistryDefinitionRefs', diagnostic.ref],
-      cause:
-        diagnostic.code === 'missing-user-definition-ref'
-          ? `Referenced user registry definition ${diagnostic.ref} is missing.`
-          : `Registry definition ${diagnostic.ref} is not user-owned and cannot be persisted with the project.`,
-      repair:
-        diagnostic.code === 'missing-user-definition-ref'
-          ? 'Supply the referenced user-origin definition or remove the stale ref.'
-          : 'Keep core/extension definitions in application registries and persist only user-origin definitions by stable ref.',
-    }),
-  );
+  const registryDiagnostics = validateProjectRegistryDefinitions(
+    projectResult.data,
+    projectRegistryDefinitionInputs,
+  ).map((diagnostic) => ({
+    code: 'INVALID_USER_REGISTRY_DEFINITION' as const,
+    path: ['userRegistryDefinitionRefs', diagnostic.ref],
+    cause:
+      diagnostic.code === 'missing-user-definition-ref'
+        ? `Referenced user registry definition ${diagnostic.ref} is missing.`
+        : `Registry definition ${diagnostic.ref} is not user-owned and cannot be persisted with the project.`,
+    repair:
+      diagnostic.code === 'missing-user-definition-ref'
+        ? 'Supply the referenced user-origin definition or remove the stale ref.'
+        : 'Keep core/extension definitions in application registries and persist only user-origin definitions by stable ref.',
+  }));
 
   const diagnostics = [...boundaryDiagnostics, ...registryDiagnostics];
   return {

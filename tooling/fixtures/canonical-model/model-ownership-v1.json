@@ -29,14 +29,7 @@
     "platform-capability",
     "blueprint-catalog"
   ],
-  "contentEntities": [
-    "record",
-    "term",
-    "relation-edge",
-    "media-metadata",
-    "user-profile",
-    "audit-event"
-  ],
+  "contentEntities": ["record", "term", "relation-edge", "media-metadata", "user-profile", "audit-event"],
   "rules": {
     "fullRegistryInsideProject": false,
     "contentCollectionsInsideProject": false,

@@ -36,11 +36,12 @@ describe('M02.8 model ownership catalog', () => {
 
   it('distinguishes project reusable components from the core ComponentDefinition registry', () => {
     const reusable = ELECTROCRAFT_MODEL_OWNERSHIP_CATALOG.find(({ key }) => key === 'reusable-component');
-    const componentDefinition = ELECTROCRAFT_MODEL_OWNERSHIP_CATALOG.find(
-      ({ key }) => key === 'component-definition',
-    );
+    const componentDefinition = ELECTROCRAFT_MODEL_OWNERSHIP_CATALOG.find(({ key }) => key === 'component-definition');
 
-    expect(reusable).toMatchObject({ category: 'project-object', canonicalShape: 'ElectroCraftDocument kind=reusable-component' });
+    expect(reusable).toMatchObject({
+      category: 'project-object',
+      canonicalShape: 'ElectroCraftDocument kind=reusable-component',
+    });
     expect(componentDefinition).toMatchObject({
       category: 'registry-definition',
       storageAuthority: 'application-registry',
