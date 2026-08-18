@@ -19,6 +19,8 @@ Solo contiene hechos estables y decisiones vigentes. Progreso y siguiente paso p
 - `ElectroCraftExportIR` es generado, immutable, versionado y neutral a target; no es una segunda fuente persistida de verdad.
 - Los nueve `ExportTargetId` viven fuera del IR en `TargetCompileContext`; cambiar de target no puede cambiar el checksum de la revisión congelada.
 - ExportIR puede transportar Project Objects y manifests/refs portables permitidos, pero nunca registries runtime completos, caches/histories/prompts, internals de compiladores ni secret values.
+- El ownership canónico se divide en exactamente tres categorías: Project Objects, Application Registries y Content Entities. Registries core/extension se versionan con la app y no se copian al proyecto; content entities viven en su storage y se consumen por refs/resolver/manifest.
+- Un reusable component específico del proyecto sigue siendo `ElectroCraftDocument kind=reusable-component`; un ComponentDefinition core pertenece al registry de aplicación. Solo definitions `origin=user` pueden persistirse separadas y referenciarse desde el proyecto.
 
 ## AI
 - AI SDK + `@ai-sdk/google` es la abstracción primaria; direct `@google/genai` solo para gaps estrechos y probados.
