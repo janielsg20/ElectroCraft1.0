@@ -19,7 +19,8 @@ Historial detallado:
 | M02.5 | COMPLETADA | `.ai/evidence/F02/M02.5/CLOSURE_2026-08-18.md` |
 | M02.6 | COMPLETADA | `.ai/evidence/F02/M02.6/CLOSURE_2026-08-18.md` |
 | M02.7 | COMPLETADA | `.ai/evidence/F02/M02.7/CLOSURE_2026-08-18.md` |
-| M02.8 | ACTIVE | `.ai/microphases/M02_8.md` |
+| M02.8 | COMPLETADA | `.ai/evidence/F02/M02.8/CLOSURE_2026-08-18.md` |
+| M02.9 | ACTIVE | `.ai/microphases/M02_9.md` |
 
 ## Cierre M02.1
 - PR `#3`; squash merge `cf4649d98f96a553daa020581a918d9559131137`.
@@ -66,8 +67,24 @@ Historial detallado:
 - Digest: `sha256:52f1fd78d673b8094bf29be9d1b47e8aa7a1b92aa8f8c4b9e6f219687a3d375b`.
 - P0/P1: `0`.
 
+## Cierre M02.8
+- PR `#10`; squash merge `cd89199a44ffbd2efda7892a4e658145de70b500`.
+- Taxonomía ejecutable de 26 tipos: `14` Project Objects, `6` Application Registries y `6` Content Entities.
+- Cada descriptor fija storage authority, serializer owner, migration owner, versioning authority y exporter access.
+- `ProjectDefinition` continúa en schema v3 sin migración nueva; M02.8 formaliza ownership alrededor de refs existentes.
+- Core/extension registries no se copian al proyecto; solo definitions `origin=user` pueden persistirse separadas y referenciarse por ID.
+- Records/terms/relation edges/media metadata/user profiles/audit events permanecen storage-owned; ExportIR solo accede por resolver/manifest cuando corresponde.
+- `validateElectroCraftProjectOwnershipBoundary` bloquea registries completos y content collections dentro de canonical project data con diagnostics reparables.
+- ExportIR ejecuta el ownership boundary antes de parse/compile y permanece libre de live registries/content stores.
+- Suite dedicada M02.8: `9/9` verde; pipeline raíz, M02.1–M02.7, Base CI, Studio y export parity verdes en PR.
+- Gate definitivo main `32193738411` — `success`.
+- Marker: `PASS_M02_8_MODEL_OWNERSHIP`.
+- Artifact final: `9345132952` — `m02-8-model-ownership-evidence`.
+- Digest: `sha256:7751ba52ff3cf167dad37e604617a1ac2fef808491952394bdb83023c825af1f`.
+- P0/P1: `0`.
+
 ## Gate actual
-F02 continúa activa con `GREEN_THROUGH_M02.7`.
+F02 continúa activa con `GREEN_THROUGH_M02.8`.
 
 ## Siguiente transición permitida
-Implementar y cerrar exclusivamente M02.8: clasificar Project Objects, Registries y Content Entities; documentar owner/storage/serialización/migrations/export access y añadir tests de invariantes que impidan serializar registries completos o confundir content records con configuración de proyecto; después avanzar a M02.9.
+Implementar y cerrar exclusivamente M02.9: wrappers versionados `{ engine, schemaVersion, value }` para payloads serializables de engines, inicialmente RQB rules y Tiptap richtext; validators/migrations permanecen en los adapters, Compatibility Analyzer bloquea engine/version no soportado y AppState/classes runtime de Rete/Puck siguen prohibidos. Después ejecutar el gate final de F02 antes de iniciar F03.
