@@ -1,4 +1,4 @@
-import type { JSONContent } from '@tiptap/core';
+import type { AnyExtension, JSONContent } from '@tiptap/core';
 import { generateHTML } from '@tiptap/html';
 import StarterKit from '@tiptap/starter-kit';
 import {
@@ -17,6 +17,8 @@ export class TiptapEnginePayloadBlockedError extends Error {
     this.name = 'TiptapEnginePayloadBlockedError';
   }
 }
+
+const starterKitForHtml = StarterKit as unknown as AnyExtension;
 
 function assertTiptapRoot(value: JsonValue): asserts value is JsonValue & { type: 'doc'; content?: JsonValue[] } {
   if (value === null || Array.isArray(value) || typeof value !== 'object') {
@@ -43,7 +45,7 @@ export function validateTiptapEnginePayload(input: unknown): ElectroCraftEngineP
   }
   assertTiptapRoot(wrapper.data.value);
   try {
-    generateHTML(wrapper.data.value as JSONContent, [StarterKit]);
+    generateHTML(wrapper.data.value as JSONContent, [starterKitForHtml]);
   } catch (error) {
     throw new TiptapEnginePayloadBlockedError(
       'INVALID_TIPTAP_VALUE',
@@ -64,5 +66,5 @@ export function migrateTiptapEnginePayload(input: unknown): ElectroCraftEnginePa
 
 export function renderTiptapEnginePayloadToHtml(input: unknown): string {
   const payload = validateTiptapEnginePayload(input);
-  return generateHTML(payload.value as JSONContent, [StarterKit]);
+  return generateHTML(payload.value as JSONContent, [starterKitForHtml]);
 }
