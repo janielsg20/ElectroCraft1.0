@@ -1,0 +1,42 @@
+name: M02.6 Format One Shot
+
+on:
+  push:
+    branches:
+      - agent/m02-6-serializer-migration-registry
+    paths:
+      - '.github/workflows/m02-6-format-one-shot.yml'
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: agent/m02-6-serializer-migration-registry
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npx prettier --write tooling/vitest/integration/serializer-migration-import-runtime.test.ts
+      - name: Commit format change
+        run: |
+          if git diff --quiet -- tooling/vitest/integration/serializer-migration-import-runtime.test.ts; then
+            echo "Already formatted"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tooling/vitest/integration/serializer-migration-import-runtime.test.ts
+          git commit -m "Format final M02.6 integration test"
+          git push origin HEAD:agent/m02-6-serializer-migration-registry
