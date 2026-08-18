@@ -6,6 +6,7 @@ export * from './component-definition-service';
 export * from './connector-registry';
 export * from './ownership-registry-service';
 export * from './project-document-service';
+export * from './project-import-service';
 
 export const packageDescriptor = Object.freeze({
   name: '@electrocraft/application',

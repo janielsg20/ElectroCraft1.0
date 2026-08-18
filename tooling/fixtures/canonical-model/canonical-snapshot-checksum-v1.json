@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "algorithm": "fnv1a64",
+  "projectFixture": "project-v3",
+  "documentFixtures": ["screen-v3", "form-v3", "template-v3"],
+  "expectedChecksum": "fnv1a64:62421025ba8927ee"
+}

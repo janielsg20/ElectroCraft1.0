@@ -1,6 +1,11 @@
 import * as z from 'zod';
 import { electroCraftDocumentSchema, type ElectroCraftDocument } from './document';
 import { electroCraftMetadataSchema } from './json-value';
+import {
+  cloneElectroCraftMigrationValue,
+  ElectroCraftMigrationRegistry,
+  type ElectroCraftMigrationResult,
+} from './migration-registry';
 import { electroCraftObjectIdSchema, type ElectroCraftObjectId } from './object-id';
 import {
   electroCraftCapabilityIdSchema,
@@ -74,6 +79,10 @@ const legacyProjectDefinitionV1Schema = z.strictObject({
   ...projectBaseShape,
 });
 
+const electroCraftProjectSchemaVersionHeaderSchema = z.object({
+  schemaVersion: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+});
+
 export interface ElectroCraftProjectDefinitionImportResult {
   project: ElectroCraftProjectDefinition;
   migratedFrom: 1 | 2 | null;
@@ -88,35 +97,73 @@ function emptyM02_5ProjectFields() {
   } as const;
 }
 
+export function createElectroCraftProjectMigrationRegistry(): ElectroCraftMigrationRegistry {
+  const registry = new ElectroCraftMigrationRegistry();
+  registry.register({
+    id: 'project-v1-to-v2-data-ownership',
+    fromVersion: 1,
+    toVersion: 2,
+    migrate(input) {
+      const project = legacyProjectDefinitionV1Schema.parse(input);
+      return legacyProjectDefinitionV2Schema.parse({
+        ...project,
+        schemaVersion: 2,
+        dataSourceRefs: [],
+        dataSchemaRefs: [],
+        queryRefs: [],
+      });
+    },
+  });
+  registry.register({
+    id: 'project-v2-to-v3-theme-blueprint-capabilities',
+    fromVersion: 2,
+    toVersion: 3,
+    migrate(input) {
+      const project = legacyProjectDefinitionV2Schema.parse(input);
+      return electroCraftProjectDefinitionSchema.parse({
+        ...project,
+        schemaVersion: 3,
+        ...emptyM02_5ProjectFields(),
+      });
+    },
+  });
+  return registry;
+}
+
+const projectMigrationRegistry = createElectroCraftProjectMigrationRegistry();
+
+export function migrateElectroCraftProjectDefinitionPayload(
+  input: unknown,
+  targetVersion = 3,
+): ElectroCraftMigrationResult {
+  const header = electroCraftProjectSchemaVersionHeaderSchema.parse(input);
+  if (targetVersion < header.schemaVersion || targetVersion > 3) {
+    throw new TypeError(`unsupported project migration target v${targetVersion}`);
+  }
+  if (header.schemaVersion === targetVersion) {
+    const value =
+      targetVersion === 3 ? electroCraftProjectDefinitionSchema.parse(input) : cloneElectroCraftMigrationValue(input);
+    return {
+      value,
+      fromVersion: header.schemaVersion,
+      toVersion: targetVersion,
+      appliedStepIds: [],
+    };
+  }
+  return projectMigrationRegistry.migrate(input, header.schemaVersion, targetVersion);
+}
+
 export function importElectroCraftProjectDefinition(input: unknown): ElectroCraftProjectDefinitionImportResult {
   const canonical = electroCraftProjectDefinitionSchema.safeParse(input);
   if (canonical.success) return { project: canonical.data, migratedFrom: null };
 
-  const legacyV2 = legacyProjectDefinitionV2Schema.safeParse(input);
-  if (legacyV2.success) {
-    return {
-      project: electroCraftProjectDefinitionSchema.parse({
-        ...legacyV2.data,
-        schemaVersion: 3,
-        ...emptyM02_5ProjectFields(),
-      }),
-      migratedFrom: 2,
-    };
-  }
+  const header = electroCraftProjectSchemaVersionHeaderSchema.safeParse(input);
+  if (!header.success || header.data.schemaVersion === 3) throw canonical.error;
 
-  const legacyV1 = legacyProjectDefinitionV1Schema.safeParse(input);
-  if (!legacyV1.success) throw canonical.error;
-
+  const migration = migrateElectroCraftProjectDefinitionPayload(input, 3);
   return {
-    project: electroCraftProjectDefinitionSchema.parse({
-      ...legacyV1.data,
-      schemaVersion: 3,
-      dataSourceRefs: [],
-      dataSchemaRefs: [],
-      queryRefs: [],
-      ...emptyM02_5ProjectFields(),
-    }),
-    migratedFrom: 1,
+    project: electroCraftProjectDefinitionSchema.parse(migration.value),
+    migratedFrom: header.data.schemaVersion,
   };
 }
 
