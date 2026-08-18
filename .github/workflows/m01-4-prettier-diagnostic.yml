@@ -1,0 +1,59 @@
+name: M01.4 Prettier diagnostic
+
+on:
+  push:
+    branches:
+      - agent/m01-4-studio-bootstrap-upload
+    paths:
+      - .github/workflows/m01-4-prettier-diagnostic.yml
+      - apps/studio/src/styles.css
+      - tooling/vitest/contract/studio-import-boundary.test.ts
+
+permissions:
+  contents: read
+  statuses: write
+
+jobs:
+  format-diagnostic:
+    name: M01.4 exact Prettier output
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Publish pending status
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: 'pending',
+              context: 'electrocraft/M01.4-format-diagnostic',
+              description: 'Formatting diagnostic running',
+              target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install workspace dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund --package-lock=false
+      - name: Emit exact Prettier diff
+        run: |
+          npx prettier --write apps/studio/src/styles.css tooling/vitest/contract/studio-import-boundary.test.ts
+          echo '--- EXACT PRETTIER DIFF START ---'
+          git diff -- apps/studio/src/styles.css tooling/vitest/contract/studio-import-boundary.test.ts
+          echo '--- EXACT PRETTIER DIFF END ---'
+      - name: Publish success status
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: 'success',
+              context: 'electrocraft/M01.4-format-diagnostic',
+              description: 'Formatting diagnostic complete',
+              target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });
