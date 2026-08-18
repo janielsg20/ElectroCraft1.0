@@ -1,0 +1,18 @@
+{
+  "engine": "tiptap",
+  "schemaVersion": 1,
+  "value": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "ElectroCraft rich text"
+          }
+        ]
+      }
+    ]
+  }
+}
