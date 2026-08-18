@@ -104,3 +104,6 @@ The target compiler receives the frozen IR revision plus a separate `TargetCompi
 
 ## Contracts location rule
 F01 fixed exactly 17 owner packages and assigned canonical contracts to `@electrocraft/domain`. Therefore the historical F02 path `packages/contracts/` is implemented as `packages/domain/src/contracts/`; do not create an 18th package.
+
+## Enforcement gate
+M02.8 fails closed when a complete application registry or runtime/content collection appears inside canonical project data, and diagnostics must provide code, path, cause and repair guidance.
