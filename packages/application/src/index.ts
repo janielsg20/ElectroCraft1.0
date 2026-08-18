@@ -1,5 +1,7 @@
 import { packageDescriptor as dep0 } from '@electrocraft/domain';
 
+export * from './project-document-service';
+
 export const packageDescriptor = Object.freeze({
   name: '@electrocraft/application',
   responsibility: 'casos de uso y ports de aplicación',
