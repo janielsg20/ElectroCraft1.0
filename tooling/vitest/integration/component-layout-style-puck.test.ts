@@ -4,10 +4,7 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { Render } from '@puckeditor/core';
 import { describe, expect, it } from 'vitest';
-import {
-  electroCraftComponentDefinitionSchema,
-  type ElectroCraftObjectId,
-} from '@electrocraft/domain';
+import { electroCraftComponentDefinitionSchema, type ElectroCraftObjectId } from '@electrocraft/domain';
 import {
   ComponentDefinitionService,
   type CanonicalComponentDefinitionRecord,

@@ -19,10 +19,7 @@ export interface CanonicalComponentDefinitionRepository {
 }
 
 export type ComponentDefinitionBlockedCode =
-  | 'INVALID_COMPONENT_DEFINITION'
-  | 'REFERENCE_ERROR'
-  | 'PERSISTENCE_ERROR'
-  | 'MISSING_COMPONENT_DEFINITION';
+  'INVALID_COMPONENT_DEFINITION' | 'REFERENCE_ERROR' | 'PERSISTENCE_ERROR' | 'MISSING_COMPONENT_DEFINITION';
 
 export interface ComponentDefinitionBlockedResult {
   status: 'blocked';

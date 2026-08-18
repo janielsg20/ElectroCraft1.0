@@ -199,7 +199,7 @@ function migratedLayout(mode: z.infer<typeof legacyComponentDefinitionSchema>['l
     align: 'stretch' as const,
     justify: 'start' as const,
     wrap: false,
-    columns: canonicalMode === 'grid' ? columns ?? 1 : null,
+    columns: canonicalMode === 'grid' ? (columns ?? 1) : null,
   };
 }
 
