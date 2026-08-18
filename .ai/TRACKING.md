@@ -14,34 +14,38 @@ Historial detallado:
 | F01 Gate | GREEN | `.ai/evidence/F01/M01.6/CLOSURE_2026-08-18.md` |
 | M02.1 | COMPLETADA | `.ai/evidence/F02/M02.1/CLOSURE_2026-08-18.md` |
 | M02.2 | COMPLETADA | `.ai/evidence/F02/M02.2/CLOSURE_2026-08-18.md` |
-| M02.3 | ACTIVE | `.ai/microphases/M02_3.md` |
+| M02.3 | COMPLETADA | `.ai/evidence/F02/M02.3/CLOSURE_2026-08-18.md` |
+| M02.4 | ACTIVE | `.ai/microphases/M02_4.md` |
 
 ## Cierre M02.1
 - PR `#3`; squash merge `cf4649d98f96a553daa020581a918d9559131137`.
 - Zod `4.4.3`; ProjectDefinition/Document/IDs/refs/migración `page -> screen`; repository port; 12/12 tests; artifact `9336023224`.
 
 ## Cierre M02.2
-- PR: `#4` — `Implement M02.2 component layout style contracts`.
-- Squash merge a `main`: `80a30bb992804a5c0bc839b001022f844001754a`.
-- Canonical owner: `packages/domain/src/contracts/`; no se creó `packages/contracts` porque F01 mantiene 17 owners estables.
-- `ElectroCraftComponentDefinition`, `ElectroCraftLayout` y `ElectroCraftStyle` versionados y strict/fail-closed.
-- Layout semántico: `flow`, `stack`, `row`, `grid`, `overlay`.
-- Style estructurado con tokens/valores y overrides responsive/platform; Tailwind/NativeWind strings no son fuente canónica.
-- Migración legacy de ComponentDefinition y round-trip determinista.
-- Application boundary: `ComponentDefinitionService` + repository port para save/reopen/migration write-back.
-- Adapter real: `@electrocraft/editor-puck` usa API pública `Config`/`ComponentConfig`; renderer se inyecta y nunca se persiste.
-- Engine pin: `@puckeditor/core@0.22.4`; Zod continúa en `4.4.3`; lockfile reproducible validado con `npm ci`.
-- Tests dedicados M02.2: unit/contract/integration `12/12` verdes, incluyendo `Render` real de Puck y persistence/reopen/migration.
-- Gate M02.2 final en `main`: run `32170341661` — `success`.
-- Marker: `PASS_M02_2_COMPONENT_LAYOUT_STYLE`.
-- Artifact final: `9337016899` — `m02-2-component-layout-style-evidence`.
-- Digest: `sha256:422bc021de29231f08aff28064099eb6b0632e1ef3aa33bdabb970d9a734907b`.
-- Revalidación completa del mismo head: M00.9, M00.10, M00.11, M01.1, M01.2, M01.3, M01.4, M02.1 y M02.2 en `success`.
-- Adaptaciones durante CI: se restauró la versión interna `@electrocraft/editor-puck` a `0.0.0-m01.3` para conservar coherencia de workspaces; se usó el `Config` público por defecto de Puck 0.22.4 para evitar un genérico incompatible; helpers temporales de lock/formato fueron retirados antes del head final.
+- PR `#4`; squash merge `80a30bb992804a5c0bc839b001022f844001754a`.
+- ComponentDefinition/Layout/Style portables/versionados; adapter real Puck `0.22.4`; 12/12 tests; run `32170341661`; artifact `9337016899`.
+
+## Cierre M02.3
+- Implementación integrada en `main`: `9bc51e70407ea37b48072e48cf5c01a1e2719565`.
+- Canonical owner: `packages/domain/src/contracts/`; DataSource/DataSchema/DataModel/Query/Form bindings versionados y strict/fail-closed.
+- `ElectroCraftDataSourceDefinition` conserva config no sensible y `authRef`; no persiste credenciales/tokens.
+- `ElectroCraftDataSchema` valida models, fields, relaciones e índices/facets por referencia.
+- `ElectroCraftQueryDefinition` conserva source/schema/model, condiciones, sort, pagination/cache sin internals del engine.
+- `@electrocraft/query-rqb` usa React Query Builder `8.23.0` y mantiene SQL parametrizado con valores separados en params.
+- `ConnectorRegistry` vive en application como registry efímero; no forma parte del ProjectDefinition persistido.
+- Form continúa como `ElectroCraftDocument kind=form` con `formMeta`; no se creó un segundo árbol de formularios.
+- `data-core`, `query-rqb` y `forms` se reutilizan como owners/adapters existentes.
+- Tests dedicados M02.3: unit/contract/integration `13/13` verdes.
+- Suite raíz observada en el mismo gate: Vitest `55/55`, Node `27/27`, Playwright `1/1`; lint, typecheck, boundaries, build y PWA verdes.
+- Integración real RQB `8.23.0` + PGlite `0.5.5` verde, incluyendo query parametrizada, persistence, facets y multi-source.
+- Gate M02.3 en `main`: run `32173466071` — `success`.
+- Marker: `PASS_M02_3_DATA_QUERY_FORM_OWNERSHIP`.
+- Artifact: `9338135809` — `m02-3-data-query-form-evidence`.
+- Digest: `sha256:59cb527f9451c0e1c1e1d22f9fc5ee3600041b0a29bd0c44f53ab8fbf0428382`.
 - P0/P1: `0`.
 
 ## Gate actual
-F02 continúa activa con `GREEN_THROUGH_M02.2`.
+F02 continúa activa con `GREEN_THROUGH_M02.3`.
 
 ## Siguiente transición permitida
-Cerrar M02.3 con ownership portable de Data Sources/Data Models/Queries/Forms, bindings, query safety/result integration y evidencia; después avanzar exclusivamente a M02.4.
+Implementar y cerrar exclusivamente M02.4 con ActionGraph, State, Route/Navigation y Permission contracts portables/versionados, migrations/round-trip, refs estables, tests de scope/persistence y evidencia; después avanzar a M02.5.
