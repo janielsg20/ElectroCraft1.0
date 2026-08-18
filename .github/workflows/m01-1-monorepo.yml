@@ -81,7 +81,10 @@ jobs:
       - name: Emit M01.1 closure candidate marker
         run: |
           test -f tooling/dist/workspace-report.json
-          test -f apps/studio/dist/studio-architecture.js
+          test -f apps/studio/dist/index.html
+          test -f apps/studio/dist/manifest.webmanifest
+          test -f apps/studio/dist/sw.js
+          test -f tooling/dist/m01-4-studio-bootstrap-report.json
           echo PASS_M01_1_MONOREPO | tee m01-1-closure.log
       - uses: actions/upload-artifact@v4
         if: always()
