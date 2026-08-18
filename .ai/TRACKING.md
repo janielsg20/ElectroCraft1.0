@@ -10,9 +10,9 @@ El tracking histórico previo a M00.9 se conserva íntegro en `.ai/TRACKING_HIST
 - F00: `COMPLETADA`.
 - M00.9, M00.10 y M00.11: `COMPLETADAS` con evidencia real de GitHub Actions.
 - F01 activa.
-- M01.1, M01.2 y M01.3: `COMPLETADAS` con evidencia real de GitHub Actions.
-- M01.4: implementación y gate dedicado `success`; cierre formal pendiente únicamente de terminar la revalidación heredada sobre el head de compatibilidad.
-- Próxima microfase bloqueada hasta cierre documental: M01.5 — Crear CI base.
+- M01.1, M01.2, M01.3 y M01.4: `COMPLETADAS` con evidencia real de GitHub Actions.
+- Gate actual: `GREEN_THROUGH_M01.4`.
+- Próxima microfase exacta: M01.5 — Crear CI base.
 
 ## M00.9 — Data Sources — COMPLETADA
 - Engine/API: `@scalar/openapi-parser@0.28.11` real + REST/GraphQL/Gateway fixtures.
@@ -67,7 +67,7 @@ El tracking histórico previo a M00.9 se conserva íntegro en `.ai/TRACKING_HIST
 - Artifact `9311487017` — `m01-3-quality-toolchain-evidence`.
 - Commit status: `electrocraft/M01.3 = success`.
 
-## M01.4 — Studio Vite/PWA bootstrap — CIERRE EN VALIDACIÓN FINAL
+## M01.4 — Studio Vite/PWA bootstrap — COMPLETADA
 ### Implementación
 - Commit inicial: `e3f8ef23de22918f27d68a69e188fa9daf09553e`.
 - React/Vite TypeScript composition root real en `apps/studio`.
@@ -75,7 +75,7 @@ El tracking histórico previo a M00.9 se conserva íntegro en `.ai/TRACKING_HIST
 - Route temporal `/` con Project Home de desarrollo y health `ready/blocked` fail-closed.
 - Help ID canónico `help.architecture.repository` preservado.
 - No demo data ni modelo de navegación paralelo.
-- Declaración `vite/client` añadida en `apps/studio/src/vite-env.d.ts` para que TypeScript conozca imports de assets/CSS sin relajar el typecheck.
+- Declaración `vite/client` en `apps/studio/src/vite-env.d.ts` para que TypeScript reconozca imports de assets/CSS sin relajar el typecheck.
 
 ### Engine/API utilizado
 - React `19.2.8` + React DOM `19.2.8`.
@@ -95,9 +95,21 @@ El tracking histórico previo a M00.9 se conserva íntegro en `.ai/TRACKING_HIST
 - Gates verdes: exact pins, Prettier/lint, typecheck, boundaries, Node tests, Vitest unit/contract/integration, Vite production build, PWA artifact verification, Playwright QA y closure marker.
 
 ### Correcciones observadas por CI
-1. Run `32145287163`: Prettier detectó drift en dos archivos; se aplicó exactamente el formato emitido por Prettier 3.9.6, sin cambios lógicos.
-2. Run `32146232918`: TypeScript detectó `TS2882` para `./styles.css`; se añadió `vite/client` y el gate permaneció estricto.
-3. Revalidación heredada M01.1 detectó una aserción obsoleta al antiguo `apps/studio/dist/studio-architecture.js`. Commit `ed4e9f12486b3ddf4f3351517867a6ee9cd73a15` actualiza únicamente ese closure gate para validar `index.html`, `manifest.webmanifest`, `sw.js` y `tooling/dist/m01-4-studio-bootstrap-report.json`.
+1. Run `32145287163`: Prettier detectó drift en `apps/studio/src/styles.css` y `tooling/vitest/contract/studio-import-boundary.test.ts`; se aplicó exactamente el formato esperado, sin cambios lógicos.
+2. Run `32146232918`: TypeScript detectó `TS2882` para `./styles.css`; se añadió `vite/client` manteniendo el gate estricto.
+3. La revalidación heredada M01.1 detectó una aserción obsoleta al antiguo `apps/studio/dist/studio-architecture.js`. Commit `ed4e9f12486b3ddf4f3351517867a6ee9cd73a15` cambió solo ese closure gate para validar `index.html`, `manifest.webmanifest`, `sw.js` y `tooling/dist/m01-4-studio-bootstrap-report.json`.
+
+### Revalidación heredada sobre el head de compatibilidad
+Head: `ed4e9f12486b3ddf4f3351517867a6ee9cd73a15`.
+
+- M00.9 — `success`; run `32146926071`.
+- M00.10 — `success`; run `32146926071`, incluidos static parity, Capacitor, LAMP/MySQL/PDO/CSRF, WordPress wp-env y closure gate.
+- M00.11 — `success`; run `32147304063`.
+- M01.1 — `success`; run `32147392932`; marker actualizado para el artifact PWA vigente.
+- M01.2 — `success`; run `32147392932`.
+- M01.3 — `success`; run `32147392932`.
+
+La evidencia formal se conserva en `.ai/evidence/F01/M01.4/CLOSURE_2026-08-18.md`.
 
 ## Correcciones de CI incorporadas durante el cierre
 1. Los workflows publican commit statuses `pending`/`success`/`failure` con `target_url`; el conector ya no depende de una lista de checks vacía.
@@ -110,4 +122,4 @@ El tracking histórico previo a M00.9 se conserva íntegro en `.ai/TRACKING_HIST
 8. Desde M01.4, M01.1 valida el artifact PWA vigente en vez del artifact temporal de librería usado antes de que existiera la app real.
 
 ## Regla de continuación
-No iniciar M01.5 hasta que la revalidación heredada provocada por `ed4e9f12486b3ddf4f3351517867a6ee9cd73a15` termine verde y el cierre documental de M01.4 se publique sobre `main`.
+M01.4 está formalmente `COMPLETADA`. La siguiente y única microfase activa debe ser M01.5 — **Crear CI base** siguiendo `.ai/microphases/M01_5.md`.
