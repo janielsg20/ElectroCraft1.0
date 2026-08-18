@@ -4,7 +4,7 @@ Product:
 ElectroCraft — No-Code App Builder.
 
 Execution:
-F00 / M00.1, M00.2, M00.3, M00.4, M00.5, M00.6 and M00.7 COMPLETADAS; M00.8 activa.
+F00 / M00.1–M00.8 COMPLETADAS; M00.9 activa.
 
 M00.1 frozen invariants:
 - R001–R084 tienen owner canónico, fase y aplicabilidad.
@@ -22,7 +22,7 @@ M00.2 frozen invariants:
 - PGlite owns embedded local Postgres runtime and official multi-tab Worker behavior; Drizzle owns typed SQL/schema/migrations.
 - TanStack Query owns async cache. Refine is Administration only. TanStack Table owns table mechanics. RHF owns React form state. Zod owns schemas. RQB owns narrow condition authoring.
 - Rete owns workflow graph/processing; Tiptap owns rich text; Zustand owns declared JS runtime state.
-- Gemini Interactions core is GA in API `v1`; `v1beta`, preview models/agents/tools remain capability-gated. AI SDK + `@ai-sdk/google` remains the primary abstraction; `@google/genai` is narrow/capability-specific.
+- Gemini Interactions core is GA in API `v1`; preview capabilities remain capability-gated. AI SDK + `@ai-sdk/google` is the primary abstraction; `@google/genai` is narrow/capability-specific.
 - AI only writes Draft; Apply remains explicit.
 - Expo SQLite native lane is stable; web is alpha/capability-gated.
 - dnd-kit upstream package/API transition must be pinned by the owning POC and never duplicates Puck surfaces.
@@ -84,14 +84,29 @@ M00.7 frozen invariants:
 - Final CI source of truth: run `32078336103`, source/build job `95536145137`, Android job `95536362004`, head `c6e05a475fa0df7fd7ba2a8138e1392bcf6df797`, conclusion SUCCESS.
 - Final artifacts: Android `9304563117`; source/build `9304237635`.
 
-M00.8 active decisions under test:
+M00.8 frozen invariants:
+- Product purpose: Gemini generates/refines **code for components, plugins and sections**. Image generation is not an M00.8 requirement and must not be reintroduced as its gate.
 - Primary provider/orchestration stack = AI SDK Core + `@ai-sdk/google` + Zod.
-- Candidate pins: `ai@7.0.48`, `@ai-sdk/google@4.0.31`, `@google/genai@2.15.0`, `zod@4.4.3`, TypeScript `6.0.3`.
-- Direct `@google/genai` is limited to one stable Gemini Interactions `v1` capability probe and cannot duplicate structured output/tools/streaming/image orchestration owned by AI SDK.
-- Canonical project data persists logical profiles only (`Automático`, `Rápido`, `Calidad`, `Imagen`); resolved model IDs are runtime/session metadata.
+- Proven pins: `ai@7.0.48`, `@ai-sdk/google@4.0.31`, `@google/genai@2.15.0`, `zod@4.4.3`, TypeScript `6.0.3`; committed lockfile + `npm ci` are mandatory.
+- Direct `@google/genai` is restricted to one stateless Gemini Interactions `v1` code-generation probe (`store:false`) and cannot duplicate structured output/tools/streaming owned by AI SDK.
+- Canonical project data persists logical profiles only: `Automático | Rápido | Calidad | Código`; resolved model IDs are runtime/session metadata.
+- `CodeArtifactPoc` supports `component | plugin | section`, multi-file code, `entryFile`, dependency proposals and validation checks. Generated output stays Draft-only.
+- Provider schema uses `draftOnly: boolean` for Gemini JSON-schema compatibility; ElectroCraft boundary rejects `draftOnly !== true`.
+- Generated artifacts fail closed on absolute/traversal/duplicate paths, invalid `entryFile` and secret references.
 - Gemini/provider secret is server-side gateway only; client contract never contains provider packages or credential fields.
-- Model tools are read/draft/validate only; Apply, DB/SQL, arbitrary code, filesystem, install, deploy and secret access remain forbidden/fail-closed.
-- M00.8 cannot close until published-package type/tests/build/security and live Gemini structured/tools/stream/image/Interactions gates are GREEN.
+- Model tools are read/draft/validate only; Apply, DB/SQL, arbitrary code execution, filesystem writes, install, deploy and secret access are forbidden/fail-closed.
+- Final live CI proved structured code plan, real code artifact, bounded tool loop, streaming, cancellation and Interactions `v1`.
+- Final CI source of truth: run `32088311808`, head `9f732e1715da3f6b953dec05223d22b2773b3225`, conclusion SUCCESS; static job `95565335277`; live job `95565379219`.
+- Live output: `PASS_LIVE_GEMINI_CODE`; closure: `PASS_LIVE_CLOSURE_GATE`.
+- Generated component evidence: 1 TSX file, 1609 bytes, SHA-256 `6805458a7e430a6ce49c664397b4514ed2ec325adb5a7c3e23ed8c6515cb6d18`.
+- Final artifacts: live `9307469682` digest `sha256:4f85501c817461cdd1964f4dcc5ce06886fc32ef3be571e80a1757dbf1a32694`; static `9307452584` digest `sha256:624c5ee51052e1de73877ee68e940bdcc421dce8d1aee8298a703266298819e6`.
+
+M00.9 active gate:
+- Build an isolated `DataSourceAdapter` POC for REST/OpenAPI + GraphQL + Gateway/SecretRef.
+- Normalize both protocols to one `DataResult {data, errors, pageInfo, meta}` contract.
+- Client may carry a SecretRef identifier but never the secret value.
+- No PostgreSQL/MySQL browser driver in Core and no second query cache.
+- Do not close M00.9 without real REST read/write, OpenAPI discovery, GraphQL query/mutation, gateway/secret scan, unsupported-capability test, lint/typecheck/test/build and ADR evidence.
 
 Core mental model:
 Screens, Navigation, Components, Data Sources, Queries, State, Actions, Forms, Auth, Administration, Resources.
