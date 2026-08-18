@@ -17,7 +17,7 @@ El changelog histórico original hasta M00.8 se preserva sin modificaciones en `
 - M01.6 normalizó `AGENTS/.ai`, separó MEMORY/STATE/TRACKING/HANDOFF, archivó reviews históricos, añadió ADR y un gate documental fail-closed.
 - F01 quedó cerrada y la ejecución pasó a F02.
 
-## 2026-08-18 — F02 progreso hasta M02.7
+## 2026-08-18 — F02 progreso hasta M02.8
 - M02.1 fijó `ElectroCraftProjectDefinition`, `ElectroCraftDocument`, IDs/refs y boundary Zod canónico.
 - M02.2 fijó Component/Layout/Style portables y el adapter real de Puck.
 - M02.3 fijó ownership de DataSource/DataSchema/DataModel/Query/Form y adapters RQB/PGlite.
@@ -25,5 +25,7 @@ El changelog histórico original hasta M00.8 se preserva sin modificaciones en `
 - M02.5 fijó Theme, Blueprint, registries y capability analysis, manteniendo exactamente 17 owner packages y schema v3.
 - M02.6 consolidó serialización JSON determinista, checksum portable, `ElectroCraftMigrationRegistry` v1→v2→v3 e import transaccional sin mutación de storage ante errores.
 - M02.7 añadió `ElectroCraftExportIR` immutable/versionado y neutral a targets, los nueve `ExportTargetId`, `TargetCompileContext` separado, `ExportValidationReport` fail-closed, Media manifest portable y boundary común de revisión para web/native.
-- M02.7 cerró con Node `27/27`, Vitest `108/108`, Playwright `1/1`, gate main `32191193359`, artifact `9344256616` y digest `sha256:52f1fd78d673b8094bf29be9d1b47e8aa7a1b92aa8f8c4b9e6f219687a3d375b`.
-- La ejecución activa pasa a F02 / M02.8 para clasificar Project Objects vs Registries vs Content Entities.
+- M02.8 fijó una taxonomía ejecutable de 26 modelos: 14 Project Objects, 6 Application Registries y 6 Content Entities; documentó storage/serializer/migration/export ownership y añadió un boundary fail-closed contra registries completos o content collections embebidos en ProjectDefinition/ExportIR.
+- M02.8 mantuvo ProjectDefinition/Document v3 sin nueva migración; solo definitions `origin=user` pueden persistirse por ref y el contenido runtime se obtiene por resolver/manifest.
+- M02.8 cerró con suite dedicada `9/9`, gate main `32193738411`, artifact `9345132952` y digest `sha256:7751ba52ff3cf167dad37e604617a1ac2fef808491952394bdb83023c825af1f`.
+- La ejecución activa pasa a F02 / M02.9 para wrappers versionados de payloads OSS permitidos antes del gate final de F02.
