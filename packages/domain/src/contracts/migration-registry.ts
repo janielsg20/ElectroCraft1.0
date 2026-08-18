@@ -12,6 +12,22 @@ export interface ElectroCraftMigrationResult {
   appliedStepIds: string[];
 }
 
+export function cloneElectroCraftMigrationValue(value: unknown): unknown {
+  if (value === null || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return value;
+  }
+  if (Array.isArray(value)) return value.map((item) => cloneElectroCraftMigrationValue(item));
+  if (typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>).map(([key, item]) => [
+        key,
+        cloneElectroCraftMigrationValue(item),
+      ]),
+    );
+  }
+  throw new TypeError('migration values must be portable canonical data');
+}
+
 export class ElectroCraftMigrationRegistry {
   readonly #steps = new Map<number, ElectroCraftMigrationStep>();
 
@@ -42,13 +58,13 @@ export class ElectroCraftMigrationRegistry {
     }
 
     let currentVersion = fromVersion;
-    let value = structuredClone(input);
+    let value = cloneElectroCraftMigrationValue(input);
     const appliedStepIds: string[] = [];
 
     while (currentVersion < targetVersion) {
       const step = this.#steps.get(currentVersion);
       if (!step) throw new TypeError(`missing migration step from v${currentVersion}`);
-      value = step.migrate(structuredClone(value));
+      value = step.migrate(cloneElectroCraftMigrationValue(value));
       currentVersion = step.toVersion;
       appliedStepIds.push(step.id);
     }
