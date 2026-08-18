@@ -1,14 +1,17 @@
-import { readFileSync } from 'node:fs';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const root = path.resolve(here, '../../..');
 
 describe('M01.6 documentation consistency report', () => {
   it('is ready and identifies a single valid active microphase', () => {
-    const report = JSON.parse(
-      readFileSync(
-        'tooling/dist/m01-6-doc-conventions-report.json',
-        'utf8',
-      ),
-    ) as {
+    const reportPath = path.join(root, 'tooling/dist/m01-6-doc-conventions-report.json');
+    expect(fs.existsSync(reportPath)).toBe(true);
+
+    const report = JSON.parse(fs.readFileSync(reportPath, 'utf8')) as {
       status: string;
       activeMicrophase: string | null;
       errors: string[];
