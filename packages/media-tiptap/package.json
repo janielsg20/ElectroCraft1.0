@@ -11,7 +11,10 @@
   ],
   "dependencies": {
     "@electrocraft/domain": "0.0.0-m01.3",
-    "@tiptap/html": "3.29.2",
-    "@tiptap/starter-kit": "3.29.2"
+    "@tiptap/core": "3.29.2",
+    "@tiptap/extension-document": "3.29.2",
+    "@tiptap/extension-paragraph": "3.29.2",
+    "@tiptap/extension-text": "3.29.2",
+    "@tiptap/html": "3.29.2"
   }
 }
