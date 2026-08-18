@@ -17,12 +17,13 @@ El changelog histórico original hasta M00.8 se preserva sin modificaciones en `
 - M01.6 normalizó `AGENTS/.ai`, separó MEMORY/STATE/TRACKING/HANDOFF, archivó reviews históricos, añadió ADR y un gate documental fail-closed.
 - F01 quedó cerrada y la ejecución pasó a F02.
 
-## 2026-08-18 — F02 progreso hasta M02.6
+## 2026-08-18 — F02 progreso hasta M02.7
 - M02.1 fijó `ElectroCraftProjectDefinition`, `ElectroCraftDocument`, IDs/refs y boundary Zod canónico.
 - M02.2 fijó Component/Layout/Style portables y el adapter real de Puck.
 - M02.3 fijó ownership de DataSource/DataSchema/DataModel/Query/Form y adapters RQB/PGlite.
 - M02.4 fijó ActionGraph/State/Route/Navigation/Role/PermissionPolicy con Rete/Zustand y permisos fail-closed.
 - M02.5 fijó Theme, Blueprint, registries y capability analysis, manteniendo exactamente 17 owner packages y schema v3.
 - M02.6 consolidó serialización JSON determinista, checksum portable, `ElectroCraftMigrationRegistry` v1→v2→v3 e import transaccional sin mutación de storage ante errores.
-- Gate M02.6 en `main` run `32186495673`: `success`; artifact `9342646837`, digest `sha256:35ce99bc90392494dd1d0e6a276a41ec245e4b62a849a6d6f59fb454404121cc`.
-- La ejecución activa pasa a F02 / M02.7 para definir `ElectroCraftExportIR` neutral a los nueve targets.
+- M02.7 añadió `ElectroCraftExportIR` immutable/versionado y neutral a targets, los nueve `ExportTargetId`, `TargetCompileContext` separado, `ExportValidationReport` fail-closed, Media manifest portable y boundary común de revisión para web/native.
+- M02.7 cerró con Node `27/27`, Vitest `108/108`, Playwright `1/1`, gate main `32191193359`, artifact `9344256616` y digest `sha256:52f1fd78d673b8094bf29be9d1b47e8aa7a1b92aa8f8c4b9e6f219687a3d375b`.
+- La ejecución activa pasa a F02 / M02.8 para clasificar Project Objects vs Registries vs Content Entities.
