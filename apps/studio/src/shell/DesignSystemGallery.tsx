@@ -28,6 +28,7 @@ import {
   type ElectroCraftStudioDensity,
   type ElectroCraftStudioThemeMode,
 } from '@electrocraft/design-system';
+import type { StudioBootstrapHealth } from '../bootstrap-health';
 import { getStudioHelpDescriptor } from '../help/studio-shell-help';
 import { tStudio, type StudioMessageKey } from '../i18n/es';
 
@@ -78,15 +79,21 @@ function IconLabel({ iconId, label }: { iconId: ElectroCraftIconId; label: strin
 
 function ThemeControls() {
   const { appearance, resolvedTheme, setTheme, setDensity } = useStudioTheme();
+  const resolvedLabel = appearance.theme === 'light' ? 'gallery.themeLight' : 'gallery.themeDark';
   return (
-    <section className="grid gap-3 rounded-lg border bg-card p-3 shadow-[var(--ec-shadow-panel)]" aria-labelledby="appearance-title">
+    <section
+      className="grid gap-3 rounded-lg border bg-card p-3 shadow-[var(--ec-shadow-panel)]"
+      aria-labelledby="appearance-title"
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 id="appearance-title" className="text-sm font-semibold text-card-foreground">
             {tStudio('gallery.theme')}
           </h2>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {appearance.theme === 'system' ? `${tStudio('gallery.themeSystem')} · ${resolvedTheme}` : tStudio(`gallery.theme${appearance.theme === 'light' ? 'Light' : 'Dark'}`)}
+            {appearance.theme === 'system'
+              ? `${tStudio('gallery.themeSystem')} · ${resolvedTheme}`
+              : tStudio(resolvedLabel)}
           </p>
         </div>
         <Badge variant="outline">{appearance.density}</Badge>
@@ -133,7 +140,10 @@ function PrimitiveStates() {
   const SettingsIcon = getElectroCraftIcon('settings');
   const MoreIcon = getElectroCraftIcon('blocks');
   return (
-    <section className="grid gap-3 rounded-lg border bg-card p-3 shadow-[var(--ec-shadow-panel)]" aria-labelledby="states-title">
+    <section
+      className="grid gap-3 rounded-lg border bg-card p-3 shadow-[var(--ec-shadow-panel)]"
+      aria-labelledby="states-title"
+    >
       <div className="flex items-center justify-between gap-2">
         <h2 id="states-title" className="text-sm font-semibold text-card-foreground">
           {tStudio('gallery.actions')}
@@ -183,12 +193,17 @@ function PrimitiveStates() {
               <DropdownMenuItem>{tStudio('nav.compatibility')}</DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>{tStudio('nav.help')}<DropdownMenuShortcut>?</DropdownMenuShortcut></DropdownMenuItem>
+            <DropdownMenuItem>
+              {tStudio('nav.help')}
+              <DropdownMenuShortcut>?</DropdownMenuShortcut>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         <Sheet>
           <SheetTrigger asChild>
-            <Button size="sm" variant="outline">{tStudio('gallery.openTools')}</Button>
+            <Button size="sm" variant="outline">
+              {tStudio('gallery.openTools')}
+            </Button>
           </SheetTrigger>
           <SheetContent side="right">
             <SheetHeader>
@@ -205,7 +220,10 @@ function PrimitiveStates() {
 
 function NavigationPrimitiveList() {
   return (
-    <section className="min-h-0 rounded-lg border bg-card shadow-[var(--ec-shadow-panel)]" aria-labelledby="navigation-primitives-title">
+    <section
+      className="min-h-0 rounded-lg border bg-card shadow-[var(--ec-shadow-panel)]"
+      aria-labelledby="navigation-primitives-title"
+    >
       <div className="border-b px-3 py-2.5">
         <h2 id="navigation-primitives-title" className="text-sm font-semibold text-card-foreground">
           {tStudio('gallery.shellPreview')}
@@ -224,17 +242,30 @@ function NavigationPrimitiveList() {
   );
 }
 
-export function DesignSystemGallery() {
+export function DesignSystemGallery({ health }: { health: StudioBootstrapHealth }) {
   const help = getStudioHelpDescriptor('help.studio.shell');
+  const HelpIcon = getElectroCraftIcon('help');
   return (
     <main className="min-h-screen bg-background text-foreground" data-help-id={help.id}>
       <div className="mx-auto grid w-full max-w-[92rem] gap-3 p-3 md:p-4 xl:grid-cols-[minmax(14rem,18rem)_minmax(0,1fr)]">
         <NavigationPrimitiveList />
         <div className="grid min-w-0 content-start gap-3">
           <header className="rounded-lg border bg-card p-4 shadow-[var(--ec-shadow-panel)]">
-            <p className="text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{tStudio('gallery.kicker')}</p>
-            <h1 className="mt-1 text-xl font-semibold tracking-tight text-card-foreground md:text-2xl">{tStudio('gallery.title')}</h1>
-            <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">{tStudio('gallery.summary')}</p>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                  {tStudio('gallery.kicker')}
+                </p>
+                <h1 className="mt-1 text-xl font-semibold tracking-tight text-card-foreground md:text-2xl">
+                  {tStudio('gallery.title')}
+                </h1>
+                <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">{tStudio('gallery.summary')}</p>
+              </div>
+              <div className="flex max-w-sm items-start gap-2" role="status" aria-live="polite">
+                <Badge variant={health.state === 'ready' ? 'success' : 'warning'}>{health.label}</Badge>
+                <span className="text-xs leading-5 text-muted-foreground">{health.detail}</span>
+              </div>
+            </div>
           </header>
           <div className="grid gap-3 lg:grid-cols-2">
             <ThemeControls />
@@ -242,9 +273,11 @@ export function DesignSystemGallery() {
           </div>
           <aside className="rounded-lg border bg-surface-sunken p-3" aria-labelledby="help-title">
             <div className="flex items-start gap-2">
-              {React.createElement(getElectroCraftIcon('help'), { className: 'mt-0.5 size-4 shrink-0', 'aria-hidden': true })}
+              <HelpIcon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
               <div>
-                <h2 id="help-title" className="text-sm font-semibold">{help.title}</h2>
+                <h2 id="help-title" className="text-sm font-semibold">
+                  {help.title}
+                </h2>
                 <p className="mt-1 text-xs leading-5 text-muted-foreground">{help.summary}</p>
                 <p className="mt-1 text-[0.7rem] font-mono text-muted-foreground">{help.id}</p>
               </div>
