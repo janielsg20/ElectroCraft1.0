@@ -2,7 +2,7 @@
   "id": "help.architecture.models",
   "locale": "es",
   "title": "Modelo canónico del proyecto",
-  "summary": "Explica ownership portable de proyecto, documentos, componentes, datos, queries, formularios, acciones, estado, navegación, permisos y adapters sin persistir internals de engines.",
+  "summary": "Explica ownership portable de proyecto, documentos, componentes, datos, queries, formularios, acciones, estado, navegación, permisos, temas, blueprints y registries sin persistir internals de engines.",
   "details": [
     "ElectroCraftProjectDefinition guarda identidad, settings y referencias por ID; no embebe todos los documentos en un mega JSON.",
     "ElectroCraftDocument usa screen, template, form, admin-screen o reusable-component; page solo existe como entrada legacy migrable a screen.",
@@ -19,6 +19,11 @@
     "ElectroCraftStateDefinition declara scope, tipo, default, persistence y sensibilidad; la instancia Zustand nunca forma parte del proyecto.",
     "ElectroCraftRouteDefinition y ElectroCraftNavigationDefinition usan refs estables y nunca persisten RouteObject, hooks o componentes de React Router/Expo Router.",
     "ElectroCraftRole referencia PermissionPolicy IDs; las policies son declarativas, fail-closed y deny prevalece sobre allow.",
+    "ElectroCraftTheme contiene exclusivamente tokens visuales, typography, variants, spacing, radius, shadows y motion.",
+    "Template sigue siendo ElectroCraftDocument kind=template con templateMeta y Display Conditions; no existe ElectroTemplate paralelo.",
+    "ElectroCraftBlueprintPackage es externo/versionado; el proyecto solo conserva originBlueprint y objetos instalados normales.",
+    "ElectroPlatformCapabilityRegistry y Component/Field/Action/Provider registries viven en application y no se copian completos al proyecto.",
+    "ProjectDefinition v3 persiste requiredCapabilities, targetCapabilityOverrides y userRegistryDefinitionRefs; export-ir consume un reporte supported/adapted/blocked.",
     "Los schemas canónicos usan Zod strictObject/schemaVersion y application valida referencias cruzadas reparables."
   ]
 }
