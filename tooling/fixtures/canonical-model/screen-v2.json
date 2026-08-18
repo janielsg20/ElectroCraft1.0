@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 2,
+  "id": "ec_document_0000000000002",
+  "version": 2,
+  "name": "Inicio",
+  "kind": "screen",
+  "root": {
+    "id": "ec_node_0000000000003",
+    "componentRef": "core.root",
+    "props": {
+      "label": "Inicio"
+    },
+    "children": []
+  },
+  "references": {
+    "documentRefs": []
+  },
+  "metadata": {
+    "fixture": "m02.3"
+  },
+  "formMeta": null
+}
