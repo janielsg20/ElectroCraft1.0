@@ -77,7 +77,11 @@ export const electroCraftActionGraphSchema = z
     if (!entry) {
       context.addIssue({ code: 'custom', path: ['entryNodeRef'], message: 'entryNodeRef must reference a graph node' });
     } else if (entry.kind !== 'trigger') {
-      context.addIssue({ code: 'custom', path: ['entryNodeRef'], message: 'entryNodeRef must reference a trigger node' });
+      context.addIssue({
+        code: 'custom',
+        path: ['entryNodeRef'],
+        message: 'entryNodeRef must reference a trigger node',
+      });
     }
 
     const edgeIds = new Set<ElectroCraftObjectId>();
@@ -261,7 +265,11 @@ export const electroCraftPermissionPolicySchema = z
   .superRefine((policy, context) => {
     for (const [index, target] of policy.targets.entries()) {
       if (target.kind === 'field' && target.fieldRef === null) {
-        context.addIssue({ code: 'custom', path: ['targets', index, 'fieldRef'], message: 'field target requires fieldRef' });
+        context.addIssue({
+          code: 'custom',
+          path: ['targets', index, 'fieldRef'],
+          message: 'field target requires fieldRef',
+        });
       }
       if (target.kind !== 'field' && target.fieldRef !== null) {
         context.addIssue({

@@ -65,9 +65,9 @@ describe('M02.4 canonical action/state/navigation/permission contracts', () => {
   it('keeps RouteDefinition portable and rejects non-canonical route paths', () => {
     const route = electroCraftRouteDefinitionSchema.parse(fixture('route-v1'));
     expect(electroCraftRouteDefinitionSchema.safeParse({ ...route, path: 'inicio' }).success).toBe(false);
-    expect(
-      electroCraftRouteDefinitionSchema.safeParse({ ...route, reactRouterObject: { index: true } }).success,
-    ).toBe(false);
+    expect(electroCraftRouteDefinitionSchema.safeParse({ ...route, reactRouterObject: { index: true } }).success).toBe(
+      false,
+    );
   });
 
   it('rejects duplicate navigation item IDs across a nested tree', () => {
@@ -84,7 +84,9 @@ describe('M02.4 canonical action/state/navigation/permission contracts', () => {
     const policy = electroCraftPermissionPolicySchema.parse(fixture('permission-policy-v1'));
     const invalid = {
       ...policy,
-      targets: [{ kind: 'route' as const, resourceRef: policy.targets[0].resourceRef, fieldRef: 'ec_field_000000000000c' }],
+      targets: [
+        { kind: 'route' as const, resourceRef: policy.targets[0].resourceRef, fieldRef: 'ec_field_000000000000c' },
+      ],
     };
     expect(electroCraftPermissionPolicySchema.safeParse(invalid).success).toBe(false);
   });

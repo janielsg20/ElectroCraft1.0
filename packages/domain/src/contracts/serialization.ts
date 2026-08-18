@@ -243,8 +243,6 @@ export function canonicalRoleRoundTrip(role: ElectroCraftRole): ElectroCraftRole
   return deserializeElectroCraftRole(serializeElectroCraftRole(role));
 }
 
-export function canonicalPermissionPolicyRoundTrip(
-  policy: ElectroCraftPermissionPolicy,
-): ElectroCraftPermissionPolicy {
+export function canonicalPermissionPolicyRoundTrip(policy: ElectroCraftPermissionPolicy): ElectroCraftPermissionPolicy {
   return deserializeElectroCraftPermissionPolicy(serializeElectroCraftPermissionPolicy(policy));
 }
