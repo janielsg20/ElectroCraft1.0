@@ -32,11 +32,12 @@ The canonical `ElectroCraftQueryDefinition.conditions` remains the primary porta
 - `engine`: `tiptap`
 - wrapper `schemaVersion`: `1`
 - adapter owner: `@electrocraft/media-tiptap`
-- exact architecture pins: `@tiptap/html@3.29.2` and `@tiptap/starter-kit@3.29.2`.
-- `@tiptap/core` is the shared compatible peer resolved by those packages; it is not independently pinned as an ElectroCraft architecture contract.
-- allowed value: Tiptap/ProseMirror JSON document rooted at `{ type: "doc" }` using extensions available in the pinned adapter.
-- adapter validation: structural root validation plus real Tiptap JSON-to-HTML generation using StarterKit.
+- coherent engine family pinned exactly to `3.29.2`: `@tiptap/core`, `@tiptap/html`, `@tiptap/extension-document`, `@tiptap/extension-paragraph` and `@tiptap/extension-text`.
+- allowed value: Tiptap/ProseMirror JSON document rooted at `{ type: "doc" }` using the extension set available in the pinned adapter.
+- adapter validation: structural root validation plus real Tiptap JSON-to-HTML generation using only Document + Paragraph + Text for the baseline wrapper.
 - migration owner: `@electrocraft/media-tiptap`; current v1 payload is identity-migrated and future wrapper revisions must be migrated there.
+
+The baseline intentionally avoids the broad StarterKit aggregate. StarterKit permits compatible extension ranges, which can resolve multiple patch versions under a workspace lock and create type/runtime drift. Additional rich-text capabilities will be added as explicit pinned extensions when their owning microphase requires them.
 
 Tiptap JSON is used as the persisted engine payload rather than HTML so the editor can reconstruct structured rich text while keeping the wrapper JSON-portable.
 
