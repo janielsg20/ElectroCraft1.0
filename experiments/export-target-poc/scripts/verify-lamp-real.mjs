@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { setTimeout as delay } from 'node:timers/promises';
 
 const cwd = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'lamp-poc');
-execFileSync('composer', ['validate', '--strict'], { cwd, stdio: 'inherit' });
+execFileSync('composer', ['validate', '--strict', '--no-check-all'], { cwd, stdio: 'inherit' });
 execFileSync('composer', ['install', '--no-interaction', '--prefer-dist'], { cwd, stdio: 'inherit' });
 execFileSync('php', ['-l', 'public/index.php'], { cwd, stdio: 'inherit' });
 

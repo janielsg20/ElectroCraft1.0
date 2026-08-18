@@ -9,7 +9,10 @@ export function compileLamp(ir) {
   const title = escapePhpSingle(ir.screen.title);
   const files = {
     'composer.json': JSON.stringify({
-      name:'electrocraft/lamp-poc', type:'project', license:'MIT',
+      name:'electrocraft/lamp-poc',
+      description:'ElectroCraft LAMP export parity proof-of-concept',
+      type:'project',
+      license:'MIT',
       require:{php:'^8.2','slim/slim':'4.15.2','slim/psr7':'1.8.0','slim/csrf':'1.5.1'},
       autoload:{'psr-4':{'ElectroCraft\\Poc\\':'src/'}},
       config:{'sort-packages':true,'allow-plugins':{}}
