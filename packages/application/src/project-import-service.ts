@@ -1,4 +1,5 @@
 import {
+  createElectroCraftProjectSnapshot,
   createElectroCraftProjectSnapshotChecksum,
   electroCraftProjectSnapshotEnvelopeSchema,
   parseCanonicalJson,
@@ -82,18 +83,6 @@ export class ProjectImportService {
     }
 
     const envelope = envelopeResult.data;
-    const actualChecksum = createElectroCraftProjectSnapshotChecksum(envelope.snapshot);
-    if (actualChecksum !== envelope.checksum) {
-      return blocked([
-        {
-          code: 'CHECKSUM_MISMATCH',
-          path: ['checksum'],
-          message: `checksum esperado ${envelope.checksum}; checksum canónico actual ${actualChecksum}`,
-          repair: 'Regenera el snapshot desde objetos canónicos válidos; no edites manualmente un snapshot firmado por checksum.',
-        },
-      ]);
-    }
-
     const referenceDiagnostics = validateProjectDocumentReferences(
       envelope.snapshot.project,
       envelope.snapshot.documents,
@@ -109,7 +98,26 @@ export class ProjectImportService {
       );
     }
 
-    return { status: 'ready', envelope };
+    const normalizedSnapshot = createElectroCraftProjectSnapshot(
+      envelope.snapshot.project,
+      envelope.snapshot.documents,
+    );
+    const actualChecksum = createElectroCraftProjectSnapshotChecksum(normalizedSnapshot);
+    if (actualChecksum !== envelope.checksum) {
+      return blocked([
+        {
+          code: 'CHECKSUM_MISMATCH',
+          path: ['checksum'],
+          message: `checksum esperado ${envelope.checksum}; checksum canónico actual ${actualChecksum}`,
+          repair: 'Regenera el snapshot desde objetos canónicos válidos; no edites manualmente un snapshot firmado por checksum.',
+        },
+      ]);
+    }
+
+    return {
+      status: 'ready',
+      envelope: electroCraftProjectSnapshotEnvelopeSchema.parse({ ...envelope, snapshot: normalizedSnapshot }),
+    };
   }
 
   async import(serialized: string): Promise<ProjectImportResult> {
