@@ -1,0 +1,45 @@
+name: M02.2 Bootstrap
+
+on:
+  push:
+    branches:
+      - agent/m02-2-component-layout-style
+    paths:
+      - '.github/workflows/m02-2-bootstrap.yml'
+      - 'package.json'
+      - 'packages/editor-puck/package.json'
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+      - name: Verify npm
+        run: test "$(npm --version)" = '10.9.2'
+      - name: Install and refresh lock
+        run: npm install --ignore-scripts --no-audit --no-fund --legacy-peer-deps
+      - name: Verify Puck and Zod pins
+        run: |
+          node -e "const p=require('./node_modules/@puckeditor/core/package.json'); if(p.version!=='0.22.4') throw new Error('expected @puckeditor/core@0.22.4');"
+          node -e "const p=require('./node_modules/zod/package.json'); if(p.version!=='4.4.3') throw new Error('expected zod@4.4.3');"
+      - name: Apply repository formatting
+        run: npm run format
+      - name: Commit generated lock and formatting
+        run: |
+          if git diff --quiet; then
+            echo 'No bootstrap changes required'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package-lock.json package.json packages/domain packages/application packages/editor-puck tooling/vitest tooling/fixtures/canonical-model .github/workflows/m02-2-component-layout-style.yml
+          git commit -m 'Bootstrap M02.2 lock and formatting'
+          git push origin HEAD:agent/m02-2-component-layout-style
