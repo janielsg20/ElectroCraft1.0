@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 0,
+  "id": "ec_component_0000000000004",
+  "version": 1,
+  "key": "LegacyRow",
+  "label": "Fila heredada",
+  "category": "Layout",
+  "fields": [
+    {
+      "key": "title",
+      "label": "Título",
+      "kind": "text",
+      "required": true,
+      "options": []
+    }
+  ],
+  "defaultProps": {
+    "title": "Legacy"
+  },
+  "layoutMode": "horizontal",
+  "gridColumns": null,
+  "style": {
+    "schemaVersion": 1,
+    "base": {
+      "width": null,
+      "height": null,
+      "minWidth": null,
+      "maxWidth": null,
+      "gap": null,
+      "padding": null,
+      "margin": null,
+      "fontSize": null,
+      "fontWeight": null,
+      "textAlign": null,
+      "foreground": null,
+      "background": null,
+      "opacity": null
+    },
+    "responsive": {},
+    "platform": {}
+  },
+  "references": {
+    "componentRefs": [],
+    "assetRefs": [],
+    "actionRefs": []
+  },
+  "metadata": {}
+}

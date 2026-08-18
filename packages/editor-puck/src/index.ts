@@ -1,6 +1,8 @@
 import { packageDescriptor as dep0 } from '@electrocraft/domain';
 import { packageDescriptor as dep1 } from '@electrocraft/application';
 
+export * from './puck-component-adapter';
+
 export const packageDescriptor = Object.freeze({
   name: '@electrocraft/editor-puck',
   responsibility: 'adapter propietario del engine Puck',
