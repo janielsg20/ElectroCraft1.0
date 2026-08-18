@@ -1,6 +1,8 @@
 import {
   electroCraftCapabilityAnalysisReportSchema,
+  electroCraftProjectSnapshotEnvelopeSchema,
   packageDescriptor as dep0,
+  type ElectroCraftCanonicalSnapshotChecksum,
   type ElectroCraftCapabilityAnalysisEntry,
   type ElectroCraftObjectId,
 } from '@electrocraft/domain';
@@ -43,6 +45,29 @@ export function createCapabilityExportPlan(input: unknown): ElectroCraftCapabili
     registryVersion: report.registryVersion,
     blocked: targets.some(({ blocked }) => blocked),
     targets,
+  };
+}
+
+export interface ElectroCraftSnapshotExportManifest {
+  schemaVersion: 1;
+  projectId: ElectroCraftObjectId;
+  projectSchemaVersion: number;
+  documentCount: number;
+  documentSchemaVersions: number[];
+  checksum: ElectroCraftCanonicalSnapshotChecksum;
+}
+
+export function createProjectSnapshotExportManifest(input: unknown): ElectroCraftSnapshotExportManifest {
+  const envelope = electroCraftProjectSnapshotEnvelopeSchema.parse(input);
+  return {
+    schemaVersion: 1,
+    projectId: envelope.snapshot.project.id,
+    projectSchemaVersion: envelope.snapshot.project.schemaVersion,
+    documentCount: envelope.snapshot.documents.length,
+    documentSchemaVersions: [...new Set(envelope.snapshot.documents.map(({ schemaVersion }) => schemaVersion))].sort(
+      (left, right) => left - right,
+    ),
+    checksum: envelope.checksum,
   };
 }
 
