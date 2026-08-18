@@ -1,8 +1,10 @@
 export const POC_ALLOWED_TOOLS = Object.freeze([
   "get_app_summary",
   "get_current_screen",
-  "draft_create_screen",
-  "validate_draft",
+  "draft_create_component",
+  "draft_create_plugin",
+  "draft_create_section",
+  "validate_code_draft",
 ] as const);
 
 export type PocAllowedTool = (typeof POC_ALLOWED_TOOLS)[number];

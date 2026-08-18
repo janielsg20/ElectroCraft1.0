@@ -1,10 +1,22 @@
 import { z } from "zod";
 
-export const logicalAIProfileSchema = z.enum(["Automático", "Rápido", "Calidad", "Imagen"]);
+export const logicalAIProfileSchema = z.enum(["Automático", "Rápido", "Calidad", "Código"]);
 export type LogicalAIProfile = z.infer<typeof logicalAIProfileSchema>;
 
+export const codeArtifactKindSchema = z.enum(["component", "plugin", "section"]);
+export type CodeArtifactKind = z.infer<typeof codeArtifactKindSchema>;
+
+const draftToolSchema = z.enum([
+  "get_app_summary",
+  "get_current_screen",
+  "draft_create_component",
+  "draft_create_plugin",
+  "draft_create_section",
+  "validate_code_draft",
+]);
+
 export const generationPlanSchema = z.object({
-  artifactType: z.enum(["screen", "component", "theme"]),
+  artifactType: codeArtifactKindSchema,
   title: z.string().min(1).max(120),
   summary: z.string().min(1).max(500),
   steps: z.array(
@@ -14,25 +26,37 @@ export const generationPlanSchema = z.object({
       description: z.string().min(1).max(300),
     }),
   ).min(1).max(8),
-  requestedTools: z.array(
-    z.enum(["get_app_summary", "get_current_screen", "draft_create_screen", "validate_draft"]),
-  ).max(4),
+  requestedTools: z.array(draftToolSchema).max(6),
 });
-
 export type GenerationPlanPoc = z.infer<typeof generationPlanSchema>;
 
+export const codeFileSchema = z.object({
+  path: z.string().min(1).max(240),
+  language: z.enum(["tsx", "ts", "jsx", "js", "css", "json", "md"]),
+  purpose: z.string().min(1).max(240),
+  content: z.string().min(1).max(30000),
+});
+
+export const codeArtifactSchema = z.object({
+  artifactType: codeArtifactKindSchema,
+  name: z.string().min(1).max(120),
+  summary: z.string().min(1).max(500),
+  entryFile: z.string().min(1).max(240),
+  files: z.array(codeFileSchema).min(1).max(12),
+  dependencies: z.array(
+    z.object({
+      name: z.string().min(1).max(120),
+      reason: z.string().min(1).max(240),
+    }),
+  ).max(8),
+  validationChecks: z.array(z.enum(["syntax", "types", "imports", "policy"])).min(2).max(4),
+  draftOnly: z.literal(true),
+});
+export type CodeArtifactPoc = z.infer<typeof codeArtifactSchema>;
+
 export const gatewayRequestSchema = z.object({
-  operation: z.enum(["structured-plan", "tool-loop", "stream", "image"]),
+  operation: z.enum(["structured-plan", "code-artifact", "tool-loop", "stream"]),
   profile: logicalAIProfileSchema,
-  prompt: z.string().min(1).max(4000),
+  prompt: z.string().min(1).max(8000),
 });
 export type GatewayRequest = z.infer<typeof gatewayRequestSchema>;
-
-export const sanitizedImageResponseSchema = z.object({
-  status: z.literal("PASS_IMAGE_RESPONSE"),
-  mediaType: z.string().regex(/^image\//),
-  byteLength: z.number().int().positive(),
-  sha256: z.string().regex(/^[a-f0-9]{64}$/),
-  logicalProfile: z.literal("Imagen"),
-  resolvedModel: z.string().min(1),
-});

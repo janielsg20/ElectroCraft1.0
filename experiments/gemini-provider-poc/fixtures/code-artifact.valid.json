@@ -1,0 +1,17 @@
+{
+  "artifactType": "component",
+  "name": "StatusBadge",
+  "summary": "Componente React Draft para representar un estado de forma compacta.",
+  "entryFile": "src/components/StatusBadge.tsx",
+  "files": [
+    {
+      "path": "src/components/StatusBadge.tsx",
+      "language": "tsx",
+      "purpose": "Componente principal",
+      "content": "export type StatusBadgeProps = { label: string };\nexport function StatusBadge({ label }: StatusBadgeProps) {\n  return <span aria-label={`Estado: ${label}`}>{label}</span>;\n}\n"
+    }
+  ],
+  "dependencies": [],
+  "validationChecks": ["syntax", "types", "imports", "policy"],
+  "draftOnly": true
+}

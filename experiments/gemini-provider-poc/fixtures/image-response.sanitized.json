@@ -1,8 +1,0 @@
-{
-  "status": "PASS_IMAGE_RESPONSE",
-  "mediaType": "image/png",
-  "byteLength": 1024,
-  "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-  "logicalProfile": "Imagen",
-  "resolvedModel": "runtime-session-only"
-}

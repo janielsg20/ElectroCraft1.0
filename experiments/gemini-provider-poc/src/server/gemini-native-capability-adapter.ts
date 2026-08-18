@@ -12,8 +12,8 @@ export class GeminiNativeCapabilityAdapter {
 
   async probeStableInteractions() {
     const interaction = await this.ai.interactions.create({
-      model: resolveRuntimeModel("Rápido"),
-      input: "Reply with POC_INTERACTIONS_OK only.",
+      model: resolveRuntimeModel("Código"),
+      input: "Return POC_INTERACTIONS_CODE_OK and then one JavaScript line: const electrocraft = true;",
       store: false,
     });
     return {

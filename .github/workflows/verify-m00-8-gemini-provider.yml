@@ -125,7 +125,7 @@ jobs:
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Build exact pinned source
         run: npm run build
-      - name: Execute real Gemini structured/tools/stream/image/Interactions gates
+      - name: Execute real Gemini code/structured/tools/stream/Interactions gates
         run: npm run live
       - name: Live closure gate
         run: npm run closure-live
@@ -149,10 +149,10 @@ jobs:
           LIVE_RESULT: ${{ needs.live-gemini.result }}
         run: |
           STATE=failure
-          DESCRIPTION='M00.8 Gemini provider gate failed or is blocked'
+          DESCRIPTION='M00.8 Gemini code-generation gate failed or is blocked'
           if test "$STATIC_RESULT" = success && test "$LIVE_RESULT" = success; then
             STATE=success
-            DESCRIPTION='M00.8 Gemini provider gate passed'
+            DESCRIPTION='M00.8 Gemini code-generation gate passed'
           fi
           curl --fail-with-body -L \
             -X POST \

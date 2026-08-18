@@ -24,8 +24,9 @@ test('direct Google SDK stays inside one narrow native capability adapter', asyn
   assert.deepEqual(directImports, ['src/server/gemini-native-capability-adapter.ts']);
 });
 
-test('primary gateway delegates structured/tools/stream/image to AI SDK', async () => {
+test('primary gateway delegates structured code/tools/stream to AI SDK', async () => {
   const source = await readFile(path.join(root, 'src/server/gateway.ts'), 'utf8');
-  for (const token of ['generateText', 'Output.object', 'tool(', 'streamText', 'generateImage', '@ai-sdk/google']) assert.ok(source.includes(token), token);
+  for (const token of ['generateText', 'Output.object', 'codeArtifactSchema', 'tool(', 'streamText', '@ai-sdk/google']) assert.ok(source.includes(token), token);
+  for (const removed of ['generateImage', 'google.image']) assert.ok(!source.includes(removed), removed);
   assert.ok(!source.includes('@google/genai'));
 });

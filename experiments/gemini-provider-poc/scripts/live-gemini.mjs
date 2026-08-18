@@ -15,58 +15,71 @@ if (!apiKey.trim()) {
 const gateway = createGeminiGateway({ apiKey });
 
 const plan = await gateway.generatePlan({
-  profile: 'Calidad',
-  prompt: 'Devuelve un GenerationPlanPoc válido para una pantalla de catálogo. Solo Draft: inspect, draft, validate. Usa únicamente herramientas permitidas.',
+  profile: 'Código',
+  prompt: 'Devuelve un GenerationPlanPoc válido para crear un componente React de ElectroCraft. artifactType debe ser component. Solo inspect, draft y validate; jamás Apply. Usa únicamente herramientas permitidas.',
 });
-if (!plan.title || plan.steps.length < 1 || plan.requestedTools.some((tool) => tool === 'apply_to_project')) {
-  throw new Error('Structured output did not satisfy ElectroCraft policy');
+if (plan.artifactType !== 'component' || !plan.title || plan.steps.length < 1 || plan.requestedTools.some((tool) => tool === 'apply_to_project')) {
+  throw new Error('Structured code plan did not satisfy ElectroCraft policy');
 }
+
+const codeArtifact = await gateway.generateCodeArtifact({
+  profile: 'Código',
+  prompt: 'Genera un componente React TypeScript pequeño llamado StatusBadge para ElectroCraft. artifactType=component. Usa rutas relativas, incluye al menos un archivo TSX exportable, sin secretos, sin acceso de red, sin instalación de paquetes y draftOnly=true.',
+});
+if (codeArtifact.artifactType !== 'component' || codeArtifact.files.length < 1) throw new Error('Code artifact missing component files');
+const entry = codeArtifact.files.find((file) => file.path === codeArtifact.entryFile);
+if (!entry || !/(export|function|const|class)/.test(entry.content)) throw new Error('Generated code entry file is not usable source code');
+const codeBytes = Buffer.from(codeArtifact.files.map((file) => `${file.path}\n${file.content}`).join('\n---\n'));
+const codeSha256 = createHash('sha256').update(codeBytes).digest('hex');
 
 const toolResult = await gateway.runToolLoop({
   profile: 'Rápido',
-  prompt: 'Primero usa get_app_summary con scope selected y luego confirma brevemente que prepararías un borrador sin aplicar cambios.',
+  prompt: 'Primero usa get_app_summary con scope selected y luego confirma brevemente que prepararías código Draft sin aplicar cambios.',
 });
 if (!toolResult.toolCalls.includes('get_app_summary') || toolResult.stepCount > 3) throw new Error('Bounded tool loop failed');
 
-const stream = gateway.streamDraft({
-  profile: 'Rápido',
-  prompt: 'Responde exactamente: POC_STREAM_OK',
+const stream = gateway.streamCodeDraft({
+  profile: 'Código',
+  prompt: 'Devuelve una sola línea de JavaScript que contenga exactamente el identificador POC_STREAM_CODE_OK y un valor true.',
 });
 let streamed = '';
 for await (const chunk of stream.textStream) streamed += chunk;
-if (!streamed.trim()) throw new Error('Streaming produced no text');
+if (!streamed.includes('POC_STREAM_CODE_OK')) throw new Error('Streaming code marker missing');
 
 const abort = new AbortController();
 abort.abort();
 let cancellation = false;
 try {
-  await gateway.generatePlan({ prompt: 'No debe ejecutarse', abortSignal: abort.signal });
+  await gateway.generateCodeArtifact({ prompt: 'No debe ejecutarse', abortSignal: abort.signal });
 } catch (error) {
   cancellation = error?.name === 'AbortError';
 }
 if (!cancellation) throw new Error('Cancellation gate did not fail closed');
 
-const image = await gateway.generateDraftImage({ prompt: 'Minimal technical placeholder: a blue geometric app card on a neutral background, no text.' });
-if (!image.mediaType.startsWith('image/') || image.bytes.byteLength === 0) throw new Error('Image generation returned no image');
-const imageSha256 = createHash('sha256').update(image.bytes).digest('hex');
-
 const native = new GeminiNativeCapabilityAdapter(apiKey);
 const interaction = await native.probeStableInteractions();
-if (interaction.status !== 'completed' || !interaction.outputText.includes('POC_INTERACTIONS_OK') || !interaction.interactionIdPresent) {
-  throw new Error(`Interactions v1 probe failed: ${JSON.stringify(interaction)}`);
+if (interaction.status !== 'completed' || !interaction.outputText.includes('POC_INTERACTIONS_CODE_OK') || !interaction.outputText.includes('electrocraft') || !interaction.interactionIdPresent) {
+  throw new Error(`Interactions v1 code probe failed: ${JSON.stringify(interaction)}`);
 }
 
 const result = {
-  status: 'PASS_LIVE_GEMINI',
+  status: 'PASS_LIVE_GEMINI_CODE',
   structuredOutput: true,
+  codeArtifact: true,
   toolLoop: true,
   streaming: true,
   cancellation: true,
-  image: true,
   interactionsV1: true,
   logicalProfiles: Object.keys(CURRENT_RUNTIME_MODELS),
   resolvedModelsSessionOnly: CURRENT_RUNTIME_MODELS,
-  imageEvidence: { mediaType: image.mediaType, byteLength: image.bytes.byteLength, sha256: imageSha256 },
+  codeEvidence: {
+    artifactType: codeArtifact.artifactType,
+    fileCount: codeArtifact.files.length,
+    languages: [...new Set(codeArtifact.files.map((file) => file.language))],
+    byteLength: codeBytes.byteLength,
+    sha256: codeSha256,
+    entryFile: codeArtifact.entryFile,
+  },
   planEvidence: { artifactType: plan.artifactType, stepCount: plan.steps.length, requestedTools: plan.requestedTools },
   toolEvidence: { stepCount: toolResult.stepCount, toolCalls: toolResult.toolCalls },
 };

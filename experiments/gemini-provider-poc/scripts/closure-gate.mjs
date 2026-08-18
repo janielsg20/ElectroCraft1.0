@@ -12,7 +12,7 @@ if (mode === 'static') {
 }
 if (mode !== 'live') throw new Error(`Unknown closure mode: ${mode}`);
 const live = JSON.parse(await readFile(path.join(root, 'artifacts', 'live-result.json'), 'utf8'));
-for (const key of ['structuredOutput', 'toolLoop', 'streaming', 'cancellation', 'image', 'interactionsV1']) {
+for (const key of ['structuredOutput', 'codeArtifact', 'toolLoop', 'streaming', 'cancellation', 'interactionsV1']) {
   if (live[key] !== true) throw new Error(`Live gate missing ${key}`);
 }
-console.log(JSON.stringify({ status: 'PASS_LIVE_CLOSURE_GATE', liveGemini: true }));
+console.log(JSON.stringify({ status: 'PASS_LIVE_CLOSURE_GATE', liveGeminiCode: true }));
