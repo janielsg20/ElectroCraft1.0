@@ -14,7 +14,10 @@ on:
       - 'experiments/data-source-poc/**'
       - '.ai/adr/ADR-DATA-SOURCES.md'
       - '.ai/OPENAPI_PARSER_EVALUATION.md'
+      - '.ai/STATE.md'
+      - '.ai/TRACKING.md'
       - '.github/workflows/data-source-poc.yml'
+      - '.github/workflows/export-target-poc.yml'
 
 permissions:
   contents: read
