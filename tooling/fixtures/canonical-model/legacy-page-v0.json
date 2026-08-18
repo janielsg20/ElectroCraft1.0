@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 0,
+  "id": "ec_document_0000000000007",
+  "version": 1,
+  "name": "Página heredada",
+  "kind": "page",
+  "root": {
+    "id": "ec_node_0000000000008",
+    "componentRef": "core.root",
+    "props": {},
+    "children": []
+  },
+  "references": {
+    "documentRefs": []
+  },
+  "metadata": {
+    "fixture": "legacy-m02.1"
+  }
+}
