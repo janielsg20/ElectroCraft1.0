@@ -29,7 +29,7 @@
     "Un reusable-component específico del proyecto sigue siendo ElectroCraftDocument; ComponentDefinition core pertenece al registry de aplicación. Esta separación evita dos fuentes de verdad.",
     "Un payload OSS permitido usa el wrapper JSON { engine, schemaVersion, value }; domain no conoce tipos del engine y el adapter owner valida/interpreta/migra value.",
     "M02.9 permite inicialmente react-querybuilder rules y Tiptap richtext JSON; engines o wrapper versions desconocidos se bloquean antes de seleccionar adapter.",
-    "El adapter richtext fija @tiptap/html y @tiptap/starter-kit 3.29.2 y comparte su peer compatible de @tiptap/core para evitar dos universos de tipos Tiptap.",
+    "El adapter richtext usa un grafo mínimo Tiptap 3.29.2: core, html, Document, Paragraph y Text; evita aggregates con peers que puedan introducir dos universos de tipos.",
     "Puck AppState/history y Rete NodeEditor/sockets/history siguen prohibidos como engine payloads: se reconstruyen desde Document/ActionGraph canónicos.",
     "ElectroCraftExportIR es un snapshot generado, immutable, versionado y neutral a targets; no es una segunda fuente de verdad persistida.",
     "ExportIR incluye Documents, Navigation, Data Sources sanitizadas, DataSchema, Queries, State, Actions, Form refs, Roles, PermissionPolicies, Theme, Media manifest y capabilities, pero excluye histories, caches, prompts, secretos, registries completos e internals target-specific.",
