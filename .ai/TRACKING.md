@@ -10,28 +10,29 @@ Historial detallado:
 | Scope | Estado | Evidencia principal |
 |---|---|---|
 | F00 | COMPLETADA | `.ai/evidence/F00/` |
-| M01.1 | COMPLETADA | inherited F01 workflow evidence |
-| M01.2 | COMPLETADA | inherited F01 workflow evidence |
-| M01.3 | COMPLETADA | inherited F01 workflow evidence |
-| M01.4 | COMPLETADA | run `32161696559` revalidado en PR M01.6 |
-| M01.5 | COMPLETADA | `.ai/evidence/F01/M01.5/CLOSURE_2026-08-18.md` |
-| M01.6 | COMPLETADA | run `32161696542`; artifact `9333862600` |
+| M01.1–M01.6 | COMPLETADAS | `.ai/evidence/F01/` + workflows heredados |
 | F01 Gate | GREEN | `.ai/evidence/F01/M01.6/CLOSURE_2026-08-18.md` |
-| M02.1 | ACTIVE | `.ai/microphases/M02_1.md` |
+| M02.1 | COMPLETADA | `.ai/evidence/F02/M02.1/CLOSURE_2026-08-18.md` |
+| M02.2 | ACTIVE | `.ai/microphases/M02_2.md` |
 
-## Cierre M01.6 / F01
-- Squash merge de implementación: `8cc248eef228d3590b8f1d5451c6061a2fa16e5e`.
-- Tree validado por Base CI y fusionado sin cambios: `8e2d70bbd62e0bacfe06a00876ff641672d1cff9`.
-- Base CI: run `32161696542` — `success`.
-- Marker: `PASS_M01_6_DOC_CONVENTIONS`.
-- Artifact: `9333862600` — `m01-6-doc-conventions-evidence`.
-- Digest: `sha256:dc3d6fbc743725eca017bf4a0b923226ea35546e7cb5ac8e0ced4fb4d86e97f0`.
-- M01.4: run `32161696559` — `success`.
-- M00.10 parity matrix: run `32161696550` — todos los targets/gates `success`.
+## Cierre M02.1
+- PR: `#3` — `Implement M02.1 canonical project and document model`.
+- Squash merge a `main`: `cf4649d98f96a553daa020581a918d9559131137`.
+- Owner canónico: `packages/domain/src/contracts/`; no se creó `packages/contracts` porque F01 congeló 17 owners y ese package no existe.
+- Boundary: Zod `4.4.3` bloqueado en `package-lock.json`.
+- Modelo: `ElectroCraftProjectDefinition`, `ElectroCraftDocument`, IDs deterministas, refs/versionado, migración legacy `page -> screen`, serialización estable y validation fail-closed.
+- Application boundary: repository port + `ProjectDocumentService` para save/reopen/recovery.
+- Tests específicos: unit/contract/integration — `12/12` verdes.
+- Gate dedicado en `main`: run `32167600544` — `success`.
+- Marker: `PASS_M02_1_PROJECT_DOCUMENT_MODEL`.
+- Artifact final: `9336023224` — `m02-1-canonical-model-evidence`.
+- Digest: `sha256:1007752a6368d124818bbfbfffac199eac91629227b93c77b632da3987074fcb`.
+- Revalidación heredada en el mismo head: `electrocraft/M01.4`, `electrocraft/M00.9` y `electrocraft/M00.10` en `success`; matriz M00.10 incluyó Static, Capacitor, Slim/PDO/CSRF y WordPress reales.
+- Adaptaciones durante CI: formato Prettier aplicado; test boundary corregido para distinguir el target canónico `react` de imports React; gate F01 actualizado para permitir únicamente Zod + imports relativos dentro de domain, manteniendo prohibidos frameworks/runtimes/adapters.
 - P0/P1: `0`.
 
 ## Gate actual
-F01 está `GREEN` y cerrada. F02 está activa.
+F02 continúa activa con `GREEN_THROUGH_M02.1`.
 
 ## Siguiente transición permitida
-Cerrar M02.1 con schemas, validación, round-trip, tests y evidencia; después avanzar exclusivamente a M02.2.
+Cerrar M02.2 con ComponentDefinition/Layout/Style portables, adapter Puck, version/migration, round-trip, unit/contract/integration y evidencia; después avanzar exclusivamente a M02.3.
