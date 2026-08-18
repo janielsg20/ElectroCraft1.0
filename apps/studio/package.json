@@ -1,10 +1,15 @@
 {
   "name": "@electrocraft/studio",
-  "version": "0.0.0-m01.3",
+  "version": "0.0.0-m01.4",
   "private": true,
   "type": "module",
   "exports": {
     ".": "./src/index.ts"
+  },
+  "scripts": {
+    "dev": "vite --config vite.config.ts",
+    "build": "vite build --config vite.config.ts",
+    "preview": "vite preview --config vite.config.ts"
   },
   "dependencies": {
     "@electrocraft/domain": "0.0.0-m01.3",
@@ -21,6 +26,14 @@
     "@electrocraft/admin-refine": "0.0.0-m01.3",
     "@electrocraft/runtime-web": "0.0.0-m01.3",
     "@electrocraft/export-ir": "0.0.0-m01.3",
-    "@electrocraft/exporters": "0.0.0-m01.3"
+    "@electrocraft/exporters": "0.0.0-m01.3",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "@vitejs/plugin-react": "6.0.5",
+    "vite-plugin-pwa": "1.3.0"
   }
 }
