@@ -5,7 +5,7 @@ export type PuckCanonicalProps = Record<string, unknown>;
 export type PuckCanonicalComponentConfig = ComponentConfig<PuckCanonicalProps>;
 export type PuckCanonicalRenderer = PuckCanonicalComponentConfig['render'];
 export type PuckRendererRegistry = Readonly<Record<string, PuckCanonicalRenderer>>;
-export type PuckCanonicalConfig = Config<Record<string, PuckCanonicalProps>>;
+export type PuckCanonicalConfig = Config;
 
 function toPuckField(field: ElectroCraftComponentField): Field {
   const base = {
