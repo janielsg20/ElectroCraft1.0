@@ -15,6 +15,7 @@ Solo contiene hechos estables y decisiones vigentes. Progreso y siguiente paso p
 - `React Query Builder` posee condición/formatting; ElectroCraft valida bindings/capabilities fail-closed.
 - `Rete` posee graph/processing/history de workflows; `ElectroCraftActionGraph` es la definición persistida.
 - `TanStack Query` posee async cache; `Refine` solo Administración; `RHF/Zod` Forms; `Tiptap` RichText; `Zustand` runtime state.
+- Snapshots canónicos usan una única serialización JSON determinista y checksum portable; las migraciones de schema se encadenan mediante un registry explícito/fail-closed, no por rutas paralelas inline.
 
 ## AI
 - AI SDK + `@ai-sdk/google` es la abstracción primaria; direct `@google/genai` solo para gaps estrechos y probados.
