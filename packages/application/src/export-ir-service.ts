@@ -15,6 +15,7 @@ import {
   electroCraftStateDefinitionSchema,
   electroCraftThemeSchema,
   validateDataSchemaReferences,
+  validateElectroCraftProjectOwnershipBoundary,
   validateProjectDefinitionSemantics,
   validateProjectDocumentReferences,
   validateQueryDefinitionReferences,
@@ -321,6 +322,18 @@ function toCanonicalIrInput(source: ParsedExportIRSource) {
 export function validateElectroCraftExportIRSource(
   input: ElectroCraftExportIRSource,
 ): ElectroCraftExportValidationReport {
+  const ownershipDiagnostics = validateElectroCraftProjectOwnershipBoundary(input.project);
+  if (ownershipDiagnostics.length > 0) {
+    return electroCraftExportValidationReportSchema.parse({
+      schemaVersion: 1,
+      status: 'blocked',
+      checksum: null,
+      diagnostics: ownershipDiagnostics.map(({ code, path, cause, repair }) =>
+        diagnostic(code, ['project', ...path], cause, repair),
+      ),
+    });
+  }
+
   let source: ParsedExportIRSource;
   try {
     source = parseSource(input);

@@ -1,121 +1,111 @@
 # MODEL OWNERSHIP — ElectroCraft
 
-Purpose:
-prevent duplicate sources of truth.
+Purpose: prevent duplicate sources of truth and make serializer, migration, storage and exporter access explicit.
 
-# Persisted Project Objects
-- ElectroCraftProjectDefinition
-- ElectroCraftDocument
-- ElectroCraftNavigationDefinition
-- ElectroCraftRouteDefinition
-- ElectroCraftDataSourceDefinition
-- ElectroCraftDataSchema
-- ElectroCraftQueryDefinition
-- ElectroCraftActionGraph
-- ElectroCraftStateDefinition
-- ElectroCraftRole / ElectroCraftPermissionPolicy
-- ElectroCraftTheme
-- user-created ElectroCraftRegistryDefinition objects referenced by the project
-- installed extension metadata
+## Three ownership categories
 
-# ProjectDefinition stores references/requirements, not registries
-- `themeRef` points to an ElectroCraftTheme object.
-- `originBlueprint` is optional provenance only; the full BlueprintPackage is external.
-- `requiredCapabilities` and `targetCapabilityOverrides` express project requirements/target exceptions.
-- `userRegistryDefinitionRefs` may reference only definitions whose origin is `user`.
-- CapabilityRegistry, ComponentRegistry, FieldRegistry, ActionRegistry and ProviderRegistry are never copied wholesale into ProjectDefinition.
+### 1. Project Objects — persisted canonical configuration
+Project Objects belong to the project schema and are versioned/migrated through `@electrocraft/domain`.
 
-# Theme rule
-ElectroCraftTheme owns visual design only:
-- tokens
-- typography
-- variants
-- spacing
-- radius
-- shadows
-- motion
+- `ElectroCraftProjectDefinition`
+- `ElectroCraftDocument` (`screen`, `template`, `form`, `admin-screen`, `reusable-component`)
+- `ElectroCraftDataSourceDefinition`
+- `ElectroCraftDataSchema`
+- `ElectroCraftQueryDefinition`
+- `ElectroCraftActionGraph`
+- `ElectroCraftStateDefinition`
+- `ElectroCraftRole` / `ElectroCraftPermissionPolicy`
+- `ElectroCraftRouteDefinition`
+- `ElectroCraftNavigationDefinition`
+- `ElectroCraftTheme`
+- user-created registry definitions referenced by stable ID
 
-Theme must not own component trees, routes, queries, state, actions or runtime engine objects.
+ProjectDefinition stores refs and requirements; it never becomes a mega blob containing registries or content rows.
 
-# Blueprint rule
-ElectroCraftBlueprintPackage is external/versioned install material.
-A Blueprint may declare artifacts and required capabilities, but after install its artifacts are normal canonical objects.
-ProjectDefinition preserves only optional `originBlueprint` provenance.
-Install planning/conflicts/rollback belong to application, not to persisted project JSON.
+### 2. Application Registries — app-versioned definitions
+Registries are owned by the running ElectroCraft application and are loaded/resolved by `@electrocraft/application`.
 
-# Template rule
-There is no second ElectroTemplate model.
-Template remains `ElectroCraftDocument kind=template` with `templateMeta` and Display Conditions.
-
-# Registry rule
-Application registries:
-- ComponentRegistry
-- FieldRegistry
-- ActionRegistry
-- ProviderRegistry
+- ComponentDefinition registry
+- FieldType registry
+- ActionNode registry
+- Provider registry
 - ConnectorRegistry
 - ElectroPlatformCapabilityRegistry
+- core Blueprint catalog
 
-Core/extension definitions live in those registries. Only user-created registry definitions are eligible to persist as project objects.
-Registry instances, Maps, callbacks and engine/provider objects are runtime-only.
+Core/extension registry definitions are not copied into projects. Only `origin=user` definitions may be persisted separately and referenced through `userRegistryDefinitionRefs`.
 
-# Capability rule
-Capability definitions live in the versioned application registry.
-The project stores required capability IDs and explicit target overrides only.
-The analyzer emits a neutral `supported | adapted | blocked` report.
-ExportIR consumes the report, not the live registry.
+### 3. Content / Runtime Entities — storage-owned data
+Content entities are data, not project configuration.
 
-# Contracts location rule
-F01 fixed exactly 17 owner packages and assigned canonical contracts to `@electrocraft/domain`.
-Therefore the historical F02 map entry `packages/contracts/` is implemented as `packages/domain/src/contracts/`.
-Do not create an 18th `@electrocraft/contracts` package or duplicate canonical schemas.
-
-# Content entities — not project definitions
-- internal records
+- records
 - taxonomy terms
 - relation edges
-- users/auth data
+- media metadata
+- users/profile data
 - audit events
-- form drafts
 
-# Studio-only
-- workspace preferences
-- Studio Appearance
-- Puck/Rete session histories
-- AI generation sessions/drafts/history
-- debug traces
-- caches
+They live in content/auth/media storage and are resolved by IDs. Exporters obtain only required content through resolver/manifest boundaries; ProjectDefinition never embeds complete record sets.
 
-# App registries — not copied wholesale into project
-- ComponentRegistry
-- FieldRegistry
-- ActionRegistry
-- ProviderRegistry
-- ConnectorRegistry
-- ElectroPlatformCapabilityRegistry
-- AppTemplateCatalog
+## Ownership matrix
 
-# Engine state that must never become canonical
+| Model | Category | Storage authority | Serializer owner | Migration owner | Export access |
+|---|---|---|---|---|---|
+| ProjectDefinition | Project Object | canonical project | domain canonical serializer | domain MigrationRegistry | embedded |
+| Document / Form / reusable component | Project Object | canonical project | domain canonical serializer | domain MigrationRegistry | embedded/ref |
+| DataSource / DataSchema / Query | Project Object | canonical project | domain canonical serializer | domain MigrationRegistry | embedded |
+| ActionGraph / State | Project Object | canonical project | domain canonical serializer | domain MigrationRegistry | embedded |
+| Roles / Policies | Project Object | canonical project | domain canonical serializer | domain MigrationRegistry | embedded |
+| Route / Navigation | Project Object | canonical project | domain canonical serializer | domain MigrationRegistry | embedded |
+| Theme / Design System | Project Object | canonical project | domain canonical serializer | domain MigrationRegistry | embedded |
+| ComponentDefinition / FieldType / ActionNode / Provider | Registry | application registry | application registry loader | app-version migration | stable refs |
+| PlatformCapability | Registry | application registry | application registry loader | app-version migration | required capability refs/report |
+| core Blueprint catalog | Registry | application registry | catalog loader | app-version migration | none after install |
+| records / terms / relation edges | Content Entity | content storage | content adapter | content-schema migration | resolver |
+| media metadata | Content Entity | media storage | media adapter | content-schema migration | MediaManifest |
+| users/profile data | Content Entity | auth storage | auth adapter | auth/content migration | refs/sanitized resolver |
+| audit events | Content Entity | audit storage | audit adapter | audit schema migration | none |
+
+The executable source of truth for the complete 26-entry classification is `packages/domain/src/contracts/model-ownership.ts`.
+
+## ProjectDefinition rule
+- `themeRef` points to an ElectroCraftTheme object.
+- `originBlueprint` is provenance only; the full BlueprintPackage remains external.
+- `requiredCapabilities` and `targetCapabilityOverrides` express requirements/exceptions only.
+- `userRegistryDefinitionRefs` may reference only definitions whose origin is `user`.
+- complete registries and content collections are forbidden inside ProjectDefinition.
+
+## Theme / Blueprint / Template rules
+- Theme owns visual tokens only; never component trees, routes, queries, state or runtime objects.
+- BlueprintPackage is versioned install material. After install, artifacts become normal canonical objects; ProjectDefinition retains only optional provenance.
+- Template remains `ElectroCraftDocument kind=template`; there is no second ElectroTemplate tree.
+
+## ExportIR rule
+`ElectroCraftExportIR` is generated from Project Objects plus only the required sanitized/resolved content surface. It may carry a portable `MediaManifest`, form document refs and capability refs, but never a live registry, content store, cache or runtime engine object.
+
+The target compiler receives the frozen IR revision plus a separate `TargetCompileContext`. Registry/core definitions are resolved by app/target adapters outside the canonical project snapshot.
+
+## Engine state that must never become canonical
 - Puck AppState/history/classes
 - Rete node/socket classes/history
 - TanStack Query cache
 - TanStack Table row model
 - Refine hook state
 - Zustand store instance
-- React Router route objects
-- Expo Router objects
+- React Router / Expo Router runtime objects
 - AI SDK messages/tool/provider objects
+- Studio workspace preferences, debug traces and AI draft/history state
 
-# One-tree rule
-ElectroCraftDocument handles:
-screen/template/form/admin-screen/reusable-component.
+## One-tree and data rules
+- ElectroCraftDocument handles screen/template/form/admin-screen/reusable-component.
+- Internal DataSchema describes logical project data; content rows remain storage-owned entities.
+- External source schemas are connector metadata/snapshots, not blindly converted into internal models.
+- AIArtifactDraft is a Studio proposal; Apply creates/updates normal canonical objects.
 
-# Data rule
-DataSourceDefinition identifies source/adapter.
-Internal DataSchema describes ElectroCraft Data.
-External source schemas are connector metadata/snapshots, not converted blindly into internal Data Models.
+## Contracts location rule
+F01 fixed exactly 17 owner packages and assigned canonical contracts to `@electrocraft/domain`. Therefore the historical F02 path `packages/contracts/` is implemented as `packages/domain/src/contracts/`; do not create an 18th package.
 
-# AI rule
-AIArtifactDraft is a Studio proposal.
-After Apply, normal canonical objects are created/updated.
-There is no AI-specific Screen/Query/Form model.
+## Enforcement gate
+M02.8 fails closed when a complete application registry or runtime/content collection appears inside canonical project data, and diagnostics must provide code, path, cause and repair guidance.
+
+M02.8 does not change the persisted ProjectDefinition v3 or Document v3 shapes, so it requires no new project migration step; it formalizes and enforces ownership around the existing refs.

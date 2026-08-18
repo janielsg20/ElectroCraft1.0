@@ -7,6 +7,7 @@ export * from './contracts/document';
 export * from './contracts/export-ir';
 export * from './contracts/json-value';
 export * from './contracts/migration-registry';
+export * from './contracts/model-ownership';
 export * from './contracts/object-id';
 export * from './contracts/project-definition';
 export * from './contracts/project-snapshot';

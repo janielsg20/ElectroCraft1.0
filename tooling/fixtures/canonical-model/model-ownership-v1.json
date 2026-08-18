@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "counts": {
+    "project-object": 14,
+    "registry-definition": 6,
+    "content-entity": 6
+  },
+  "projectObjects": [
+    "project-definition",
+    "document",
+    "data-source",
+    "data-schema",
+    "query-definition",
+    "form-definition",
+    "action-graph",
+    "state-definition",
+    "role",
+    "permission-policy",
+    "route",
+    "navigation",
+    "theme",
+    "reusable-component"
+  ],
+  "registries": [
+    "component-definition",
+    "field-type",
+    "action-node",
+    "provider",
+    "platform-capability",
+    "blueprint-catalog"
+  ],
+  "contentEntities": ["record", "term", "relation-edge", "media-metadata", "user-profile", "audit-event"],
+  "rules": {
+    "fullRegistryInsideProject": false,
+    "contentCollectionsInsideProject": false,
+    "userRegistryDefinitionsByStableRefOnly": true,
+    "exportContentAccess": "resolver-or-manifest"
+  }
+}

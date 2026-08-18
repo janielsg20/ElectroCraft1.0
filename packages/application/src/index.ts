@@ -5,6 +5,7 @@ export * from './blueprint-installer';
 export * from './component-definition-service';
 export * from './connector-registry';
 export * from './export-ir-service';
+export * from './model-ownership-service';
 export * from './ownership-registry-service';
 export * from './project-document-service';
 export * from './project-import-service';
