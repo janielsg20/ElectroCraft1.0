@@ -132,7 +132,7 @@ function validateTsConfig(snapshot) {
   if (options.strict !== true) errors.push('TypeScript strict must be true');
   if (options.moduleResolution !== 'Bundler') errors.push('TypeScript moduleResolution must be Bundler');
   if (options.noEmit !== true) errors.push('TypeScript base config must use noEmit');
-  if (options.baseUrl !== '.') errors.push('TypeScript baseUrl must be repository root');
+  if ('baseUrl' in options) errors.push('TypeScript 7 baseUrl must be absent');
   if (tsconfig.extends !== './tsconfig.base.json') errors.push('root tsconfig must extend tsconfig.base.json');
   if (domainTsconfig.extends !== '../../tsconfig.base.json') errors.push('domain tsconfig must extend root strict base');
   if (JSON.stringify(domainTsconfig.compilerOptions?.lib) !== JSON.stringify(['ES2024'])) errors.push('domain TypeScript lib must exclude DOM');
@@ -142,8 +142,8 @@ function validateTsConfig(snapshot) {
   const actual = options.paths ?? {};
   for (const [name, target] of Object.entries(expected)) {
     const value = actual[name];
-    if (!Array.isArray(value) || value.length !== 1 || value[0].replace(/^\.\//, '') !== target) {
-      errors.push(`TypeScript alias ${name} must point only to ${target}`);
+    if (!Array.isArray(value) || value.length !== 1 || value[0] !== `./${target}`) {
+      errors.push(`TypeScript alias ${name} must point only to ./${target}`);
     }
   }
   for (const alias of Object.keys(actual)) {

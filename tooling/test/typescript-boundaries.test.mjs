@@ -12,12 +12,22 @@ function record(file, specifier) { return [{ file, specifier }]; }
 test('root TypeScript configuration is strict and aliases only public workspace roots', () => {
   const snapshot = collectWorkspace(root);
   assert.equal(snapshot.tsconfigBase.compilerOptions.strict, true);
+  assert.equal('baseUrl' in snapshot.tsconfigBase.compilerOptions, false);
   const aliases = snapshot.tsconfigBase.compilerOptions.paths;
   assert.equal(Object.keys(aliases).length, 19);
   assert.equal(Object.keys(aliases).some((name) => name.includes('*')), false);
+  assert.equal(Object.values(aliases).every((value) => Array.isArray(value) && value.length === 1 && value[0].startsWith('./')), true);
   assert.deepEqual(snapshot.domainTsconfig.compilerOptions.lib, ['ES2024']);
   assert.deepEqual(snapshot.domainTsconfig.compilerOptions.types, []);
   assert.deepEqual(validateWorkspaceSnapshot(snapshot), { ok: true, errors: [] });
+});
+
+test('negative: TypeScript 7 rejects reintroducing baseUrl', () => {
+  const snapshot = structuredClone(collectWorkspace(root));
+  snapshot.tsconfigBase.compilerOptions.baseUrl = '.';
+  const result = validateWorkspaceSnapshot(snapshot);
+  assert.equal(result.ok, false);
+  assert.ok(result.errors.includes('TypeScript 7 baseUrl must be absent'));
 });
 
 test('negative: domain cannot import React, Puck, Drizzle, Expo, DOM or filesystem engines', () => {
