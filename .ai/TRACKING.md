@@ -20,7 +20,8 @@ Historial detallado:
 | M02.6 | COMPLETADA | `.ai/evidence/F02/M02.6/CLOSURE_2026-08-18.md` |
 | M02.7 | COMPLETADA | `.ai/evidence/F02/M02.7/CLOSURE_2026-08-18.md` |
 | M02.8 | COMPLETADA | `.ai/evidence/F02/M02.8/CLOSURE_2026-08-18.md` |
-| M02.9 | ACTIVE | `.ai/microphases/M02_9.md` |
+| M02.9 | ACTIVE — cierre técnico GREEN | `.ai/evidence/F02/M02.9/CLOSURE_2026-08-18.md` |
+| F02 Gate | IN_PROGRESS | `.github/workflows/f02-canonical-model-gate.yml` |
 
 ## Cierre M02.1
 - PR `#3`; squash merge `cf4649d98f96a553daa020581a918d9559131137`.
@@ -53,38 +54,32 @@ Historial detallado:
 
 ## Cierre M02.7
 - PR `#9`; squash merge `572baebbd6aa5bb62b57d085f7d178d49dd699e2`.
-- `ElectroCraftExportIR` immutable/versionado y neutral a targets; no es source of truth persistida.
-- Closed set de nueve `ExportTargetId`: local-project, react-web, static-web, pwa, android-expo, ios-expo, capacitor, lamp y wordpress.
-- `TargetCompileContext` queda separado del IR y lleva target/config/capabilities/environment/toolchain/SecretRefs.
-- `ExportValidationReport` bloquea refs rotas, secret values, caches/histories/prompts e internals target-specific antes de compilación.
-- Forms se representan por refs a `ElectroCraftDocument kind=form`; Media se representa por manifest portable, no por blobs/runtime storage.
-- Checksum de fixture congelado: `fnv1a64:3f5ab54591022ac0`; React Web y Android/Expo reciben exactamente esa misma revisión.
-- Suite dedicada M02.7: `11/11` verdes; suite acumulada en `main`: Node `27/27`, Vitest `108/108`, Playwright `1/1`; lint/Prettier, typecheck, boundaries, Studio/PWA y build verdes.
-- Gate PR final `32190889315` success; export parity static/Capacitor/LAMP/WordPress verde.
-- Gate definitivo main `32191193359` — `success`.
-- Marker: `PASS_M02_7_CANONICAL_EXPORT_IR`.
-- Artifact final: `9344256616` — `m02-7-canonical-export-ir-evidence`.
-- Digest: `sha256:52f1fd78d673b8094bf29be9d1b47e8aa7a1b92aa8f8c4b9e6f219687a3d375b`.
-- P0/P1: `0`.
+- `ElectroCraftExportIR` immutable/versionado y neutral a targets; nueve targets Core y `TargetCompileContext` separado.
+- Checksum fixture `fnv1a64:3f5ab54591022ac0`; suite dedicada `11/11`; acumulada Node `27/27`, Vitest `108/108`, Playwright `1/1`.
+- Gate main `32191193359` success; artifact `9344256616`; digest `sha256:52f1fd78d673b8094bf29be9d1b47e8aa7a1b92aa8f8c4b9e6f219687a3d375b`.
 
 ## Cierre M02.8
 - PR `#10`; squash merge `cd89199a44ffbd2efda7892a4e658145de70b500`.
-- Taxonomía ejecutable de 26 tipos: `14` Project Objects, `6` Application Registries y `6` Content Entities.
-- Cada descriptor fija storage authority, serializer owner, migration owner, versioning authority y exporter access.
-- `ProjectDefinition` continúa en schema v3 sin migración nueva; M02.8 formaliza ownership alrededor de refs existentes.
-- Core/extension registries no se copian al proyecto; solo definitions `origin=user` pueden persistirse separadas y referenciarse por ID.
-- Records/terms/relation edges/media metadata/user profiles/audit events permanecen storage-owned; ExportIR solo accede por resolver/manifest cuando corresponde.
-- `validateElectroCraftProjectOwnershipBoundary` bloquea registries completos y content collections dentro de canonical project data con diagnostics reparables.
-- ExportIR ejecuta el ownership boundary antes de parse/compile y permanece libre de live registries/content stores.
-- Suite dedicada M02.8: `9/9` verde; pipeline raíz, M02.1–M02.7, Base CI, Studio y export parity verdes en PR.
-- Gate definitivo main `32193738411` — `success`.
-- Marker: `PASS_M02_8_MODEL_OWNERSHIP`.
-- Artifact final: `9345132952` — `m02-8-model-ownership-evidence`.
-- Digest: `sha256:7751ba52ff3cf167dad37e604617a1ac2fef808491952394bdb83023c825af1f`.
+- Taxonomía ejecutable: 14 Project Objects + 6 Application Registries + 6 Content Entities; ownership/export boundary fail-closed.
+- ProjectDefinition/Document permanecen v3; suite dedicada `9/9`.
+- Gate main `32193738411` success; artifact `9345132952`; digest `sha256:7751ba52ff3cf167dad37e604617a1ac2fef808491952394bdb83023c825af1f`.
+
+## Cierre técnico M02.9
+- PR `#11`; squash merge `53401b29df8ef44deb69468c92cd36ae5f547761`.
+- Wrapper portable determinista `{ engine, schemaVersion, value }`; domain permanece engine-agnostic.
+- React Query Builder rules validados con `@react-querybuilder/core@8.23.0` y formatter parametrizado real.
+- Tiptap rich-text JSON usa un grafo mínimo exacto `3.29.2`: core, html, Document, Paragraph y Text; se eliminó el aggregate StarterKit para evitar dos universos de tipos/patches.
+- Compatibility Analyzer bloquea engine/version inválidos y payloads runtime prohibidos; Puck AppState/history, Rete NodeEditor/history, Zustand stores y TanStack Query cache siguen fuera del modelo canónico.
+- ProjectDefinition/Document permanecen schema v3; no se añadió migración de proyecto innecesaria.
+- Suite dedicada M02.9: `11/11`; pipeline acumulado en `main`: Node `27/27`, Vitest `128/128`, Playwright `1/1`; lint/Prettier, typecheck, boundaries, Studio/PWA y build verdes.
+- Gate definitivo main `32196416073` — `success`.
+- Marker: `PASS_M02_9_ENGINE_PAYLOAD_WRAPPERS`.
+- Artifact final: `9346006290` — `m02-9-engine-payload-wrappers-evidence`.
+- Digest: `sha256:0083bf96e88e0935a9876a37d8fc465b8315e03ec836dcd1d8bd8609c0d8770b`.
 - P0/P1: `0`.
 
 ## Gate actual
-F02 continúa activa con `GREEN_THROUGH_M02.8`.
+M02.1–M02.9 tienen cierre técnico verde. F02 permanece `IN_PROGRESS` únicamente hasta completar su gate final integrado.
 
 ## Siguiente transición permitida
-Implementar y cerrar exclusivamente M02.9: wrappers versionados `{ engine, schemaVersion, value }` para payloads serializables de engines, inicialmente RQB rules y Tiptap richtext; validators/migrations permanecen en los adapters, Compatibility Analyzer bloquea engine/version no soportado y AppState/classes runtime de Rete/Puck siguen prohibidos. Después ejecutar el gate final de F02 antes de iniciar F03.
+Ejecutar Gate F02. Solo tras `electrocraft/F02 = success` se marcarán M02.9/F02 como `COMPLETADA/GREEN` y se activará F03 / M03.1.
