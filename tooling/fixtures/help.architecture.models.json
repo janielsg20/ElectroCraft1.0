@@ -2,13 +2,17 @@
   "id": "help.architecture.models",
   "locale": "es",
   "title": "Modelo canónico del proyecto",
-  "summary": "Explica qué datos pertenecen al ProjectDefinition y a los Documents sin persistir internals de engines.",
+  "summary": "Explica qué datos pertenecen al ProjectDefinition, Documents y ComponentDefinition sin persistir internals de engines.",
   "details": [
     "ElectroCraftProjectDefinition guarda identidad, settings y referencias por ID; no embebe todos los documentos en un mega JSON.",
     "ElectroCraftDocument usa screen, template, form, admin-screen o reusable-component; page solo existe como entrada legacy migrable a screen.",
     "Cada Document conserva un árbol portable mínimo de nodes con componentRef, props JSON y children; nunca Puck AppState.",
-    "Los schemas canónicos usan Zod strictObject y schemaVersion 1; claves desconocidas fallan cerrado.",
+    "ElectroCraftComponentDefinition guarda metadata, campos, props por defecto, layout, style y refs; nunca un React component o renderer persistido.",
+    "ElectroCraftLayout usa modos semánticos flow, stack, row, grid y overlay en lugar de CSS o payloads internos de Puck.",
+    "ElectroCraftStyle usa valores estructurados/tokens y overrides responsive/platform; Tailwind o NativeWind solo pueden existir como salida de adapters.",
+    "Los schemas canónicos usan Zod strictObject y schemaVersion; claves desconocidas fallan cerrado.",
     "Los IDs canónicos se generan de forma determinista por namespace y seed.",
-    "El application service reabre proyectos mediante un repository port y bloquea refs faltantes o payloads inválidos en vez de perder datos silenciosamente."
+    "Los application services reabren objetos mediante repository ports y bloquean refs o payloads inválidos en vez de perder datos silenciosamente.",
+    "El adapter @electrocraft/editor-puck traduce ComponentDefinition a Config/ComponentConfig de Puck e inyecta renderers fuera del modelo persistido."
   ]
 }
