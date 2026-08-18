@@ -1,21 +1,21 @@
 # HANDOFF — ElectroCraft
 
 ## Current
-F02 / M02.9 — Definir wrappers versionados para payloads de engines — `ACTIVE`.
+F02 / M02.9 — cierre técnico GREEN; Gate F02 — `ACTIVE` transition guard.
 
 ## Siguiente acción exacta
-1. Leer `.ai/microphases/M02_9.md` y conservar exactamente 17 owner packages; contracts siguen en `packages/domain/src/contracts/`.
-2. Definir en domain el wrapper JSON portable `{ engine, schemaVersion, value }` sin importar tipos de RQB, Tiptap, Rete o Puck.
-3. Aplicar inicialmente el wrapper a React Query Builder rules y Tiptap richtext; el engine adapter valida/interpreta `value` y posee sus migraciones de formato.
-4. Mantener Rete/Puck como definiciones Electro portables; no persistir NodeEditor, sockets, histories, AppState, React nodes, classes ni callbacks.
-5. Crear Compatibility Analyzer application-facing que reporte `supported` o `blocked` para engine/schemaVersion desconocidos con diagnostics reparables.
-6. Documentar allowlist/denylist en `.ai/ENGINE_PAYLOAD_POLICY.md`, incluyendo serializer/migration ownership.
-7. Añadir fixtures round-trip y negative cases para engine/version/value inválidos; comprobar que domain solo ve JSON.
-8. Conectar adapters reales de query-rqb/media-tiptap sin crear subsystem paralelo ni mover ownership.
-9. Añadir gate M02.9, ejecutar suite dedicada, `npm run check`, gates M02.1–M02.8, Studio y export parity cuando corresponda.
-10. Fusionar solo verde; volver a validar M02.9 en `main`, registrar artifact/digest y ejecutar el gate final de F02 antes de activar F03.
+1. Mantener M02.9 como la única microfase `ACTIVE` hasta cerrar Gate F02 para respetar la convención documental de continuidad.
+2. Ejecutar `.github/workflows/f02-canonical-model-gate.yml` sobre el árbol integrado de `main`.
+3. Verificar exactamente 17 owner packages y ausencia de package paralelo `packages/contracts`.
+4. Exigir evidencia de cierre M02.1–M02.9 y los docs `MODEL_OWNERSHIP.md` / `ENGINE_PAYLOAD_POLICY.md`.
+5. Ejecutar las suites dedicadas `test:m02-1`…`test:m02-9` y después `npm run check` completo.
+6. Confirmar ProjectDefinition/Document v3, JSON/checksum/migrations, ExportIR target-neutral, ownership 14/6/6 y wrappers OSS fail-closed sin runtime internals.
+7. Generar marker/artifact del Gate F02 y publicar status `electrocraft/F02`.
+8. Solo con Gate F02 `success`, marcar M02.9 `COMPLETADA`, F02 `COMPLETADA`, Gate F02 `GREEN` y crear evidencia de cierre de fase.
+9. Activar F03 / M03.1 como única microfase `ACTIVE` y actualizar STATE/TRACKING/HANDOFF/CHANGELOG.
+10. Para M03.1, leer su spec, consultar APIs oficiales actuales de shadcn/ui Radix, Radix, Tailwind y Lucide, y mantener `packages/design-system` como owner antes de crear AppShell UI.
 
 ## Read set
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M02_9.md`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/phases/F02.md`.
 
-M02.1–M02.8 están cerradas; no reabrirlas salvo regresión reproducible.
+M02.1–M02.9 tienen validación técnica verde; no iniciar M03.1 antes de Gate F02 verde.
