@@ -1,14 +1,16 @@
-import { defineConfig } from 'vite';
+import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import { VitePWA } from 'vite-plugin-pwa';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { defineConfig } from 'vite';
+import { VitePWA } from 'vite-plugin-pwa';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   root: here,
   plugins: [
+    tailwindcss(),
     react(),
     VitePWA({
       injectRegister: 'script',
@@ -18,13 +20,13 @@ export default defineConfig({
         id: '/',
         name: 'ElectroCraft — Desarrollo',
         short_name: 'ElectroCraft',
-        description: 'Bootstrap técnico de ElectroCraft Studio.',
+        description: 'Studio de ElectroCraft.',
         lang: 'es',
         start_url: '/',
         scope: '/',
         display: 'standalone',
-        theme_color: '#111318',
-        background_color: '#0c0e12',
+        theme_color: '#17191f',
+        background_color: '#111318',
         icons: [
           {
             src: '/electrocraft-dev.svg',
