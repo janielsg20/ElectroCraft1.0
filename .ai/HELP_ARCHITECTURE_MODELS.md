@@ -6,7 +6,7 @@
 Modelo canónico del proyecto
 
 ## Resumen
-ElectroCraft separa proyecto, documentos, componentes, datos, queries, formularios, acciones, estado, navegación, permisos, layout y estilo de los engines de edición/render/runtime/storage para conservar portabilidad, referencias estables y ownership neutral a targets.
+ElectroCraft separa proyecto, documentos, componentes, datos, queries, formularios, acciones, estado, navegación, permisos, temas, blueprints y registries de los engines de edición/render/runtime/storage para conservar portabilidad, referencias estables y ownership neutral a targets.
 
 ## M02.1 — ProjectDefinition y Document
 - `ElectroCraftProjectDefinition` contiene identidad, `schemaVersion`, versión de objeto, settings de app, targets por defecto, refs y feature flags.
@@ -41,5 +41,16 @@ ElectroCraft separa proyecto, documentos, componentes, datos, queries, formulari
 - `ElectroCraftRole` solo agrupa PermissionPolicy refs. `ElectroCraftPermissionPolicy` expresa allow/deny por capability y target; no persiste callbacks de autorización.
 - `auth-core` evalúa policies fail-closed y `deny` prevalece sobre `allow`.
 - `application` valida las referencias cruzadas; missing refs quedan como diagnósticos reparables y nunca se ignoran silenciosamente.
+
+## M02.5 — Theme, Blueprint, Registries y Capability
+- `ElectroCraftTheme` contiene únicamente diseño visual portable: tokens, typography, variants, spacing, radius, shadows y motion. No contiene componentes ni runtime state.
+- Template no es un modelo paralelo: continúa como `ElectroCraftDocument kind=template` y usa `templateMeta` + Display Conditions.
+- `ElectroCraftBlueprintPackage` es un paquete externo versionado que describe artifacts y capabilities requeridas. El proyecto conserva únicamente `originBlueprint` opcional y los objetos instalados se comportan como objetos canónicos normales.
+- `ElectroCraftBlueprintInstaller` vive en `application`, detecta conflictos antes de aplicar y conserva journal suficiente para rollback.
+- `ElectroPlatformCapabilityRegistry` vive en `application`, es versionado y no se serializa completo dentro del proyecto.
+- `ElectroCraftProjectDefinition` v3 persiste solo `requiredCapabilities`, overrides por target y refs de definitions creadas por usuario.
+- Component/Field/Action/Provider registries son registries de aplicación; definitions core/extension no se copian al proyecto.
+- `export-ir` consume el reporte neutral `supported/adapted/blocked`, no el registry runtime.
+- La referencia histórica `packages/contracts/` de la especificación se materializa en `packages/domain/src/contracts/`: F01 fijó 17 owner packages y crear un package 18 duplicaría el owner canónico ya establecido.
 
 La versión estructurada para el futuro HelpRegistry vive en `tooling/fixtures/help.architecture.models.json`; F02 no introduce un HelpRegistry paralelo.

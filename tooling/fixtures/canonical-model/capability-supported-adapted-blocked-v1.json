@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "requiredCapabilities": ["storage.local", "navigation.basic", "media.native-camera"],
+  "expected": {
+    "local": {
+      "storage.local": "supported",
+      "navigation.basic": "supported",
+      "media.native-camera": "blocked"
+    },
+    "react": {
+      "storage.local": "supported",
+      "navigation.basic": "supported",
+      "media.native-camera": "blocked"
+    },
+    "pwa": {
+      "storage.local": "supported",
+      "navigation.basic": "adapted",
+      "media.native-camera": "blocked"
+    }
+  },
+  "expectedBlocked": true
+}

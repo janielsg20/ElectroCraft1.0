@@ -2,6 +2,11 @@ import * as z from 'zod';
 import { electroCraftDocumentSchema, type ElectroCraftDocument } from './document';
 import { electroCraftMetadataSchema } from './json-value';
 import { electroCraftObjectIdSchema, type ElectroCraftObjectId } from './object-id';
+import {
+  electroCraftCapabilityIdSchema,
+  electroCraftCapabilitySupportModeSchema,
+  electroCraftOriginBlueprintSchema,
+} from './theme-blueprint';
 
 export const electroCraftTargetIdSchema = z.enum([
   'local',
@@ -37,15 +42,32 @@ const projectBaseShape = {
   metadata: electroCraftMetadataSchema,
 } as const;
 
-export const electroCraftProjectDefinitionSchema = z.strictObject({
-  schemaVersion: z.literal(2),
-  ...projectBaseShape,
+const projectDataShape = {
   dataSourceRefs: z.array(electroCraftObjectIdSchema),
   dataSchemaRefs: z.array(electroCraftObjectIdSchema),
   queryRefs: z.array(electroCraftObjectIdSchema),
+} as const;
+
+export const electroCraftProjectDefinitionSchema = z.strictObject({
+  schemaVersion: z.literal(3),
+  ...projectBaseShape,
+  ...projectDataShape,
+  originBlueprint: electroCraftOriginBlueprintSchema.nullable(),
+  requiredCapabilities: z.array(electroCraftCapabilityIdSchema).max(200),
+  targetCapabilityOverrides: z.partialRecord(
+    electroCraftTargetIdSchema,
+    z.record(electroCraftCapabilityIdSchema, electroCraftCapabilitySupportModeSchema),
+  ),
+  userRegistryDefinitionRefs: z.array(electroCraftObjectIdSchema).max(2_000),
 });
 
 export type ElectroCraftProjectDefinition = z.infer<typeof electroCraftProjectDefinitionSchema>;
+
+const legacyProjectDefinitionV2Schema = z.strictObject({
+  schemaVersion: z.literal(2),
+  ...projectBaseShape,
+  ...projectDataShape,
+});
 
 const legacyProjectDefinitionV1Schema = z.strictObject({
   schemaVersion: z.literal(1),
@@ -54,23 +76,45 @@ const legacyProjectDefinitionV1Schema = z.strictObject({
 
 export interface ElectroCraftProjectDefinitionImportResult {
   project: ElectroCraftProjectDefinition;
-  migratedFrom: 1 | null;
+  migratedFrom: 1 | 2 | null;
+}
+
+function emptyM02_5ProjectFields() {
+  return {
+    originBlueprint: null,
+    requiredCapabilities: [],
+    targetCapabilityOverrides: {},
+    userRegistryDefinitionRefs: [],
+  } as const;
 }
 
 export function importElectroCraftProjectDefinition(input: unknown): ElectroCraftProjectDefinitionImportResult {
   const canonical = electroCraftProjectDefinitionSchema.safeParse(input);
   if (canonical.success) return { project: canonical.data, migratedFrom: null };
 
-  const legacy = legacyProjectDefinitionV1Schema.safeParse(input);
-  if (!legacy.success) throw canonical.error;
+  const legacyV2 = legacyProjectDefinitionV2Schema.safeParse(input);
+  if (legacyV2.success) {
+    return {
+      project: electroCraftProjectDefinitionSchema.parse({
+        ...legacyV2.data,
+        schemaVersion: 3,
+        ...emptyM02_5ProjectFields(),
+      }),
+      migratedFrom: 2,
+    };
+  }
+
+  const legacyV1 = legacyProjectDefinitionV1Schema.safeParse(input);
+  if (!legacyV1.success) throw canonical.error;
 
   return {
     project: electroCraftProjectDefinitionSchema.parse({
-      ...legacy.data,
-      schemaVersion: 2,
+      ...legacyV1.data,
+      schemaVersion: 3,
       dataSourceRefs: [],
       dataSchemaRefs: [],
       queryRefs: [],
+      ...emptyM02_5ProjectFields(),
     }),
     migratedFrom: 1,
   };
@@ -84,6 +128,9 @@ export type CanonicalReferenceDiagnosticCode =
   | 'duplicate-data-source-ref'
   | 'duplicate-data-schema-ref'
   | 'duplicate-query-ref'
+  | 'duplicate-required-capability'
+  | 'duplicate-user-registry-definition-ref'
+  | 'capability-override-not-required'
   | 'root-navigation-not-listed'
   | 'duplicate-document-id'
   | 'missing-document-ref';
@@ -116,11 +163,23 @@ export function validateProjectDefinitionSemantics(
     ['duplicate-data-source-ref', project.dataSourceRefs],
     ['duplicate-data-schema-ref', project.dataSchemaRefs],
     ['duplicate-query-ref', project.queryRefs],
+    ['duplicate-required-capability', project.requiredCapabilities],
+    ['duplicate-user-registry-definition-ref', project.userRegistryDefinitionRefs],
   ] as const;
 
   for (const [code, values] of lists) {
     for (const duplicate of duplicateValues(values)) {
       diagnostics.push({ code, ownerId: project.id, ref: duplicate });
+    }
+  }
+
+  const requiredCapabilities = new Set(project.requiredCapabilities);
+  for (const overrides of Object.values(project.targetCapabilityOverrides)) {
+    if (!overrides) continue;
+    for (const capabilityId of Object.keys(overrides)) {
+      if (!requiredCapabilities.has(capabilityId)) {
+        diagnostics.push({ code: 'capability-override-not-required', ownerId: project.id, ref: capabilityId });
+      }
     }
   }
 

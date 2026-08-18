@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "registryVersion": 1,
+  "definitions": [
+    {
+      "schemaVersion": 1,
+      "id": "storage.local",
+      "version": 1,
+      "label": "Almacenamiento local",
+      "support": [
+        { "target": "local", "mode": "supported", "adapter": null, "reason": null },
+        { "target": "react", "mode": "supported", "adapter": null, "reason": null },
+        { "target": "pwa", "mode": "supported", "adapter": null, "reason": null }
+      ],
+      "metadata": { "fixture": "m02.5" }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "navigation.basic",
+      "version": 1,
+      "label": "Navegación básica",
+      "support": [
+        { "target": "local", "mode": "supported", "adapter": null, "reason": null },
+        { "target": "react", "mode": "supported", "adapter": null, "reason": null },
+        { "target": "pwa", "mode": "adapted", "adapter": "router.web", "reason": "Se adapta al router web." }
+      ],
+      "metadata": { "fixture": "m02.5" }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "media.native-camera",
+      "version": 1,
+      "label": "Cámara nativa",
+      "support": [
+        { "target": "local", "mode": "blocked", "adapter": null, "reason": "No existe cámara nativa en target local." },
+        {
+          "target": "react",
+          "mode": "blocked",
+          "adapter": null,
+          "reason": "El runtime React web no expone esta capability."
+        },
+        { "target": "pwa", "mode": "blocked", "adapter": null, "reason": "La capability exige runtime nativo." }
+      ],
+      "metadata": { "fixture": "m02.5" }
+    }
+  ]
+}

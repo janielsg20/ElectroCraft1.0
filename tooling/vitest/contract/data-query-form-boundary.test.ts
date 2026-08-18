@@ -13,7 +13,7 @@ function fixture(name: string): unknown {
 
 describe('M02.3 data/query/form boundaries', () => {
   it('keeps connector registry and credentials outside persisted ProjectDefinition', () => {
-    const project = electroCraftProjectDefinitionSchema.parse(fixture('project-v2'));
+    const project = electroCraftProjectDefinitionSchema.parse(fixture('project-v3'));
     const serialized = serializeElectroCraftProjectDefinition(project);
 
     expect(serialized).not.toMatch(/ConnectorRegistry|connectorRegistry|password|accessToken|apiKey/i);

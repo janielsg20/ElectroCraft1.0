@@ -39,6 +39,16 @@ import {
   type ElectroCraftProjectDefinitionImportResult,
 } from './project-definition';
 import { electroCraftQueryDefinitionSchema, type ElectroCraftQueryDefinition } from './query-definition';
+import {
+  electroCraftBlueprintPackageSchema,
+  electroCraftRegistryDefinitionSchema,
+  electroCraftThemeSchema,
+  electroPlatformCapabilityDefinitionSchema,
+  type ElectroCraftBlueprintPackage,
+  type ElectroCraftRegistryDefinition,
+  type ElectroCraftTheme,
+  type ElectroPlatformCapabilityDefinition,
+} from './theme-blueprint';
 
 function sortJsonValue(value: unknown): unknown {
   if (Array.isArray(value)) return value.map((item) => sortJsonValue(item));
@@ -191,6 +201,40 @@ export function deserializeElectroCraftPermissionPolicy(serialized: string): Ele
   return electroCraftPermissionPolicySchema.parse(parseJson(serialized));
 }
 
+export function serializeElectroCraftTheme(input: unknown): string {
+  return stableCanonicalStringify(electroCraftThemeSchema.parse(input));
+}
+
+export function deserializeElectroCraftTheme(serialized: string): ElectroCraftTheme {
+  return electroCraftThemeSchema.parse(parseJson(serialized));
+}
+
+export function serializeElectroCraftBlueprintPackage(input: unknown): string {
+  return stableCanonicalStringify(electroCraftBlueprintPackageSchema.parse(input));
+}
+
+export function deserializeElectroCraftBlueprintPackage(serialized: string): ElectroCraftBlueprintPackage {
+  return electroCraftBlueprintPackageSchema.parse(parseJson(serialized));
+}
+
+export function serializeElectroCraftRegistryDefinition(input: unknown): string {
+  return stableCanonicalStringify(electroCraftRegistryDefinitionSchema.parse(input));
+}
+
+export function deserializeElectroCraftRegistryDefinition(serialized: string): ElectroCraftRegistryDefinition {
+  return electroCraftRegistryDefinitionSchema.parse(parseJson(serialized));
+}
+
+export function serializeElectroPlatformCapabilityDefinition(input: unknown): string {
+  return stableCanonicalStringify(electroPlatformCapabilityDefinitionSchema.parse(input));
+}
+
+export function deserializeElectroPlatformCapabilityDefinition(
+  serialized: string,
+): ElectroPlatformCapabilityDefinition {
+  return electroPlatformCapabilityDefinitionSchema.parse(parseJson(serialized));
+}
+
 export function canonicalProjectRoundTrip(project: ElectroCraftProjectDefinition): ElectroCraftProjectDefinition {
   return deserializeElectroCraftProjectDefinition(serializeElectroCraftProjectDefinition(project));
 }
@@ -245,4 +289,20 @@ export function canonicalRoleRoundTrip(role: ElectroCraftRole): ElectroCraftRole
 
 export function canonicalPermissionPolicyRoundTrip(policy: ElectroCraftPermissionPolicy): ElectroCraftPermissionPolicy {
   return deserializeElectroCraftPermissionPolicy(serializeElectroCraftPermissionPolicy(policy));
+}
+
+export function canonicalThemeRoundTrip(theme: ElectroCraftTheme): ElectroCraftTheme {
+  return deserializeElectroCraftTheme(serializeElectroCraftTheme(theme));
+}
+
+export function canonicalBlueprintPackageRoundTrip(
+  blueprint: ElectroCraftBlueprintPackage,
+): ElectroCraftBlueprintPackage {
+  return deserializeElectroCraftBlueprintPackage(serializeElectroCraftBlueprintPackage(blueprint));
+}
+
+export function canonicalRegistryDefinitionRoundTrip(
+  definition: ElectroCraftRegistryDefinition,
+): ElectroCraftRegistryDefinition {
+  return deserializeElectroCraftRegistryDefinition(serializeElectroCraftRegistryDefinition(definition));
 }

@@ -1,8 +1,10 @@
 import { packageDescriptor as dep0 } from '@electrocraft/domain';
 
 export * from './app-behavior-service';
+export * from './blueprint-installer';
 export * from './component-definition-service';
 export * from './connector-registry';
+export * from './ownership-registry-service';
 export * from './project-document-service';
 
 export const packageDescriptor = Object.freeze({

@@ -22,11 +22,13 @@ describe('M02.1 canonical model boundaries', () => {
     expect(schema.additionalProperties).toBe(false);
     expect(schema.properties).toHaveProperty('documentRefs');
     expect(schema.properties).toHaveProperty('dataSourceRefs');
+    expect(schema.properties).toHaveProperty('requiredCapabilities');
     expect(schema.properties).not.toHaveProperty('documents');
+    expect(schema.properties).not.toHaveProperty('capabilityRegistry');
   });
 
   it('fails closed when a referenced document is missing', () => {
-    const project = electroCraftProjectDefinitionSchema.parse(fixture('project-v2'));
+    const project = electroCraftProjectDefinitionSchema.parse(fixture('project-v3'));
     const diagnostics = validateProjectDocumentReferences(project, []);
 
     expect(diagnostics).toEqual(
@@ -40,7 +42,7 @@ describe('M02.1 canonical model boundaries', () => {
   });
 
   it('rejects Puck/AppState internals as canonical document keys', () => {
-    const document = fixture('screen-v2') as Record<string, unknown>;
+    const document = fixture('screen-v3') as Record<string, unknown>;
     const result = electroCraftDocumentSchema.safeParse({
       ...document,
       appState: { content: [] },
@@ -55,6 +57,7 @@ describe('M02.1 canonical model boundaries', () => {
       'packages/domain/src/contracts/project-definition.ts',
       'packages/domain/src/contracts/data-definition.ts',
       'packages/domain/src/contracts/query-definition.ts',
+      'packages/domain/src/contracts/theme-blueprint.ts',
       'packages/domain/src/contracts/serialization.ts',
     ];
     const source = files.map((file) => readFileSync(resolve(file), 'utf8')).join('\n');

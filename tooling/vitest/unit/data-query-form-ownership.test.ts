@@ -70,11 +70,12 @@ describe('M02.3 data/query/form ownership', () => {
   });
 
   it('keeps forms inside ElectroCraftDocument with required formMeta', () => {
-    const form = electroCraftDocumentSchema.parse(fixture('form-v2'));
+    const form = electroCraftDocumentSchema.parse(fixture('form-v3'));
     const schema = electroCraftDataSchemaSchema.parse(fixture('data-schema-v1'));
 
     expect(form.kind).toBe('form');
     expect(form.formMeta).not.toBeNull();
+    expect(form.templateMeta).toBeNull();
     expect(validateFormDocument(form, [schema])).toEqual([]);
     expect(collectFormBindings(form).map(({ binding }) => binding.source)).toEqual(['query', 'query']);
 
@@ -83,11 +84,11 @@ describe('M02.3 data/query/form ownership', () => {
 
   it('validates the canonical project data ownership graph with no parallel registries', () => {
     const graph = {
-      project: electroCraftProjectDefinitionSchema.parse(fixture('project-v2')),
+      project: electroCraftProjectDefinitionSchema.parse(fixture('project-v3')),
       sources: [electroCraftDataSourceDefinitionSchema.parse(fixture('data-source-v1'))],
       schemas: [electroCraftDataSchemaSchema.parse(fixture('data-schema-v1'))],
       queries: [electroCraftQueryDefinitionSchema.parse(fixture('query-v1'))],
-      forms: [electroCraftDocumentSchema.parse(fixture('form-v2'))],
+      forms: [electroCraftDocumentSchema.parse(fixture('form-v3'))],
     };
 
     expect(validateDataOwnershipGraph(graph)).toEqual([]);
@@ -97,7 +98,10 @@ describe('M02.3 data/query/form ownership', () => {
     const project = importElectroCraftProjectDefinition(fixture('project-v1'));
     const document = importElectroCraftDocument(fixture('screen-v1'));
 
-    expect(project).toMatchObject({ migratedFrom: 1, project: { schemaVersion: 2 } });
-    expect(document).toMatchObject({ migratedFrom: 1, document: { schemaVersion: 2, formMeta: null } });
+    expect(project).toMatchObject({ migratedFrom: 1, project: { schemaVersion: 3 } });
+    expect(document).toMatchObject({
+      migratedFrom: 1,
+      document: { schemaVersion: 3, formMeta: null, templateMeta: null },
+    });
   });
 });

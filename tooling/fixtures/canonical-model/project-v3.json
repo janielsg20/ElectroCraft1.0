@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 3,
+  "id": "ec_project_0000000000001",
+  "version": 3,
+  "name": "Proyecto canónico de prueba",
+  "appSettings": {
+    "displayName": "ElectroCraft Fixture",
+    "locale": "es"
+  },
+  "defaultTargets": ["local", "react", "pwa"],
+  "documentRefs": ["ec_document_0000000000002", "ec_document_000000000000e", "ec_document_000000000000q"],
+  "routeRefs": ["ec_route_0000000000005"],
+  "navigationRefs": ["ec_navigation_0000000000004"],
+  "rootNavigationRef": "ec_navigation_0000000000004",
+  "themeRef": "ec_theme_0000000000006",
+  "dataSourceRefs": ["ec_source_0000000000007"],
+  "dataSchemaRefs": ["ec_schema_0000000000008"],
+  "queryRefs": ["ec_query_000000000000d"],
+  "originBlueprint": {
+    "packageId": "electrocraft.blueprint.starter",
+    "version": "1.0.0"
+  },
+  "requiredCapabilities": ["storage.local", "navigation.basic"],
+  "targetCapabilityOverrides": {
+    "pwa": {
+      "navigation.basic": "adapted"
+    }
+  },
+  "userRegistryDefinitionRefs": ["ec_registry-definition_000000000000r"],
+  "featureFlags": {
+    "canonicalModel": true,
+    "dataOwnership": true,
+    "themeBlueprintOwnership": true
+  },
+  "metadata": {
+    "fixture": "m02.5"
+  }
+}
