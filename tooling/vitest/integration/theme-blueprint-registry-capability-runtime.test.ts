@@ -73,7 +73,12 @@ describe('M02.5 integrated Blueprint and registry ownership', () => {
       /unresolved conflicts/,
     );
 
-    evidence('m02-5-blueprint-install-report.json', { plan, conflictPlan, journal, afterRollback: contentHashMap(store) });
+    evidence('m02-5-blueprint-install-report.json', {
+      plan,
+      conflictPlan,
+      journal,
+      afterRollback: contentHashMap(store),
+    });
   });
 
   it('produces a real supported/adapted/blocked capability report and neutral ExportIR plan', () => {

@@ -85,7 +85,11 @@ export const electroCraftDocumentSchema = z
       context.addIssue({ code: 'custom', path: ['templateMeta'], message: 'template document requires templateMeta' });
     }
     if (document.kind !== 'template' && document.templateMeta !== null) {
-      context.addIssue({ code: 'custom', path: ['templateMeta'], message: 'templateMeta is only valid for template documents' });
+      context.addIssue({
+        code: 'custom',
+        path: ['templateMeta'],
+        message: 'templateMeta is only valid for template documents',
+      });
     }
     if (document.kind === 'form' && document.formMeta !== null) {
       const hasDataSchema = document.formMeta.dataSchemaRef !== null;

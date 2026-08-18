@@ -295,7 +295,9 @@ export function canonicalThemeRoundTrip(theme: ElectroCraftTheme): ElectroCraftT
   return deserializeElectroCraftTheme(serializeElectroCraftTheme(theme));
 }
 
-export function canonicalBlueprintPackageRoundTrip(blueprint: ElectroCraftBlueprintPackage): ElectroCraftBlueprintPackage {
+export function canonicalBlueprintPackageRoundTrip(
+  blueprint: ElectroCraftBlueprintPackage,
+): ElectroCraftBlueprintPackage {
   return deserializeElectroCraftBlueprintPackage(serializeElectroCraftBlueprintPackage(blueprint));
 }
 

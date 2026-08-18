@@ -43,7 +43,9 @@ describe('M02.5 theme/blueprint/registry/capability contracts', () => {
     expect(template.kind).toBe('template');
     expect(template.templateMeta?.displayConditions).toHaveLength(1);
     expect(electroCraftDocumentSchema.safeParse({ ...template, templateMeta: null }).success).toBe(false);
-    expect(electroCraftDocumentSchema.safeParse({ ...screen, templateMeta: template.templateMeta }).success).toBe(false);
+    expect(electroCraftDocumentSchema.safeParse({ ...screen, templateMeta: template.templateMeta }).success).toBe(
+      false,
+    );
   });
 
   it('keeps Theme visual-only and rejects component/runtime ownership drift', () => {

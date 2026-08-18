@@ -33,7 +33,12 @@
       "label": "Cámara nativa",
       "support": [
         { "target": "local", "mode": "blocked", "adapter": null, "reason": "No existe cámara nativa en target local." },
-        { "target": "react", "mode": "blocked", "adapter": null, "reason": "El runtime React web no expone esta capability." },
+        {
+          "target": "react",
+          "mode": "blocked",
+          "adapter": null,
+          "reason": "El runtime React web no expone esta capability."
+        },
         { "target": "pwa", "mode": "blocked", "adapter": null, "reason": "La capability exige runtime nativo." }
       ],
       "metadata": { "fixture": "m02.5" }

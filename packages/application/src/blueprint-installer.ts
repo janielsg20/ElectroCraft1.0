@@ -46,10 +46,7 @@ export class ElectroCraftBlueprintInstaller {
     this.version = version;
   }
 
-  plan(
-    blueprintInput: unknown,
-    installedInputs: readonly InstalledBlueprintObject[],
-  ): BlueprintInstallPlan {
+  plan(blueprintInput: unknown, installedInputs: readonly InstalledBlueprintObject[]): BlueprintInstallPlan {
     const blueprint = electroCraftBlueprintPackageSchema.parse(blueprintInput);
     const installed = new Map(installedInputs.map((entry) => [entry.objectId, structuredClone(entry)] as const));
     const creates: ElectroCraftBlueprintArtifact[] = [];
@@ -76,7 +73,10 @@ export class ElectroCraftBlueprintInstaller {
     };
   }
 
-  apply(plan: BlueprintInstallPlan, store: Map<ElectroCraftObjectId, InstalledBlueprintObject>): BlueprintInstallJournal {
+  apply(
+    plan: BlueprintInstallPlan,
+    store: Map<ElectroCraftObjectId, InstalledBlueprintObject>,
+  ): BlueprintInstallJournal {
     if (plan.conflicts.length > 0) throw new TypeError('blueprint install plan contains unresolved conflicts');
     const replacedBefore: InstalledBlueprintObject[] = [];
     const createdObjectRefs: ElectroCraftObjectId[] = [];
@@ -93,7 +93,8 @@ export class ElectroCraftBlueprintInstaller {
     }
 
     for (const artifact of plan.creates) {
-      if (store.has(artifact.objectId)) throw new TypeError(`create target appeared during install: ${artifact.objectId}`);
+      if (store.has(artifact.objectId))
+        throw new TypeError(`create target appeared during install: ${artifact.objectId}`);
       createdObjectRefs.push(artifact.objectId);
       store.set(artifact.objectId, {
         objectId: artifact.objectId,
