@@ -1,4 +1,11 @@
 import {
+  electroCraftComponentDefinitionSchema,
+  importElectroCraftComponentDefinition,
+  validateComponentDefinitionReferences,
+  type ElectroCraftComponentDefinition,
+  type ElectroCraftComponentDefinitionImportResult,
+} from './component-definition';
+import {
   electroCraftDocumentSchema,
   importElectroCraftDocument,
   type ElectroCraftDocument,
@@ -62,10 +69,36 @@ export function deserializeElectroCraftDocument(serialized: string): ElectroCraf
   return importElectroCraftDocument(parseJson(serialized));
 }
 
+export function serializeElectroCraftComponentDefinition(input: unknown): string {
+  const definition = electroCraftComponentDefinitionSchema.parse(input);
+  const diagnostics = validateComponentDefinitionReferences(definition);
+  if (diagnostics.length > 0) {
+    throw new TypeError(`invalid component references: ${diagnostics.map(({ code }) => code).join(', ')}`);
+  }
+  return stableCanonicalStringify(definition);
+}
+
+export function deserializeElectroCraftComponentDefinition(
+  serialized: string,
+): ElectroCraftComponentDefinitionImportResult {
+  const result = importElectroCraftComponentDefinition(parseJson(serialized));
+  const diagnostics = validateComponentDefinitionReferences(result.definition);
+  if (diagnostics.length > 0) {
+    throw new TypeError(`invalid component references: ${diagnostics.map(({ code }) => code).join(', ')}`);
+  }
+  return result;
+}
+
 export function canonicalProjectRoundTrip(project: ElectroCraftProjectDefinition): ElectroCraftProjectDefinition {
   return deserializeElectroCraftProjectDefinition(serializeElectroCraftProjectDefinition(project));
 }
 
 export function canonicalDocumentRoundTrip(document: ElectroCraftDocument): ElectroCraftDocument {
   return deserializeElectroCraftDocument(serializeElectroCraftDocument(document)).document;
+}
+
+export function canonicalComponentDefinitionRoundTrip(
+  definition: ElectroCraftComponentDefinition,
+): ElectroCraftComponentDefinition {
+  return deserializeElectroCraftComponentDefinition(serializeElectroCraftComponentDefinition(definition)).definition;
 }
