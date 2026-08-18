@@ -72,7 +72,11 @@ jobs:
       - name: Lint
         run: npm run lint
       - name: Typecheck
-        run: npm run typecheck
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          set -o pipefail
+          npm run typecheck 2>&1 | tee artifacts/typecheck.log
       - name: Build
         run: npm run build
       - name: Tests
