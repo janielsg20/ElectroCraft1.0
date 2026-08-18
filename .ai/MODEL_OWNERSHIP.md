@@ -107,3 +107,5 @@ F01 fixed exactly 17 owner packages and assigned canonical contracts to `@electr
 
 ## Enforcement gate
 M02.8 fails closed when a complete application registry or runtime/content collection appears inside canonical project data, and diagnostics must provide code, path, cause and repair guidance.
+
+M02.8 does not change the persisted ProjectDefinition v3 or Document v3 shapes, so it requires no new project migration step; it formalizes and enforces ownership around the existing refs.
