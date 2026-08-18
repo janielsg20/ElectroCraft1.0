@@ -1,92 +1,54 @@
-# .ai DOCUMENTATION SYSTEM — ElectroCraft Eighth Final
+# Sistema documental `.ai/` — ElectroCraft
 
-# Canonical
-- PROMPT_MAESTRO_ELECTROCRAFT.md
-- REQUIREMENTS.md
-- RULES.md
-- PRODUCT_DIRECTION.md
-- OSS_DECISION_MATRIX.md
-- ENGINE_RESPONSIBILITY_MATRIX.md
-- MODEL_OWNERSHIP.md
-- ARCHITECTURE.md
-- CODEBASE_LOCATION_MAP.md
+Este archivo es el mapa documental canónico. `AGENTS.md` es solo el entry point corto.
 
-# Continuity
-- MEMORY.md
-- STATE.md
-- TRACKING.md
-- DECISIONS.md
-- BLOCKERS.md
-- CHANGELOG.md
-- HANDOFF.md
-- evidence/
+## Orden mínimo por sesión
+`RULES → MEMORY → STATE → TRACKING → HANDOFF → microfase ACTIVE`.
 
-# UI / Spanish / Help
-- DESIGN_SYSTEM.md
-- APP_SHELL_SPEC.md
-- SCREEN_BY_SCREEN_SPEC.md
-- SCREEN_LAYOUT_BLUEPRINTS_ES.md
-- UI_UX_LAYOUT_RULES.md
-- I18N_SPEC.md
-- SPANISH_UI_COPY_SPEC.md
-- SECTION_HELP_CATALOG_ES.md
-- USER_FLOWS_ES.md
-- INSPECTOR_SPEC.md
-- SKILL_USAGE_POLICY.md
+La microfase activa enlaza las specs adicionales necesarias. No cargues todo `.ai/` por defecto.
 
-# Builder/data/logic
-- EDITOR_ENGINE.md
-- WIDGET_SYSTEM.md
-- COMPONENT_RATIONALIZATION.md
-- PALETTE_CATALOG_MATRIX.md
-- DATA_ARCHITECTURE.md
-- DATA_SOURCE_ARCHITECTURE.md
-- THEME_SYSTEM.md
-- EXTENSION_PLUGIN_SYSTEM.md
-- BLUEPRINT_MATRIX.md
+## Fuentes de verdad
+- `PROMPT_MAESTRO_ELECTROCRAFT_2.md` — alias estable del Prompt Maestro canónico.
+- `MASTER_SPEC.md` — índice del contrato maestro.
+- `REQUIREMENTS.md` — requisitos atómicos.
+- `RULES.md` — reglas obligatorias de implementación.
+- `ARCHITECTURE.md` / `DATA_MODELS.md` — ownership y modelos portables.
+- `DECISIONS.md` — resumen de ADR vigentes; detalle en `adr/`.
+- `PHASES.md`, `phases/`, `microphases/` — ejecución prescriptiva.
 
-# AI
-- AI_ARCHITECTURE.md
-- AI_PROVIDER_GEMINI.md
-- AI_UI_ELEMENTS_SPEC.md
-- AI_DATA_MODELS.md
-- AI_ARTIFACT_CATALOG.md
-- AI_TOOL_CATALOG.md
-- AI_GENERATION_STUDIO_SPEC.md
-- AI_SETTINGS_SPEC.md
-- AI_SECURITY_PRIVACY.md
+## Continuidad
+- `MEMORY.md` — solo hechos estables y decisiones vigentes; nunca logs/progreso.
+- `STATE.md` — estado actual compacto y única microfase `ACTIVE`.
+- `TRACKING.md` — tabla de posición/gates; evidencia detallada vive en `evidence/`.
+- `HANDOFF.md` — siguiente acción exacta para retomar trabajo.
+- `BLOCKERS.md` — bloqueos reales P0/P1/P2 con evidencia.
+- `CHANGELOG.md` — historia de cambios de producto/arquitectura.
 
-# Export — all Core
-- EXPORT_TARGET_CONTRACT.md
-- EXPORT_PARITY_MATRIX.md
-- EXPORT_LOCAL.md
-- EXPORT_REACT.md
-- EXPORT_MOBILE.md
-- CAPACITOR_RUNTIME_SPEC.md
-- LAMP_RUNTIME_SPEC.md
-- WORDPRESS_RUNTIME_SPEC.md
-- EXPORT_LAMP.md
-- EXPORT_WORDPRESS.md
-- RUNTIME_DEPENDENCY_BUDGET.md
+## Specs por área
+### UI/editor
+`EDITOR_ENGINE.md`, `WIDGET_SYSTEM.md`, `DESIGN_SYSTEM.md`, `THEME_SYSTEM.md`, `APP_SHELL_SPEC.md`, `SCREEN_BY_SCREEN_SPEC.md`, `UI_UX_LAYOUT_RULES.md`, `ACCESSIBILITY.md`.
 
-# QA
-- TEST_STRATEGY.md
-- SECURITY.md
-- ACCESSIBILITY.md
-- TRACEABILITY_MATRIX.md
-- FEATURE_MATRIX.md
-- PROFESSIONAL_CAPABILITY_MATRIX.md
-- PROFESSIONAL_CAPABILITY_GAP_MATRIX.md
-- REDUNDANCY_AUDIT.md
-- FINAL_EIGHTH_REVIEW_AUDIT.md
+### Datos/administración
+`DATA_ARCHITECTURE.md`, `DATA_SOURCE_ARCHITECTURE.md`, `CONTENT_ENGINE.md`, `BACKEND_BUILDER.md`.
 
-# Execution
-- PHASES.md
-- DETAILED_EXECUTION_PHASES.md
-- PHASE_DEPENDENCY_GRAPH.md
-- MICROPHASE_EXECUTION_CONTRACT.md
-- phases/
-- microphases/
-- acceptance/
+### AI
+`AI_ARCHITECTURE.md`, `AI_PROVIDER_GEMINI.md`, `AI_UI_ELEMENTS_SPEC.md`, `AI_TOOL_CATALOG.md`, `AI_SECURITY_PRIVACY.md`.
 
-Read only the active subset during implementation; AGENTS.md defines the context protocol.
+### Export
+`EXPORT_TARGET_CONTRACT.md`, `EXPORT_PARITY_MATRIX.md` y la spec específica del target.
+
+### QA/seguridad
+`TEST_STRATEGY.md`, `SECURITY.md`, `ACCESSIBILITY.md`, `TRACEABILITY_MATRIX.md`.
+
+## Convenciones de archivos
+- Evidencia real: `evidence/<fase>/<microfase>/`.
+- Templates: `templates/` (`MICROPHASE`, `ADR`, `BUG`, `HANDOFF`).
+- ADR detallados: `adr/`; `DECISIONS.md` conserva solo el resumen vigente.
+- Historia y review reports no canónicos: `archive/` o archivos `*_HISTORY_*`.
+- Un archivo archivado nunca compite con `STATE`, `TRACKING`, `HANDOFF`, `MASTER_SPEC` o la microfase activa.
+
+## Validación automática
+`npm run test:docs` valida required files, phase/microphase references, templates, MEMORY sin progreso y una única microfase `ACTIVE`.
+`npm run build:docs` genera `tooling/dist/m01-6-doc-conventions-report.json`.
+
+Ayuda persistente: `help.architecture.repository`.

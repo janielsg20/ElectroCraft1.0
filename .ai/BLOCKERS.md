@@ -1,15 +1,21 @@
-# BLOCKERS
+# BLOCKERS — ElectroCraft
 
-No known implementation blockers because coding has not started.
+## Estado actual
+- P0: 0
+- P1: 0
+- P2: 0 abiertos
 
-When a blocker appears record:
+Registra aquí únicamente bloqueos reales que impidan o degraden una microfase. Los fallos ya resueltos pertenecen a evidence/ADR/CHANGELOG, no permanecen como blockers activos.
+
+## Formato
 - ID;
-- phase/microphase;
-- exact failing command/test;
-- engine/API involved;
-- severity;
-- workaround attempted;
-- whether independent work can continue;
-- resolution/evidence.
+- fase/microfase;
+- comando/test exacto;
+- engine/API;
+- severidad P0/P1/P2;
+- impacto;
+- workaround intentado;
+- trabajo independiente posible;
+- resolución/evidencia.
 
-Do not use this file to hide red tests and advance.
+Nunca ocultar tests rojos para avanzar.

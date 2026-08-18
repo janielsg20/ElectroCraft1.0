@@ -1,47 +1,28 @@
-# AGENTS.md — ElectroCraft Eighth Final
+# AGENTS.md — ElectroCraft
 
-## First implementation session
-Read in order:
-1. `.ai/PROMPT_MAESTRO_ELECTROCRAFT.md`
+Entry point corto para sesiones de implementación. No duplica el Prompt Maestro.
+
+## Lectura mínima por sesión
+1. `.ai/README.md`
 2. `.ai/RULES.md`
-3. `.ai/PRODUCT_DIRECTION.md`
-4. `.ai/OSS_DECISION_MATRIX.md`
-5. `.ai/ENGINE_RESPONSIBILITY_MATRIX.md`
-6. `.ai/MODEL_OWNERSHIP.md`
-7. `.ai/EXPORT_TARGET_CONTRACT.md`
-8. `.ai/EXPORT_PARITY_MATRIX.md`
-9. `.ai/PHASE_DEPENDENCY_GRAPH.md`
-10. `.ai/MEMORY.md`
-11. `.ai/STATE.md`
-12. `.ai/TRACKING.md`
-13. active microphase.
+3. `.ai/MEMORY.md`
+4. `.ai/STATE.md`
+5. `.ai/TRACKING.md`
+6. `.ai/HANDOFF.md`
+7. la microfase `ACTIVE` indicada por `STATE.md`
 
-## Later sessions
-RULES -> MEMORY -> STATE -> TRACKING -> active microphase -> referenced subsystem specs.
+Lee specs adicionales solo cuando la microfase activa las enlace. No cargues todos los `.md` por defecto.
 
-## UI work
-Also read:
-DESIGN_SYSTEM, APP_SHELL_SPEC, SCREEN_BY_SCREEN_SPEC, UI_UX_LAYOUT_RULES, I18N_SPEC, SECTION_HELP_CATALOG_ES.
+## Primera sesión o cambio de arquitectura
+Añade `.ai/PROMPT_MAESTRO_ELECTROCRAFT_2.md`, `.ai/MASTER_SPEC.md`, `.ai/REQUIREMENTS.md`, `.ai/ARCHITECTURE.md` y `.ai/DECISIONS.md`.
 
-Load:
-- shadcn skill;
-- relevant UI/UX/Layout/Accessibility skills;
-- React best-practices after multi-component TSX work.
+## Reglas operativas
+- una sola microfase `ACTIVE`;
+- engine-first y API pública antes de crear adapters;
+- imports entre owners solo por exports públicos;
+- UI de release en español y ayuda persistente cuando aplique;
+- no datos demo permanentes, no modelo/runtime paralelo, no fake completion;
+- todos los targets Core respetan el contrato común de exportación;
+- `DONE` requiere tests, build y evidencia real.
 
-## AI work
-Read:
-AI_ARCHITECTURE, AI_PROVIDER_GEMINI, AI_UI_ELEMENTS_SPEC, AI_TOOL_CATALOG, AI_SECURITY_PRIVACY.
-
-## Export work
-Read:
-EXPORT_TARGET_CONTRACT, EXPORT_PARITY_MATRIX and the target-specific spec.
-
-## Rules
-- one active microphase;
-- engine-first;
-- Spanish release UI;
-- Help;
-- no duplicate model/runtime;
-- no fake completion;
-- all nine export targets Core;
-- evidence before DONE.
+El mapa documental y los read sets por área viven en `.ai/README.md`.
