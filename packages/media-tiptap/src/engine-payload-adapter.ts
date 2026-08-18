@@ -1,4 +1,3 @@
-import type { AnyExtension, JSONContent } from '@tiptap/core';
 import { generateHTML } from '@tiptap/html';
 import StarterKit from '@tiptap/starter-kit';
 import {
@@ -18,8 +17,6 @@ export class TiptapEnginePayloadBlockedError extends Error {
   }
 }
 
-const starterKitForHtml = StarterKit as unknown as AnyExtension;
-
 function assertTiptapRoot(value: JsonValue): asserts value is JsonValue & { type: 'doc'; content?: JsonValue[] } {
   if (value === null || Array.isArray(value) || typeof value !== 'object') {
     throw new TiptapEnginePayloadBlockedError('INVALID_TIPTAP_VALUE', 'Tiptap JSON must be a document object');
@@ -30,6 +27,11 @@ function assertTiptapRoot(value: JsonValue): asserts value is JsonValue & { type
   if ('content' in value && value.content !== undefined && !Array.isArray(value.content)) {
     throw new TiptapEnginePayloadBlockedError('INVALID_TIPTAP_VALUE', 'Tiptap document content must be an array');
   }
+}
+
+function renderTiptapJson(value: JsonValue): string {
+  assertTiptapRoot(value);
+  return generateHTML(value as Parameters<typeof generateHTML>[0], [StarterKit]);
 }
 
 export function validateTiptapEnginePayload(input: unknown): ElectroCraftEnginePayload {
@@ -43,10 +45,10 @@ export function validateTiptapEnginePayload(input: unknown): ElectroCraftEngineP
       `Tiptap wrapper schemaVersion ${wrapper.data.schemaVersion} is not supported`,
     );
   }
-  assertTiptapRoot(wrapper.data.value);
   try {
-    generateHTML(wrapper.data.value as JSONContent, [starterKitForHtml]);
+    renderTiptapJson(wrapper.data.value);
   } catch (error) {
+    if (error instanceof TiptapEnginePayloadBlockedError) throw error;
     throw new TiptapEnginePayloadBlockedError(
       'INVALID_TIPTAP_VALUE',
       error instanceof Error ? error.message : 'Tiptap rejected the persisted rich-text JSON',
@@ -66,5 +68,5 @@ export function migrateTiptapEnginePayload(input: unknown): ElectroCraftEnginePa
 
 export function renderTiptapEnginePayloadToHtml(input: unknown): string {
   const payload = validateTiptapEnginePayload(input);
-  return generateHTML(payload.value as JSONContent, [starterKitForHtml]);
+  return renderTiptapJson(payload.value);
 }
