@@ -17,7 +17,8 @@ Historial detallado:
 | M02.3 | COMPLETADA | `.ai/evidence/F02/M02.3/CLOSURE_2026-08-18.md` |
 | M02.4 | COMPLETADA | `.ai/evidence/F02/M02.4/CLOSURE_2026-08-18.md` |
 | M02.5 | COMPLETADA | `.ai/evidence/F02/M02.5/CLOSURE_2026-08-18.md` |
-| M02.6 | ACTIVE | `.ai/microphases/M02_6.md` |
+| M02.6 | COMPLETADA | `.ai/evidence/F02/M02.6/CLOSURE_2026-08-18.md` |
+| M02.7 | ACTIVE | `.ai/microphases/M02_7.md` |
 
 ## Cierre M02.1
 - PR `#3`; squash merge `cf4649d98f96a553daa020581a918d9559131137`.
@@ -39,25 +40,24 @@ Historial detallado:
 
 ## Cierre M02.5
 - PR `#7`; squash merge `7cb7016d6ae6e4e91cef3a7de41de66cb861fc55`.
-- `ElectroCraftTheme` visual-only; template permanece `ElectroCraftDocument kind=template` con `templateMeta` y Display Conditions.
-- `ElectroCraftBlueprintPackage` externo/versionado; `ElectroCraftBlueprintInstaller` en application con plan, conflicto y rollback verificables.
-- `ElectroPlatformCapabilityRegistry` y Component/Field/Action/Provider registries viven en application; ProjectDefinition no serializa registries runtime.
-- `ElectroCraftProjectDefinition` evoluciona a schema v3 con `originBlueprint`, `requiredCapabilities`, `targetCapabilityOverrides` y `userRegistryDefinitionRefs`.
-- `ElectroCraftDocument` evoluciona a schema v3; migrations explícitas desde v2/v1/page.
-- `export-ir` consume reporte neutral `supported | adapted | blocked` en vez del registry vivo.
-- Se preservó el invariant F01 de exactamente 17 owner packages; la referencia histórica `packages/contracts/` se resuelve a `packages/domain/src/contracts/`, sin package 18.
-- Tests dedicados M02.5: `14/14` verdes.
-- Suite acumulada en `main`: Node `27/27`, Vitest `83/83`, Playwright `1/1`; lint/Prettier, typecheck, boundaries, Studio/PWA y build verdes.
-- Evidencia generada: `capabilityEntries=9`, cobertura supported/adapted/blocked completa; `blueprintConflicts=1`; rollback confirmado.
-- Gate PR final `32182296286` success; gates heredados M02.1–M02.4 y Studio verdes; export parity WordPress/LAMP/Capacitor/static verde.
-- Gate definitivo en `main`: run `32182633428` — `success`.
-- Marker: `PASS_M02_5_THEME_BLUEPRINT_REGISTRY_CAPABILITY`.
-- Artifact final: `9341317925` — `m02-5-theme-blueprint-registry-capability-evidence`.
-- Digest: `sha256:13d612fd3c8ae4af6cb88b52e5f3b1ce6d56d77e844b38f6625d959638a7f026`.
+- Theme visual-only, Blueprint install/conflict/rollback, registries de application y capability analysis neutral; ProjectDefinition/Document schema v3.
+- Suite dedicada `14/14`; gate main `32182633428` success; artifact `9341317925`; digest `sha256:13d612fd3c8ae4af6cb88b52e5f3b1ce6d56d77e844b38f6625d959638a7f026`.
+
+## Cierre M02.6
+- PR `#8`; squash merge `c74fc8284a56487dc56b9dbb90775fb592f803d8`.
+- Una sola ruta de JSON canónico determinista compartida por serialización de objetos y snapshots; checksum portable `fnv1a64` con fixture fijo.
+- `ElectroCraftMigrationRegistry` encadena project v1→v2→v3 de forma explícita/fail-closed; no existe una ruta inline paralela.
+- `ProjectImportService` valida JSON/Zod/refs/checksum antes de `putMany`; imports inválidos devuelven diagnostics reparables y no mutan storage.
+- `export-ir` recibe manifest neutral de snapshot, sin repository/import runtime internals.
+- Suite dedicada M02.6: `14/14` verdes; suite acumulada en `main`: Node `27/27`, Vitest `97/97`, Playwright `1/1`; lint/Prettier, typecheck, boundaries, Studio/PWA y build verdes.
+- Gate definitivo main `32186495673` — `success`.
+- Marker: `PASS_M02_6_SERIALIZER_MIGRATION_REGISTRY`.
+- Artifact final: `9342646837` — `m02-6-serializer-migration-registry-evidence`.
+- Digest: `sha256:35ce99bc90392494dd1d0e6a276a41ec245e4b62a849a6d6f59fb454404121cc`.
 - P0/P1: `0`.
 
 ## Gate actual
-F02 continúa activa con `GREEN_THROUGH_M02.5`.
+F02 continúa activa con `GREEN_THROUGH_M02.6`.
 
 ## Siguiente transición permitida
-Implementar y cerrar exclusivamente M02.6: serialización determinista, checksum canonical snapshot, MigrationRegistry por schemaVersion, migration real verificable e import inválido con diagnostics sin mutar storage; después avanzar a M02.7.
+Implementar y cerrar exclusivamente M02.7: `ElectroCraftExportIR` immutable/versionado, los nueve `ExportTargetId`, `TargetCompileContext`, snapshot/checksum determinista, `ExportValidationReport` y fixtures/boundaries que excluyan internals target-specific; después avanzar a M02.8.
