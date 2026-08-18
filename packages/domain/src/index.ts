@@ -1,4 +1,5 @@
 export * from './contracts/app-behavior';
+export * from './contracts/capability-report';
 export * from './contracts/component-definition';
 export * from './contracts/data-definition';
 export * from './contracts/document';
