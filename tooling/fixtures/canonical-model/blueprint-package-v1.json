@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "packageId": "electrocraft.blueprint.starter",
+  "version": "1.0.0",
+  "name": "Starter Blueprint",
+  "requiredCapabilities": ["storage.local", "navigation.basic"],
+  "artifacts": [
+    {
+      "objectId": "ec_document_000000000000t",
+      "kind": "document",
+      "operation": "create",
+      "contentHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "objectId": "ec_theme_0000000000006",
+      "kind": "theme",
+      "operation": "replace",
+      "contentHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    }
+  ],
+  "metadata": {
+    "fixture": "m02.5"
+  }
+}
