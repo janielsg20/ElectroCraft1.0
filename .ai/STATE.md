@@ -14,20 +14,21 @@
 - M02.6 — Serializer y migrations de proyecto: `COMPLETADA`.
 - M02.7 — Definir `ElectroCraftExportIR`: `COMPLETADA`.
 - M02.8 — Clasificar ownership: Project Objects vs Registries vs Content Entities: `COMPLETADA`.
-- M02.9 — Definir wrappers versionados para payloads de engines: `ACTIVE`.
-- Gate acumulado: `GREEN_THROUGH_M02.8`.
+- M02.9 — Definir wrappers versionados para payloads de engines: `ACTIVE` con cierre técnico `GREEN` en `main`; permanece activa únicamente hasta completar Gate F02.
+- Gate acumulado: `GREEN_THROUGH_M02.9`.
+- Gate F02: `IN_PROGRESS`.
 - Blockers P0/P1: `0`.
 
 ## Microfase activa
-`M02.9` — Definir wrappers versionados para payloads de engines.
+`M02.9` — cierre técnico completado; transición retenida por Gate F02.
 
-Objetivo actual: definir el patrón portable `{ engine, schemaVersion, value }`, aplicarlo inicialmente a RQB rules y Tiptap richtext mediante validators/migrations en sus adapters, detectar engines/versiones no soportados y documentar qué payloads OSS pueden persistirse sin convertir AppState/classes/runtime internals de Rete/Puck en modelo canónico.
+Objetivo actual: ejecutar el gate final de F02 sobre el árbol integrado con M02.1–M02.9, verificar ownership único, contracts/serialización/migraciones/ExportIR/wrappers, suites acumuladas y continuidad documental. Solo con Gate F02 verde se marcará M02.9 `COMPLETADA`, F02 `COMPLETADA` y se activará F03 / M03.1.
 
 ## Referencias
-- Spec: `.ai/microphases/M02_9.md`.
+- Spec M02.9: `.ai/microphases/M02_9.md`.
 - Fase: `.ai/phases/F02.md`.
 - Tracking: `.ai/TRACKING.md`.
 - Handoff: `.ai/HANDOFF.md`.
-- Cierre M02.8: `.ai/evidence/F02/M02.8/CLOSURE_2026-08-18.md`.
+- Evidencia M02.9: `.ai/evidence/F02/M02.9/CLOSURE_2026-08-18.md`.
 
-No cerrar F02 ni iniciar F03 hasta cerrar M02.9 con tests/build/evidencia y ejecutar el gate final de F02.
+No iniciar M03.1 hasta que Gate F02 cierre verde.
