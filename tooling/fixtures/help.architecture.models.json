@@ -2,7 +2,7 @@
   "id": "help.architecture.models",
   "locale": "es",
   "title": "Modelo canónico del proyecto",
-  "summary": "Explica ownership portable de proyecto, documentos, componentes, datos, queries, formularios, acciones, estado, navegación, permisos, temas, blueprints y registries sin persistir internals de engines.",
+  "summary": "Explica ownership portable de proyecto, documentos, componentes, datos, queries, formularios, acciones, estado, navegación, permisos, temas, blueprints, registries y ExportIR sin persistir internals de engines.",
   "details": [
     "ElectroCraftProjectDefinition guarda identidad, settings y referencias por ID; no embebe todos los documentos en un mega JSON.",
     "ElectroCraftDocument usa screen, template, form, admin-screen o reusable-component; page solo existe como entrada legacy migrable a screen.",
@@ -24,6 +24,9 @@
     "ElectroCraftBlueprintPackage es externo/versionado; el proyecto solo conserva originBlueprint y objetos instalados normales.",
     "ElectroPlatformCapabilityRegistry y Component/Field/Action/Provider registries viven en application y no se copian completos al proyecto.",
     "ProjectDefinition v3 persiste requiredCapabilities, targetCapabilityOverrides y userRegistryDefinitionRefs; export-ir consume un reporte supported/adapted/blocked.",
-    "Los schemas canónicos usan Zod strictObject/schemaVersion y application valida referencias cruzadas reparables."
+    "ElectroCraftExportIR es un snapshot generado, immutable, versionado y neutral a targets; no es una segunda fuente de verdad persistida.",
+    "ExportIR incluye Documents, Navigation, Data Sources sanitizadas, DataSchema, Queries, State, Actions, Form refs, Roles, PermissionPolicies, Theme, Media manifest y capabilities, pero excluye histories, caches, prompts, secretos e internals target-specific.",
+    "Los nueve ExportTargetId Core viven en TargetCompileContext, separado del IR; cambiar de target no puede cambiar el checksum de la revisión congelada.",
+    "Los schemas canónicos usan Zod strictObject/schemaVersion y application valida referencias cruzadas reparables antes de compilar."
   ]
 }

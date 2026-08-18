@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "targetId": "android-expo",
+  "config": {
+    "applicationId": "com.electrocraft.fixture",
+    "buildProfile": "source-only"
+  },
+  "capabilities": [
+    {
+      "id": "navigation.basic",
+      "mode": "supported",
+      "adapter": "navigation.portable"
+    },
+    {
+      "id": "storage.local",
+      "mode": "adapted",
+      "adapter": "storage.native"
+    }
+  ],
+  "environment": {
+    "platform": "linux",
+    "ci": true
+  },
+  "toolchain": {
+    "node": "22.16.0",
+    "mode": "source-only"
+  },
+  "secretRefs": []
+}

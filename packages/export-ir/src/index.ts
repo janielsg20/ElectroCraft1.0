@@ -7,6 +7,8 @@ import {
   type ElectroCraftObjectId,
 } from '@electrocraft/domain';
 
+export * from './target-compile-input';
+
 export interface ElectroCraftTargetCapabilityPlan {
   target: string;
   blocked: boolean;
