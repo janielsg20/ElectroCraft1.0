@@ -6,10 +6,7 @@ import {
 } from '@electrocraft/domain';
 
 export type ElectroCraftEnginePayloadCompatibilityCode =
-  | 'INVALID_ENGINE_PAYLOAD'
-  | 'PROHIBITED_ENGINE_PAYLOAD'
-  | 'UNSUPPORTED_ENGINE'
-  | 'UNSUPPORTED_ENGINE_SCHEMA_VERSION';
+  'INVALID_ENGINE_PAYLOAD' | 'PROHIBITED_ENGINE_PAYLOAD' | 'UNSUPPORTED_ENGINE' | 'UNSUPPORTED_ENGINE_SCHEMA_VERSION';
 
 export interface ElectroCraftEnginePayloadCompatibilityDiagnostic {
   code: ElectroCraftEnginePayloadCompatibilityCode;
@@ -58,9 +55,8 @@ export function analyzeElectroCraftEnginePayloadCompatibility(
     );
   }
 
-  const supported = ELECTROCRAFT_APPROVED_ENGINE_PAYLOADS[
-    payload.engine as keyof typeof ELECTROCRAFT_APPROVED_ENGINE_PAYLOADS
-  ];
+  const supported =
+    ELECTROCRAFT_APPROVED_ENGINE_PAYLOADS[payload.engine as keyof typeof ELECTROCRAFT_APPROVED_ENGINE_PAYLOADS];
   if (!supported) {
     return blocked(
       'UNSUPPORTED_ENGINE',

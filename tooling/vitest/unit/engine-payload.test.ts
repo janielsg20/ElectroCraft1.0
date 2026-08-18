@@ -42,7 +42,8 @@ describe('M02.9 portable engine payload contract', () => {
       electroCraftEnginePayloadSchema.safeParse({ engine: 'tiptap', schemaVersion: 1, value: undefined }).success,
     ).toBe(false);
     expect(
-      electroCraftEnginePayloadSchema.safeParse({ engine: 'Tiptap!', schemaVersion: 1, value: { type: 'doc' } }).success,
+      electroCraftEnginePayloadSchema.safeParse({ engine: 'Tiptap!', schemaVersion: 1, value: { type: 'doc' } })
+        .success,
     ).toBe(false);
   });
 });

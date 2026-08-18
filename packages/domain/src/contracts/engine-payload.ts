@@ -13,7 +13,10 @@ export const electroCraftEnginePayloadSchema = z.strictObject({
 export type ElectroCraftEnginePayload = z.infer<typeof electroCraftEnginePayloadSchema>;
 
 export const ELECTROCRAFT_APPROVED_ENGINE_PAYLOADS = Object.freeze({
-  'react-querybuilder': Object.freeze({ schemaVersions: Object.freeze([1] as const), owner: '@electrocraft/query-rqb' }),
+  'react-querybuilder': Object.freeze({
+    schemaVersions: Object.freeze([1] as const),
+    owner: '@electrocraft/query-rqb',
+  }),
   tiptap: Object.freeze({ schemaVersions: Object.freeze([1] as const), owner: '@electrocraft/media-tiptap' }),
 } as const);
 
