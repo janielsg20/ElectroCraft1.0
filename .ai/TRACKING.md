@@ -20,8 +20,9 @@ Historial detallado:
 | M02.6 | COMPLETADA | `.ai/evidence/F02/M02.6/CLOSURE_2026-08-18.md` |
 | M02.7 | COMPLETADA | `.ai/evidence/F02/M02.7/CLOSURE_2026-08-18.md` |
 | M02.8 | COMPLETADA | `.ai/evidence/F02/M02.8/CLOSURE_2026-08-18.md` |
-| M02.9 | ACTIVE — cierre técnico GREEN | `.ai/evidence/F02/M02.9/CLOSURE_2026-08-18.md` |
-| F02 Gate | IN_PROGRESS | `.github/workflows/f02-canonical-model-gate.yml` |
+| M02.9 | COMPLETADA | `.ai/evidence/F02/M02.9/CLOSURE_2026-08-18.md` |
+| F02 Gate | GREEN | `.ai/evidence/F02/CLOSURE_2026-08-18.md` |
+| F03 / M03.1 | ACTIVE | `.ai/microphases/M03_1.md` |
 
 ## Cierre M02.1
 - PR `#3`; squash merge `cf4649d98f96a553daa020581a918d9559131137`.
@@ -64,22 +65,24 @@ Historial detallado:
 - ProjectDefinition/Document permanecen v3; suite dedicada `9/9`.
 - Gate main `32193738411` success; artifact `9345132952`; digest `sha256:7751ba52ff3cf167dad37e604617a1ac2fef808491952394bdb83023c825af1f`.
 
-## Cierre técnico M02.9
+## Cierre M02.9
 - PR `#11`; squash merge `53401b29df8ef44deb69468c92cd36ae5f547761`.
 - Wrapper portable determinista `{ engine, schemaVersion, value }`; domain permanece engine-agnostic.
-- React Query Builder rules validados con `@react-querybuilder/core@8.23.0` y formatter parametrizado real.
-- Tiptap rich-text JSON usa un grafo mínimo exacto `3.29.2`: core, html, Document, Paragraph y Text; se eliminó el aggregate StarterKit para evitar dos universos de tipos/patches.
-- Compatibility Analyzer bloquea engine/version inválidos y payloads runtime prohibidos; Puck AppState/history, Rete NodeEditor/history, Zustand stores y TanStack Query cache siguen fuera del modelo canónico.
-- ProjectDefinition/Document permanecen schema v3; no se añadió migración de proyecto innecesaria.
-- Suite dedicada M02.9: `11/11`; pipeline acumulado en `main`: Node `27/27`, Vitest `128/128`, Playwright `1/1`; lint/Prettier, typecheck, boundaries, Studio/PWA y build verdes.
-- Gate definitivo main `32196416073` — `success`.
-- Marker: `PASS_M02_9_ENGINE_PAYLOAD_WRAPPERS`.
-- Artifact final: `9346006290` — `m02-9-engine-payload-wrappers-evidence`.
-- Digest: `sha256:0083bf96e88e0935a9876a37d8fc465b8315e03ec836dcd1d8bd8609c0d8770b`.
-- P0/P1: `0`.
+- RQB rules con `@react-querybuilder/core@8.23.0`; Tiptap rich-text JSON con grafo exacto `3.29.2` de core/html/Document/Paragraph/Text.
+- Runtime/editor state de Puck/Rete/Zustand/TanStack permanece fuera del modelo canónico.
+- Suite dedicada `11/11`; acumulada Node `27/27`, Vitest `128/128`, Playwright `1/1`.
+- Gate main `32196416073` success; artifact `9346006290`; digest `sha256:0083bf96e88e0935a9876a37d8fc465b8315e03ec836dcd1d8bd8609c0d8770b`.
+
+## Cierre F02
+- Gate final `.github/workflows/f02-canonical-model-gate.yml` ejecutó las nueve suites dedicadas y luego `npm run check` sobre el árbol integrado.
+- Run definitivo `32197039836` — `success` sobre `83d67d31ab10ac5b588b43ff7136e9cd219c62ef`.
+- Marker: `PASS_F02_CANONICAL_MODEL_GATE`.
+- Artifact: `9346213452` — `f02-canonical-model-evidence`.
+- Digest: `sha256:160658d864ba742265c958ecab629fe855e5d425a78a3f643ecfce908c0aaa12`.
+- Invariantes: 17 owners, sin `packages/contracts`, ProjectDefinition/Document v3, ownership 14/6/6, ExportIR target-neutral, wrappers OSS fail-closed, Node 27/27, Vitest 128/128, Playwright 1/1, blockers P0/P1 `0`.
 
 ## Gate actual
-M02.1–M02.9 tienen cierre técnico verde. F02 permanece `IN_PROGRESS` únicamente hasta completar su gate final integrado.
+F02 `COMPLETADA` / Gate F02 `GREEN`. F03 está `IN_PROGRESS` con M03.1 como única microfase activa.
 
 ## Siguiente transición permitida
-Ejecutar Gate F02. Solo tras `electrocraft/F02 = success` se marcarán M02.9/F02 como `COMPLETADA/GREEN` y se activará F03 / M03.1.
+Implementar y cerrar exclusivamente M03.1: shadcn/ui sobre Radix, Lucide y tokens ElectroCraft en `packages/design-system`; después avanzar a M03.2.
