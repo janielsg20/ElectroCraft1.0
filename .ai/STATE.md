@@ -7,20 +7,21 @@
 - M01.1–M01.6: `COMPLETADAS` con evidencia real.
 - F02 — Modelo canónico del proyecto: `IN_PROGRESS`.
 - M02.1 — Definir `ElectroCraftProjectDefinition` y `ElectroCraftDocument`: `COMPLETADA`.
-- M02.2 — Definir Component/Layout/Style: `ACTIVE`.
-- Gate acumulado: `GREEN_THROUGH_M02.1`.
+- M02.2 — Definir Component/Layout/Style: `COMPLETADA`.
+- M02.3 — Definir ownership de Data Sources, Data Models, Queries y Forms: `ACTIVE`.
+- Gate acumulado: `GREEN_THROUGH_M02.2`.
 - Blockers P0/P1: `0`.
 
 ## Microfase activa
-`M02.2` — Definir Component/Layout/Style.
+`M02.3` — Definir ownership de Data Sources, Data Models, Queries y Forms.
 
-Objetivo actual: definir metadata portable de componentes, layout semántico y estilos con overrides responsive/platform, versionado y migración, manteniendo Puck como adapter y evitando persistir internals de React/Tailwind/NativeWind.
+Objetivo actual: definir contratos portables/versionados para DataSourceDefinition, ElectroCraftDataSchema/DataModel, QueryDefinition y bindings; mantener Form como `ElectroCraftDocument kind=form` con `formMeta`; reutilizar `data-core`, `query-rqb` y `forms` como owners/adapters existentes, sin persistir secrets ni internals de engines.
 
 ## Referencias
-- Spec: `.ai/microphases/M02_2.md`.
+- Spec: `.ai/microphases/M02_3.md`.
 - Fase: `.ai/phases/F02.md`.
 - Tracking: `.ai/TRACKING.md`.
 - Handoff: `.ai/HANDOFF.md`.
-- Cierre M02.1: `.ai/evidence/F02/M02.1/CLOSURE_2026-08-18.md`.
+- Cierre M02.2: `.ai/evidence/F02/M02.2/CLOSURE_2026-08-18.md`.
 
-No iniciar M02.3 hasta cerrar M02.2 con tests/build/evidencia.
+No iniciar M02.4 hasta cerrar M02.3 con tests/build/evidencia.
