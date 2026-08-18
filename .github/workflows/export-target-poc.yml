@@ -29,6 +29,7 @@ on:
 
 permissions:
   contents: read
+  statuses: write
 
 jobs:
   m00_9_precondition:
@@ -201,3 +202,17 @@ jobs:
           test "$LAMP" = success
           test "$WP" = success
           echo PASS_M00_10_CLOSURE_GATE
+      - name: Publish M00.10 commit status
+        if: ${{ always() && github.event_name != 'pull_request' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: '${{ job.status }}' === 'success' ? 'success' : 'failure',
+              context: 'electrocraft/M00.10',
+              description: 'M00.10 export target parity gate'
+            })

@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  statuses: write
 
 jobs:
   monorepo:
@@ -68,3 +69,45 @@ jobs:
             m01-1-vite.log
             m01-1-playwright.log
             m01-1-closure.log
+
+  m01_2:
+    name: M01.2 reusable boundaries gate
+    needs: monorepo
+    uses: ./.github/workflows/m01-2-typescript-boundaries.yml
+    with:
+      head_sha: ${{ github.event.workflow_run.head_sha }}
+
+  m01_3:
+    name: M01.3 reusable quality gate
+    needs: m01_2
+    uses: ./.github/workflows/m01-3-quality-toolchain.yml
+    with:
+      head_sha: ${{ github.event.workflow_run.head_sha }}
+
+  publish_statuses:
+    name: Publish F01 commit statuses
+    if: always()
+    needs: [monorepo, m01_2, m01_3]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish M01.1-M01.3 statuses
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const sha = '${{ github.event.workflow_run.head_sha }}';
+            const gates = [
+              ['electrocraft/M01.1', '${{ needs.monorepo.result }}', 'M01.1 monorepo ownership gate'],
+              ['electrocraft/M01.2', '${{ needs.m01_2.result }}', 'M01.2 TypeScript boundaries gate'],
+              ['electrocraft/M01.3', '${{ needs.m01_3.result }}', 'M01.3 quality toolchain gate']
+            ];
+            for (const [gateContext, result, description] of gates) {
+              await github.rest.repos.createCommitStatus({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                sha,
+                state: result === 'success' ? 'success' : 'failure',
+                context: gateContext,
+                description: result === 'success' ? description : `${description}: ${result}`
+              });
+            }

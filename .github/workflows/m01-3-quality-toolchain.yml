@@ -1,9 +1,12 @@
 name: M01.3 Quality Toolchain Gate
 
 on:
-  workflow_run:
-    workflows: ['M01.2 TypeScript Boundaries Gate']
-    types: [completed]
+  workflow_call:
+    inputs:
+      head_sha:
+        description: Exact commit SHA inherited from the F01 entry gate
+        required: true
+        type: string
   workflow_dispatch:
 
 permissions:
@@ -12,13 +15,12 @@ permissions:
 jobs:
   quality:
     name: M01.3 lint test build and empty-repo verification
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout exact M01.2 green head
+      - name: Checkout exact validation head
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && github.sha || github.event.workflow_run.head_sha }}
+          ref: ${{ inputs.head_sha || github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: '22.16.0'
