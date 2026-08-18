@@ -1,0 +1,71 @@
+name: M02.6 Format Bootstrap
+
+on:
+  push:
+    branches:
+      - agent/m02-6-serializer-migration-registry
+    paths:
+      - '.github/workflows/m02-6-format-bootstrap.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/m02-6-format-bootstrap.yml'
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v6
+        with:
+          ref: agent/m02-6-serializer-migration-registry
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Format M02.6 files
+        run: |
+          npx prettier --write \
+            package.json \
+            .github/workflows/m02-6-serializer-migration-registry.yml \
+            packages/domain/src/contracts/canonical-json.ts \
+            packages/domain/src/contracts/migration-registry.ts \
+            packages/domain/src/contracts/project-definition.ts \
+            packages/domain/src/contracts/project-snapshot.ts \
+            packages/domain/src/contracts/serialization.ts \
+            packages/domain/src/index.ts \
+            packages/application/src/project-import-service.ts \
+            packages/application/src/index.ts \
+            packages/export-ir/src/index.ts \
+            tooling/vitest/unit/serializer-migration-registry.test.ts \
+            tooling/vitest/contract/serializer-migration-registry-boundary.test.ts \
+            tooling/vitest/integration/serializer-migration-import-runtime.test.ts \
+            tooling/fixtures/canonical-model/project-migration-v1-to-v2-expected.json \
+            tooling/fixtures/canonical-model/canonical-snapshot-checksum-v1.json
+
+      - name: Commit formatted files
+        run: |
+          if git diff --quiet; then
+            echo "M02.6 files already formatted"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json .github/workflows/m02-6-serializer-migration-registry.yml packages/domain/src packages/application/src packages/export-ir/src tooling/vitest tooling/fixtures/canonical-model/project-migration-v1-to-v2-expected.json tooling/fixtures/canonical-model/canonical-snapshot-checksum-v1.json
+          git commit -m "Format M02.6 serializer migration registry"
+          git push origin HEAD:agent/m02-6-serializer-migration-registry
