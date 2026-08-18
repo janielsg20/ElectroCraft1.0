@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "ec_route_0000000000005",
+  "version": 1,
+  "key": "inicio",
+  "path": "/",
+  "screenRef": "ec_document_0000000000002",
+  "parentRouteRef": null,
+  "actionRefs": ["ec_action-graph_000000000000f"],
+  "stateRefs": ["ec_state_000000000000j"],
+  "permissionPolicyRefs": ["ec_policy_000000000000k"],
+  "metadata": {
+    "fixture": "m02.4"
+  }
+}
