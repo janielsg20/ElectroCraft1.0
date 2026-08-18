@@ -15,6 +15,8 @@
     "Vitest separa unit, contract e integration; Playwright reserva E2E/QA.",
     "El script check ejecuta lint, typecheck, boundaries, tests, build y E2E en ese orden.",
     "Studio es un composition root React/Vite; el bootstrap PWA de M01.4 no es owner del modelo canónico.",
-    "La PWA de M01.4 es un shell técnico sin runtime caching avanzado y su Project Home es temporal."
+    "La PWA de M01.4 es un shell técnico sin runtime caching avanzado y su Project Home es temporal.",
+    "M01.5 usa package-lock.json y npm ci para una instalación CI reproducible.",
+    "El CI base cachea el cache global de npm por lockfile, conserva contents: read y no contiene deploy/cloud secrets."
   ]
 }
