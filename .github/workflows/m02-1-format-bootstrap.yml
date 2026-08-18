@@ -1,0 +1,38 @@
+name: M02.1 Format Bootstrap
+
+on:
+  push:
+    branches:
+      - agent/m02-1-project-document-model
+    paths:
+      - '.github/workflows/m02-1-format-bootstrap.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Apply repository Prettier contract
+        run: npm run format
+      - name: Commit formatting only
+        run: |
+          if git diff --quiet; then
+            echo 'No formatting changes required'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add packages/domain/src packages/application/src tooling/vitest package.json package-lock.json .github/workflows/m02-1-canonical-model.yml tooling/fixtures
+          git commit -m 'Apply M02.1 repository formatting'
+          git push origin HEAD:agent/m02-1-project-document-model
