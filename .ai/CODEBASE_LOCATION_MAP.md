@@ -17,8 +17,11 @@ Este mapa es obligatorio para impedir que una IA cree módulos en lugares arbitr
 
 ### F02
 - `packages/domain/`
+- `packages/domain/src/contracts/`
 - `packages/application/`
-- `packages/contracts/`
+- `packages/export-ir/`
+
+Nota de compatibilidad de ownership: la referencia histórica `packages/contracts/` queda materializada en `packages/domain/src/contracts/`. F01 fijó exactamente 17 owner packages y `@electrocraft/domain` es el owner canónico de contratos; no crear un package paralelo `@electrocraft/contracts` sin ADR y cambio explícito del gate de arquitectura.
 
 ### F03
 - `packages/design-system/`
