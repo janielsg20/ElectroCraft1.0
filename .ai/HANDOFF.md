@@ -1,21 +1,29 @@
 # HANDOFF — ElectroCraft
 
 ## Current
-F02 / M02.9 — cierre técnico GREEN; Gate F02 — `ACTIVE` transition guard.
+F03 / M03.1 — Inicializar shadcn/ui Radix, Lucide y tokens ElectroCraft — `ACTIVE`.
 
 ## Siguiente acción exacta
-1. Mantener M02.9 como la única microfase marcada de ejecución durante Gate F02 para respetar la convención documental de continuidad.
-2. Ejecutar `.github/workflows/f02-canonical-model-gate.yml` sobre el árbol integrado de `main`.
-3. Verificar exactamente 17 owner packages y ausencia de package paralelo `packages/contracts`.
-4. Exigir evidencia de cierre M02.1–M02.9 y los docs `MODEL_OWNERSHIP.md` / `ENGINE_PAYLOAD_POLICY.md`.
-5. Ejecutar las suites dedicadas `test:m02-1`…`test:m02-9` y después `npm run check` completo.
-6. Confirmar ProjectDefinition/Document v3, JSON/checksum/migrations, ExportIR target-neutral, ownership 14/6/6 y wrappers OSS fail-closed sin runtime internals.
-7. Generar marker/artifact del Gate F02 y publicar status `electrocraft/F02`.
-8. Solo con Gate F02 `success`, marcar M02.9 `COMPLETADA`, F02 `COMPLETADA`, Gate F02 `GREEN` y crear evidencia de cierre de fase.
-9. Después del cierre verde, iniciar F03 / M03.1 como siguiente microfase y actualizar STATE/TRACKING/HANDOFF/CHANGELOG.
-10. Para M03.1, leer su spec, consultar APIs oficiales actuales de shadcn/ui Radix, Radix, Tailwind y Lucide, y mantener `packages/design-system` como owner antes de crear AppShell UI.
+1. Mantener `packages/design-system` como owner del sistema visual; no crear un segundo UI kit dentro de `apps/studio`.
+2. Inspeccionar `packages/design-system`, `apps/studio`, aliases/tsconfig/Vite y el CSS existente antes de inicializar shadcn.
+3. Usar shadcn CLI v4 de forma no interactiva con base Radix (`init -d --base radix`) o reproducir exactamente su estructura cuando el CLI no pueda operar dentro del entorno del repo; no usar Base UI.
+4. Mantener estilo product/dashboard compacto, tokens semánticos y CSS variables; no codificar colores fundacionales ad hoc.
+5. Integrar Tailwind v4 y el `cn()` utility en el owner correcto, sin romper el bootstrap Vite/PWA existente.
+6. Añadir solo primitives necesarias para M03.1 y las próximas piezas inmediatas del AppShell: Button, Tooltip, Separator, DropdownMenu, Sheet, ScrollArea y otros primitives mínimos justificados por el spec.
+7. Crear un registry Lucide tipado; iconos consistentes y decorativos con tratamiento de accesibilidad correcto.
+8. Definir tokens ElectroCraft para background/foreground/surface/border/muted/primary/destructive/ring, densidad, spacing, radius y estados; soportar light/dark/system.
+9. Crear i18n key mínima y HelpDescriptor `help.studio.shell` antes de introducir copy visible nuevo.
+10. Añadir una galería técnica accesible que pruebe primitives, estados, focus-visible, tema y densidad sin adelantar el layout completo de M03.2.
+11. Añadir unit/contract/integration/browser tests y gate M03.1; ejecutar `npm run check` y validar visualmente en navegador antes del merge.
+12. Validar M03.1 nuevamente en `main`, registrar artifact/digest y solo entonces activar M03.2.
+
+## APIs/decisiones actuales
+- shadcn CLI v4: inicialización no interactiva requiere `-d`; Radix se selecciona explícitamente con `--base radix`.
+- shadcn actual usa el paquete unificado `radix-ui` para nuevos componentes Radix.
+- Tailwind v4 usa tokens mediante `@theme inline`; los componentes deben consumir variables semánticas.
+- La interfaz debe usar primitives shadcn/Radix antes que controles HTML nativos cuando exista primitive equivalente.
 
 ## Read set
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/phases/F02.md`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M03_1.md`.
 
-M02.1–M02.9 tienen validación técnica verde; no iniciar M03.1 antes de Gate F02 verde.
+F02 está cerrada con Gate GREEN. M03.1 es la única microfase activa.
