@@ -40,3 +40,11 @@ La misma información queda disponible como fixture estructurado en `tooling/fix
 - La PWA es un shell técnico: manifiesto + service worker generado, sin runtime caching ni estrategia avanzada en esta microfase.
 - El Studio referencia este descriptor mediante `help.architecture.repository`; F01 no introduce un HelpRegistry paralelo antes de F03.
 - El bootstrap no persiste datos demo, internals de Vite/Workbox ni un segundo modelo canónico.
+
+## M01.5 — CI base reproducible
+- El CI base vive en `.github/workflows/ci.yml` y se ejecuta en `push` a `main` y en `pull_request`.
+- La instalación usa `npm ci` contra `package-lock.json`; el workflow no actualiza dependencias durante la validación.
+- `actions/setup-node` cachea el cache global de npm usando el hash del lockfile; `node_modules` no es el artifact cacheado.
+- El job ejecuta lint, typecheck, tests, build y Playwright de forma explícita antes de emitir evidencia.
+- Los permisos del workflow son de solo lectura y M01.5 no contiene deploys, publicación ni cloud secrets.
+- `.npmrc` fija `legacy-peer-deps=true` porque el lockfile raíz requiere la misma política usada para sortear el fallo vigente de npm/Arborist durante resolución de peers; no se relaja TypeScript, lint ni los gates de arquitectura.
