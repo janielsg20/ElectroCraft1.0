@@ -43,6 +43,20 @@ export const electroCraftFormMetaSchema = z.strictObject({
 });
 export type ElectroCraftFormMeta = z.infer<typeof electroCraftFormMetaSchema>;
 
+export const electroCraftDisplayConditionSchema = z.strictObject({
+  subject: z.enum(['route', 'document', 'role', 'capability']),
+  operator: z.enum(['equals', 'not-equals', 'includes']),
+  value: z.string().trim().min(1).max(240),
+});
+export type ElectroCraftDisplayCondition = z.infer<typeof electroCraftDisplayConditionSchema>;
+
+export const electroCraftTemplateMetaSchema = z.strictObject({
+  slot: z.enum(['page', 'section', 'header', 'footer', 'modal']),
+  priority: z.number().int().min(-10_000).max(10_000),
+  displayConditions: z.array(electroCraftDisplayConditionSchema).max(100),
+});
+export type ElectroCraftTemplateMeta = z.infer<typeof electroCraftTemplateMetaSchema>;
+
 const documentBaseShape = {
   id: electroCraftObjectIdSchema,
   version: z.number().int().positive(),
@@ -55,9 +69,10 @@ const documentBaseShape = {
 
 export const electroCraftDocumentSchema = z
   .strictObject({
-    schemaVersion: z.literal(2),
+    schemaVersion: z.literal(3),
     ...documentBaseShape,
     formMeta: electroCraftFormMetaSchema.nullable(),
+    templateMeta: electroCraftTemplateMetaSchema.nullable(),
   })
   .superRefine((document, context) => {
     if (document.kind === 'form' && document.formMeta === null) {
@@ -65,6 +80,12 @@ export const electroCraftDocumentSchema = z
     }
     if (document.kind !== 'form' && document.formMeta !== null) {
       context.addIssue({ code: 'custom', path: ['formMeta'], message: 'formMeta is only valid for form documents' });
+    }
+    if (document.kind === 'template' && document.templateMeta === null) {
+      context.addIssue({ code: 'custom', path: ['templateMeta'], message: 'template document requires templateMeta' });
+    }
+    if (document.kind !== 'template' && document.templateMeta !== null) {
+      context.addIssue({ code: 'custom', path: ['templateMeta'], message: 'templateMeta is only valid for template documents' });
     }
     if (document.kind === 'form' && document.formMeta !== null) {
       const hasDataSchema = document.formMeta.dataSchemaRef !== null;
@@ -80,6 +101,12 @@ export const electroCraftDocumentSchema = z
   });
 
 export type ElectroCraftDocument = z.infer<typeof electroCraftDocumentSchema>;
+
+const legacyDocumentV2Schema = z.strictObject({
+  schemaVersion: z.literal(2),
+  ...documentBaseShape,
+  formMeta: electroCraftFormMetaSchema.nullable(),
+});
 
 const legacyDocumentV1Schema = z.strictObject({
   schemaVersion: z.literal(1),
@@ -99,7 +126,7 @@ export const legacyPageDocumentSchema = z.strictObject({
 
 export interface ElectroCraftDocumentImportResult {
   document: ElectroCraftDocument;
-  migratedFrom: 'page' | 1 | null;
+  migratedFrom: 'page' | 1 | 2 | null;
 }
 
 function emptyLegacyFormMeta(): ElectroCraftFormMeta {
@@ -113,18 +140,37 @@ function emptyLegacyFormMeta(): ElectroCraftFormMeta {
   };
 }
 
+function emptyLegacyTemplateMeta(): ElectroCraftTemplateMeta {
+  return {
+    slot: 'page',
+    priority: 0,
+    displayConditions: [],
+  };
+}
+
 export function importElectroCraftDocument(input: unknown): ElectroCraftDocumentImportResult {
   const canonical = electroCraftDocumentSchema.safeParse(input);
   if (canonical.success) {
     return { document: canonical.data, migratedFrom: null };
   }
 
+  const legacyV2 = legacyDocumentV2Schema.safeParse(input);
+  if (legacyV2.success) {
+    const document = electroCraftDocumentSchema.parse({
+      ...legacyV2.data,
+      schemaVersion: 3,
+      templateMeta: legacyV2.data.kind === 'template' ? emptyLegacyTemplateMeta() : null,
+    });
+    return { document, migratedFrom: 2 };
+  }
+
   const legacyV1 = legacyDocumentV1Schema.safeParse(input);
   if (legacyV1.success) {
     const document = electroCraftDocumentSchema.parse({
       ...legacyV1.data,
-      schemaVersion: 2,
+      schemaVersion: 3,
       formMeta: legacyV1.data.kind === 'form' ? emptyLegacyFormMeta() : null,
+      templateMeta: legacyV1.data.kind === 'template' ? emptyLegacyTemplateMeta() : null,
     });
     return { document, migratedFrom: 1 };
   }
@@ -137,9 +183,10 @@ export function importElectroCraftDocument(input: unknown): ElectroCraftDocument
   const { schemaVersion: _legacySchemaVersion, ...legacy } = legacyPage.data;
   const document = electroCraftDocumentSchema.parse({
     ...legacy,
-    schemaVersion: 2,
+    schemaVersion: 3,
     kind: 'screen',
     formMeta: null,
+    templateMeta: null,
   });
 
   return { document, migratedFrom: 'page' };
