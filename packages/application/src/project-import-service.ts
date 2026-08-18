@@ -11,11 +11,7 @@ import {
 import type { CanonicalProjectObjectRecord, CanonicalProjectObjectRepository } from './project-document-service';
 
 export type ProjectImportDiagnosticCode =
-  | 'INVALID_JSON'
-  | 'INVALID_SCHEMA'
-  | 'CHECKSUM_MISMATCH'
-  | 'REFERENCE_ERROR'
-  | 'PERSISTENCE_ERROR';
+  'INVALID_JSON' | 'INVALID_SCHEMA' | 'CHECKSUM_MISMATCH' | 'REFERENCE_ERROR' | 'PERSISTENCE_ERROR';
 
 export interface ProjectImportDiagnostic {
   code: ProjectImportDiagnosticCode;
@@ -93,7 +89,8 @@ export class ProjectImportService {
           code: 'REFERENCE_ERROR',
           path: diagnostic.ref ? ['snapshot', 'project', diagnostic.ref] : ['snapshot', 'project'],
           message: `${diagnostic.code}${diagnostic.ref ? `: ${diagnostic.ref}` : ''}`,
-          repair: 'Restaura la referencia canónica faltante/duplicada o elimina la referencia inválida antes de importar.',
+          repair:
+            'Restaura la referencia canónica faltante/duplicada o elimina la referencia inválida antes de importar.',
         })),
       );
     }
@@ -109,7 +106,8 @@ export class ProjectImportService {
           code: 'CHECKSUM_MISMATCH',
           path: ['checksum'],
           message: `checksum esperado ${envelope.checksum}; checksum canónico actual ${actualChecksum}`,
-          repair: 'Regenera el snapshot desde objetos canónicos válidos; no edites manualmente un snapshot firmado por checksum.',
+          repair:
+            'Regenera el snapshot desde objetos canónicos válidos; no edites manualmente un snapshot firmado por checksum.',
         },
       ]);
     }

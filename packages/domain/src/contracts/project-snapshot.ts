@@ -89,9 +89,7 @@ export function parseElectroCraftProjectSnapshotEnvelope(serialized: string): un
   return parseCanonicalJson(serialized);
 }
 
-export function verifyElectroCraftProjectSnapshotEnvelope(
-  envelopeInput: unknown,
-): ElectroCraftProjectSnapshotEnvelope {
+export function verifyElectroCraftProjectSnapshotEnvelope(envelopeInput: unknown): ElectroCraftProjectSnapshotEnvelope {
   const envelope = electroCraftProjectSnapshotEnvelopeSchema.parse(envelopeInput);
   const actualChecksum = createElectroCraftProjectSnapshotChecksum(envelope.snapshot);
   if (actualChecksum !== envelope.checksum) {

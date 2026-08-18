@@ -85,9 +85,9 @@ describe('M02.6 deterministic serializer and MigrationRegistry', () => {
     const registry = new ElectroCraftMigrationRegistry();
     registry.register({ id: 'v1-v2', fromVersion: 1, toVersion: 2, migrate: (value) => value });
 
-    expect(() => registry.register({ id: 'duplicate', fromVersion: 1, toVersion: 2, migrate: (value) => value })).toThrow(
-      /already registered/,
-    );
+    expect(() =>
+      registry.register({ id: 'duplicate', fromVersion: 1, toVersion: 2, migrate: (value) => value }),
+    ).toThrow(/already registered/);
     expect(() => registry.register({ id: 'jump', fromVersion: 2, toVersion: 4, migrate: (value) => value })).toThrow(
       /sequential/,
     );
