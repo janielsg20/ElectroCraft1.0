@@ -97,7 +97,7 @@ describe('M02.3 portable query/runtime integration', () => {
     expect(result.rows[0]).toMatchObject({ recordId: 'record-1', data: { title: 'Power Bank' } });
   });
 
-  it('reopens legacy v1 project/document records, migrates them to v2, and writes them back', async () => {
+  it('reopens legacy v1 project/document records, migrates them to v3, and writes them back', async () => {
     const projectV1 = fixture('project-v1') as { id: string };
     const screenV1 = fixture('screen-v1') as { id: string };
     const projectId = electroCraftObjectIdSchema.parse(projectV1.id);
@@ -124,12 +124,23 @@ describe('M02.3 portable query/runtime integration', () => {
     if (reopened.status !== 'ready') return;
     expect(reopened.migratedProject).toBe(true);
     expect(reopened.migratedDocumentIds).toEqual([documentId]);
-    expect(reopened.project.schemaVersion).toBe(2);
-    expect(reopened.documents[0]).toMatchObject({ schemaVersion: 2, formMeta: null });
+    expect(reopened.project.schemaVersion).toBe(3);
+    expect(reopened.documents[0]).toMatchObject({ schemaVersion: 3, formMeta: null, templateMeta: null });
 
     const storedProject = await repository.get('project', projectId);
     const storedDocument = await repository.get('document', documentId);
-    expect(JSON.parse(storedProject?.payload ?? '{}')).toMatchObject({ schemaVersion: 2, dataSourceRefs: [] });
-    expect(JSON.parse(storedDocument?.payload ?? '{}')).toMatchObject({ schemaVersion: 2, formMeta: null });
+    expect(JSON.parse(storedProject?.payload ?? '{}')).toMatchObject({
+      schemaVersion: 3,
+      dataSourceRefs: [],
+      originBlueprint: null,
+      requiredCapabilities: [],
+      targetCapabilityOverrides: {},
+      userRegistryDefinitionRefs: [],
+    });
+    expect(JSON.parse(storedDocument?.payload ?? '{}')).toMatchObject({
+      schemaVersion: 3,
+      formMeta: null,
+      templateMeta: null,
+    });
   });
 });
