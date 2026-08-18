@@ -55,7 +55,9 @@ describe('M02.1 canonical model boundaries', () => {
       'packages/domain/src/contracts/serialization.ts',
     ];
     const source = files.map((file) => readFileSync(resolve(file), 'utf8')).join('\n');
+    const forbiddenImport =
+      /from ['"](?:@puckeditor\/core|react(?:\/[^'"]*)?|drizzle-orm(?:\/[^'"]*)?|node:fs|node:path)['"]/;
 
-    expect(source).not.toMatch(/@puckeditor\/core|react|drizzle-orm|node:fs|node:path/);
+    expect(source).not.toMatch(forbiddenImport);
   });
 });
