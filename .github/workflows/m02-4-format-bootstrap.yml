@@ -1,0 +1,51 @@
+name: M02.4 Format Bootstrap
+
+on:
+  push:
+    branches:
+      - agent/m02-4-action-state-navigation-permission
+    paths:
+      - '.github/workflows/m02-4-format-bootstrap.yml'
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v6
+        with:
+          ref: agent/m02-4-action-state-navigation-permission
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Format M02.4 sources
+        run: |
+          npx prettier --write packages/domain/src/contracts/app-behavior.ts packages/domain/src/contracts/serialization.ts tooling/vitest/unit/action-state-navigation-permission.test.ts
+
+      - name: Commit formatted sources
+        run: |
+          if git diff --quiet -- packages/domain/src/contracts/app-behavior.ts packages/domain/src/contracts/serialization.ts tooling/vitest/unit/action-state-navigation-permission.test.ts; then
+            echo "M02.4 sources already formatted"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add packages/domain/src/contracts/app-behavior.ts packages/domain/src/contracts/serialization.ts tooling/vitest/unit/action-state-navigation-permission.test.ts
+          git commit -m "Format M02.4 canonical contracts"
+          git push origin HEAD:agent/m02-4-action-state-navigation-permission
