@@ -15,8 +15,8 @@ export const studioShellHelpDescriptor = Object.freeze({
     'El Sidebar usa los grupos Construir, Datos, Lógica, App, Recursos, Apariencia y Publicar. Cada destino conserva icono Lucide, label accesible y aria-current cuando está activo.',
     'Desktop permite contraer 240px a 64px. Laptop conserva rail de 64px; cuando el lienzo útil se estrecha, Contexto e Inspector usan un único overlay en vez de comprimir el Canvas.',
     'Tablet conserva un rail global de 56px con objetivos táctiles y mantiene la navegación completa disponible en un Sheet Radix. Las herramientas secundarias del editor también usan Sheets.',
-    'Móvil elimina el rail lateral, conserva una Topbar compacta y añade navegación inferior Componentes, Pantallas, Lienzo, Propiedades y Más sin ocultar capacidades primarias.',
-    'En móvil, Componentes y Propiedades usan Sheets inferiores; Más abre Capas/Outline en un Sheet de altura completa. Todos usan triggers Radix reales para restaurar el foco al cerrar.',
+    'Móvil elimina el rail lateral, conserva una Topbar compacta y añade navegación inferior Componentes, Pantallas, Lienzo, Propiedades, Apariencia y Más sin ocultar capacidades primarias.',
+    'En móvil, Componentes, Propiedades y Apariencia usan Sheets inferiores; Más abre Capas/Outline en un Sheet de altura completa. Todos usan triggers Radix reales para restaurar el foco al cerrar.',
     'La preferencia de colapso se consume mediante WorkspacePreferencesPort. Durante F03 el adapter es in-memory; F04 puede sustituir solo el adapter por PGlite sin cambiar el contrato de UI.',
     'La Topbar de 52px separa breadcrumb/proyecto/guardado, herramientas contextuales y acciones de publicación. En tablet y móvil las herramientas secundarias se trasladan a Sheet.',
     'Ayuda abre este descriptor persistente y Configuración abre un Sheet real. El gear es la última acción del extremo derecho y el cierre de Radix restaura el foco al trigger.',
@@ -34,11 +34,27 @@ export const studioShellHelpDescriptor = Object.freeze({
     'Favoritos y Recientes guardan solo paletteItemId como preferencias del workspace. No clonan ComponentDefinitions ni forman parte de ElectroCraftDocument o ExportIR.',
     'Puck.Components permanece como fuente de drag para componentes registrados. El click-to-insert pasa por el adapter Puck y solo se habilita cuando existe el mapping real; un item aún no mapeado muestra código, ubicación, causa y acción sugerida en vez de fingir éxito.',
     'La Palette es navegable por teclado: el buscador precede al catálogo, ArrowDown entra en los items y Escape devuelve el foco al lienzo. En móvil vive dentro del Sheet inferior de Componentes, no como una versión desktop comprimida.',
+    'Apariencia del Studio usa un preference schema separado del documento y aplica únicamente tokens del Design System; no reutiliza ni modifica el theme del proyecto.',
+  ]),
+} satisfies HelpDescriptor);
+
+export const studioAppearanceHelpDescriptor = Object.freeze({
+  id: 'help.studio.appearance',
+  title: 'Apariencia del Studio',
+  summary:
+    'Configura la presentación del propio editor de ElectroCraft sin modificar ElectroCraftDocument, el tema del frontend, el tema de Administración ni ExportIR.',
+  details: Object.freeze([
+    'Modo, colores, tipografía, iconos, forma, densidad y movimiento se previsualizan mediante tokens del Studio antes de Aplicar.',
+    'Aplicar persiste el perfil de la sesión; Revertir descarta la vista previa. Si intentas cerrar con cambios pendientes, ElectroCraft pide aplicar, descartar o seguir editando.',
+    'Los presets integrados y personales guardan solo preferencias de apariencia del Studio. Nunca se serializan dentro del proyecto ni de ExportIR.',
+    'prefers-reduced-motion del sistema limita la animación solicitada por el perfil. El usuario no puede forzar movimiento alto por encima de esa preferencia del sistema.',
+    'Las combinaciones de contraste o legibilidad marcadas como no accesibles muestran una advertencia visible y permiten Restaurar valores accesibles.',
   ]),
 } satisfies HelpDescriptor);
 
 export const studioHelpRegistry = Object.freeze({
   [studioShellHelpDescriptor.id]: studioShellHelpDescriptor,
+  [studioAppearanceHelpDescriptor.id]: studioAppearanceHelpDescriptor,
 });
 
 export type StudioHelpId = keyof typeof studioHelpRegistry;
