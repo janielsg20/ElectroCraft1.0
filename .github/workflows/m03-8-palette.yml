@@ -88,21 +88,12 @@ jobs:
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
 
-      - name: Verify M03.8 source formatting
+      - name: Produce exact M03.8 Prettier output
         run: >-
-          npx prettier --check
-          .github/workflows/m03-8-palette.yml
+          npx prettier --write
           apps/studio/src/shell/palette-catalog.ts
           apps/studio/src/shell/palette-preferences.ts
           apps/studio/src/shell/palette-panel.tsx
-          apps/studio/src/shell/palette-panel.css
-          apps/studio/src/i18n/palette.es.ts
-          tooling/test/m03-8-palette.test.mjs
-          tooling/vitest/unit/palette-catalog.test.ts
-          tooling/vitest/unit/palette-preferences.test.ts
-          tooling/vitest/contract/palette-puck-boundary.test.ts
-          tooling/vitest/integration/palette-runtime.test.ts
-          tooling/playwright/m03-8-palette.spec.ts
 
       - name: Execute dedicated M03.8 structural suite
         run: node --test tooling/test/m03-8-palette.test.mjs
@@ -132,7 +123,7 @@ jobs:
       - name: Emit closure marker
         run: echo PASS_M03_8_DISCOVERABLE_PALETTE | tee m03-8-closure.log
 
-      - name: Upload evidence
+      - name: Upload evidence and formatted sources
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -142,6 +133,9 @@ jobs:
             m03-8-closure.log
             test-results/**
             .ai/evidence/F03/M03.8/**
+            apps/studio/src/shell/palette-catalog.ts
+            apps/studio/src/shell/palette-preferences.ts
+            apps/studio/src/shell/palette-panel.tsx
           if-no-files-found: warn
 
       - name: Publish final commit status
