@@ -14,7 +14,8 @@ El historial detallado previo permanece versionado en Git y en los archivos de e
 | M03.2 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.2/CLOSURE_2026-08-19.md` |
 | M03.3 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.3/CLOSURE_2026-08-19.md` |
 | M03.4 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.4/CLOSURE_2026-08-19.md` |
-| F03 / M03.5 | ACTIVE | `.ai/microphases/M03_5.md` + `.ai/evidence/F03/M03.5/IMPLEMENTATION_2026-08-19.md` |
+| M03.5 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.5/CLOSURE_2026-08-19.md` |
+| F03 / M03.6 | ACTIVE | `.ai/microphases/M03_6.md` |
 
 ## Cierres canónicos recientes
 ### M03.3
@@ -31,19 +32,22 @@ El historial detallado previo permanece versionado en Git y en los archivos de e
 - Node `27/27`, Vitest `169/169`, build PASS, Playwright `16/16` y `npm run check` GREEN.
 - Topbar 52px, Settings gear último, Sheet Radix, restore-focus y WorkspacePreferencesPort compartido.
 
-## Implementación M03.5
-- Base exacta: `main@dd6ac8ea28276d9a1fc05f387338cba5980462a5`.
-- Contexto: 288px desktop, rango 240–380px.
-- Canvas: región dominante `minmax(0, 1fr)` con `Puck.Preview` real.
-- Inspector: 320px desktop, rango 280–440px.
-- Status: se conserva el Statusbar owner de AppShell a 26px, informativo y sin acciones nuevas.
-- Resizers desktop accesibles por puntero/teclado y con límites explícitos.
-- Laptop: Contexto 240px + Canvas; Inspector en Sheet.
-- Tablet/móvil: Canvas prioritario; Contexto e Inspector en Sheet.
-- Puck permanece encapsulado por `@electrocraft/editor-puck`; no existe import directo desde Studio.
-- Placeholders son estructurales y explícitos; no simulan widgets ni persistencia futura.
-- Tests unit/contract/integration/node/E2E incluidos; gate completo pendiente sobre el árbol aplicado.
-- M03.6 no puede iniciar hasta Gate GREEN de M03.5.
+### M03.5
+- PR `#18`; base `main@dd6ac8ea28276d9a1fc05f387338cba5980462a5`.
+- Head validado `5044a3456cee87094f66d8c5f262b457ea338020`.
+- Run propietario `32296070741` — success; job `96207545673`.
+- Artifact `9381289623`; digest `sha256:c78ebf5db9dd87d2235a08907f2f9e51ce9e00a070190540322530d026f4c73c`.
+- Closure marker `PASS_M03_5_EDITOR_LAYOUT`.
+- Structural `1/1`; Vitest dedicado `7/7`; Playwright dedicado `4/4`.
+- Full gate: Node `28/28`, Vitest `176/176` en 53 archivos, Playwright `20/20`, typecheck/build GREEN.
+- Contexto 288px 240–380, Canvas dominante, Inspector 320px 280–440 y Statusbar AppShell 26px.
+- Radix `SheetTrigger` preserva restore-focus y `help.studio.shell` conserva ownership único en AppShell.
+
+## Transición M03.6
+- M03.6 es la única microfase `ACTIVE`.
+- Su implementación permanece bloqueada únicamente por la integración de PR `#18` y la revalidación M03.5 sobre `main`; no existe blocker funcional P0/P1 conocido.
+- Scope siguiente: laptop con colapso/overlay cuando Canvas sea estrecho; tablet con rail + Sheets; móvil con Topbar compacta + bottom nav `Components | Screens | Canvas | Properties | More`, Properties en bottom Sheet y Outline en Sheet full-height.
+- No puede desaparecer ninguna capacidad primaria ni adelantarse scope de M03.7+.
 
 ## Historial extendido
 - hasta M00.8: `.ai/TRACKING_HISTORY_THROUGH_M00.8.md`;
