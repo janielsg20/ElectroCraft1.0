@@ -1,6 +1,7 @@
 import { ThemeProvider } from '@electrocraft/design-system';
 import type { ReactNode } from 'react';
 import { getStudioHelpDescriptor } from '../help/help-registry';
+import { iaT } from '../i18n/information-architecture.es';
 import { studioT } from '../i18n/studio-shell.es';
 import { AppShell, type AppShellCopy, type AppShellStatus } from './app-shell';
 import { resolveSidebarActiveItem, studioSidebarNavigation } from './sidebar-navigation';
@@ -70,6 +71,13 @@ const topbarCopy: StudioTopbarCopy = Object.freeze({
   sidebarCollapsedLabel: studioT('studio.topbar.sidebarCollapsedLabel'),
   collapseSidebarAction: studioT('studio.topbar.collapseSidebarAction'),
   expandSidebarAction: studioT('studio.topbar.expandSidebarAction'),
+  settingsAdvancedTitle: iaT('studio.ia.settings.advancedTitle'),
+  settingsAdvancedSummary: iaT('studio.ia.settings.advancedSummary'),
+  settingsPersistenceLabel: iaT('studio.ia.settings.persistenceLabel'),
+  settingsPersistenceValue: iaT('studio.ia.settings.persistenceValue'),
+  settingsPersistenceHelp: iaT('studio.ia.settings.persistenceHelp'),
+  settingsStatusErrorTitle: iaT('studio.ia.settings.statusErrorTitle'),
+  settingsStatusErrorSummary: iaT('studio.ia.settings.statusErrorSummary'),
 });
 
 const workspacePreferencesPort = createMemoryWorkspacePreferencesPort();
