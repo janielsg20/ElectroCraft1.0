@@ -43,6 +43,7 @@ export interface AppShellProps {
   readonly preferencesPort: WorkspacePreferencesPort;
   readonly helpId: `help.${string}`;
   readonly status?: AppShellStatus;
+  readonly topbar?: ReactNode;
   readonly children?: ReactNode;
 }
 
@@ -112,6 +113,7 @@ export function AppShell({
   preferencesPort,
   helpId,
   status = 'ready',
+  topbar,
   children,
 }: AppShellProps) {
   const preferences = useSyncExternalStore(
@@ -190,8 +192,12 @@ export function AppShell({
             </SheetContent>
           </Sheet>
 
-          <strong className="ec-app-shell-topbar-title">{copy.title}</strong>
-          <span className="ec-app-shell-topbar-spacer" aria-hidden="true" />
+          {topbar ?? (
+            <>
+              <strong className="ec-app-shell-topbar-title">{copy.title}</strong>
+              <span className="ec-app-shell-topbar-spacer" aria-hidden="true" />
+            </>
+          )}
         </header>
 
         <main className="ec-app-shell-workspace" aria-label={copy.workspaceLabel}>
