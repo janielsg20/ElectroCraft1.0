@@ -48,11 +48,7 @@ test('M03.5 structural gate keeps exact editor dimensions and ownership', () => 
   }
 
   assert.equal(appCss.includes('height: 26px'), true, 'M03.5 must preserve the AppShell 26px Statusbar');
-  assert.equal(
-    studio.includes("from '@puckeditor/core'"),
-    false,
-    'Studio must not bypass editor-puck ownership',
-  );
+  assert.equal(studio.includes("from '@puckeditor/core'"), false, 'Studio must not bypass editor-puck ownership');
   for (const token of [
     'PuckEditorComponents',
     'PuckEditorOutline',
@@ -96,9 +92,5 @@ test('M03.5 structural gate keeps exact editor dimensions and ownership', () => 
     true,
     'M03.4 verifier must support post-closure regression mode',
   );
-  assert.equal(
-    m034Verifier.includes('32278183037'),
-    true,
-    'M03.4 verifier must pin the real GREEN closure run',
-  );
+  assert.equal(m034Verifier.includes('32278183037'), true, 'M03.4 verifier must pin the real GREEN closure run');
 });
