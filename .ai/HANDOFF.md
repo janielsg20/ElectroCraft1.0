@@ -1,31 +1,32 @@
 # HANDOFF — ElectroCraft
 
 ## Current
-F03 / M03.6 — Adaptar laptop/tablet/mobile — `ACTIVE`.
+F03 / M03.7 — Aplicar Progressive Disclosure y arquitectura de información — `ACTIVE`.
 
 ## Estado heredado
-- M03.5 fue integrado por PR `#18` como `main@f7577871dcadb843ea59a4bec0378cbbf9cc396b`.
-- Gate propietario M03.5 sobre `main`: run `32297534296`, job `96212236246` — success.
-- Artifact `9381789348`; digest `sha256:b5d07c57b0a24e8c1a4cf9df94707cd5eaf23948639fd8e0ab24081e46ac361b`.
-- Full gate M03.5: Node `28/28`, Vitest `176/176`, Playwright `20/20`, typecheck/build GREEN.
-
-## Implementación M03.6 actual
-- Rama `agent/m03-6-responsive-shell` creada desde el `main` ya validado.
-- Laptop conserva rail AppShell 64px; editor usa `split` >=1152 y un único overlay de herramienta secundaria entre 1024–1151.
-- Tablet usa rail global 56px + navegación completa en Sheet y Contexto/Inspector en Sheets.
-- Móvil usa Topbar compacta + dock inferior exacto `Componentes | Pantallas | Lienzo | Propiedades | Más`.
-- Propiedades usa el `Sheet` Radix existente extendido con `side="bottom"`; Más expone Outline/Capas en Sheet full-height.
-- Pantallas resuelve su href desde el registry canónico del Sidebar.
-- Puck mantiene ownership detrás de `@electrocraft/editor-puck`; Studio no importa `@puckeditor/core`.
-- Copy español, HelpRegistry, icon IDs semánticos y objetivos táctiles >=44px implementados.
-- Unit/contract/integration/Playwright M03.6 preparados; M03.2 tablet actualizado al contrato superseding de rail.
+- M03.6 cerró GREEN en PR `#19`, head funcional `f82d119d4c65bad6908674801dcb18ff318bab88`.
+- Run propietario `32299990614` success; job `96220101415`.
+- Artifact `9382670739`; digest `sha256:8220e02ccde96f013de24c4ee258f3bbe36fb1600d486e6b65277ba4353bb67f`.
+- Gate M03.6: structural `1/1`, Vitest dedicado `12/12`, Playwright dedicado `4/4`, Node global `29/29`, Vitest global `188/188`, Playwright global `24/24`, typecheck/build GREEN.
 
 ## Siguiente acción exacta
-1. Añadir structural gate M03.6 y workflow propietario.
-2. Ejecutar gate dedicado y `npm run check` completo en GitHub Actions.
-3. Corregir únicamente fallos reales de formato, typecheck, tests, build o browser audit.
-4. Con M03.6 GREEN, registrar closure, pasar M03.6 a COMPLETADA y activar solo la microfase siguiente declarada por el repo.
-5. No adelantar M03.7 mientras M03.6 permanezca ACTIVE.
+1. Confirmar que el gate M03.6 post-cierre sigue GREEN con `M03.6 COMPLETADA` y `M03.7 ACTIVE`.
+2. Integrar PR `#19` en `main` sin introducir cambios ajenos al scope validado.
+3. Revalidar el gate propietario M03.6 sobre `main` y exigir GREEN.
+4. Crear una rama limpia desde ese `main` y comenzar M03.7 según `.ai/microphases/M03_7.md`.
+5. Crear `UX_INFORMATION_ARCHITECTURE.md`, clasificar opciones primary/contextual/advanced/diagnostic y aplicar primero a Settings/Inspector/List-Detail.
+6. No implementar M03.8 mientras M03.7 permanezca ACTIVE.
+
+## Decisiones vigentes
+- Desktop conserva geometría M03.5.
+- Laptop conserva rail 64px y usa split >=1152 / overlay secundario entre 1024–1151.
+- Tablet usa rail global 56px + navegación completa en Sheet.
+- Móvil usa dock 58px exacto `Componentes | Pantallas | Lienzo | Propiedades | Más`.
+- Propiedades usa bottom Sheet; Más expone Outline/Capas full-height.
+- Pantallas usa el registry canónico del Sidebar.
+- `SheetContent` Radix existente soporta `left | right | bottom`; no existe otro drawer subsystem.
+- Puck conserva ownership detrás de `@electrocraft/editor-puck`.
+- M03.7 debe reducir complejidad visible sin eliminar capacidades, rutas canónicas ni diagnostics importantes.
 
 ## Read set
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M03_6.md → .ai/APP_SHELL_SPEC.md`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M03_7.md → UI_UX_LAYOUT_RULES.md`.
