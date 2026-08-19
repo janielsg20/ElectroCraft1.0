@@ -1,7 +1,7 @@
 # M03.6 — Implementation evidence — 2026-08-19
 
 ## Estado
-`ACTIVE`. Implementación escrita; pendiente gate propietario GREEN antes de cierre.
+`COMPLETADA / GREEN` en PR `#19`. El cierre canónico vive en `.ai/evidence/F03/M03.6/CLOSURE_2026-08-19.md`.
 
 ## Scope implementado
 - Desktop >=1280 conserva el editor completo M03.5 sin cambios de geometría.
@@ -26,15 +26,20 @@
 - Studio no importa `@puckeditor/core` directamente.
 - M03.2 tablet fue actualizado únicamente en la expectativa superseded `sidebar hidden -> 56px rail + Sheet`; desktop/laptop/mobile se conservan.
 
-## Cobertura preparada
-- Unit: `tooling/vitest/unit/responsive-editor-layout.test.ts`.
-- Contract: `tooling/vitest/contract/responsive-shell-boundary.test.ts`.
-- Integration: `tooling/vitest/integration/responsive-shell-runtime.test.ts`.
-- Browser: `tooling/playwright/m03-6-responsive-shell.spec.ts`.
-- Pendiente: structural Node gate, workflow propietario y ejecución real de full repository gate.
+## Cobertura GREEN
+- Structural: `tooling/test/m03-6-responsive-shell.test.mjs` — `1/1`.
+- Unit/contract/integration dedicado — `12/12` en `3` archivos.
+- Playwright dedicado — `4/4`.
+- Full Node — `29/29`.
+- Full Vitest — `188/188` en `56` archivos.
+- Full Playwright — `24/24`.
+- Typecheck, boundaries y build GREEN.
+- Workflow `M03.6 Responsive Shell Gate` run `32299990614`, job `96220101415`.
+- Artifact `9382670739`; digest `sha256:8220e02ccde96f013de24c4ee258f3bbe36fb1600d486e6b65277ba4353bb67f`.
+- Closure marker `PASS_M03_6_RESPONSIVE_SHELL`.
 
 ## Predecesor
 M03.5 fue revalidado GREEN en `main` mediante run `32297534296`, job `96212236246`, artifact `9381789348`, digest `sha256:b5d07c57b0a24e8c1a4cf9df94707cd5eaf23948639fd8e0ab24081e46ac361b`.
 
-## Blockers
-Ningún blocker funcional P0/P1 conocido. M03.6 no puede marcarse COMPLETADA hasta obtener evidencia real de lint, typecheck, tests, build y Playwright GREEN.
+## Continuidad
+M03.7 es la única microfase `ACTIVE`, pero su implementación queda bloqueada hasta integrar PR `#19` y revalidar el gate M03.6 sobre `main`.
