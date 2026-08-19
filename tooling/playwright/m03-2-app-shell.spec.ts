@@ -52,14 +52,17 @@ test.describe('M03.2 AppShell', () => {
     await expect(page.getByRole('link', { name: 'Editor' })).toBeVisible();
   });
 
-  test('moves structural navigation to a keyboard-accessible Radix Sheet on tablet', async ({ page }) => {
+  test('uses a tablet rail plus a keyboard-accessible full-navigation Radix Sheet', async ({ page }) => {
     await page.setViewportSize({ width: 900, height: 800 });
     await page.goto('/');
 
-    await expect(page.locator('.ec-app-shell-sidebar')).toBeHidden();
+    const sidebar = page.locator('.ec-app-shell-sidebar');
+    await expect(sidebar).toBeVisible();
+    expect(Math.round((await sidebar.boundingBox())?.width ?? 0)).toBe(56);
+    await expect(sidebar.getByRole('link', { name: 'Editor' })).toBeVisible();
+
     const menuButton = page.getByRole('button', { name: 'Abrir navegación' });
     await expect(menuButton).toBeVisible();
-
     await menuButton.focus();
     await expect(menuButton).toBeFocused();
     await page.keyboard.press('Enter');
