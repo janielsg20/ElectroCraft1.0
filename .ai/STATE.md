@@ -10,24 +10,23 @@
 - M03.3 — Construir Sidebar global: `COMPLETADA`; Gate `GREEN`.
 - M03.4 — Construir Topbar global + Settings: `COMPLETADA`; Gate `GREEN`.
 - M03.5 — Construir Context/Canvas/Inspector/Status: `COMPLETADA`; Gate `GREEN`.
-- M03.6 — Adaptar laptop/tablet/mobile: `ACTIVE`.
-- Blockers P0/P1: `0` funcionales conocidos.
+- M03.6 — Adaptar laptop/tablet/mobile: `COMPLETADA`; Gate `GREEN`.
+- M03.7 — Aplicar Progressive Disclosure y arquitectura de información: `ACTIVE`.
+- Blockers P0/P1: `0` funcionales conocidos; implementar M03.7 solo después de integrar M03.6 y confirmar su gate propietario GREEN sobre `main`.
 
 ## Cierre predecesor
-M03.5 fue integrado por PR `#18` como `main@f7577871dcadb843ea59a4bec0378cbbf9cc396b` y revalidado con run propietario `32297534296` `success`, job `96212236246`, artifact `9381789348`, digest `sha256:b5d07c57b0a24e8c1a4cf9df94707cd5eaf23948639fd8e0ab24081e46ac361b` y full `npm run check` GREEN.
+M03.6 cerró en PR `#19` sobre head funcional `f82d119d4c65bad6908674801dcb18ff318bab88` con run propietario `32299990614` `success`, job `96220101415`, artifact `9382670739`, digest `sha256:8220e02ccde96f013de24c4ee258f3bbe36fb1600d486e6b65277ba4353bb67f` y full `npm run check` GREEN.
 
 ## Microfase activa
-`M03.6` — Adaptar laptop/tablet/mobile.
+`M03.7` — Aplicar Progressive Disclosure y arquitectura de información.
 
-Objetivo: preservar todas las capacidades del editor al adaptar laptop, tablet y móvil; laptop usa rail y overlay cuando el Canvas queda estrecho, tablet usa rail + Sheets y móvil usa Topbar compacta + navegación inferior con Properties/Outline en superficies táctiles adecuadas.
+Objetivo: reducir complejidad visible sin eliminar potencia profesional, clasificando opciones como primary/contextual/advanced/diagnostic, manteniendo módulos de primer nivel en navegación, colocando detalles secundarios en Disclosure y definiendo empty states/microcopy/help sin rutas redundantes.
 
 ## Referencias
-- Spec: `.ai/microphases/M03_6.md`.
-- AppShell contract: `.ai/APP_SHELL_SPEC.md`.
+- Spec: `.ai/microphases/M03_7.md`.
 - Fase: `.ai/phases/F03.md`.
-- Evidencia M03.5: `.ai/evidence/F03/M03.5/CLOSURE_2026-08-19.md`.
-- Evidencia M03.6: `.ai/evidence/F03/M03.6/IMPLEMENTATION_2026-08-19.md`.
+- Evidencia M03.6: `.ai/evidence/F03/M03.6/CLOSURE_2026-08-19.md`.
 - Tracking: `.ai/TRACKING.md`.
 - Handoff: `.ai/HANDOFF.md`.
 
-M03.6 puede continuar dentro de su contrato. No activar M03.7 ni declarar M03.6 completada hasta que lint, typecheck, tests, build y browser gate sean GREEN con evidencia real.
+No implementar M03.7 hasta integrar PR `#19` y confirmar el gate M03.6 GREEN sobre `main`. No activar M03.8 ni declarar M03.7 completada sin su propia evidencia real.
