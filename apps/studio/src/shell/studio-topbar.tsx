@@ -12,6 +12,7 @@ import {
 import { useSyncExternalStore } from 'react';
 import type { HelpDescriptor } from '../help/help-registry';
 import type { AppShellStatus } from './app-shell';
+import { ProgressiveDisclosure } from './information-architecture-ui';
 import { normalizeZoomPercent, resolveStudioViewportBreakpoint, type StudioViewportBreakpoint } from './topbar-model';
 import type { WorkspacePreferencesPort } from './workspace-preferences';
 
@@ -47,6 +48,13 @@ export interface StudioTopbarCopy {
   readonly sidebarCollapsedLabel: string;
   readonly collapseSidebarAction: string;
   readonly expandSidebarAction: string;
+  readonly settingsAdvancedTitle: string;
+  readonly settingsAdvancedSummary: string;
+  readonly settingsPersistenceLabel: string;
+  readonly settingsPersistenceValue: string;
+  readonly settingsPersistenceHelp: string;
+  readonly settingsStatusErrorTitle: string;
+  readonly settingsStatusErrorSummary: string;
 }
 
 export interface StudioTopbarProps {
@@ -137,6 +145,7 @@ export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help 
   const breakpoint = resolveStudioViewportBreakpoint(width);
   const sidebarCollapsed = preferences.sidebarCollapsed;
   const sidebarAction = sidebarCollapsed ? copy.expandSidebarAction : copy.collapseSidebarAction;
+  const hasVisibleDiagnostic = status === 'error' || status === 'blocked';
 
   return (
     <div className="ec-topbar" data-breakpoint={breakpoint}>
@@ -244,7 +253,18 @@ export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help 
               <SheetDescription>{copy.settingsDescription}</SheetDescription>
             </SheetHeader>
             <div className="ec-topbar-sheet-body">
-              <section className="ec-topbar-settings-section" aria-labelledby="workspace-settings-title">
+              {hasVisibleDiagnostic ? (
+                <div className="ec-ia-diagnostic-alert" role="alert" data-information-level="diagnostic">
+                  <strong>{copy.settingsStatusErrorTitle}</strong>
+                  <p>{copy.settingsStatusErrorSummary}</p>
+                </div>
+              ) : null}
+
+              <section
+                className="ec-topbar-settings-section"
+                aria-labelledby="workspace-settings-title"
+                data-information-level="primary"
+              >
                 <h2 id="workspace-settings-title">{copy.workspaceSettingsTitle}</h2>
                 <div className="ec-topbar-setting-row">
                   <div>
@@ -256,6 +276,21 @@ export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help 
                   </Button>
                 </div>
               </section>
+
+              <ProgressiveDisclosure
+                id="settings-advanced"
+                title={copy.settingsAdvancedTitle}
+                summary={copy.settingsAdvancedSummary}
+              >
+                <div className="ec-ia-setting-detail">
+                  <div className="ec-ia-setting-detail-row">
+                    <strong>{copy.settingsPersistenceLabel}</strong>
+                    <span className="ec-ia-setting-detail-value">{copy.settingsPersistenceValue}</span>
+                  </div>
+                  <p>{copy.settingsPersistenceHelp}</p>
+                </div>
+              </ProgressiveDisclosure>
+
               <SheetClose asChild>
                 <Button variant="outline" size="sm" aria-label={copy.closeSettingsLabel}>
                   <CloseIcon aria-hidden="true" />
