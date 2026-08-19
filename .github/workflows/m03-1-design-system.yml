@@ -1,0 +1,120 @@
+name: M03.1 Design System Gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'packages/design-system/**'
+      - 'apps/studio/**'
+      - 'tooling/vitest/**/design-system-*'
+      - 'tooling/playwright/design-system-gallery.spec.ts'
+      - 'playwright.m03-1.config.ts'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/m03-1-design-system.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'packages/design-system/**'
+      - 'apps/studio/**'
+      - 'tooling/vitest/**/design-system-*'
+      - 'tooling/playwright/design-system-gallery.spec.ts'
+      - 'playwright.m03-1.config.ts'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/m03-1-design-system.yml'
+
+permissions:
+  contents: read
+  statuses: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  m03-1:
+    name: M03.1 shadcn Radix design system
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Publish pending status
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: 'pending',
+              context: 'electrocraft/M03.1',
+              description: 'M03.1 design system gate running',
+              target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });
+
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Verify exact UI engine pins
+        run: |
+          node -e "const p=require('./node_modules/radix-ui/package.json'); console.log('radix-ui@'+p.version)"
+          node -e "const p=require('./node_modules/lucide-react/package.json'); console.log('lucide-react@'+p.version)"
+          node -e "const p=require('./node_modules/tailwindcss/package.json'); console.log('tailwindcss@'+p.version)"
+          node -e "const p=require('./node_modules/@tailwindcss/vite/package.json'); console.log('@tailwindcss/vite@'+p.version)"
+          node -e "const p=require('./tooling/package-boundaries.json'); if(Object.keys(p.packages).length!==17) throw new Error('owner package drift')"
+
+      - name: Execute M03.1 unit contract integration tests
+        run: npm run test:m03-1 | tee m03-1-tests.log
+
+      - name: Execute repository pipeline
+        run: npm run check | tee m03-1-check.log
+
+      - name: Execute M03.1 browser coverage
+        run: |
+          npx playwright install --with-deps chromium
+          npx playwright test --config playwright.m03-1.config.ts | tee m03-1-browser.log
+
+      - name: Emit M03.1 marker
+        run: echo PASS_M03_1_DESIGN_SYSTEM | tee m03-1-closure.log
+
+      - name: Upload M03.1 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: m03-1-design-system-evidence
+          path: |
+            m03-1-tests.log
+            m03-1-check.log
+            m03-1-browser.log
+            m03-1-closure.log
+            packages/design-system/components.json
+            packages/design-system/src/theme.css
+            apps/studio/src/i18n/es.ts
+            apps/studio/src/help/studio-shell-help.ts
+          if-no-files-found: error
+
+      - name: Publish final status
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: '${{ job.status }}' === 'success' ? 'success' : 'failure',
+              context: 'electrocraft/M03.1',
+              description: 'M03.1 design system gate',
+              target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });
