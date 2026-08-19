@@ -43,10 +43,7 @@ interface PaneHandleProps {
 function PaneHandle({ label, side, value, constraint, onChange }: PaneHandleProps) {
   const dragStartRef = useRef<{ pointerX: number; size: number } | null>(null);
 
-  const commit = useCallback(
-    (next: number) => onChange(clampPaneSize(next, constraint)),
-    [constraint, onChange],
-  );
+  const commit = useCallback((next: number) => onChange(clampPaneSize(next, constraint)), [constraint, onChange]);
 
   const onPointerMove = useCallback(
     (event: globalThis.PointerEvent) => {
@@ -117,12 +114,8 @@ export function ResizableTriPane({
   rightConstraint,
   className,
 }: ResizableTriPaneProps) {
-  const [leftSize, setLeftSize] = useState(() =>
-    clampPaneSize(leftConstraint.defaultSize, leftConstraint),
-  );
-  const [rightSize, setRightSize] = useState(() =>
-    clampPaneSize(rightConstraint.defaultSize, rightConstraint),
-  );
+  const [leftSize, setLeftSize] = useState(() => clampPaneSize(leftConstraint.defaultSize, leftConstraint));
+  const [rightSize, setRightSize] = useState(() => clampPaneSize(rightConstraint.defaultSize, rightConstraint));
 
   const style = {
     '--ec-resizable-left': `${leftSize}px`,
@@ -132,13 +125,7 @@ export function ResizableTriPane({
   return (
     <div className={cn('ec-resizable-tri-pane', className)} style={style}>
       <div className="ec-resizable-tri-pane-left">{left}</div>
-      <PaneHandle
-        side="left"
-        label={leftLabel}
-        value={leftSize}
-        constraint={leftConstraint}
-        onChange={setLeftSize}
-      />
+      <PaneHandle side="left" label={leftLabel} value={leftSize} constraint={leftConstraint} onChange={setLeftSize} />
       <div className="ec-resizable-tri-pane-center">{center}</div>
       <PaneHandle
         side="right"
