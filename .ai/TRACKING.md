@@ -16,7 +16,8 @@ El historial detallado previo permanece versionado en Git y en los archivos de e
 | M03.4 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.4/CLOSURE_2026-08-19.md` |
 | M03.5 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.5/CLOSURE_2026-08-19.md` |
 | M03.6 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.6/CLOSURE_2026-08-19.md` |
-| F03 / M03.7 | ACTIVE | `.ai/microphases/M03_7.md` |
+| M03.7 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.7/CLOSURE_2026-08-19.md` |
+| F03 / M03.8 | ACTIVE | `.ai/microphases/M03_8.md` |
 
 ## Cierres canónicos recientes
 ### M03.5
@@ -37,10 +38,20 @@ El historial detallado previo permanece versionado en Git y en los archivos de e
 - Móvil usa dock inferior 58px exacto `Componentes | Pantallas | Lienzo | Propiedades | Más`; Propiedades bottom Sheet y Más/Capas full-height.
 - Pantallas reutiliza el registry canónico del Sidebar; Puck permanece detrás de `@electrocraft/editor-puck`.
 
-## Transición M03.7
-- M03.7 es la única microfase `ACTIVE`.
-- Su contrato exige `UX_INFORMATION_ARCHITECTURE.md`, clasificación primary/contextual/advanced/diagnostic, Progressive Disclosure primero en Settings/Inspector/List-Detail, empty states y microcopy/help sin rutas redundantes.
-- La implementación M03.7 permanece bloqueada únicamente hasta integrar PR `#19` y revalidar M03.6 GREEN sobre `main`.
+### M03.7
+- PR `#21`; head funcional validado `6f9acca7261f31ba38f79b286fa8e73124b89300`.
+- Workflow propietario `M03.7 Information Architecture Gate`: run `32304389329` — success; job `96233873445`.
+- Artifact `9384209280`; digest `sha256:d9b13f174fb36d64571bb1f200aa3f5a408130bd18d19bcfdf22227594001b84`.
+- Structural `1/1`; Vitest dedicado `17/17`; Playwright dedicado `10/10`.
+- Full gate: Node `30/30`, Vitest `205/205` en 59 archivos, Playwright `34/34`, lint/typecheck/build GREEN.
+- Implementa taxonomía `primary | contextual | advanced | diagnostic`; Advanced usa Progressive Disclosure Radix y diagnostics de estado no se esconden.
+- Inspector conserva ownership de Puck; `/content` es la ruta canónica List/Detail; rutas redundantes fallan cerradas.
+- Queries, Forms, Administración, Media y Export muestran empty states honestos mientras no exista la capacidad funcional.
+
+## Transición M03.8
+- M03.8 es la única microfase `ACTIVE` en esta rama de cierre.
+- Su contrato exige `PALETTE_UX_SPEC.md`, `palette search synonym index`, Palette E2E, categorías exactas y catálogo gobernado por `PALETTE_CATALOG_MATRIX.md` sin duplicar ComponentDefinitions.
+- Para iniciar M03.8 desde una rama limpia, integrar primero PR `#21` y revalidar M03.7 GREEN sobre `main`.
 
 ## Historial extendido
 - hasta M00.8: `.ai/TRACKING_HISTORY_THROUGH_M00.8.md`;

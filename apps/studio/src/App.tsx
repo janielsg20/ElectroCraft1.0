@@ -4,11 +4,13 @@ import { studioT } from './i18n/studio-shell.es';
 import { StudioAppShellRoute } from './shell/app-shell-route';
 import { DesignSystemDevelopmentRoute } from './shell/design-system-route';
 import { StudioEditorWorkspace } from './shell/editor-workspace';
+import { StudioContentListDetailRoute, StudioModuleEmptyStateRoute } from './shell/information-architecture-ui';
 import './styles.css';
 import './shell/sidebar.css';
 import './shell/topbar.css';
 import './shell/editor-workspace.css';
 import './shell/responsive-shell.css';
+import './shell/information-architecture.css';
 
 const projectHomeRoute = Object.freeze({
   id: 'project-home-development',
@@ -17,6 +19,8 @@ const projectHomeRoute = Object.freeze({
 });
 
 const designSystemRoute = '/__design-system';
+const contentRoute = '/content';
+const canonicalEmptyModuleRoutes = new Set(['/queries', '/forms', '/admin', '/media', '/export']);
 
 function StudioWorkspaceBootstrap({
   pathname,
@@ -70,6 +74,13 @@ function StudioWorkspaceBootstrap({
   );
 }
 
+function resolveStudioWorkspace(pathname: string, health: ReturnType<typeof evaluateStudioBootstrapHealth>) {
+  if (pathname === projectHomeRoute.pathname) return <StudioEditorWorkspace />;
+  if (pathname === contentRoute) return <StudioContentListDetailRoute />;
+  if (canonicalEmptyModuleRoutes.has(pathname)) return <StudioModuleEmptyStateRoute pathname={pathname} />;
+  return <StudioWorkspaceBootstrap pathname={pathname} health={health} />;
+}
+
 export function App() {
   const pathname = window.location.pathname;
 
@@ -80,13 +91,5 @@ export function App() {
   const health = evaluateStudioBootstrapHealth(studioWorkspaceDescriptor.dependencies);
   const shellStatus = health.state === 'blocked' ? 'blocked' : 'ready';
 
-  return (
-    <StudioAppShellRoute status={shellStatus}>
-      {pathname === projectHomeRoute.pathname ? (
-        <StudioEditorWorkspace />
-      ) : (
-        <StudioWorkspaceBootstrap pathname={pathname} health={health} />
-      )}
-    </StudioAppShellRoute>
-  );
+  return <StudioAppShellRoute status={shellStatus}>{resolveStudioWorkspace(pathname, health)}</StudioAppShellRoute>;
 }

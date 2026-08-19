@@ -22,6 +22,7 @@ import {
 } from '@electrocraft/editor-puck';
 import { useRef, useState, type ReactNode, type RefObject } from 'react';
 import { editorT } from '../i18n/editor.es';
+import { iaT } from '../i18n/information-architecture.es';
 import {
   editorPaneContract,
   resolveEditorLayoutMode,
@@ -29,6 +30,7 @@ import {
   type EditorLayoutMode,
   type LaptopPanelStrategy,
 } from './editor-layout-model';
+import { ProgressiveDisclosure, StudioEmptyState } from './information-architecture-ui';
 import { getStudioSidebarNavigationItem } from './sidebar-navigation';
 import { useEditorViewportWidth } from './use-editor-layout-mode';
 
@@ -42,6 +44,7 @@ const MobileCanvasIcon = getStudioIcon('studio.mobile.canvas');
 const MobilePropertiesIcon = getStudioIcon('studio.mobile.properties');
 const MobileMoreIcon = getStudioIcon('studio.mobile.more');
 const screensDestination = getStudioSidebarNavigationItem('screens');
+const hasStructuralContent = structuralPuckData.content.length > 0;
 
 type SecondaryTool = 'context' | 'inspector';
 type MobileTool = 'components' | 'properties' | 'outline';
@@ -84,6 +87,7 @@ function ComponentsContent() {
 function OutlineContent() {
   return (
     <div className="ec-editor-puck-slot" data-puck-composition="outline">
+      {!hasStructuralContent ? <StudioEmptyState id="outline" /> : null}
       <PuckEditorOutline />
     </div>
   );
@@ -94,6 +98,32 @@ function FieldsContent() {
     <div className="ec-editor-puck-slot" data-puck-composition="fields">
       <PuckEditorFields wrapFields={false} />
     </div>
+  );
+}
+
+function InspectorContent() {
+  return (
+    <>
+      <section
+        className="ec-ia-inspector-section"
+        data-information-level="primary"
+        aria-label={iaT('studio.ia.inspector.primaryTitle')}
+      >
+        <h3>{iaT('studio.ia.inspector.primaryTitle')}</h3>
+        <p>{iaT('studio.ia.inspector.primarySummary')}</p>
+        {!hasStructuralContent ? <StudioEmptyState id="inspector" /> : null}
+        <FieldsContent />
+      </section>
+      <ProgressiveDisclosure
+        id="inspector-advanced"
+        title={iaT('studio.ia.inspector.advancedTitle')}
+        summary={iaT('studio.ia.inspector.advancedSummary')}
+      >
+        <div className="ec-ia-inspector-section" data-inspector-advanced-placeholder>
+          <p>{iaT('studio.ia.disclosure.advancedSummary')}</p>
+        </div>
+      </ProgressiveDisclosure>
+    </>
   );
 }
 
@@ -112,6 +142,7 @@ function CanvasRegion({ stageRef }: { readonly stageRef?: RefObject<HTMLDivEleme
     <EditorRegion region="canvas" title={editorT('studio.editor.canvasTitle')} icon={CanvasIcon}>
       <div className="ec-editor-canvas-stage" data-editor-canvas-stage ref={stageRef} tabIndex={-1}>
         <StructuralNotice>{editorT('studio.editor.canvasStructural')}</StructuralNotice>
+        {!hasStructuralContent ? <StudioEmptyState id="canvas" className="ec-editor-canvas-empty" /> : null}
         <div className="ec-editor-puck-preview" data-puck-composition="preview">
           <PuckEditorPreview id="electrocraft-editor-preview" />
         </div>
@@ -124,7 +155,7 @@ function InspectorRegion() {
   return (
     <EditorRegion region="inspector" title={editorT('studio.editor.inspectorTitle')} icon={InspectorIcon}>
       <StructuralNotice>{editorT('studio.editor.inspectorStructural')}</StructuralNotice>
-      <FieldsContent />
+      <InspectorContent />
     </EditorRegion>
   );
 }
@@ -330,9 +361,7 @@ function MobileEditorLayout() {
             </SheetHeader>
             <div className="ec-editor-mobile-sheet-body">
               <StructuralNotice>{editorT('studio.editor.inspectorStructural')}</StructuralNotice>
-              <div className="ec-editor-mobile-puck-panel">
-                <FieldsContent />
-              </div>
+              <InspectorContent />
             </div>
           </SheetContent>
         </Sheet>
