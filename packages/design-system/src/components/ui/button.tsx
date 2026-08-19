@@ -29,27 +29,14 @@ export const buttonVariants = cva(
   },
 );
 
-export interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   readonly asChild?: boolean;
 }
 
-export function Button({
-  asChild = false,
-  className,
-  variant,
-  size,
-  type = 'button',
-  ...props
-}: ButtonProps) {
+export function Button({ asChild = false, className, variant, size, type = 'button', ...props }: ButtonProps) {
   const Comp = asChild ? Slot.Root : 'button';
 
   return (
-    <Comp
-      className={cn(buttonVariants({ variant, size }), className)}
-      {...(!asChild ? { type } : {})}
-      {...props}
-    />
+    <Comp className={cn(buttonVariants({ variant, size }), className)} {...(!asChild ? { type } : {})} {...props} />
   );
 }

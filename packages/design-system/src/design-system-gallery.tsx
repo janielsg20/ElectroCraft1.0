@@ -18,12 +18,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from './components/ui/sheet';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from './components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './components/ui/tooltip';
 import { getStudioIcon } from './icons/studio-icon-registry';
 import { useTheme, type ThemePreference } from './foundation';
 
@@ -114,19 +109,10 @@ const semanticTokens = [
   'ring',
 ] as const;
 
-export function DesignSystemGallery({
-  copy,
-  navigationLabels,
-  help,
-}: DesignSystemGalleryProps) {
+export function DesignSystemGallery({ copy, navigationLabels, help }: DesignSystemGalleryProps) {
   const { theme, resolvedTheme, setTheme } = useTheme();
 
-  const themeText =
-    theme === 'system'
-      ? copy.themeSystem
-      : theme === 'light'
-        ? copy.themeLight
-        : copy.themeDark;
+  const themeText = theme === 'system' ? copy.themeSystem : theme === 'light' ? copy.themeLight : copy.themeDark;
 
   const rotateTheme = () => {
     const index = themeCycle.indexOf(theme);
@@ -242,7 +228,9 @@ export function DesignSystemGallery({
         <article className="ec-gallery-card">
           <div className="ec-gallery-card-heading">
             <span>{copy.tokensLabel}</span>
-            <code>{copy.densityLabel}: {copy.densityHigh}</code>
+            <code>
+              {copy.densityLabel}: {copy.densityHigh}
+            </code>
           </div>
           <Separator />
           <div className="ec-gallery-token-grid" aria-label={copy.tokensLabel}>

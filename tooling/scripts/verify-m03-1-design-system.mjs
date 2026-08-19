@@ -74,7 +74,10 @@ assert.equal(packageJson.imports['#lib/*'], './src/lib/*.ts');
 
 const tsconfigBase = readJson('tsconfig.base.json');
 assert.equal(tsconfigBase.compilerOptions.resolvePackageJsonImports, true);
-assert.equal(Object.keys(tsconfigBase.compilerOptions.paths).some((alias) => alias.includes('*')), false);
+assert.equal(
+  Object.keys(tsconfigBase.compilerOptions.paths).some((alias) => alias.includes('*')),
+  false,
+);
 assert.doesNotMatch(read('apps/studio/src/App.tsx'), /@electrocraft\/design-system\//);
 
 const studioPackage = readJson('apps/studio/package.json');

@@ -93,9 +93,7 @@ export const studioShellMessagesEs = Object.freeze({
 
 export type StudioShellMessageKey = keyof typeof studioShellMessagesEs;
 
-export function studioT<Key extends StudioShellMessageKey>(
-  key: Key,
-): (typeof studioShellMessagesEs)[Key] {
+export function studioT<Key extends StudioShellMessageKey>(key: Key): (typeof studioShellMessagesEs)[Key] {
   return studioShellMessagesEs[key];
 }
 

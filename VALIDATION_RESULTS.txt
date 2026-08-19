@@ -1,39 +1,43 @@
-ElectroCraft M03.1 overlay v5 — validation results
+ElectroCraft M03.1 overlay v6 — validation results
 Prepared: 2026-08-19
-Application base: main@1ab2ce7f9f1340cd07ad20c66370d65aa56d2bf9
+Application base: main@cecce5531050b3617911d21de8ac3d65cbf8892c
 
-GITHUB ACTIONS RUN 32266099186 — REAL EXECUTION
+GITHUB ACTIONS RUN 32267262219 — REAL EXECUTION ON V5
 PASS - locked Node/npm toolchain
-PASS - real package-lock candidate generation
-PASS - M03.1 structural verifier: blockers=0, lockVerified=true
-PASS - npm ci (625 packages)
+PASS - package-lock synchronization (no lock candidate required)
+PASS - M03.1 structural verifier
+PASS - npm ci
 PASS - installed engine pins
-PASS - dedicated M03.1 suite: 3 files / 15 tests
+PASS - temporary Prettier formatting candidate generation
+PASS - dedicated M03.1 suite: 15/15
 PASS - Playwright Chromium installation
-FAIL - full repository gate stopped at Prettier format:check
-NOT REACHED - semantic typecheck, accumulated tests, build, Playwright E2E
+PASS - full repository gate: npm run check
+  PASS - lint on formatted tree
+  PASS - typecheck
+  PASS - workspace boundaries
+  PASS - accumulated tests
+  PASS - build
+  PASS - Playwright E2E
+PASS - execution marker emitted
+EXPECTED FAIL-CLOSED - formatting synchronization guard, because 14 formatted files were not yet committed
 
-PRETTIER FINDING
-Exactly 14 files need formatting. No logic failure was reported before this formatting gate.
+FORMATTING ARTIFACT
+- artifact id: 9370734134
+- artifact name: m03-1-formatting-candidate
+- artifact digest: sha256:3cf346e520f2302250ca84e5bb81c920464a72b49ee989af7296ce6b69cd546a
+- exact formatted files: 14
+- v6 applies those artifact files byte-for-byte
 
-RECOVERED ARTIFACTS
-- lock artifact: 9370267875; artifact digest sha256:e8f3bc70e3d639cf840798eff418441a99db55593c36cea8fe3f2e9010d79f48
-- evidence artifact: 9370268489; artifact digest sha256:a6100d24028f977c166437e6361622868bcf8314892a9e4d23e38ee1c5c4f91f
-- package-lock.json SHA-256: 1025aa726810d4fbbc313829ae59df9b4c5e85bf5f7ddb553daa754c75ca8789
+LOCKFILE
+- package-lock.json is the real Actions-generated v5 lock
+- lockfileVersion: 3
+- package-lock SHA-256: 1025aa726810d4fbbc313829ae59df9b4c5e85bf5f7ddb553daa754c75ca8789
 
-V5 STRUCTURAL VALIDATION
-PASS - package-lock v3 contains design-system/studio entries and exact pins
-PASS - verify-m03-1-design-system.mjs blockers=0, lockVerified=true
-PASS - workflow contains lock candidate fail-closed contract
-PASS - workflow contains formatting candidate fail-closed contract
-PASS - M03.2 remains inactive
+V6 LOCAL VALIDATION
+- PASS - structural verifier: blockers=0, lockVerified=true
+- PASS - JSON/YAML parsing
+- PASS - recovered formatting artifact byte match: 14/14
+- ZIP integrity: reported after archive creation
 
-EXPECTED NEXT RUN
-The v5 workflow temporarily runs npm run format, uploads m03-1-formatting-candidate if needed, and then executes the complete repository gate on the formatted checkout. If formatting changed, the run still fails closed after collecting the deeper gate result.
-
-LOCAL V5 EXECUTION
-PASS - node tooling/scripts/verify-m03-1-design-system.mjs => blockers=0, lockVerified=true
-PASS - node --check verifier
-PASS - JSON parse + exact lock pins
-PASS - YAML parse for M03.1 workflow and base CI
-PASS - package-lock SHA-256 matches recovered Actions candidate
+GATE
+M03.1 remains ACTIVE until v6 is versioned and GitHub Actions re-runs against the committed formatting. M03.2 remains gated until electrocraft/M03.1 is GREEN.

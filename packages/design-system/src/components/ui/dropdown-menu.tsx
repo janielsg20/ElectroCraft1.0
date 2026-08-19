@@ -30,11 +30,7 @@ export interface DropdownMenuItemProps extends ComponentProps<typeof DropdownMen
   readonly destructive?: boolean;
 }
 
-export function DropdownMenuItem({
-  destructive = false,
-  className,
-  ...props
-}: DropdownMenuItemProps) {
+export function DropdownMenuItem({ destructive = false, className, ...props }: DropdownMenuItemProps) {
   return (
     <DropdownMenuPrimitive.Item
       data-destructive={destructive ? 'true' : undefined}
@@ -49,14 +45,6 @@ export function DropdownMenuItem({
   );
 }
 
-export function DropdownMenuSeparator({
-  className,
-  ...props
-}: ComponentProps<typeof DropdownMenuPrimitive.Separator>) {
-  return (
-    <DropdownMenuPrimitive.Separator
-      className={cn('-mx-1 my-1 h-px bg-border', className)}
-      {...props}
-    />
-  );
+export function DropdownMenuSeparator({ className, ...props }: ComponentProps<typeof DropdownMenuPrimitive.Separator>) {
+  return <DropdownMenuPrimitive.Separator className={cn('-mx-1 my-1 h-px bg-border', className)} {...props} />;
 }

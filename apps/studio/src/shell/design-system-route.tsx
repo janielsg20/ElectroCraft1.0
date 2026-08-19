@@ -1,13 +1,6 @@
-import {
-  DesignSystemGallery,
-  ThemeProvider,
-  type DesignSystemGalleryCopy,
-} from '@electrocraft/design-system';
+import { DesignSystemGallery, ThemeProvider, type DesignSystemGalleryCopy } from '@electrocraft/design-system';
 import { getStudioHelpDescriptor } from '../help/help-registry';
-import {
-  studioNavigationMessageKeys,
-  studioT,
-} from '../i18n/studio-shell.es';
+import { studioNavigationMessageKeys, studioT } from '../i18n/studio-shell.es';
 
 const galleryCopy: DesignSystemGalleryCopy = Object.freeze({
   kicker: studioT('studio.designSystem.kicker'),
@@ -60,20 +53,14 @@ const galleryCopy: DesignSystemGalleryCopy = Object.freeze({
   }),
 });
 
-const navigationLabels = Object.freeze(
-  studioNavigationMessageKeys.map((key) => studioT(key)),
-);
+const navigationLabels = Object.freeze(studioNavigationMessageKeys.map((key) => studioT(key)));
 
 export function DesignSystemDevelopmentRoute() {
   const help = getStudioHelpDescriptor('help.studio.shell');
 
   return (
     <ThemeProvider defaultTheme="system">
-      <DesignSystemGallery
-        copy={galleryCopy}
-        navigationLabels={navigationLabels}
-        help={help}
-      />
+      <DesignSystemGallery copy={galleryCopy} navigationLabels={navigationLabels} help={help} />
     </ThemeProvider>
   );
 }

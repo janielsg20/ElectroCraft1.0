@@ -111,6 +111,22 @@ Historial detallado:
 - Overlay v5 incorpora el lock real y convierte Prettier en candidato reproducible: formatea temporalmente, sube patch/tar exacto y continúa el full gate sobre el árbol ya formateado.
 - Estado: M03.1 `ACTIVE`; no activar M03.2 aún.
 
+## M03.1 — Actions run 32267262219 (2026-08-19)
+- Head: `cecce5531050b3617911d21de8ac3d65cbf8892c`.
+- Lockfile: sincronizado; no se requirió nuevo candidato.
+- Verifier M03.1: PASS.
+- `npm ci`: PASS.
+- Pins instalados: PASS.
+- Formatting candidate: generado por Prettier 3.9.6 para exactamente 14 archivos.
+- Suite dedicada: PASS, `15/15`.
+- Chromium: PASS.
+- Full `npm run check` sobre el árbol formateado: PASS completo, incluyendo lint, typecheck, boundaries, tests, build y Playwright E2E.
+- Marker de ejecución: PASS.
+- Artifact de formato: `9370734134`, digest `sha256:3cf346e520f2302250ca84e5bb81c920464a72b49ee989af7296ce6b69cd546a`.
+- Job final: `failure` esperado exclusivamente por `Require committed formatting synchronization`.
+- Overlay v6 incorpora exactamente esos 14 archivos; siguiente ejecución debe confirmar GREEN antes de activar M03.2.
+- Estado: M03.1 `ACTIVE`.
+
 ## Gate actual
 F02 `COMPLETADA` / Gate F02 `GREEN`. F03 está `IN_PROGRESS` con M03.1 como única microfase activa.
 

@@ -27,9 +27,7 @@ export function App() {
       <section className="development-panel" aria-labelledby="development-title">
         <p className="development-kicker">{studioT('studio.bootstrap.m03Kicker')}</p>
         <h1 id="development-title">{studioT('studio.bootstrap.title')}</h1>
-        <p className="development-summary">
-          {studioT('studio.bootstrap.foundationSummary')}
-        </p>
+        <p className="development-summary">{studioT('studio.bootstrap.foundationSummary')}</p>
 
         <div className="development-status" data-state={health.state}>
           <span className="status-dot" aria-hidden="true" />

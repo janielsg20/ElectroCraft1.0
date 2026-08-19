@@ -6,11 +6,7 @@ export const Sheet = DialogPrimitive.Root;
 export const SheetTrigger = DialogPrimitive.Trigger;
 export const SheetClose = DialogPrimitive.Close;
 
-export function SheetContent({
-  className,
-  children,
-  ...props
-}: ComponentProps<typeof DialogPrimitive.Content>) {
+export function SheetContent({ className, children, ...props }: ComponentProps<typeof DialogPrimitive.Content>) {
   return (
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-overlay/45" />
@@ -28,33 +24,16 @@ export function SheetContent({
   );
 }
 
-export function SheetHeader({
-  className,
-  ...props
-}: ComponentProps<'header'>) {
+export function SheetHeader({ className, ...props }: ComponentProps<'header'>) {
   return <header className={cn('grid gap-1.5 text-left', className)} {...props} />;
 }
 
-export function SheetTitle({
-  className,
-  ...props
-}: ComponentProps<typeof DialogPrimitive.Title>) {
-  return (
-    <DialogPrimitive.Title
-      className={cn('text-sm font-semibold text-foreground', className)}
-      {...props}
-    />
-  );
+export function SheetTitle({ className, ...props }: ComponentProps<typeof DialogPrimitive.Title>) {
+  return <DialogPrimitive.Title className={cn('text-sm font-semibold text-foreground', className)} {...props} />;
 }
 
-export function SheetDescription({
-  className,
-  ...props
-}: ComponentProps<typeof DialogPrimitive.Description>) {
+export function SheetDescription({ className, ...props }: ComponentProps<typeof DialogPrimitive.Description>) {
   return (
-    <DialogPrimitive.Description
-      className={cn('text-xs leading-5 text-muted-foreground', className)}
-      {...props}
-    />
+    <DialogPrimitive.Description className={cn('text-xs leading-5 text-muted-foreground', className)} {...props} />
   );
 }

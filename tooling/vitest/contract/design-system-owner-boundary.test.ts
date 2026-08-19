@@ -5,10 +5,7 @@ import {
   isDesignSystemFoundationConfigV1,
 } from '../../../packages/design-system/src/foundation/design-system-foundation';
 import { studioNavigationMessageKeys, studioT } from '../../../apps/studio/src/i18n/studio-shell.es';
-import {
-  getStudioHelpDescriptor,
-  studioShellHelpDescriptor,
-} from '../../../apps/studio/src/help/help-registry';
+import { getStudioHelpDescriptor, studioShellHelpDescriptor } from '../../../apps/studio/src/help/help-registry';
 
 describe('M03.1 design-system owner boundary', () => {
   it('pins Radix/Lucide semantics without creating project-canonical UI state', () => {

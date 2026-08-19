@@ -15,13 +15,8 @@ export function ScrollArea({ label, className, children, ...props }: ScrollAreaP
       className={cn('relative overflow-hidden rounded-md border border-border bg-surface', className)}
       {...props}
     >
-      <ScrollAreaPrimitive.Viewport className="size-full rounded-[inherit]">
-        {children}
-      </ScrollAreaPrimitive.Viewport>
-      <ScrollAreaPrimitive.Scrollbar
-        orientation="vertical"
-        className="flex touch-none select-none p-0.5"
-      >
+      <ScrollAreaPrimitive.Viewport className="size-full rounded-[inherit]">{children}</ScrollAreaPrimitive.Viewport>
+      <ScrollAreaPrimitive.Scrollbar orientation="vertical" className="flex touch-none select-none p-0.5">
         <ScrollAreaPrimitive.Thumb className="relative flex-1 rounded-full bg-border" />
       </ScrollAreaPrimitive.Scrollbar>
       <ScrollAreaPrimitive.Corner />

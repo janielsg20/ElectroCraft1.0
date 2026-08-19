@@ -9,9 +9,9 @@
 - Gate F02: `GREEN`.
 - F03 — Design System, AppShell, español y ayuda: `IN_PROGRESS`.
 - M03.1 — Inicializar shadcn/ui Radix, Lucide y tokens ElectroCraft: `ACTIVE`.
-- Avance M03.1 integrado en `main@1ab2ce7`: foundation/tokens, primitives reales sobre `radix-ui`, Lucide registry, Tailwind v4, galería `/__design-system`, i18n/help/shell y suites dedicadas.
+- Avance M03.1 integrado en `main@cecce553`: v5 con lockfile real, foundation/tokens, primitives `radix-ui`, Lucide, Tailwind v4, galería `/__design-system`, i18n/help/shell y suites dedicadas.
 - Blockers P0/P1 de producto: `0`.
-- Run Actions `32266099186`: verifier, lockfile real, `npm ci`, pins y suite dedicada M03.1 (`15/15`) pasaron. El full gate se detuvo únicamente en Prettier: 14 archivos requerían formato. El lock candidato real ya fue recuperado para v5.
+- Run Actions `32267262219`: `npm ci`, pins, suite M03.1 `15/15`, Chromium y **full `npm run check`** pasaron sobre el árbol temporalmente formateado. El job falló solo por el guard fail-closed que exige versionar los 14 archivos modificados por Prettier. Overlay v6 incorpora exactamente ese artifact de formato.
 
 ## Microfase activa
 `M03.1` — Inicializar shadcn/ui Radix, Lucide y tokens ElectroCraft.
@@ -29,6 +29,6 @@ Objetivo actual: consolidar `packages/design-system` como owner del sistema visu
 No iniciar M03.2 hasta cerrar M03.1 con instalación shadcn/Radix/Tailwind/Lucide reproducible, lint, typecheck, tests, build y validación visual/teclado pertinente.
 
 ## Estado de implementación M03.1
-- Overlay v5 incorpora el `package-lock.json` real generado por Actions (lockfile v3, SHA-256 `1025aa726810d4fbbc313829ae59df9b4c5e85bf5f7ddb553daa754c75ca8789`).
-- Run `32266099186` confirmó `npm ci`, pins exactos y suite dedicada M03.1 `15/15` antes del full gate.
-- Pendiente para DONE: sincronizar formato Prettier de los 14 archivos detectados y completar el resto de `npm run check` (typecheck, tests acumulados, build y Playwright). El workflow v5 genera un artifact de formato exacto y ejecuta el resto del gate sobre el árbol temporalmente formateado para revelar cualquier fallo posterior en la misma pasada.
+- Overlay v6 conserva el `package-lock.json` real generado por Actions (lockfile v3, SHA-256 `1025aa726810d4fbbc313829ae59df9b4c5e85bf5f7ddb553daa754c75ca8789`).
+- Run `32267262219` confirmó verifier, `npm ci`, pins exactos, suite dedicada `15/15` y el **full `npm run check`** completo sobre el árbol formateado, incluyendo typecheck, tests acumulados, build y Playwright.
+- Artifact `9370734134` contiene exactamente los 14 archivos Prettier; v6 los incorpora byte por byte. Pendiente para DONE: versionar v6 y obtener la reejecución GREEN sin formatting diff.

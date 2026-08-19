@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type PropsWithChildren,
-} from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, type PropsWithChildren } from 'react';
 import type { ThemePreference } from './design-system-foundation';
 
 type ResolvedTheme = Exclude<ThemePreference, 'system'>;
@@ -57,10 +50,7 @@ export function ThemeProvider({ defaultTheme = 'system', children }: ThemeProvid
     return () => media.removeEventListener('change', applyTheme);
   }, [theme]);
 
-  const value = useMemo<ThemeContextValue>(
-    () => ({ theme, resolvedTheme, setTheme }),
-    [resolvedTheme, theme],
-  );
+  const value = useMemo<ThemeContextValue>(() => ({ theme, resolvedTheme, setTheme }), [resolvedTheme, theme]);
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

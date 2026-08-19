@@ -1,26 +1,41 @@
-# ElectroCraft1.0 — M03.1 update v5 overlay
+# ElectroCraft1.0 — M03.1 update v6 overlay
 
-Base de aplicación: `main@1ab2ce7f9f1340cd07ad20c66370d65aa56d2bf9`.
+Base de aplicación: `main@cecce5531050b3617911d21de8ac3d65cbf8892c`.
 
-## Objetivo de v5
-Cerrar los dos hallazgos reales del primer run de Actions sin inventar evidencia:
-- versionar el `package-lock.json` exacto generado por npm real;
-- convertir el formato Prettier pendiente en un artifact reproducible, mientras se continúa el full gate sobre el árbol temporalmente formateado.
+## Objetivo
+Esta revisión incorpora exactamente el formatting candidate generado por GitHub Actions run `32267262219` sobre M03.1 v5. No cambia comportamiento funcional: sincroniza los 14 archivos que Prettier 3.9.6 modificó durante el gate real.
 
-## Evidencia heredada del run 32266099186
-- verifier: PASS, blockers=0, lockVerified=true;
-- `npm ci`: PASS, 625 packages;
-- engine pins: PASS;
-- M03.1 dedicated suite: 15/15 PASS;
-- Chromium install: PASS;
-- repository gate: detenido en Prettier, 14 archivos;
-- lock artifact: 9370267875;
-- evidence artifact: 9370268489.
+## Evidencia del run v5
+- `Prepare reproducible M03.1 lock candidate`: PASS; el lock ya estaba sincronizado.
+- `Verify M03.1 closure inputs and structure`: PASS.
+- `npm ci`: PASS.
+- Pins Radix/Lucide/Tailwind: PASS.
+- `Prepare reproducible formatting candidate`: PASS.
+- Suite dedicada M03.1: PASS, 15/15.
+- Playwright Chromium install: PASS.
+- `Execute repository gate` (`npm run check`) sobre el árbol temporalmente formateado: PASS completo, incluyendo lint, typecheck, tests, build y Playwright E2E.
+- El job terminó en failure únicamente en `Require committed formatting synchronization`, por diseño fail-closed.
 
-## Cambio principal
-- `package-lock.json`: lockfile v3 real, SHA-256 `1025aa726810d4fbbc313829ae59df9b4c5e85bf5f7ddb553daa754c75ca8789`.
-- `.github/workflows/m03-1-design-system.yml`: añade formatting candidate reproducible y ejecuta el full gate después de formatear temporalmente.
-- `tooling/scripts/verify-m03-1-design-system.mjs`: verifica también el contrato del formatting candidate.
-- evidencia/STATE/TRACKING/HANDOFF actualizados con el run real.
+## Artifact aplicado
+- Artifact: `9370734134` — `m03-1-formatting-candidate`.
+- Digest artifact: `sha256:3cf346e520f2302250ca84e5bb81c920464a72b49ee989af7296ce6b69cd546a`.
+- Contiene 14 archivos formateados + patch reproducible.
 
-M03.1 permanece ACTIVE. M03.2 sigue bloqueada hasta gate GREEN.
+## Archivos sincronizados desde Actions
+- `apps/studio/src/App.tsx`
+- `apps/studio/src/i18n/studio-shell.es.ts`
+- `apps/studio/src/shell/design-system-route.tsx`
+- `packages/design-system/src/components/ui/button.tsx`
+- `packages/design-system/src/components/ui/dropdown-menu.tsx`
+- `packages/design-system/src/components/ui/scroll-area.tsx`
+- `packages/design-system/src/components/ui/separator.tsx`
+- `packages/design-system/src/components/ui/sheet.tsx`
+- `packages/design-system/src/components/ui/tooltip.tsx`
+- `packages/design-system/src/design-system-gallery.tsx`
+- `packages/design-system/src/foundation/theme-provider.tsx`
+- `tooling/scripts/verify-m03-1-design-system.mjs`
+- `tooling/vitest/contract/design-system-owner-boundary.test.ts`
+- `tsconfig.base.json`
+
+## Estado
+M03.1 permanece `ACTIVE` únicamente hasta reejecutar el mismo gate sobre estos 14 archivos ya versionados. Si no aparece un fallo nuevo, el siguiente run debe poder producir `electrocraft/M03.1 = success`, registrar el cierre y habilitar M03.2.
