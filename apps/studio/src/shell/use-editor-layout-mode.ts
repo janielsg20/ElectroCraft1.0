@@ -6,14 +6,18 @@ function subscribe(callback: () => void) {
   return () => window.removeEventListener('resize', callback);
 }
 
-function getSnapshot(): EditorLayoutMode {
-  return resolveEditorLayoutMode(window.innerWidth);
+function getWidthSnapshot(): number {
+  return window.innerWidth;
 }
 
-function getServerSnapshot(): EditorLayoutMode {
-  return 'desktop';
+function getServerWidthSnapshot(): number {
+  return 1280;
+}
+
+export function useEditorViewportWidth(): number {
+  return useSyncExternalStore(subscribe, getWidthSnapshot, getServerWidthSnapshot);
 }
 
 export function useEditorLayoutMode(): EditorLayoutMode {
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  return resolveEditorLayoutMode(useEditorViewportWidth());
 }
