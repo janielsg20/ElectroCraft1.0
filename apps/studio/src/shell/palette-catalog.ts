@@ -1127,7 +1127,7 @@ export function searchPaletteCatalog(query: string): readonly PaletteItemDescrip
   if (!normalized) return paletteCatalog;
 
   const directSynonyms = paletteSearchSynonymIndex[normalized as keyof typeof paletteSearchSynonymIndex] ?? [];
-  const directIds = new Set(directSynonyms);
+  const directIds = new Set<PaletteItemDescriptor['id']>(directSynonyms);
 
   return paletteCatalog.filter(
     (descriptor) => directIds.has(descriptor.id) || searchableText(descriptor).includes(normalized),
