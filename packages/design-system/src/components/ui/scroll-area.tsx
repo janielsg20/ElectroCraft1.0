@@ -5,7 +5,10 @@ import { cn } from '../../lib/utils';
 export function ScrollArea({ className, children, ...props }: React.ComponentProps<typeof ScrollAreaPrimitive.Root>) {
   return (
     <ScrollAreaPrimitive.Root data-slot="scroll-area" className={cn('relative overflow-hidden', className)} {...props}>
-      <ScrollAreaPrimitive.Viewport data-slot="scroll-area-viewport" className="size-full rounded-[inherit] outline-none focus-visible:ring-2 focus-visible:ring-ring">
+      <ScrollAreaPrimitive.Viewport
+        data-slot="scroll-area-viewport"
+        className="size-full rounded-[inherit] outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
         {children}
       </ScrollAreaPrimitive.Viewport>
       <ScrollBar />
@@ -14,7 +17,11 @@ export function ScrollArea({ className, children, ...props }: React.ComponentPro
   );
 }
 
-export function ScrollBar({ className, orientation = 'vertical', ...props }: React.ComponentProps<typeof ScrollAreaPrimitive.Scrollbar>) {
+export function ScrollBar({
+  className,
+  orientation = 'vertical',
+  ...props
+}: React.ComponentProps<typeof ScrollAreaPrimitive.Scrollbar>) {
   return (
     <ScrollAreaPrimitive.Scrollbar
       data-slot="scroll-area-scrollbar"

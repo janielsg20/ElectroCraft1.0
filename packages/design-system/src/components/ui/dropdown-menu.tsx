@@ -68,10 +68,25 @@ export function DropdownMenuLabel({
   );
 }
 
-export function DropdownMenuSeparator({ className, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Separator>) {
-  return <DropdownMenuPrimitive.Separator data-slot="dropdown-menu-separator" className={cn('-mx-1 my-1 h-px bg-border', className)} {...props} />;
+export function DropdownMenuSeparator({
+  className,
+  ...props
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Separator>) {
+  return (
+    <DropdownMenuPrimitive.Separator
+      data-slot="dropdown-menu-separator"
+      className={cn('-mx-1 my-1 h-px bg-border', className)}
+      {...props}
+    />
+  );
 }
 
 export function DropdownMenuShortcut({ className, ...props }: React.ComponentProps<'span'>) {
-  return <span data-slot="dropdown-menu-shortcut" className={cn('ml-auto text-[0.7rem] tracking-widest text-muted-foreground', className)} {...props} />;
+  return (
+    <span
+      data-slot="dropdown-menu-shortcut"
+      className={cn('ml-auto text-[0.7rem] tracking-widest text-muted-foreground', className)}
+      {...props}
+    />
+  );
 }

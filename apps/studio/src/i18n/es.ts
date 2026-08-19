@@ -44,7 +44,8 @@ export const studioEsMessages = Object.freeze({
   'gallery.helpSummary': 'El AppShell reutiliza una sola foundation shadcn/Radix y no controles paralelos.',
   'gallery.noDemoData': 'Esta galería valida el sistema visual; no contiene datos demo persistentes.',
   'route.unavailable': 'Ruta no disponible en esta fase',
-  'route.summary': 'La navegación final pertenece al modelo canónico y se integrará en las siguientes microfases del AppShell.',
+  'route.summary':
+    'La navegación final pertenece al modelo canónico y se integrará en las siguientes microfases del AppShell.',
   'route.backHome': 'Volver al inicio',
   'common.close': 'Cerrar',
   'common.cancel': 'Cancelar',

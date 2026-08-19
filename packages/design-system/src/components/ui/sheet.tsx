@@ -29,10 +29,14 @@ export function SheetContent({
         className={cn(
           'fixed z-50 flex flex-col gap-4 border bg-background shadow-lg transition ease-in-out',
           'data-[state=open]:animate-in data-[state=closed]:animate-out',
-          side === 'right' && 'inset-y-0 right-0 h-full w-[min(90vw,24rem)] border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right',
-          side === 'left' && 'inset-y-0 left-0 h-full w-[min(90vw,24rem)] border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left',
-          side === 'top' && 'inset-x-0 top-0 w-full border-b data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top',
-          side === 'bottom' && 'inset-x-0 bottom-0 w-full border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
+          side === 'right' &&
+            'inset-y-0 right-0 h-full w-[min(90vw,24rem)] border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right',
+          side === 'left' &&
+            'inset-y-0 left-0 h-full w-[min(90vw,24rem)] border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left',
+          side === 'top' &&
+            'inset-x-0 top-0 w-full border-b data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top',
+          side === 'bottom' &&
+            'inset-x-0 bottom-0 w-full border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
           className,
         )}
         {...props}
@@ -56,13 +60,31 @@ export function SheetHeader({ className, ...props }: React.ComponentProps<'div'>
 }
 
 export function SheetFooter({ className, ...props }: React.ComponentProps<'div'>) {
-  return <div data-slot="sheet-footer" className={cn('mt-auto flex flex-col-reverse gap-2 p-4 sm:flex-row sm:justify-end', className)} {...props} />;
+  return (
+    <div
+      data-slot="sheet-footer"
+      className={cn('mt-auto flex flex-col-reverse gap-2 p-4 sm:flex-row sm:justify-end', className)}
+      {...props}
+    />
+  );
 }
 
 export function SheetTitle({ className, ...props }: React.ComponentProps<typeof SheetPrimitive.Title>) {
-  return <SheetPrimitive.Title data-slot="sheet-title" className={cn('text-sm font-semibold text-foreground', className)} {...props} />;
+  return (
+    <SheetPrimitive.Title
+      data-slot="sheet-title"
+      className={cn('text-sm font-semibold text-foreground', className)}
+      {...props}
+    />
+  );
 }
 
 export function SheetDescription({ className, ...props }: React.ComponentProps<typeof SheetPrimitive.Description>) {
-  return <SheetPrimitive.Description data-slot="sheet-description" className={cn('text-sm text-muted-foreground', className)} {...props} />;
+  return (
+    <SheetPrimitive.Description
+      data-slot="sheet-description"
+      className={cn('text-sm text-muted-foreground', className)}
+      {...props}
+    />
+  );
 }

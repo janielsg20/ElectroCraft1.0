@@ -7,7 +7,10 @@ import { DesignSystemGallery } from './shell/DesignSystemGallery';
 function RouteUnavailable() {
   return (
     <main className="grid min-h-screen place-items-center bg-background p-4 text-foreground">
-      <section className="w-full max-w-lg rounded-lg border bg-card p-5 shadow-[var(--ec-shadow-panel)]" aria-labelledby="route-unavailable-title">
+      <section
+        className="w-full max-w-lg rounded-lg border bg-card p-5 shadow-[var(--ec-shadow-panel)]"
+        aria-labelledby="route-unavailable-title"
+      >
         <h1 id="route-unavailable-title" className="text-lg font-semibold text-card-foreground">
           {tStudio('route.unavailable')}
         </h1>
@@ -26,7 +29,9 @@ export function App() {
 
   return (
     <StudioThemeProvider>
-      <TooltipProvider>{isProjectHome ? <DesignSystemGallery health={health} /> : <RouteUnavailable />}</TooltipProvider>
+      <TooltipProvider>
+        {isProjectHome ? <DesignSystemGallery health={health} /> : <RouteUnavailable />}
+      </TooltipProvider>
     </StudioThemeProvider>
   );
 }

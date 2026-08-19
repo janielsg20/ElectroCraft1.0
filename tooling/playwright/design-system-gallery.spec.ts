@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-test('M03.1 design system gallery supports theme, keyboard surfaces and compact responsive layout', async ({ page }) => {
+test('M03.1 design system gallery supports theme, keyboard surfaces and compact responsive layout', async ({
+  page,
+}) => {
   await page.goto('/');
 
   await expect(page.getByRole('heading', { name: 'Fundación visual de ElectroCraft' })).toBeVisible();
@@ -33,7 +35,9 @@ test('M03.1 design system gallery supports theme, keyboard surfaces and compact 
   await expect(page.getByRole('dialog')).toBeHidden();
 
   await page.setViewportSize({ width: 390, height: 844 });
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
   expect(overflow).toBeLessThanOrEqual(1);
   await expect(page.getByRole('heading', { name: 'Fundación visual de ElectroCraft' })).toBeVisible();
 
