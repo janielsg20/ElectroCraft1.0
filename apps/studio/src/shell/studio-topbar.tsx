@@ -12,6 +12,7 @@ import {
 import { useSyncExternalStore } from 'react';
 import type { HelpDescriptor } from '../help/help-registry';
 import type { AppShellStatus } from './app-shell';
+import { AppearancePanelTrigger } from './appearance-panel';
 import { ProgressiveDisclosure } from './information-architecture-ui';
 import { normalizeZoomPercent, resolveStudioViewportBreakpoint, type StudioViewportBreakpoint } from './topbar-model';
 import type { WorkspacePreferencesPort } from './workspace-preferences';
@@ -205,6 +206,8 @@ export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help 
           <span className="ec-topbar-local-dot" aria-hidden="true" />
           <span>{copy.localLabel}</span>
         </span>
+
+        <AppearancePanelTrigger />
 
         <Sheet>
           <SheetTrigger asChild>
