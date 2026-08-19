@@ -98,7 +98,14 @@ test('M03.5 structural gate keeps exact editor dimensions and ownership', () => 
     assert.equal(closure.includes('32296070741'), true, 'M03.5 closure must pin the GREEN owner run');
     assert.equal(closure.includes('9381289623'), true, 'M03.5 closure must pin the GREEN artifact');
     assert.equal(closure.includes('GREEN'), true, 'M03.5 closure evidence must remain GREEN');
-    assert.match(state, /M03\.6[^\n]*ACTIVE/);
+
+    const activeSuccessor = state.match(/M03\.(\d+)[^\n]*ACTIVE/);
+    assert.notEqual(activeSuccessor, null, 'A later F03 microphase must remain ACTIVE after M03.5 closes');
+    assert.equal(
+      Number(activeSuccessor?.[1]) > 5,
+      true,
+      'M03.5 post-closure regression requires an ACTIVE F03 successor after M03.5',
+    );
   }
 
   assert.equal(
