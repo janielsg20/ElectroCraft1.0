@@ -1,0 +1,148 @@
+name: M03.9 Editor Appearance Profile Gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'apps/studio/src/theme.ts'
+      - 'apps/studio/src/theme-provider.tsx'
+      - 'apps/studio/src/i18n/appearance.es.ts'
+      - 'apps/studio/src/shell/appearance-*'
+      - 'apps/studio/src/shell/app-shell-route.tsx'
+      - 'apps/studio/src/shell/studio-topbar.tsx'
+      - 'apps/studio/src/shell/editor-workspace.tsx'
+      - 'apps/studio/src/shell/responsive-shell.css'
+      - 'packages/design-system/src/foundation/theme-provider.tsx'
+      - 'tooling/vitest/**/editor-appearance-*.test.ts'
+      - 'tooling/playwright/m03-9-appearance.spec.ts'
+      - '.ai/evidence/F03/M03.9/**'
+      - '.ai/STATE.md'
+      - '.ai/TRACKING.md'
+      - '.ai/HANDOFF.md'
+      - '.github/workflows/m03-9-appearance.yml'
+  push:
+    branches:
+      - main
+      - codex/m03-9-editor-session-appearance-profile
+    paths:
+      - 'apps/studio/src/theme.ts'
+      - 'apps/studio/src/theme-provider.tsx'
+      - 'apps/studio/src/i18n/appearance.es.ts'
+      - 'apps/studio/src/shell/appearance-*'
+      - 'apps/studio/src/shell/app-shell-route.tsx'
+      - 'apps/studio/src/shell/studio-topbar.tsx'
+      - 'apps/studio/src/shell/editor-workspace.tsx'
+      - 'apps/studio/src/shell/responsive-shell.css'
+      - 'packages/design-system/src/foundation/theme-provider.tsx'
+      - 'tooling/vitest/**/editor-appearance-*.test.ts'
+      - 'tooling/playwright/m03-9-appearance.spec.ts'
+      - '.ai/evidence/F03/M03.9/**'
+      - '.ai/STATE.md'
+      - '.ai/TRACKING.md'
+      - '.ai/HANDOFF.md'
+      - '.github/workflows/m03-9-appearance.yml'
+
+permissions:
+  contents: read
+  statuses: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  m03-9:
+    name: M03.9 Editor Appearance Profile
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Publish pending status
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createCommitStatus({ owner: context.repo.owner, repo: context.repo.repo, sha: context.sha, state: 'pending', context: 'electrocraft/M03.9', description: 'M03.9 appearance gate running', target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}` });
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Verify locked toolchain
+        run: |
+          test "$(node --version)" = 'v22.16.0'
+          test "$(npm --version)" = '10.9.2'
+          test "$(npm config get legacy-peer-deps)" = 'true'
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Verify M03.9 source formatting
+        run: >-
+          npx prettier --check
+          .github/workflows/m03-9-appearance.yml
+          apps/studio/src/theme.ts
+          apps/studio/src/theme-provider.tsx
+          apps/studio/src/i18n/appearance.es.ts
+          apps/studio/src/shell/appearance-panel.tsx
+          apps/studio/src/shell/appearance.css
+          apps/studio/src/shell/app-shell-route.tsx
+          apps/studio/src/shell/studio-topbar.tsx
+          apps/studio/src/shell/editor-workspace.tsx
+          apps/studio/src/shell/responsive-shell.css
+          packages/design-system/src/foundation/theme-provider.tsx
+          tooling/vitest/unit/editor-appearance-profile.test.ts
+          tooling/vitest/contract/editor-appearance-isolation.test.ts
+          tooling/vitest/integration/editor-appearance-runtime.test.ts
+          tooling/playwright/m03-9-appearance.spec.ts
+
+      - name: Execute dedicated M03.9 unit contract integration suite
+        run: >-
+          npx vitest run --config vitest.config.ts
+          tooling/vitest/unit/editor-appearance-profile.test.ts
+          tooling/vitest/contract/editor-appearance-isolation.test.ts
+          tooling/vitest/integration/editor-appearance-runtime.test.ts
+
+      - name: Install Playwright Chromium
+        timeout-minutes: 8
+        run: |
+          if ! timeout 240s npx playwright install chromium; then
+            echo 'First Chromium install attempt did not complete; retrying once on the same runner.'
+            npx playwright install chromium
+          fi
+
+      - name: Execute dedicated M03.9 browser audit
+        run: npx playwright test --config playwright.config.ts tooling/playwright/m03-9-appearance.spec.ts
+
+      - name: Execute full repository gate
+        run: npm run check | tee m03-9-check.log
+
+      - name: Emit closure marker
+        run: echo PASS_M03_9_EDITOR_APPEARANCE_PROFILE | tee m03-9-closure.log
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m03-9-appearance-evidence
+          path: |
+            m03-9-check.log
+            m03-9-closure.log
+            test-results/**
+            .ai/evidence/F03/M03.9/**
+          if-no-files-found: warn
+
+      - name: Publish final commit status
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createCommitStatus({ owner: context.repo.owner, repo: context.repo.repo, sha: context.sha, state: '${{ job.status }}' === 'success' ? 'success' : 'failure', context: 'electrocraft/M03.9', description: 'M03.9 editor appearance profile gate', target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}` });
