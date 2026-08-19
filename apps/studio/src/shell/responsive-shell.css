@@ -88,7 +88,7 @@
 .ec-editor-mobile-dock {
   height: 58px;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   align-items: stretch;
   border-top: 1px solid var(--border);
   background: var(--surface);
