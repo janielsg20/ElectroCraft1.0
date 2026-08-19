@@ -261,11 +261,7 @@ function MobileEditorLayout() {
               <span>{editorT('studio.editor.mobile.components')}</span>
             </button>
           </SheetTrigger>
-          <SheetContent
-            side="bottom"
-            className="ec-editor-mobile-bottom-sheet"
-            data-editor-mobile-sheet="components"
-          >
+          <SheetContent side="bottom" className="ec-editor-mobile-bottom-sheet" data-editor-mobile-sheet="components">
             <SheetHeader className="ec-editor-mobile-sheet-header">
               <div>
                 <SheetTitle>{editorT('studio.editor.mobile.components')}</SheetTitle>
@@ -320,11 +316,7 @@ function MobileEditorLayout() {
               <span>{editorT('studio.editor.mobile.properties')}</span>
             </button>
           </SheetTrigger>
-          <SheetContent
-            side="bottom"
-            className="ec-editor-mobile-bottom-sheet"
-            data-editor-mobile-sheet="properties"
-          >
+          <SheetContent side="bottom" className="ec-editor-mobile-bottom-sheet" data-editor-mobile-sheet="properties">
             <SheetHeader className="ec-editor-mobile-sheet-header">
               <div>
                 <SheetTitle>{editorT('studio.editor.mobile.properties')}</SheetTitle>
