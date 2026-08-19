@@ -1,6 +1,6 @@
 import { Button, Input, ScrollArea, getStudioIcon } from '@electrocraft/design-system';
 import { PuckEditorComponents, structuralPuckConfig, usePuckPaletteInsert } from '@electrocraft/editor-puck';
-import { useMemo, useRef, useState, type KeyboardEvent } from 'react';
+import { useMemo, useState, type KeyboardEvent } from 'react';
 import { paletteT } from '../i18n/palette.es';
 import {
   getPaletteItemById,
@@ -116,7 +116,12 @@ function PaletteDiagnosticNotice({
           <strong>{paletteT('studio.palette.diagnosticTitle')}</strong>
           <code>{diagnostic.code}</code>
         </div>
-        <Button variant="ghost" size="icon" onClick={onDismiss} aria-label={paletteT('studio.palette.clearSearch')}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onDismiss}
+          aria-label={paletteT('studio.palette.diagnosticClose')}
+        >
           <CloseIcon aria-hidden="true" />
         </Button>
       </header>
@@ -141,8 +146,6 @@ function PaletteDiagnosticNotice({
 export function StudioPalette() {
   const [query, setQuery] = useState('');
   const [diagnostic, setDiagnostic] = useState<PaletteDiagnostic | null>(null);
-  const searchRef = useRef<HTMLInputElement>(null);
-  const firstItemRef = useRef<HTMLElement | null>(null);
   const insertWithPuck = usePuckPaletteInsert();
   const { preferences, toggleFavorite, rememberRecent } = usePalettePreferences();
   const availableComponentTypes = useMemo(() => new Set(Object.keys(structuralPuckConfig.components)), []);
@@ -187,7 +190,7 @@ export function StudioPalette() {
   };
 
   const onPanelKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key === 'Escape' && event.target !== searchRef.current) {
+    if (event.key === 'Escape') {
       event.preventDefault();
       focusCanvas();
     }
@@ -199,7 +202,6 @@ export function StudioPalette() {
       aria-label={paletteT('studio.palette.title')}
       data-studio-palette
       onKeyDown={onPanelKeyDown}
-      ref={firstItemRef}
     >
       <header className="ec-palette-header">
         <div className="ec-palette-heading">
@@ -213,7 +215,6 @@ export function StudioPalette() {
           <span className="sr-only">{paletteT('studio.palette.searchLabel')}</span>
           <SearchIcon aria-hidden="true" />
           <Input
-            ref={searchRef}
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -227,7 +228,7 @@ export function StudioPalette() {
 
       {diagnostic ? <PaletteDiagnosticNotice diagnostic={diagnostic} onDismiss={() => setDiagnostic(null)} /> : null}
 
-      <ScrollArea className="ec-palette-scroll">
+      <ScrollArea className="ec-palette-scroll" label={paletteT('studio.palette.allCategories')}>
         <div className="ec-palette-content">
           {!query && favoriteItems.length > 0 ? (
             <PaletteSection
