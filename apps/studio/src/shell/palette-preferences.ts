@@ -11,13 +11,16 @@ export interface PalettePreferences {
 
 export const emptyPalettePreferences: PalettePreferences = Object.freeze({ favorites: [], recent: [] });
 
-const uniqueIds = (values: readonly string[]): PaletteItemDescriptor['id'][] =>
-  [...new Set(values.filter((value): value is PaletteItemDescriptor['id'] => value.startsWith('palette.')))];
+const uniqueIds = (values: readonly string[]): PaletteItemDescriptor['id'][] => [
+  ...new Set(values.filter((value): value is PaletteItemDescriptor['id'] => value.startsWith('palette.'))),
+];
 
 export function normalizePalettePreferences(value: unknown): PalettePreferences {
   if (!value || typeof value !== 'object') return emptyPalettePreferences;
   const candidate = value as { favorites?: unknown; recent?: unknown };
-  const favorites = Array.isArray(candidate.favorites) ? uniqueIds(candidate.favorites.filter((v): v is string => typeof v === 'string')) : [];
+  const favorites = Array.isArray(candidate.favorites)
+    ? uniqueIds(candidate.favorites.filter((v): v is string => typeof v === 'string'))
+    : [];
   const recent = Array.isArray(candidate.recent)
     ? uniqueIds(candidate.recent.filter((v): v is string => typeof v === 'string')).slice(0, PALETTE_RECENT_LIMIT)
     : [];
@@ -51,7 +54,10 @@ export function pushRecentPaletteItem(
   preferences: PalettePreferences,
   paletteItemId: PaletteItemDescriptor['id'],
 ): PalettePreferences {
-  const recent = [paletteItemId, ...preferences.recent.filter((id) => id !== paletteItemId)].slice(0, PALETTE_RECENT_LIMIT);
+  const recent = [paletteItemId, ...preferences.recent.filter((id) => id !== paletteItemId)].slice(
+    0,
+    PALETTE_RECENT_LIMIT,
+  );
   return Object.freeze({ favorites: preferences.favorites, recent });
 }
 

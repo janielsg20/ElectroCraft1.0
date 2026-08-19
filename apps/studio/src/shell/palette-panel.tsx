@@ -1,9 +1,5 @@
 import { Button, Input, ScrollArea, getStudioIcon } from '@electrocraft/design-system';
-import {
-  PuckEditorComponents,
-  structuralPuckConfig,
-  usePuckPaletteInsert,
-} from '@electrocraft/editor-puck';
+import { PuckEditorComponents, structuralPuckConfig, usePuckPaletteInsert } from '@electrocraft/editor-puck';
 import { useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { paletteT } from '../i18n/palette.es';
 import {
@@ -61,9 +57,7 @@ function PaletteItem({
         type="button"
         className="ec-palette-favorite"
         aria-pressed={favorite}
-        aria-label={
-          favorite ? paletteT('studio.palette.favoriteRemove') : paletteT('studio.palette.favoriteAdd')
-        }
+        aria-label={favorite ? paletteT('studio.palette.favoriteRemove') : paletteT('studio.palette.favoriteAdd')}
         onClick={() => onToggleFavorite(descriptor.id)}
       >
         <span aria-hidden="true">{favorite ? '★' : '☆'}</span>
@@ -151,14 +145,12 @@ export function StudioPalette() {
   const firstItemRef = useRef<HTMLElement | null>(null);
   const insertWithPuck = usePuckPaletteInsert();
   const { preferences, toggleFavorite, rememberRecent } = usePalettePreferences();
-  const availableComponentTypes = useMemo(
-    () => new Set(Object.keys(structuralPuckConfig.components)),
-    [],
-  );
+  const availableComponentTypes = useMemo(() => new Set(Object.keys(structuralPuckConfig.components)), []);
   const results = useMemo(() => searchPaletteCatalog(query), [query]);
   const favorites = useMemo(() => new Set(preferences.favorites), [preferences.favorites]);
   const favoriteItems = useMemo(
-    () => preferences.favorites.map(getPaletteItemById).filter((value): value is PaletteItemDescriptor => Boolean(value)),
+    () =>
+      preferences.favorites.map(getPaletteItemById).filter((value): value is PaletteItemDescriptor => Boolean(value)),
     [preferences.favorites],
   );
   const recentItems = useMemo(
