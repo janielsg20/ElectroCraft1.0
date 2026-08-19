@@ -1,12 +1,5 @@
 import { ThemeProvider } from '@electrocraft/design-system';
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type PropsWithChildren,
-} from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, type PropsWithChildren } from 'react';
 import {
   createBrowserEditorAppearanceStorage,
   loadEditorAppearanceProfile,
@@ -42,10 +35,7 @@ export interface StudioAppearanceProviderProps extends PropsWithChildren {
 }
 
 export function StudioAppearanceProvider({ storage, children }: StudioAppearanceProviderProps) {
-  const storagePort = useMemo(
-    () => storage ?? createBrowserEditorAppearanceStorage(),
-    [storage],
-  );
+  const storagePort = useMemo(() => storage ?? createBrowserEditorAppearanceStorage(), [storage]);
   const [appliedProfile, setAppliedProfile] = useState<EditorAppearanceProfile>(() =>
     loadEditorAppearanceProfile(storagePort),
   );
@@ -102,8 +92,12 @@ export function StudioAppearanceProvider({ storage, children }: StudioAppearance
   );
 }
 
+export function useOptionalStudioAppearance() {
+  return useContext(StudioAppearanceContext);
+}
+
 export function useStudioAppearance() {
-  const context = useContext(StudioAppearanceContext);
+  const context = useOptionalStudioAppearance();
   if (!context) throw new Error('useStudioAppearance must be used inside StudioAppearanceProvider');
   return context;
 }
