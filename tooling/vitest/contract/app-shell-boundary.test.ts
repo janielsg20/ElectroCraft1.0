@@ -51,7 +51,7 @@ describe('M03.2 AppShell boundaries', () => {
     expect(shell).not.toContain("'Configuración'");
   });
 
-  it('preserves exact AppShell geometry as the Sidebar gains its M03.3 behavior', () => {
+  it('preserves exact AppShell geometry as later responsive microphases extend it', () => {
     const layout = read('apps/studio/src/shell/app-shell-layout.ts');
     expect(layout).toContain('sidebarExpandedPx: 240');
     expect(layout).toContain('sidebarCollapsedPx: 64');
@@ -59,10 +59,12 @@ describe('M03.2 AppShell boundaries', () => {
     expect(layout).toContain('statusbarPx: 26');
   });
 
-  it('uses persistent help and a left-capable real Radix Sheet for tablet/mobile navigation', () => {
+  it('uses persistent help and a left/right-capable real Radix Sheet while M03.6 adds bottom support', () => {
+    const sheet = read('packages/design-system/src/components/ui/sheet.tsx');
     expect(read('apps/studio/src/help/help-registry.ts')).toContain("id: 'help.studio.shell'");
-    expect(read('packages/design-system/src/components/ui/sheet.tsx')).toContain("side?: 'left' | 'right'");
-    expect(read('packages/design-system/src/components/ui/sheet.tsx')).toContain("from 'radix-ui'");
+    expect(sheet).toContain("'left'");
+    expect(sheet).toContain("'right'");
+    expect(sheet).toContain("from 'radix-ui'");
     expect(read('packages/design-system/src/icons/studio-icon-registry.ts')).toContain("'studio.menu': Menu");
   });
 });
