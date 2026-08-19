@@ -29,7 +29,13 @@ describe('M03.9 editor session appearance profile', () => {
     expect(loadEditorAppearanceProfile(memoryStorage('{broken'))).toEqual(DEFAULT_EDITOR_APPEARANCE_PROFILE);
     expect(
       deserializeEditorAppearanceProfile(
-        JSON.stringify({ name: 'Mi perfil', tone: 'unknown', accent: 'emerald', density: 'nope', canvasDensity: 'compact' }),
+        JSON.stringify({
+          name: 'Mi perfil',
+          tone: 'unknown',
+          accent: 'emerald',
+          density: 'nope',
+          canvasDensity: 'compact',
+        }),
       ),
     ).toEqual({
       name: 'Mi perfil',
