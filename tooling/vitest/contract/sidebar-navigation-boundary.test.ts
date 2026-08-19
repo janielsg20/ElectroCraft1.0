@@ -25,13 +25,30 @@ describe('M03.3 Sidebar navigation contract', () => {
     );
 
     expect(labels).toEqual([
-      'Editor', 'Pantallas', 'Componentes', 'Plantillas', 'Generar con IA',
-      'Registros', 'Modelos', 'Fuentes de datos', 'Consultas',
-      'Acciones y workflows', 'Estado y variables', 'Formularios',
-      'Navegación', 'Usuarios y permisos', 'Administración',
-      'Medios', 'Extensiones',
-      'Temas', 'Sistema de diseño', 'Tokens',
-      'Vista previa', 'Compatibilidad', 'Exportar', 'Desplegar',
+      'Editor',
+      'Pantallas',
+      'Componentes',
+      'Plantillas',
+      'Generar con IA',
+      'Registros',
+      'Modelos',
+      'Fuentes de datos',
+      'Consultas',
+      'Acciones y workflows',
+      'Estado y variables',
+      'Formularios',
+      'Navegación',
+      'Usuarios y permisos',
+      'Administración',
+      'Medios',
+      'Extensiones',
+      'Temas',
+      'Sistema de diseño',
+      'Tokens',
+      'Vista previa',
+      'Compatibilidad',
+      'Exportar',
+      'Desplegar',
     ]);
     expect(labels).not.toContain('Taxonomías');
     expect(labels).not.toContain('Relaciones');
