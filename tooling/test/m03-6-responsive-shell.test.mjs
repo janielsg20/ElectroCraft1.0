@@ -6,6 +6,7 @@ import test from 'node:test';
 const root = process.cwd();
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const exists = (file) => fs.existsSync(path.join(root, file));
+const closurePath = '.ai/evidence/F03/M03.6/CLOSURE_2026-08-19.md';
 
 const required = [
   'apps/studio/src/shell/editor-workspace.tsx',
@@ -23,6 +24,7 @@ const required = [
   'tooling/playwright/m03-6-responsive-shell.spec.ts',
   '.ai/evidence/F03/M03.5/CLOSURE_2026-08-19.md',
   '.ai/evidence/F03/M03.6/IMPLEMENTATION_2026-08-19.md',
+  closurePath,
 ];
 
 test('M03.6 structural gate preserves capabilities across responsive modes', () => {
@@ -98,8 +100,19 @@ test('M03.6 structural gate preserves capabilities across responsive modes', () 
   }
 
   assert.match(state, /M03\.5[^\n]*COMPLETADA[^\n]*GREEN/);
-  assert.match(state, /M03\.6[^\n]*ACTIVE/);
+  const active = /M03\.6[^\n]*ACTIVE/.test(state);
+  const complete = /M03\.6[^\n]*COMPLETADA[^\n]*GREEN/.test(state);
+  assert.equal(active || complete, true, 'M03.6 must be ACTIVE or post-closure COMPLETADA / GREEN');
   assert.equal((state.match(/`ACTIVE`/g) ?? []).length, 1, 'Exactly one microphase must remain ACTIVE');
+
+  if (complete) {
+    const closure = read(closurePath);
+    assert.equal(closure.includes('32299990614'), true, 'M03.6 closure must pin the GREEN owner run');
+    assert.equal(closure.includes('9382670739'), true, 'M03.6 closure must pin the GREEN artifact');
+    assert.equal(closure.includes('GREEN'), true, 'M03.6 closure evidence must remain GREEN');
+    assert.match(state, /M03\.7[^\n]*ACTIVE/);
+  }
+
   assert.equal(predecessor.includes('32297534296'), true, 'M03.5 main GREEN run must be recorded');
   assert.equal(predecessor.includes('9381789348'), true, 'M03.5 main artifact must be recorded');
 });
