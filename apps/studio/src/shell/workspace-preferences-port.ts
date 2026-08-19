@@ -18,11 +18,11 @@ export function createInMemoryWorkspacePreferencesPort(
 
   return Object.freeze({
     getSnapshot: () => snapshot,
-    subscribe(listener) {
+    subscribe(listener: () => void) {
       listeners.add(listener);
       return () => listeners.delete(listener);
     },
-    setSidebarCollapsed(collapsed) {
+    setSidebarCollapsed(collapsed: boolean) {
       if (typeof collapsed !== 'boolean') {
         throw new TypeError('WorkspacePreferencesPort sidebarCollapsed must be boolean');
       }
