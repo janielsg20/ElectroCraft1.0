@@ -39,9 +39,27 @@ for (const token of ['sidebarExpandedPx: 240', 'sidebarCollapsedPx: 64', 'topbar
   if (!layout.includes(token)) throw new Error(`M03.2 layout regression missing: ${token}`);
 }
 for (const label of [
-  'Editor', 'Pantallas', 'Plantillas', 'Componentes', 'Generar con IA', 'Contenido', 'Modelos', 'Consultas',
-  'Formularios', 'Automatizaciones', 'Administración', 'Roles', 'Medios', 'Extensiones', 'Temas', 'Vista previa',
-  'Compatibilidad', 'Exportar', 'Desplegar', 'Ayuda', 'Configuración',
+  'Editor',
+  'Pantallas',
+  'Plantillas',
+  'Componentes',
+  'Generar con IA',
+  'Contenido',
+  'Modelos',
+  'Consultas',
+  'Formularios',
+  'Automatizaciones',
+  'Administración',
+  'Roles',
+  'Medios',
+  'Extensiones',
+  'Temas',
+  'Vista previa',
+  'Compatibilidad',
+  'Exportar',
+  'Desplegar',
+  'Ayuda',
+  'Configuración',
 ]) {
   if (!i18n.includes(`'${label}'`)) throw new Error(`M03.2 compatibility label missing: ${label}`);
 }
@@ -50,8 +68,14 @@ if (shell.includes('@electrocraft/design-system/')) throw new Error('M03.2 deep 
 if (!help.includes("id: 'help.studio.shell'")) throw new Error('M03.2 help.studio.shell missing');
 if (!sheet.includes("side?: 'left' | 'right'")) throw new Error('M03.2 left/right Radix Sheet support missing');
 if (!icons.includes("'studio.menu': Menu")) throw new Error('M03.2 Lucide menu icon ID missing');
-if (!closure.includes('32272564567') || !closure.includes('GREEN')) throw new Error('M03.2 closure evidence is not GREEN');
-if (!state.includes('M03.2') || !state.includes('COMPLETADA') || !state.includes('M03.3') || !state.includes('ACTIVE')) {
+if (!closure.includes('32272564567') || !closure.includes('GREEN'))
+  throw new Error('M03.2 closure evidence is not GREEN');
+if (
+  !state.includes('M03.2') ||
+  !state.includes('COMPLETADA') ||
+  !state.includes('M03.3') ||
+  !state.includes('ACTIVE')
+) {
   throw new Error('M03.2 post-closure transition to M03.3 is incomplete');
 }
 
