@@ -85,7 +85,12 @@ function SidebarNavigation({
   return (
     <nav className="ec-app-shell-navigation" aria-label={ariaLabel}>
       {groups.map((group) => (
-        <section className="ec-app-shell-navigation-group" aria-label={group.label} data-nav-group={group.id} key={group.id}>
+        <section
+          className="ec-app-shell-navigation-group"
+          aria-label={group.label}
+          data-nav-group={group.id}
+          key={group.id}
+        >
           <h2 className="ec-app-shell-navigation-group-label">{group.label}</h2>
           <ul className="ec-app-shell-navigation-list">
             {group.items.map((item) => (
@@ -176,7 +181,11 @@ export function AppShell({
                 </SheetClose>
               </SheetHeader>
               <ScrollArea label={copy.navigationLabel} className="ec-app-shell-mobile-nav-scroll">
-                <SidebarNavigation groups={navigationGroups} activeItemId={activeItemId} ariaLabel={copy.navigationLabel} />
+                <SidebarNavigation
+                  groups={navigationGroups}
+                  activeItemId={activeItemId}
+                  ariaLabel={copy.navigationLabel}
+                />
               </ScrollArea>
             </SheetContent>
           </Sheet>

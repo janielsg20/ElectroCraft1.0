@@ -83,7 +83,12 @@ if (!navigation.includes("iconId: 'studio.sidebar.editor'")) throw new Error('M0
 if (!css.includes("data-sidebar-collapsed='true'") || !css.includes('grid-template-columns: 64px')) {
   throw new Error('M03.3 240 -> 64 collapse CSS missing');
 }
-for (const iconId of ['studio.sidebar.collapse', 'studio.sidebar.expand', 'studio.sidebar.editor', 'studio.sidebar.deploy']) {
+for (const iconId of [
+  'studio.sidebar.collapse',
+  'studio.sidebar.expand',
+  'studio.sidebar.editor',
+  'studio.sidebar.deploy',
+]) {
   if (!icons.includes(`'${iconId}'`)) throw new Error(`M03.3 Lucide registry ID missing: ${iconId}`);
 }
 if (!help.includes('WorkspacePreferencesPort') || !help.includes('Tooltip Radix')) {
@@ -92,7 +97,12 @@ if (!help.includes('WorkspacePreferencesPort') || !help.includes('Tooltip Radix'
 if (!closure.includes('32272740576') || !closure.includes('GREEN')) {
   throw new Error('M03.2 closure evidence is not GREEN');
 }
-if (!state.includes('M03.2') || !state.includes('COMPLETADA') || !state.includes('M03.3') || !state.includes('ACTIVE')) {
+if (
+  !state.includes('M03.2') ||
+  !state.includes('COMPLETADA') ||
+  !state.includes('M03.3') ||
+  !state.includes('ACTIVE')
+) {
   throw new Error('STATE transition M03.2 -> M03.3 is incomplete');
 }
 

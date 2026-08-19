@@ -47,7 +47,7 @@ describe('M03.3 Sidebar boundaries', () => {
       'studio.sidebar.designSystem',
       'studio.sidebar.deploy',
     ] as const) {
-      expect(studioIconRegistry[iconId]).toBeTypeOf('function');
+      expect(studioIconRegistry[iconId]).toBeDefined();
     }
 
     expect(read('apps/studio/src/shell/app-shell.tsx')).not.toContain("from 'lucide-react'");

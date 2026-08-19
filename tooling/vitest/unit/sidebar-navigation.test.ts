@@ -1,8 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import {
-  resolveSidebarActiveItem,
-  studioSidebarNavigation,
-} from '../../../apps/studio/src/shell/sidebar-navigation';
+import { resolveSidebarActiveItem, studioSidebarNavigation } from '../../../apps/studio/src/shell/sidebar-navigation';
 import { createMemoryWorkspacePreferencesPort } from '../../../apps/studio/src/shell/workspace-preferences';
 
 describe('M03.3 Sidebar navigation', () => {

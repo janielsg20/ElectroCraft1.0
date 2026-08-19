@@ -20,7 +20,12 @@ const navigation = [
     label: studioT('studio.sidebar.group.build'),
     items: [
       { id: 'editor', label: studioT('studio.sidebar.item.editor'), href: '/', iconId: 'studio.sidebar.editor' },
-      { id: 'screens', label: studioT('studio.sidebar.item.screens'), href: '/screens', iconId: 'studio.sidebar.screens' },
+      {
+        id: 'screens',
+        label: studioT('studio.sidebar.item.screens'),
+        href: '/screens',
+        iconId: 'studio.sidebar.screens',
+      },
       {
         id: 'components',
         label: studioT('studio.sidebar.item.components'),
@@ -45,7 +50,12 @@ const navigation = [
     id: 'data',
     label: studioT('studio.sidebar.group.data'),
     items: [
-      { id: 'records', label: studioT('studio.sidebar.item.records'), href: '/content', iconId: 'studio.sidebar.records' },
+      {
+        id: 'records',
+        label: studioT('studio.sidebar.item.records'),
+        href: '/content',
+        iconId: 'studio.sidebar.records',
+      },
       { id: 'models', label: studioT('studio.sidebar.item.models'), href: '/models', iconId: 'studio.sidebar.models' },
       {
         id: 'data-sources',
@@ -53,7 +63,12 @@ const navigation = [
         href: '/data-sources',
         iconId: 'studio.sidebar.dataSources',
       },
-      { id: 'queries', label: studioT('studio.sidebar.item.queries'), href: '/queries', iconId: 'studio.sidebar.queries' },
+      {
+        id: 'queries',
+        label: studioT('studio.sidebar.item.queries'),
+        href: '/queries',
+        iconId: 'studio.sidebar.queries',
+      },
     ],
   },
   {
@@ -115,7 +130,12 @@ const navigation = [
     id: 'publish',
     label: studioT('studio.sidebar.group.publish'),
     items: [
-      { id: 'preview', label: studioT('studio.sidebar.item.preview'), href: '/preview', iconId: 'studio.sidebar.preview' },
+      {
+        id: 'preview',
+        label: studioT('studio.sidebar.item.preview'),
+        href: '/preview',
+        iconId: 'studio.sidebar.preview',
+      },
       {
         id: 'compatibility',
         label: studioT('studio.sidebar.item.compatibility'),
