@@ -199,7 +199,8 @@ export function validateInformationArchitecture(options: readonly InformationOpt
     if (option.surface === 'navigation') {
       if (option.level !== 'primary') errors.push(`top-level navigation must be primary: ${option.id}`);
       if (!option.route) errors.push(`navigation option requires canonical route: ${option.id}`);
-      if (option.route && navigationRoutes.has(option.route)) errors.push(`duplicate navigation route: ${option.route}`);
+      if (option.route && navigationRoutes.has(option.route))
+        errors.push(`duplicate navigation route: ${option.route}`);
       if (option.route) navigationRoutes.add(option.route);
     }
   }
@@ -214,9 +215,5 @@ export function getEmptyState(id: EmptyStateDescriptor['id']): EmptyStateDescrip
 }
 
 export function resolveModuleEmptyState(pathname: string): EmptyStateDescriptor | null {
-  return (
-    studioEmptyStates.find(
-      (entry) => entry.route === pathname && entry.pattern === 'single',
-    ) ?? null
-  );
+  return studioEmptyStates.find((entry) => entry.route === pathname && entry.pattern === 'single') ?? null;
 }
