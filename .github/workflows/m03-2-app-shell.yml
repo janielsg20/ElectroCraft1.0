@@ -79,7 +79,12 @@ jobs:
       - name: Execute dedicated M03.2 suite
         run: npm run test:m03-2
       - name: Install Playwright Chromium
-        run: npx playwright install chromium
+        timeout-minutes: 8
+        run: |
+          if ! timeout 240s npx playwright install chromium; then
+            echo 'First Chromium install attempt did not complete; retrying once on the same runner.'
+            npx playwright install chromium
+          fi
       - name: Execute repository gate
         run: npm run check | tee m03-2-check.log
       - name: Emit execution marker
