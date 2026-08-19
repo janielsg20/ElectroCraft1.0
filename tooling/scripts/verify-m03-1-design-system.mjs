@@ -105,6 +105,9 @@ assert.match(read('.github/workflows/m03-1-design-system.yml'), /if: always\(\)/
 assert.match(read('.github/workflows/m03-1-design-system.yml'), /npm install --package-lock-only/);
 assert.match(read('.github/workflows/m03-1-design-system.yml'), /m03-1-lockfile-candidate/);
 assert.match(read('.github/workflows/m03-1-design-system.yml'), /Require committed lockfile synchronization/);
+assert.match(read('.github/workflows/m03-1-design-system.yml'), /npm run format/);
+assert.match(read('.github/workflows/m03-1-design-system.yml'), /m03-1-formatting-candidate/);
+assert.match(read('.github/workflows/m03-1-design-system.yml'), /Require committed formatting synchronization/);
 
 const blockers = [];
 

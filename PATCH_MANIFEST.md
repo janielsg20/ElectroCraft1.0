@@ -1,38 +1,26 @@
-# ElectroCraft1.0 — M03.1 update v4 overlay
+# ElectroCraft1.0 — M03.1 update v5 overlay
 
-Base exacta: `main@0afa33651a677fb2a1d47cf45c38fa7b22df6239`.
+Base de aplicación: `main@1ab2ce7f9f1340cd07ad20c66370d65aa56d2bf9`.
 
-## Qué consolida
-Esta revisión conserva los primitives reales `radix-ui`, Lucide, Tailwind v4, schema/migration, i18n/help/shell, High Density y coverage de navegador. Además corrige el gate de cierre: la spec canónica M03.1 exige validación visual/E2E pero no un SVG de referencia externo.
+## Objetivo de v5
+Cerrar los dos hallazgos reales del primer run de Actions sin inventar evidencia:
+- versionar el `package-lock.json` exacto generado por npm real;
+- convertir el formato Prettier pendiente en un artifact reproducible, mientras se continúa el full gate sobre el árbol temporalmente formateado.
 
-## Archivos principales
-- `packages/design-system/**`
-- `apps/studio/src/{shell,i18n,help}/**`
-- `apps/studio/src/App.tsx` y `apps/studio/vite.config.ts`
-- `tooling/vitest/**/design-system-*.test.ts`
-- `tooling/playwright/m03-1-design-system.spec.ts`
-- `tooling/scripts/verify-m03-1-design-system.mjs`
-- `.github/workflows/{ci,m03-1-design-system}.yml`
-- `.ai/evidence/F03/M03.1/**` y continuidad `STATE/TRACKING/MEMORY/HANDOFF`
-- `M03_1_LOCAL_GATE.md`
+## Evidencia heredada del run 32266099186
+- verifier: PASS, blockers=0, lockVerified=true;
+- `npm ci`: PASS, 625 packages;
+- engine pins: PASS;
+- M03.1 dedicated suite: 15/15 PASS;
+- Chromium install: PASS;
+- repository gate: detenido en Prettier, 14 archivos;
+- lock artifact: 9370267875;
+- evidence artifact: 9370268489.
 
-## Compatibilidad arquitectónica
-- `@electrocraft/design-system` conserva un único export público (`.`).
-- Sin wildcard aliases ni deep workspace imports.
-- shadcn usa aliases privados `#...` mediante `package.json#imports`.
-- Tailwind v4 registra el source compartido mediante `@source`.
-- UI visible nueva pasa por i18n español y la ayuda persistente usa `help.studio.shell`.
-- Revisión React: sin `useMemo` trivial, Lucide lookups hoisted y sin nuevos hardcodes visibles de shell/galería fuera del seam tipado M03.1.
-- Pins revalidados el 2026-08-19; `lucide-react` se actualiza a `1.31.0` antes del lockfile porque es el `latest` estable observado.
+## Cambio principal
+- `package-lock.json`: lockfile v3 real, SHA-256 `1025aa726810d4fbbc313829ae59df9b4c5e85bf5f7ddb553daa754c75ca8789`.
+- `.github/workflows/m03-1-design-system.yml`: añade formatting candidate reproducible y ejecuta el full gate después de formatear temporalmente.
+- `tooling/scripts/verify-m03-1-design-system.mjs`: verifica también el contrato del formatting candidate.
+- evidencia/STATE/TRACKING/HANDOFF actualizados con el run real.
 
-## Lockfile
-`package-lock.json` no se fabrica en este runtime porque el registry npm no es alcanzable. Las versiones están fijadas en manifests y el verificador falla cerrado si el lock no queda sincronizado tras aplicar el overlay.
-
-## Gate v4
-- `tooling/scripts/verify-m03-1-design-system.mjs` genera `tooling/dist/m03-1-design-system-report.json`.
-- Falla cerrado por `package-lock.json` ausente/desincronizado.
-- Registra como contrato visual ejecutable `/__design-system` + Playwright en 360/768/1440 y teclado/focus/theme/Dropdown/Sheet.
-- `ELECTROCRAFT_M03_1_ALLOW_EXTERNAL_BLOCKERS=1` sirve solo para inspección estructural local; nunca equivale a cierre.
-- En GitHub Actions, un lock obsoleto se regenera de forma temporal, se prueba de extremo a extremo y se publica como artifact `m03-1-lockfile-candidate`; el job falla después para exigir que el lock real sea versionado.
-
-M03.1 permanece `ACTIVE` hasta ejecutar el toolchain completo y obtener gate verde. M03.2 no se implementa en este ZIP.
+M03.1 permanece ACTIVE. M03.2 sigue bloqueada hasta gate GREEN.

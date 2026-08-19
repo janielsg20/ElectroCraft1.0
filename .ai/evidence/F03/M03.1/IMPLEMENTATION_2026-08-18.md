@@ -64,3 +64,25 @@ M03.1 remains `ACTIVE` until:
 4. the design-system route is checked at mobile/tablet/desktop and with keyboard;
 
 M03.2 must not start before those conditions are met.
+
+## GitHub Actions evidence — run 32266099186 (2026-08-19)
+Head: `1ab2ce7f9f1340cd07ad20c66370d65aa56d2bf9`.
+
+Passed before the repository gate stopped:
+- locked Node/npm toolchain;
+- real npm lock generation;
+- M03.1 verifier with `blockers=0`, `lockVerified=true`;
+- `npm ci` (`625` packages);
+- installed engine pins;
+- dedicated M03.1 Vitest: `3` files, `15/15` tests;
+- Playwright Chromium installation.
+
+The repository gate then stopped at Prettier before semantic typecheck/build/E2E. Exactly 14 files were reported as needing formatting. No later gate stage is claimed green.
+
+Artifacts recovered:
+- `9370267875` — `m03-1-lockfile-candidate`; artifact digest `sha256:e8f3bc70e3d639cf840798eff418441a99db55593c36cea8fe3f2e9010d79f48`;
+- `9370268489` — `m03-1-design-system-evidence`; artifact digest `sha256:a6100d24028f977c166437e6361622868bcf8314892a9e4d23e38ee1c5c4f91f`.
+
+Recovered lock: lockfile v3, SHA-256 `1025aa726810d4fbbc313829ae59df9b4c5e85bf5f7ddb553daa754c75ca8789`. Overlay v5 versions this exact lock.
+
+The v5 workflow additionally runs `npm run format` in the disposable Actions checkout, captures an exact formatting patch/tar artifact, then continues the full repository gate on the formatted tree. It still fails closed until that formatting diff is committed.

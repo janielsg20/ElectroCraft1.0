@@ -1,6 +1,6 @@
 # TRACKING — ElectroCraft current position
 
-Date: 2026-08-18.
+Date: 2026-08-19.
 
 Historial detallado:
 - hasta M00.8: `.ai/TRACKING_HISTORY_THROUGH_M00.8.md`;
@@ -95,6 +95,21 @@ Historial detallado:
 - Revisión React/shadcn 2026-08-19: se eliminó memoización trivial, se hoistaron lookups Lucide y el copy nuevo visible de M03.1 pasa por el catálogo tipado; i18next real se mantiene reservado para M03.10 según su spec.
 - `npm run lint`, `npm run typecheck`, `npm test`, `npm run build` y Playwright real: `NOT_RUN` por checkout/dependencias completas no disponibles.
 - M03.1 permanece `ACTIVE`; evidencia: `.ai/evidence/F03/M03.1/IMPLEMENTATION_2026-08-18.md`.
+
+## M03.1 — Actions run 32266099186 (2026-08-19)
+- Head: `1ab2ce7f9f1340cd07ad20c66370d65aa56d2bf9`.
+- `Prepare reproducible M03.1 lock candidate`: PASS.
+- `Verify M03.1 closure inputs and structure`: PASS (`blockers=0`, `lockVerified=true`).
+- `npm ci`: PASS, 625 packages instalados.
+- Pins instalados: PASS (`radix-ui@1.6.7`, `lucide-react@1.31.0`, `tailwindcss@4.3.3`).
+- Suite dedicada: PASS, `3` test files / `15` tests.
+- Playwright Chromium install: PASS.
+- Full `npm run check`: STOP en `format:check`; Prettier reportó exactamente `14` archivos con estilo pendiente antes de llegar a typecheck/tests/build/E2E.
+- Lock artifact: `9370267875`, digest del artifact ZIP `sha256:e8f3bc70e3d639cf840798eff418441a99db55593c36cea8fe3f2e9010d79f48`.
+- Evidence artifact: `9370268489`, digest `sha256:a6100d24028f977c166437e6361622868bcf8314892a9e4d23e38ee1c5c4f91f`.
+- Lock recuperado: `package-lock.json` SHA-256 `1025aa726810d4fbbc313829ae59df9b4c5e85bf5f7ddb553daa754c75ca8789`.
+- Overlay v5 incorpora el lock real y convierte Prettier en candidato reproducible: formatea temporalmente, sube patch/tar exacto y continúa el full gate sobre el árbol ya formateado.
+- Estado: M03.1 `ACTIVE`; no activar M03.2 aún.
 
 ## Gate actual
 F02 `COMPLETADA` / Gate F02 `GREEN`. F03 está `IN_PROGRESS` con M03.1 como única microfase activa.

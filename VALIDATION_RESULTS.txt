@@ -1,42 +1,39 @@
-ElectroCraft M03.1 overlay v4 — validation results
+ElectroCraft M03.1 overlay v5 — validation results
 Prepared: 2026-08-19
-Base: main@0afa33651a677fb2a1d47cf45c38fa7b22df6239
+Application base: main@1ab2ce7f9f1340cd07ad20c66370d65aa56d2bf9
 
-EXECUTED / PASS
-- PASS_M03_1_DESIGN_SYSTEM_STRUCTURE with explicit local lock-blocker override
-- VERIFIER_FAIL_CLOSED_LOCK_ONLY_PASS
-- NODE_CHECK_VERIFIER_PASS
-- TS_SYNTAX_FILES=26
-- TS_SYNTAX_ERRORS=0
-- JSON_PASS files=5
-- YAML_PASS files=2
-- LOCAL_IMPORTS_PASS files=23
-- M03_1_WORKSPACE_IMPORT_BOUNDARY_PASS
-- M03_1_PUBLIC_ALIAS_BOUNDARY_PASS
-- CSS_BRACE_PASS files=3
-- M03_1_VISIBLE_COPY_CATALOG_PASS
-- REACT_REVIEW_STATIC_PASS: trivial memo removed; semantic Lucide lookups module-hoisted
-- M03_1_ACTIONS_LOCK_BOOTSTRAP_PASS
-- FOUNDATION_RUNTIME_PASS schema=v1 migration=v0->v1 roundtrip=pass future=blocked
-- Machine report: .ai/evidence/F03/M03.1/LOCAL_STRUCTURE_REPORT_2026-08-19.json
-- Canonical visual contract corrected: /__design-system + Playwright; no external SVG is required by M03.1
-- Current stable pins reverified before lock generation: radix-ui 1.6.7; lucide-react 1.31.0; tailwindcss/@tailwindcss-vite 4.3.3; CVA 0.7.1; clsx 2.1.1; tailwind-merge 3.6.0
-- Dedicated Actions path verified structurally: generate package-lock candidate, run verifier/npm ci/tests/build/Playwright, upload m03-1-lockfile-candidate, fail closed until lock is versioned
+GITHUB ACTIONS RUN 32266099186 — REAL EXECUTION
+PASS - locked Node/npm toolchain
+PASS - real package-lock candidate generation
+PASS - M03.1 structural verifier: blockers=0, lockVerified=true
+PASS - npm ci (625 packages)
+PASS - installed engine pins
+PASS - dedicated M03.1 suite: 3 files / 15 tests
+PASS - Playwright Chromium installation
+FAIL - full repository gate stopped at Prettier format:check
+NOT REACHED - semantic typecheck, accumulated tests, build, Playwright E2E
 
-REAL CLOSURE BLOCKER (1)
-1. The exact M03.1 package-lock graph cannot be generated in this local runtime because npm registry DNS is unavailable. The workflow now generates and tests that candidate on GitHub Actions without committing automatically.
+PRETTIER FINDING
+Exactly 14 files need formatting. No logic failure was reported before this formatting gate.
 
-NOT CLAIMED / NOT RUN LOCALLY
-- npm install/package-lock generation against the real registry
-- npm ci with the new dependency graph
-- Prettier/ESLint full repository lint
-- full TypeScript semantic typecheck against installed Radix/Lucide/React packages
-- Vitest runtime suite with installed external dependencies
-- Vite production build with the new graph
-- real JS Playwright browser execution
+RECOVERED ARTIFACTS
+- lock artifact: 9370267875; artifact digest sha256:e8f3bc70e3d639cf840798eff418441a99db55593c36cea8fe3f2e9010d79f48
+- evidence artifact: 9370268489; artifact digest sha256:a6100d24028f977c166437e6361622868bcf8314892a9e4d23e38ee1c5c4f91f
+- package-lock.json SHA-256: 1025aa726810d4fbbc313829ae59df9b4c5e85bf5f7ddb553daa754c75ca8789
 
-NEXT EXECUTABLE STEP
-Publish this overlay through GitHub Desktop. The M03.1 workflow will create the real lock candidate artifact and run the complete gate. If the lock changes, the workflow intentionally fails after uploading m03-1-lockfile-candidate. That artifact can then be incorporated into the next ZIP and revalidated.
+V5 STRUCTURAL VALIDATION
+PASS - package-lock v3 contains design-system/studio entries and exact pins
+PASS - verify-m03-1-design-system.mjs blockers=0, lockVerified=true
+PASS - workflow contains lock candidate fail-closed contract
+PASS - workflow contains formatting candidate fail-closed contract
+PASS - M03.2 remains inactive
 
-GATE
-M03.1 remains ACTIVE. M03.2 is not activated until M03.1 is GREEN with the committed real lockfile and complete repository gate.
+EXPECTED NEXT RUN
+The v5 workflow temporarily runs npm run format, uploads m03-1-formatting-candidate if needed, and then executes the complete repository gate on the formatted checkout. If formatting changed, the run still fails closed after collecting the deeper gate result.
+
+LOCAL V5 EXECUTION
+PASS - node tooling/scripts/verify-m03-1-design-system.mjs => blockers=0, lockVerified=true
+PASS - node --check verifier
+PASS - JSON parse + exact lock pins
+PASS - YAML parse for M03.1 workflow and base CI
+PASS - package-lock SHA-256 matches recovered Actions candidate
