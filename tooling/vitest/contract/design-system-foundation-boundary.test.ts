@@ -27,11 +27,11 @@ describe('M03.1 design system architecture boundary', () => {
 
   it('defines semantic CSS variables, Tailwind v4 theme mapping and density tokens', () => {
     const css = read('packages/design-system/src/theme.css');
-    expect(css).toContain('@import "tailwindcss"');
+    expect(css).toMatch(/@import ['"]tailwindcss['"];/);
     expect(css).toContain('@theme inline');
     expect(css).toContain('--color-background: var(--background)');
     expect(css).toContain('--ec-control-height');
-    expect(css).toContain('[data-density="compact"]');
+    expect(css).toMatch(/\[data-density=['"]compact['"]\]/);
     expect(css).toContain('.dark');
     expect(css).toContain('@media (prefers-reduced-motion: reduce)');
   });
