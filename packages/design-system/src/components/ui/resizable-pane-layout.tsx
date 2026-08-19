@@ -117,8 +117,12 @@ export function ResizableTriPane({
   rightConstraint,
   className,
 }: ResizableTriPaneProps) {
-  const [leftSize, setLeftSize] = useState(() => clampPaneSize(leftConstraint.defaultSize, leftConstraint));
-  const [rightSize, setRightSize] = useState(() => clampPaneSize(rightConstraint.defaultSize, rightConstraint));
+  const [leftSize, setLeftSize] = useState(() =>
+    clampPaneSize(leftConstraint.defaultSize, leftConstraint),
+  );
+  const [rightSize, setRightSize] = useState(() =>
+    clampPaneSize(rightConstraint.defaultSize, rightConstraint),
+  );
 
   const style = {
     '--ec-resizable-left': `${leftSize}px`,
