@@ -1,0 +1,176 @@
+.ec-app-shell-workspace:has(.ec-editor-workspace) {
+  overflow: hidden;
+}
+
+.ec-editor-workspace,
+.ec-editor-desktop-layout,
+.ec-editor-panel-group,
+.ec-editor-panel-surface,
+.ec-editor-canvas-surface {
+  min-width: 0;
+  min-height: 0;
+}
+
+.ec-editor-workspace,
+.ec-editor-desktop-layout,
+.ec-editor-panel-group {
+  width: 100%;
+  height: 100%;
+}
+
+.ec-editor-panel-group {
+  background: var(--background);
+}
+
+.ec-editor-panel-surface,
+.ec-editor-canvas-surface {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  background: var(--surface);
+}
+
+.ec-editor-canvas-surface {
+  background: var(--background);
+}
+
+.ec-editor-panel-header,
+.ec-editor-canvas-header {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+  padding: 7px 10px;
+}
+
+.ec-editor-panel-header h2,
+.ec-editor-canvas-header h2,
+.ec-editor-panel-placeholder p,
+.ec-editor-canvas-empty p {
+  margin: 0;
+}
+
+.ec-editor-panel-header h2,
+.ec-editor-canvas-header h2 {
+  font-size: var(--ec-text-sm);
+}
+
+.ec-editor-panel-eyebrow {
+  margin: 0 0 2px;
+  color: var(--muted-foreground);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.ec-editor-panel-scroll {
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.ec-editor-panel-placeholder,
+.ec-editor-canvas-empty {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  color: var(--muted-foreground);
+  font-size: var(--ec-text-xs);
+  line-height: 1.45;
+}
+
+.ec-editor-panel-placeholder strong,
+.ec-editor-canvas-empty strong {
+  color: var(--foreground);
+}
+
+.ec-editor-engine-badge {
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--ec-radius-sm);
+  padding: 3px 7px;
+  color: var(--muted-foreground);
+  font-size: 0.625rem;
+  white-space: nowrap;
+}
+
+.ec-editor-canvas-stage {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  padding: 20px;
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--border) 55%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--border) 55%, transparent) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.ec-editor-canvas-empty {
+  width: min(100%, 520px);
+  border: 1px dashed var(--border);
+  border-radius: var(--ec-radius-md);
+  padding: 20px;
+  text-align: center;
+}
+
+[data-slot='resizable-handle'] {
+  width: 8px;
+  flex: 0 0 8px;
+  cursor: col-resize;
+  background: var(--border);
+}
+
+[data-slot='resizable-handle']:hover,
+[data-slot='resizable-handle']:focus-visible {
+  background: var(--ring);
+}
+
+.ec-editor-responsive-layout {
+  display: none;
+}
+
+.ec-editor-responsive-sheet {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 1023px) {
+  .ec-editor-desktop-layout {
+    display: none;
+  }
+
+  .ec-editor-responsive-layout {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .ec-editor-responsive-tools {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-bottom: 1px solid var(--border);
+    padding: 6px 8px;
+    background: var(--surface);
+  }
+
+  .ec-editor-responsive-layout .ec-editor-canvas-surface {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .ec-editor-responsive-tools button {
+    min-height: 44px;
+  }
+}
