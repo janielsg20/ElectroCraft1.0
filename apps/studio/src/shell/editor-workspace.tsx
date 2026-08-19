@@ -188,7 +188,6 @@ export function StudioEditorWorkspace() {
       <section
         className="ec-editor-workspace"
         data-editor-layout={mode}
-        data-help-id="help.studio.shell"
         aria-label={editorT('studio.editor.workspaceLabel')}
       >
         {mode === 'desktop' ? (
