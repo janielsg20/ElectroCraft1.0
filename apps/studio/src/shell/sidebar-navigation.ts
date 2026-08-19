@@ -21,9 +21,24 @@ export const studioSidebarNavigationGroups = Object.freeze([
     items: [
       { id: 'editor', labelKey: 'studio.navigation.editor', href: '/', iconId: 'studio.navigation.editor' },
       { id: 'screens', labelKey: 'studio.navigation.screens', href: '/pantallas', iconId: 'studio.navigation.screens' },
-      { id: 'components', labelKey: 'studio.navigation.components', href: '/componentes', iconId: 'studio.navigation.components' },
-      { id: 'templates', labelKey: 'studio.navigation.templates', href: '/plantillas', iconId: 'studio.navigation.templates' },
-      { id: 'ai-generate', labelKey: 'studio.navigation.aiGenerate', href: '/generar-con-ia', iconId: 'studio.navigation.aiGenerate' },
+      {
+        id: 'components',
+        labelKey: 'studio.navigation.components',
+        href: '/componentes',
+        iconId: 'studio.navigation.components',
+      },
+      {
+        id: 'templates',
+        labelKey: 'studio.navigation.templates',
+        href: '/plantillas',
+        iconId: 'studio.navigation.templates',
+      },
+      {
+        id: 'ai-generate',
+        labelKey: 'studio.navigation.aiGenerate',
+        href: '/generar-con-ia',
+        iconId: 'studio.navigation.aiGenerate',
+      },
     ],
   },
   {
@@ -32,7 +47,12 @@ export const studioSidebarNavigationGroups = Object.freeze([
     items: [
       { id: 'records', labelKey: 'studio.navigation.records', href: '/registros', iconId: 'studio.navigation.records' },
       { id: 'models', labelKey: 'studio.navigation.models', href: '/modelos', iconId: 'studio.navigation.models' },
-      { id: 'data-sources', labelKey: 'studio.navigation.dataSources', href: '/fuentes-de-datos', iconId: 'studio.navigation.dataSources' },
+      {
+        id: 'data-sources',
+        labelKey: 'studio.navigation.dataSources',
+        href: '/fuentes-de-datos',
+        iconId: 'studio.navigation.dataSources',
+      },
       { id: 'queries', labelKey: 'studio.navigation.queries', href: '/consultas', iconId: 'studio.navigation.queries' },
     ],
   },
@@ -40,8 +60,18 @@ export const studioSidebarNavigationGroups = Object.freeze([
     id: 'logic',
     labelKey: 'studio.sidebar.group.logic',
     items: [
-      { id: 'actions-workflows', labelKey: 'studio.navigation.actionsWorkflows', href: '/acciones-workflows', iconId: 'studio.navigation.actionsWorkflows' },
-      { id: 'state-variables', labelKey: 'studio.navigation.stateVariables', href: '/estado-variables', iconId: 'studio.navigation.stateVariables' },
+      {
+        id: 'actions-workflows',
+        labelKey: 'studio.navigation.actionsWorkflows',
+        href: '/acciones-workflows',
+        iconId: 'studio.navigation.actionsWorkflows',
+      },
+      {
+        id: 'state-variables',
+        labelKey: 'studio.navigation.stateVariables',
+        href: '/estado-variables',
+        iconId: 'studio.navigation.stateVariables',
+      },
       { id: 'forms', labelKey: 'studio.navigation.forms', href: '/formularios', iconId: 'studio.navigation.forms' },
     ],
   },
@@ -49,8 +79,18 @@ export const studioSidebarNavigationGroups = Object.freeze([
     id: 'app',
     labelKey: 'studio.sidebar.group.app',
     items: [
-      { id: 'navigation', labelKey: 'studio.navigation.navigation', href: '/navegacion', iconId: 'studio.navigation.navigation' },
-      { id: 'users-permissions', labelKey: 'studio.navigation.usersPermissions', href: '/usuarios-permisos', iconId: 'studio.navigation.usersPermissions' },
+      {
+        id: 'navigation',
+        labelKey: 'studio.navigation.navigation',
+        href: '/navegacion',
+        iconId: 'studio.navigation.navigation',
+      },
+      {
+        id: 'users-permissions',
+        labelKey: 'studio.navigation.usersPermissions',
+        href: '/usuarios-permisos',
+        iconId: 'studio.navigation.usersPermissions',
+      },
       { id: 'admin', labelKey: 'studio.navigation.admin', href: '/administracion', iconId: 'studio.navigation.admin' },
     ],
   },
@@ -59,7 +99,12 @@ export const studioSidebarNavigationGroups = Object.freeze([
     labelKey: 'studio.sidebar.group.resources',
     items: [
       { id: 'media', labelKey: 'studio.navigation.media', href: '/medios', iconId: 'studio.navigation.media' },
-      { id: 'extensions', labelKey: 'studio.navigation.extensions', href: '/extensiones', iconId: 'studio.navigation.extensions' },
+      {
+        id: 'extensions',
+        labelKey: 'studio.navigation.extensions',
+        href: '/extensiones',
+        iconId: 'studio.navigation.extensions',
+      },
     ],
   },
   {
@@ -67,7 +112,12 @@ export const studioSidebarNavigationGroups = Object.freeze([
     labelKey: 'studio.sidebar.group.appearance',
     items: [
       { id: 'themes', labelKey: 'studio.navigation.themes', href: '/temas', iconId: 'studio.navigation.themes' },
-      { id: 'design-system', labelKey: 'studio.navigation.designSystem', href: '/sistema-de-diseno', iconId: 'studio.navigation.designSystem' },
+      {
+        id: 'design-system',
+        labelKey: 'studio.navigation.designSystem',
+        href: '/sistema-de-diseno',
+        iconId: 'studio.navigation.designSystem',
+      },
       { id: 'tokens', labelKey: 'studio.navigation.tokens', href: '/tokens', iconId: 'studio.navigation.tokens' },
     ],
   },
@@ -75,8 +125,18 @@ export const studioSidebarNavigationGroups = Object.freeze([
     id: 'publish',
     labelKey: 'studio.sidebar.group.publish',
     items: [
-      { id: 'preview', labelKey: 'studio.navigation.preview', href: '/vista-previa', iconId: 'studio.navigation.preview' },
-      { id: 'compatibility', labelKey: 'studio.navigation.compatibility', href: '/compatibilidad', iconId: 'studio.navigation.compatibility' },
+      {
+        id: 'preview',
+        labelKey: 'studio.navigation.preview',
+        href: '/vista-previa',
+        iconId: 'studio.navigation.preview',
+      },
+      {
+        id: 'compatibility',
+        labelKey: 'studio.navigation.compatibility',
+        href: '/compatibilidad',
+        iconId: 'studio.navigation.compatibility',
+      },
       { id: 'export', labelKey: 'studio.navigation.export', href: '/exportar', iconId: 'studio.navigation.export' },
       { id: 'deploy', labelKey: 'studio.navigation.deploy', href: '/desplegar', iconId: 'studio.navigation.deploy' },
     ],
