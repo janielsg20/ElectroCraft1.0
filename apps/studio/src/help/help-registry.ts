@@ -9,13 +9,15 @@ export const studioShellHelpDescriptor = Object.freeze({
   id: 'help.studio.shell',
   title: 'AppShell del Studio',
   summary:
-    'ElectroCraft usa un único AppShell compartido con Sidebar global agrupado, Topbar, área de trabajo y Statusbar sobre la foundation shadcn/ui con base Radix.',
+    'ElectroCraft usa un único AppShell compartido con Sidebar global, Topbar contextual, área de trabajo y Statusbar sobre la foundation shadcn/ui con base Radix.',
   details: Object.freeze([
     'El layout raíz usa 100dvh y mantiene el scroll dentro del área de trabajo; el body global no se usa como superficie desplazable del editor.',
     'El Sidebar usa los grupos Construir, Datos, Lógica, App, Recursos, Apariencia y Publicar. Cada destino conserva icono Lucide, label accesible y aria-current cuando está activo.',
-    'Desktop permite contraer 240px a 64px; en modo compacto los labels se sustituyen visualmente por iconos y Tooltip Radix. Laptop usa rail de 64px y tablet/móvil trasladan la navegación al Sheet existente.',
+    'Desktop permite contraer 240px a 64px; laptop usa rail de 64px y tablet/móvil trasladan la navegación al Sheet existente.',
     'La preferencia de colapso se consume mediante WorkspacePreferencesPort. Durante F03 el adapter es in-memory; F04 puede sustituir solo el adapter por PGlite sin cambiar el contrato de UI.',
-    'La Topbar funcional y Configuración pertenecen a M03.4. Claro, oscuro y sistema siguen siendo preferencias del Studio, no Project Objects.',
+    'La Topbar de 52px separa breadcrumb/proyecto/guardado, herramientas contextuales y acciones de publicación. En tablet y móvil las herramientas secundarias se trasladan a Sheet.',
+    'Ayuda abre este descriptor persistente y Configuración abre un Sheet real. El gear es la última acción del extremo derecho y el cierre de Radix restaura el foco al trigger.',
+    'Configuración > Espacio de trabajo controla el mismo WorkspacePreferencesPort del Sidebar; no crea una segunda fuente de verdad ni persiste Project Objects.',
   ]),
 } satisfies HelpDescriptor);
 
