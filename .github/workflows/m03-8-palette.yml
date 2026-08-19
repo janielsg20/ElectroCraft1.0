@@ -12,6 +12,7 @@ on:
       - 'packages/editor-puck/**'
       - 'packages/design-system/**'
       - 'tooling/vitest/**/palette*.test.ts'
+      - 'tooling/test/m03-5-editor-layout.test.mjs'
       - 'tooling/test/m03-8-palette.test.mjs'
       - 'tooling/playwright/m03-8-palette.spec.ts'
       - '.ai/PALETTE_CATALOG_MATRIX.md'
@@ -35,6 +36,7 @@ on:
       - 'packages/editor-puck/**'
       - 'packages/design-system/**'
       - 'tooling/vitest/**/palette*.test.ts'
+      - 'tooling/test/m03-5-editor-layout.test.mjs'
       - 'tooling/test/m03-8-palette.test.mjs'
       - 'tooling/playwright/m03-8-palette.spec.ts'
       - '.ai/PALETTE_CATALOG_MATRIX.md'
@@ -47,7 +49,7 @@ on:
       - '.github/workflows/m03-8-palette.yml'
 
 permissions:
-  contents: write
+  contents: read
   statuses: write
 
 defaults:
@@ -70,7 +72,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          persist-credentials: true
+          persist-credentials: false
 
       - name: Setup Node
         uses: actions/setup-node@v7
@@ -88,34 +90,28 @@ jobs:
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
 
-      - name: Apply focused M03.8 type fixes and persist formatting
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          path = Path('apps/studio/src/shell/palette-catalog.ts')
-          source = path.read_text()
-          old = 'const directIds = new Set(directSynonyms);'
-          new = "const directIds = new Set<PaletteItemDescriptor['id']>(directSynonyms);"
-          if old in source:
-              path.write_text(source.replace(old, new, 1))
-          PY
-          npx prettier --write \
-            apps/studio/src/shell/palette-catalog.ts \
-            apps/studio/src/shell/palette-panel.tsx
-          if ! git diff --quiet -- \
-            apps/studio/src/shell/palette-catalog.ts \
-            apps/studio/src/shell/palette-panel.tsx; then
-            git config user.name 'electrocraft-actions'
-            git config user.email 'actions@users.noreply.github.com'
-            git add \
-              apps/studio/src/shell/palette-catalog.ts \
-              apps/studio/src/shell/palette-panel.tsx
-            git commit -m 'fix(m03.8): resolve Palette type errors'
-            git push origin HEAD:agent/m03-8-palette-discoverability
-          fi
+      - name: Verify M03.8 source formatting
+        run: >-
+          npx prettier --check
+          .github/workflows/m03-8-palette.yml
+          apps/studio/src/shell/palette-catalog.ts
+          apps/studio/src/shell/palette-preferences.ts
+          apps/studio/src/shell/palette-panel.tsx
+          apps/studio/src/shell/palette-panel.css
+          apps/studio/src/i18n/palette.es.ts
+          tooling/test/m03-5-editor-layout.test.mjs
+          tooling/test/m03-8-palette.test.mjs
+          tooling/vitest/unit/palette-catalog.test.ts
+          tooling/vitest/unit/palette-preferences.test.ts
+          tooling/vitest/contract/palette-puck-boundary.test.ts
+          tooling/vitest/integration/palette-runtime.test.ts
+          tooling/playwright/m03-8-palette.spec.ts
 
       - name: Execute dedicated M03.8 structural suite
         run: node --test tooling/test/m03-8-palette.test.mjs
+
+      - name: Revalidate M03.5 successor composition
+        run: node --test tooling/test/m03-5-editor-layout.test.mjs
 
       - name: Execute dedicated M03.8 unit contract integration suite
         run: >-
