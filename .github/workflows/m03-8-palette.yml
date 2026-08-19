@@ -14,6 +14,8 @@ on:
       - 'tooling/vitest/**/palette*.test.ts'
       - 'tooling/vitest/integration/editor-puck-composition.test.ts'
       - 'tooling/test/m03-5-editor-layout.test.mjs'
+      - 'tooling/test/m03-6-responsive-shell.test.mjs'
+      - 'tooling/test/m03-7-information-architecture.test.mjs'
       - 'tooling/test/m03-8-palette.test.mjs'
       - 'tooling/playwright/m03-8-palette.spec.ts'
       - '.ai/PALETTE_CATALOG_MATRIX.md'
@@ -23,6 +25,7 @@ on:
       - '.ai/STATE.md'
       - '.ai/TRACKING.md'
       - '.ai/HANDOFF.md'
+      - '.ai/MEMORY.md'
       - '.github/workflows/m03-8-palette.yml'
   push:
     branches:
@@ -39,6 +42,8 @@ on:
       - 'tooling/vitest/**/palette*.test.ts'
       - 'tooling/vitest/integration/editor-puck-composition.test.ts'
       - 'tooling/test/m03-5-editor-layout.test.mjs'
+      - 'tooling/test/m03-6-responsive-shell.test.mjs'
+      - 'tooling/test/m03-7-information-architecture.test.mjs'
       - 'tooling/test/m03-8-palette.test.mjs'
       - 'tooling/playwright/m03-8-palette.spec.ts'
       - '.ai/PALETTE_CATALOG_MATRIX.md'
@@ -48,6 +53,7 @@ on:
       - '.ai/STATE.md'
       - '.ai/TRACKING.md'
       - '.ai/HANDOFF.md'
+      - '.ai/MEMORY.md'
       - '.github/workflows/m03-8-palette.yml'
 
 permissions:
@@ -102,6 +108,8 @@ jobs:
           apps/studio/src/shell/palette-panel.css
           apps/studio/src/i18n/palette.es.ts
           tooling/test/m03-5-editor-layout.test.mjs
+          tooling/test/m03-6-responsive-shell.test.mjs
+          tooling/test/m03-7-information-architecture.test.mjs
           tooling/test/m03-8-palette.test.mjs
           tooling/vitest/integration/editor-puck-composition.test.ts
           tooling/vitest/unit/palette-catalog.test.ts
@@ -115,6 +123,12 @@ jobs:
 
       - name: Revalidate M03.5 successor composition
         run: node --test tooling/test/m03-5-editor-layout.test.mjs
+
+      - name: Revalidate M03.6 successor continuity
+        run: node --test tooling/test/m03-6-responsive-shell.test.mjs
+
+      - name: Revalidate M03.7 successor continuity
+        run: node --test tooling/test/m03-7-information-architecture.test.mjs
 
       - name: Execute dedicated M03.8 unit contract integration suite
         run: >-

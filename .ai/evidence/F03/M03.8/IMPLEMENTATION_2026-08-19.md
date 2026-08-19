@@ -58,6 +58,14 @@ F03/M03.8 posee la UX de descubrimiento, no los ComponentDefinitions finales del
 - Browser/E2E: search conceptual, categorías, grid, favoritos/recientes, diagnóstico, keyboard/focus y mobile Sheet.
 - Workflow owner: `.github/workflows/m03-8-palette.yml` con contexto `electrocraft/M03.8`.
 
-## Estado de evidencia
+## Validación GREEN
 
-Implementación escrita. Gate de GitHub Actions pendiente de resultado final antes de declarar M03.8 `COMPLETADA/GREEN` o activar M03.9.
+Head funcional `b3e66bf4d85518ea3f3102e8ffe0db472aea9947` validado por `M03.8 Discoverable Palette Gate`, run `32308655658`, job `96246831243`, artifact `9385669357`, digest `sha256:1692ec47ef5cab4a30a480d8c3b7fb2763c9f2daf2faf5ad0e88b5aa1429434c`.
+
+- Structural M03.8: `7/7`.
+- M03.5 successor composition: `1/1`.
+- Vitest dedicado: `27/27`.
+- Playwright dedicado: `11/11`.
+- Full gate: Node `37/37`, Vitest `230/230` en 63 archivos, Playwright `45/45`, lint/format, TypeScript strict, boundaries y builds GREEN.
+
+M03.8 queda contractualmente cerrable sin blockers P0/P1 conocidos.
