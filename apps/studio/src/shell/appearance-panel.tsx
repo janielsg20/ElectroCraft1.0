@@ -17,7 +17,11 @@ import type {
   EditorAppearanceTone,
   EditorCanvasDensity,
 } from '../theme';
-import { useStudioAppearance } from '../theme-provider';
+import {
+  StudioAppearanceProvider,
+  useOptionalStudioAppearance,
+  useStudioAppearance,
+} from '../theme-provider';
 import './appearance.css';
 
 const AppearanceIcon = getStudioIcon('studio.sidebar.themes');
@@ -93,7 +97,21 @@ export interface AppearancePanelTriggerProps {
   readonly presentation?: 'topbar' | 'mobile';
 }
 
-export function AppearancePanelTrigger({ presentation = 'topbar' }: AppearancePanelTriggerProps) {
+export function AppearancePanelTrigger(props: AppearancePanelTriggerProps) {
+  const appearance = useOptionalStudioAppearance();
+
+  if (!appearance) {
+    return (
+      <StudioAppearanceProvider>
+        <AppearancePanelContent {...props} />
+      </StudioAppearanceProvider>
+    );
+  }
+
+  return <AppearancePanelContent {...props} />;
+}
+
+function AppearancePanelContent({ presentation = 'topbar' }: AppearancePanelTriggerProps) {
   const { appliedProfile, previewProfile, resolvedProfile, preview, apply, revert, reset } = useStudioAppearance();
   const isMobile = presentation === 'mobile';
   const hasPreview = previewProfile !== null;
@@ -167,7 +185,11 @@ export function AppearancePanelTrigger({ presentation = 'topbar' }: AppearancePa
             onSelect={(canvasDensity) => preview({ ...resolvedProfile, canvasDensity })}
           />
 
-          <p className="ec-appearance-preview-hint" role="status" data-appearance-preview-active={hasPreview || undefined}>
+          <p
+            className="ec-appearance-preview-hint"
+            role="status"
+            data-appearance-preview-active={hasPreview || undefined}
+          >
             {hasPreview ? appearanceT('previewHint') : appliedProfile.name}
           </p>
 
@@ -175,7 +197,14 @@ export function AppearancePanelTrigger({ presentation = 'topbar' }: AppearancePa
             <Button type="button" size="sm" onClick={() => apply()} disabled={!hasPreview} data-appearance-apply>
               {appearanceT('apply')}
             </Button>
-            <Button type="button" size="sm" variant="outline" onClick={revert} disabled={!hasPreview} data-appearance-revert>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={revert}
+              disabled={!hasPreview}
+              data-appearance-revert
+            >
               {appearanceT('revert')}
             </Button>
             <Button type="button" size="sm" variant="outline" onClick={reset} data-appearance-reset>
