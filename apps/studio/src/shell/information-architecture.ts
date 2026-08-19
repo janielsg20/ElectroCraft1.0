@@ -215,9 +215,8 @@ export function getEmptyState(id: EmptyStateDescriptor['id']): EmptyStateDescrip
 }
 
 export function resolveModuleEmptyState(pathname: string): EmptyStateDescriptor | null {
-  return (
-    studioEmptyStates.find(
-      (entry) => 'route' in entry && entry.route === pathname && entry.pattern === 'single',
-    ) ?? null
+  const descriptor = studioEmptyStates.find(
+    (entry) => 'route' in entry && entry.route === pathname && entry.pattern === 'single',
   );
+  return descriptor ?? null;
 }
