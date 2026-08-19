@@ -4,6 +4,7 @@ import { studioT } from './i18n/studio-shell.es';
 import { StudioAppShellRoute } from './shell/app-shell-route';
 import { DesignSystemDevelopmentRoute } from './shell/design-system-route';
 import './styles.css';
+import './shell/sidebar.css';
 
 const projectHomeRoute = Object.freeze({
   id: 'project-home-development',

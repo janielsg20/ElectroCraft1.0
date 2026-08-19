@@ -30,7 +30,8 @@ const help = read('apps/studio/src/help/help-registry.ts');
 const sheet = read('packages/design-system/src/components/ui/sheet.tsx');
 const icons = read('packages/design-system/src/icons/studio-icon-registry.ts');
 const state = read('.ai/STATE.md');
-const closure = read('.ai/evidence/F03/M03.1/CLOSURE_2026-08-19.md');
+const predecessorClosure = read('.ai/evidence/F03/M03.1/CLOSURE_2026-08-19.md');
+const m032ClosurePath = path.join(root, '.ai/evidence/F03/M03.2/CLOSURE_2026-08-19.md');
 
 for (const token of ['100dvh', '240px', '64px', '52px', '26px', 'overflow: hidden', 'min-width: 0']) {
   if (!css.includes(token)) throw new Error(`M03.2 CSS contract missing: ${token}`);
@@ -70,21 +71,25 @@ if (shell.includes('@electrocraft/design-system/')) throw new Error('M03.2 deep 
 if (!help.includes("id: 'help.studio.shell'")) throw new Error('M03.2 help.studio.shell missing');
 if (!sheet.includes("side?: 'left' | 'right'")) throw new Error('M03.2 left/right Radix Sheet support missing');
 if (!icons.includes("'studio.menu': Menu")) throw new Error('M03.2 Lucide menu icon ID missing');
-if (!closure.includes('32267795991') || !closure.includes('GREEN')) {
+if (!predecessorClosure.includes('32267795991') || !predecessorClosure.includes('GREEN')) {
   throw new Error('M03.1 closure evidence is not GREEN');
 }
-if (
-  !state.includes('M03.1') ||
-  !state.includes('COMPLETADA') ||
-  !state.includes('M03.2') ||
-  !state.includes('ACTIVE')
-) {
-  throw new Error('STATE transition M03.1 -> M03.2 is incomplete');
+
+const m032Active = /M03\.2[^\n]*ACTIVE/.test(state);
+const m032Complete = /M03\.2[^\n]*COMPLETADA/.test(state);
+if (!m032Active && !m032Complete) throw new Error('M03.2 must be ACTIVE or post-closure COMPLETADA');
+if (m032Complete) {
+  if (!fs.existsSync(m032ClosurePath)) throw new Error('M03.2 post-closure evidence missing');
+  const closure = fs.readFileSync(m032ClosurePath, 'utf8');
+  if (!closure.includes('32272740576') || !closure.includes('GREEN')) {
+    throw new Error('M03.2 post-closure evidence is not GREEN');
+  }
 }
 
 const report = {
   schemaVersion: 1,
   microphase: 'M03.2',
+  mode: m032Complete ? 'post-closure-regression' : 'active-gate',
   engine: 'shadcn/ui Radix + AppShell',
   baseCommit: 'c0ee291f29405a1f1dd9fb1c14afe7d13b3a45ae',
   geometry: { root: '100dvh', sidebar: [240, 64], topbar: 52, statusbar: 26 },
@@ -94,4 +99,4 @@ const report = {
 };
 fs.mkdirSync(path.join(root, 'tooling/dist'), { recursive: true });
 fs.writeFileSync(path.join(root, 'tooling/dist/m03-2-app-shell-report.json'), `${JSON.stringify(report, null, 2)}\n`);
-console.log('PASS_M03_2_APP_SHELL_STRUCTURE blockers=0');
+console.log(`PASS_M03_2_APP_SHELL_STRUCTURE mode=${report.mode} blockers=0`);

@@ -1,0 +1,197 @@
+.ec-app-shell-sidebar {
+  display: grid;
+  grid-template-rows: 52px minmax(0, 1fr) 40px;
+}
+
+.ec-app-shell-nav-scroll {
+  height: 100%;
+}
+
+.ec-app-shell-navigation {
+  padding: 6px;
+}
+
+.ec-app-shell-navigation-group + .ec-app-shell-navigation-group {
+  margin-top: 8px;
+}
+
+.ec-app-shell-navigation-group-label {
+  margin: 0 0 3px;
+  padding: 0 8px;
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ec-app-shell-navigation-list {
+  gap: 1px;
+  padding: 0;
+}
+
+.ec-app-shell-navigation-item {
+  min-height: 0;
+  padding: 0;
+}
+
+.ec-app-shell-navigation-link {
+  width: 100%;
+  min-width: 0;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border-radius: var(--ec-radius-sm);
+  padding: 5px 8px;
+  color: var(--muted-foreground);
+  font-size: var(--ec-text-xs);
+  line-height: 1.25;
+  text-decoration: none;
+}
+
+.ec-app-shell-navigation-link:hover {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.ec-app-shell-navigation-link:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+.ec-app-shell-navigation-link[aria-current='page'] {
+  background: var(--accent);
+  color: var(--foreground);
+  font-weight: 700;
+}
+
+.ec-app-shell-navigation-link[aria-current='page']::before {
+  width: 2px;
+  height: 16px;
+  flex: 0 0 2px;
+  border-radius: 999px;
+  background: var(--primary);
+  content: '';
+}
+
+.ec-app-shell-navigation-icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+}
+
+.ec-app-shell-sidebar-footer {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  padding: 5px 6px;
+}
+
+.ec-app-shell-collapse-trigger {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.ec-app-shell-collapse-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (min-width: 1280px) {
+  .ec-app-shell[data-sidebar-collapsed='true'] {
+    grid-template-columns: 64px minmax(0, 1fr);
+  }
+
+  .ec-app-shell[data-sidebar-collapsed='true'] .ec-app-shell-brand {
+    justify-content: center;
+    padding-inline: 0;
+  }
+
+  .ec-app-shell[data-sidebar-collapsed='true'] .ec-app-shell-brand-label,
+  .ec-app-shell[data-sidebar-collapsed='true'] .ec-app-shell-navigation-group-label,
+  .ec-app-shell[data-sidebar-collapsed='true'] .ec-app-shell-navigation-label,
+  .ec-app-shell[data-sidebar-collapsed='true'] .ec-app-shell-collapse-label {
+    display: none;
+  }
+
+  .ec-app-shell[data-sidebar-collapsed='true'] .ec-app-shell-navigation {
+    padding-inline: 5px;
+  }
+
+  .ec-app-shell[data-sidebar-collapsed='true'] .ec-app-shell-navigation-link {
+    justify-content: center;
+    padding-inline: 0;
+  }
+
+  .ec-app-shell[data-sidebar-collapsed='true'] .ec-app-shell-navigation-link[aria-current='page']::before {
+    position: absolute;
+    left: 0;
+  }
+
+  .ec-app-shell[data-sidebar-collapsed='true'] .ec-app-shell-navigation-item {
+    position: relative;
+  }
+
+  .ec-app-shell[data-sidebar-collapsed='true'] .ec-app-shell-collapse-trigger {
+    justify-content: center;
+    padding-inline: 0;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .ec-app-shell-sidebar {
+    grid-template-rows: 52px minmax(0, 1fr);
+  }
+
+  .ec-app-shell-navigation {
+    display: block;
+    padding-inline: 5px;
+  }
+
+  .ec-app-shell-navigation-group-label,
+  .ec-app-shell-navigation-label,
+  .ec-app-shell-sidebar-footer {
+    display: none;
+  }
+
+  .ec-app-shell-navigation-link {
+    justify-content: center;
+    padding-inline: 0;
+  }
+
+  .ec-app-shell-navigation-link[aria-current='page'] {
+    position: relative;
+  }
+
+  .ec-app-shell-navigation-link[aria-current='page']::before {
+    position: absolute;
+    left: 0;
+  }
+}
+
+@media (max-width: 1023px) {
+  .ec-app-shell-sidebar {
+    display: none;
+  }
+
+  .ec-app-shell-mobile-sheet .ec-app-shell-navigation {
+    padding: 0;
+  }
+
+  .ec-app-shell-mobile-sheet .ec-app-shell-navigation-group + .ec-app-shell-navigation-group {
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 767px) {
+  .ec-app-shell-mobile-sheet .ec-app-shell-navigation-link {
+    min-height: 44px;
+  }
+}

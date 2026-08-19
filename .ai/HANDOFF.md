@@ -1,25 +1,25 @@
 # HANDOFF — ElectroCraft
 
 ## Current
-F03 / M03.2 — Construir AppShell desktop — `ACTIVE`.
+F03 / M03.3 — Construir Sidebar global — `ACTIVE`.
 
 ## Estado heredado
-- `main@c0ee291f29405a1f1dd9fb1c14afe7d13b3a45ae` cerró M03.1 con run `32267795991` success.
-- M03.1 artifact `9370938322`; digest `sha256:0aa9467b713fcc66f19d91acfd6d31c783b35aaa5ddddda04a8d5a379760156f`.
-- M03.2 implementa únicamente la estructura AppShell y responsive. No implementa el Sidebar agrupado/persistente de M03.3 ni la Topbar funcional/Settings de M03.4.
+- `main@38b2f5aac504a406b42537b7aade8f3d26626e7d` cerró M03.2 con run `32272740576` success.
+- M03.2 artifact `9372820239`; digest `sha256:81531bf99ddd82d56ba813ec87f15305f6af0407498915363d802b174c97bce8`.
+- El full repository gate de M03.2 pasó lint, typecheck, boundaries, tests, build y Playwright; no hubo formatting candidate pendiente.
 
 ## Siguiente acción exacta
-1. Aplicar el overlay M03.2 sobre `main@c0ee291f29405a1f1dd9fb1c14afe7d13b3a45ae`.
-2. Ejecutar `M03.2 AppShell Gate`.
-3. Resolver solo evidencia real del run si aparece un formatting/test/build/E2E blocker.
-4. Con M03.2 GREEN, registrar cierre y activar M03.3 — Construir Sidebar global.
+1. Ejecutar `M03.3 Sidebar Gate` sobre la rama de implementación.
+2. Resolver únicamente fallos reales de formato, typecheck, tests, build o Playwright.
+3. Con M03.3 GREEN, registrar cierre y activar M03.4 — Construir Topbar global + Settings.
+4. No adelantar persistencia PGlite: F03 usa `WorkspacePreferencesPort` con adapter in-memory explícito.
 
 ## Decisiones vigentes
-- `packages/design-system` sigue siendo único owner de primitives/tokens.
-- Studio consume solo `@electrocraft/design-system` root export.
-- Tablet/mobile usan Sheet Radix; no hay desktop comprimido.
-- Navigation grouping/icons/active/preferences pertenecen a M03.3.
-- Topbar completa y Settings pertenecen a M03.4.
+- Los grupos del Sidebar son exactamente `Construir | Datos | Lógica | App | Recursos | Apariencia | Publicar`.
+- El Sidebar usa Lucide mediante el registry semántico de `packages/design-system`; Studio no importa `lucide-react` directamente.
+- Desktop permite `240→64`; laptop conserva rail 64; tablet/mobile reutilizan el Sheet Radix del AppShell.
+- `WorkspacePreferencesPort` desacopla la UI de persistencia. F04 podrá cambiar solo el adapter.
+- Topbar funcional, Ayuda/Configuración y Settings pertenecen a M03.4.
 
 ## Read set
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M03_2.md`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M03_3.md → .ai/APP_SHELL_SPEC.md`.

@@ -9,12 +9,13 @@ export const studioShellHelpDescriptor = Object.freeze({
   id: 'help.studio.shell',
   title: 'AppShell del Studio',
   summary:
-    'ElectroCraft usa un único AppShell compartido para reservar navegación, Topbar, área de trabajo y Statusbar sobre la foundation shadcn/ui con base Radix.',
+    'ElectroCraft usa un único AppShell compartido con Sidebar global agrupado, Topbar, área de trabajo y Statusbar sobre la foundation shadcn/ui con base Radix.',
   details: Object.freeze([
     'El layout raíz usa 100dvh y mantiene el scroll dentro del área de trabajo; el body global no se usa como superficie desplazable del editor.',
-    'Desktop reserva 240px para la navegación; laptop reserva 64px. Tablet y móvil trasladan la navegación estructural a un Sheet de Radix en lugar de comprimir el layout desktop.',
-    'M03.2 define la geometría y los landmarks globales. La agrupación, iconos, estado activo y preferencias del Sidebar pertenecen a M03.3; la Topbar funcional y Settings pertenecen a M03.4.',
-    'Claro, oscuro y sistema son preferencias del Studio; no forman parte del modelo canónico del proyecto.',
+    'El Sidebar usa los grupos Construir, Datos, Lógica, App, Recursos, Apariencia y Publicar. Cada destino conserva icono Lucide, label accesible y aria-current cuando está activo.',
+    'Desktop permite contraer 240px a 64px; en modo compacto los labels se sustituyen visualmente por iconos y Tooltip Radix. Laptop usa rail de 64px y tablet/móvil trasladan la navegación al Sheet existente.',
+    'La preferencia de colapso se consume mediante WorkspacePreferencesPort. Durante F03 el adapter es in-memory; F04 puede sustituir solo el adapter por PGlite sin cambiar el contrato de UI.',
+    'La Topbar funcional y Configuración pertenecen a M03.4. Claro, oscuro y sistema siguen siendo preferencias del Studio, no Project Objects.',
   ]),
 } satisfies HelpDescriptor);
 
