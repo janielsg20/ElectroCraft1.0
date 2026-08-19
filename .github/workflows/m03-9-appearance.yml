@@ -11,6 +11,7 @@ on:
       - 'apps/studio/src/shell/app-shell-route.tsx'
       - 'apps/studio/src/shell/studio-topbar.tsx'
       - 'apps/studio/src/shell/editor-workspace.tsx'
+      - 'apps/studio/src/shell/editor-workspace.css'
       - 'apps/studio/src/shell/responsive-shell.css'
       - 'packages/design-system/src/foundation/theme-provider.tsx'
       - 'tooling/vitest/**/editor-appearance-*.test.ts'
@@ -32,6 +33,7 @@ on:
       - 'apps/studio/src/shell/app-shell-route.tsx'
       - 'apps/studio/src/shell/studio-topbar.tsx'
       - 'apps/studio/src/shell/editor-workspace.tsx'
+      - 'apps/studio/src/shell/editor-workspace.css'
       - 'apps/studio/src/shell/responsive-shell.css'
       - 'packages/design-system/src/foundation/theme-provider.tsx'
       - 'tooling/vitest/**/editor-appearance-*.test.ts'
@@ -96,6 +98,7 @@ jobs:
           apps/studio/src/shell/app-shell-route.tsx
           apps/studio/src/shell/studio-topbar.tsx
           apps/studio/src/shell/editor-workspace.tsx
+          apps/studio/src/shell/editor-workspace.css
           apps/studio/src/shell/responsive-shell.css
           packages/design-system/src/foundation/theme-provider.tsx
           tooling/vitest/unit/editor-appearance-profile.test.ts
