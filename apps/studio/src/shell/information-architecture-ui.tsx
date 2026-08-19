@@ -55,7 +55,13 @@ export function ProgressiveDisclosure({
   );
 }
 
-export function StudioEmptyState({ id, className }: { readonly id: EmptyStateDescriptor['id']; readonly className?: string }) {
+export function StudioEmptyState({
+  id,
+  className,
+}: {
+  readonly id: EmptyStateDescriptor['id'];
+  readonly className?: string;
+}) {
   const descriptor = getEmptyState(id);
   return (
     <EmptyState
@@ -72,7 +78,9 @@ export function StudioContentListDetailRoute() {
     <section className="ec-ia-route" aria-labelledby="content-route-title" data-ia-route="content-list-detail">
       <header className="ec-ia-route-header">
         <div>
-          <p className="ec-ia-route-kicker">{iaT('studio.ia.listDetail.listLabel')} / {iaT('studio.ia.listDetail.detailLabel')}</p>
+          <p className="ec-ia-route-kicker">
+            {iaT('studio.ia.listDetail.listLabel')} / {iaT('studio.ia.listDetail.detailLabel')}
+          </p>
           <h1 id="content-route-title">{iaT('studio.ia.content.title')}</h1>
         </div>
       </header>
@@ -81,7 +89,11 @@ export function StudioContentListDetailRoute() {
           <h2 id="content-list-title">{iaT('studio.ia.content.listTitle')}</h2>
           <StudioEmptyState id="content" />
         </section>
-        <section className="ec-ia-detail-region" aria-label={iaT('studio.ia.listDetail.detailLabel')} data-information-level="contextual">
+        <section
+          className="ec-ia-detail-region"
+          aria-label={iaT('studio.ia.listDetail.detailLabel')}
+          data-information-level="contextual"
+        >
           <StudioEmptyState id="content-detail" />
         </section>
       </div>
