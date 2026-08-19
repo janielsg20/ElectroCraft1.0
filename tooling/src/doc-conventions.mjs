@@ -40,7 +40,11 @@ export const REQUIRED_TEMPLATES = [
 
 const CONTINUITY_DOCS = ['.ai/STATE.md', '.ai/TRACKING.md', '.ai/HANDOFF.md'];
 const EXECUTION_DOCS = ['AGENTS.md', '.ai/README.md', ...CONTINUITY_DOCS, '.ai/PHASES.md'];
-const ACTIVE_PATTERN = /\b(M\d{2}\.\d+)\b[^\n]*`?ACTIVE`?/g;
+const ACTIVE_PATTERNS = [
+  /^\s*-\s*(M\d{2}\.\d+)\b[^\n]*:\s*`ACTIVE`\s*\.?\s*$/gm,
+  /^\s*\|[^|\n]*\b(M\d{2}\.\d+)\b[^|\n]*\|\s*ACTIVE\s*\|/gm,
+  /^\s*(?:F\d{2}\s*\/\s*)?(M\d{2}\.\d+)\b[^\n]*—\s*`ACTIVE`\s*\.?\s*$/gm,
+];
 const PHASE_PATTERN = /\bF(\d{2})\b/g;
 const MICROPHASE_PATTERN = /\bM(\d{2})\.(\d+)\b/g;
 
@@ -68,7 +72,10 @@ export function evaluateDocConventions(root) {
   for (const relativePath of CONTINUITY_DOCS) {
     if (!existsSync(join(root, relativePath))) continue;
     const content = read(root, relativePath);
-    for (const match of content.matchAll(ACTIVE_PATTERN)) activeIds.push(match[1]);
+    for (const pattern of ACTIVE_PATTERNS) {
+      pattern.lastIndex = 0;
+      for (const match of content.matchAll(pattern)) activeIds.push(match[1]);
+    }
   }
   const uniqueActiveIds = unique(activeIds);
   if (uniqueActiveIds.length !== 1) {
