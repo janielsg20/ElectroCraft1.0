@@ -71,9 +71,38 @@ export const studioShellMessagesEs = Object.freeze({
   'studio.appShell.status.error': 'Error',
   'studio.appShell.status.blocked': 'Bloqueado',
 
-  'studio.bootstrap.m03Kicker': 'Studio · F03 / M03.3',
+  'studio.topbar.project': 'Proyecto local',
+  'studio.topbar.breadcrumbFallback': 'Studio',
+  'studio.topbar.save.ready': 'Sin cambios',
+  'studio.topbar.save.saving': 'Guardando',
+  'studio.topbar.save.error': 'Error al guardar',
+  'studio.topbar.save.blocked': 'Bloqueado',
+  'studio.topbar.contextLabel': 'Herramientas contextuales',
+  'studio.topbar.document': 'Documento',
+  'studio.topbar.platform': 'Web',
+  'studio.topbar.breakpoint': 'Escritorio',
+  'studio.topbar.undo': 'Deshacer',
+  'studio.topbar.redo': 'Rehacer',
+  'studio.topbar.zoom': '100 %',
+  'studio.topbar.local': 'Local',
+  'studio.topbar.tools': 'Más herramientas',
+  'studio.topbar.toolsTitle': 'Herramientas',
+  'studio.topbar.toolsDescription':
+    'Contexto del documento y acciones secundarias del Studio para pantallas compactas.',
+  'studio.topbar.closeHelp': 'Cerrar ayuda',
+  'studio.settings.title': 'Configuración',
+  'studio.settings.description': 'Preferencias del espacio de trabajo de ElectroCraft Studio.',
+  'studio.settings.workspaceTitle': 'Espacio de trabajo',
+  'studio.settings.sidebarTitle': 'Barra lateral',
+  'studio.settings.sidebarExpanded': 'Expandida',
+  'studio.settings.sidebarCollapsed': 'Compacta',
+  'studio.settings.expandSidebar': 'Expandir barra lateral',
+  'studio.settings.collapseSidebar': 'Contraer barra lateral',
+  'studio.settings.close': 'Cerrar configuración',
+
+  'studio.bootstrap.m03Kicker': 'Studio · F03 / M03.4',
   'studio.bootstrap.foundationSummary':
-    'Sidebar global activo sobre el AppShell Radix/Lucide: grupos exactos, estado activo, modo 240/64 y preferencias del espacio de trabajo mediante un port reemplazable.',
+    'Topbar global activa sobre el AppShell: contexto, responsive, Ayuda y Configuración Radix conectada a preferencias reales del espacio de trabajo.',
   'studio.bootstrap.openDesignSystemGallery': 'Abrir galería técnica del sistema de diseño',
   'studio.bootstrap.title': 'ElectroCraft — Desarrollo',
   'studio.bootstrap.environmentStatus': 'Estado del entorno',
@@ -142,31 +171,14 @@ export const studioShellMessagesEs = Object.freeze({
 } as const);
 
 export type StudioShellMessageKey = keyof typeof studioShellMessagesEs;
-
 export function studioT<Key extends StudioShellMessageKey>(key: Key): (typeof studioShellMessagesEs)[Key] {
   return studioShellMessagesEs[key];
 }
-
 export const studioNavigationMessageKeys = Object.freeze([
-  'studio.navigation.editor',
-  'studio.navigation.screens',
-  'studio.navigation.templates',
-  'studio.navigation.components',
-  'studio.navigation.aiGenerate',
-  'studio.navigation.content',
-  'studio.navigation.models',
-  'studio.navigation.queries',
-  'studio.navigation.forms',
-  'studio.navigation.automations',
-  'studio.navigation.admin',
-  'studio.navigation.roles',
-  'studio.navigation.media',
-  'studio.navigation.extensions',
-  'studio.navigation.themes',
-  'studio.navigation.preview',
-  'studio.navigation.compatibility',
-  'studio.navigation.export',
-  'studio.navigation.deploy',
-  'studio.navigation.help',
+  'studio.navigation.editor', 'studio.navigation.screens', 'studio.navigation.templates', 'studio.navigation.components',
+  'studio.navigation.aiGenerate', 'studio.navigation.content', 'studio.navigation.models', 'studio.navigation.queries',
+  'studio.navigation.forms', 'studio.navigation.automations', 'studio.navigation.admin', 'studio.navigation.roles',
+  'studio.navigation.media', 'studio.navigation.extensions', 'studio.navigation.themes', 'studio.navigation.preview',
+  'studio.navigation.compatibility', 'studio.navigation.export', 'studio.navigation.deploy', 'studio.navigation.help',
   'studio.navigation.settings',
 ] as const satisfies readonly StudioShellMessageKey[]);

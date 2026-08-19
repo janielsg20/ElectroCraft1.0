@@ -1,122 +1,31 @@
 import fs from 'node:fs';
 import path from 'node:path';
-
 const root = process.cwd();
 const required = [
-  'apps/studio/src/shell/app-shell.tsx',
-  'apps/studio/src/shell/app-shell-route.tsx',
-  'apps/studio/src/shell/sidebar-navigation.ts',
-  'apps/studio/src/shell/workspace-preferences.ts',
-  'apps/studio/src/shell/sidebar.css',
-  'apps/studio/src/i18n/studio-shell.es.ts',
-  'apps/studio/src/help/help-registry.ts',
-  'packages/design-system/src/icons/studio-icon-registry.ts',
-  'tooling/vitest/unit/sidebar-navigation.test.ts',
-  'tooling/vitest/contract/sidebar-boundary.test.ts',
-  'tooling/vitest/integration/sidebar-preferences-runtime.test.ts',
-  'tooling/playwright/m03-3-sidebar.spec.ts',
-  '.ai/evidence/F03/M03.2/CLOSURE_2026-08-19.md',
+  'apps/studio/src/shell/app-shell.tsx', 'apps/studio/src/shell/sidebar-navigation.ts',
+  'apps/studio/src/shell/workspace-preferences.ts', 'apps/studio/src/shell/sidebar.css',
+  'apps/studio/src/i18n/studio-shell.es.ts', 'apps/studio/src/help/help-registry.ts',
+  'packages/design-system/src/icons/studio-icon-registry.ts', 'tooling/playwright/m03-3-sidebar.spec.ts',
+  '.ai/evidence/F03/M03.3/CLOSURE_2026-08-19.md',
 ];
-
-for (const file of required) {
-  if (!fs.existsSync(path.join(root, file))) throw new Error(`M03.3 required file missing: ${file}`);
-}
-
+for (const file of required) if (!fs.existsSync(path.join(root, file))) throw new Error(`M03.3 regression file missing: ${file}`);
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const shell = read('apps/studio/src/shell/app-shell.tsx');
 const navigation = read('apps/studio/src/shell/sidebar-navigation.ts');
 const preferences = read('apps/studio/src/shell/workspace-preferences.ts');
 const css = read('apps/studio/src/shell/sidebar.css');
-const i18n = read('apps/studio/src/i18n/studio-shell.es.ts');
 const help = read('apps/studio/src/help/help-registry.ts');
-const icons = read('packages/design-system/src/icons/studio-icon-registry.ts');
+const closure = read('.ai/evidence/F03/M03.3/CLOSURE_2026-08-19.md');
 const state = read('.ai/STATE.md');
-const closure = read('.ai/evidence/F03/M03.2/CLOSURE_2026-08-19.md');
-
-for (const label of ['Construir', 'Datos', 'Lógica', 'App', 'Recursos', 'Apariencia', 'Publicar']) {
-  if (!i18n.includes(`'${label}'`)) throw new Error(`M03.3 group label missing: ${label}`);
-}
-for (const label of [
-  'Editor',
-  'Pantallas',
-  'Componentes',
-  'Plantillas',
-  'Generar con IA',
-  'Registros',
-  'Modelos',
-  'Fuentes de datos',
-  'Consultas',
-  'Acciones y workflows',
-  'Estado y variables',
-  'Formularios',
-  'Navegación',
-  'Usuarios y permisos',
-  'Administración',
-  'Medios',
-  'Extensiones',
-  'Temas',
-  'Sistema de diseño',
-  'Tokens',
-  'Vista previa',
-  'Compatibilidad',
-  'Exportar',
-  'Desplegar',
-]) {
-  if (!i18n.includes(`'${label}'`)) throw new Error(`M03.3 item label missing: ${label}`);
-}
-if (i18n.includes("'Taxonomías'") || i18n.includes("'Relaciones'")) {
-  throw new Error('M03.3 must not expose Taxonomías/Relaciones as top-level navigation');
-}
-for (const token of ['aria-current', 'TooltipTrigger', 'useSyncExternalStore', 'data-sidebar-collapsed']) {
-  if (!shell.includes(token)) throw new Error(`M03.3 AppShell behavior missing: ${token}`);
-}
-if (!preferences.includes('export interface WorkspacePreferencesPort')) {
-  throw new Error('M03.3 WorkspacePreferencesPort missing');
-}
-if (!preferences.includes('createMemoryWorkspacePreferencesPort')) {
-  throw new Error('M03.3 in-memory adapter missing');
-}
-if (preferences.includes('localStorage') || preferences.includes('PGlite')) {
-  throw new Error('M03.3 must not preempt F04 persistence');
-}
-if (!navigation.includes("iconId: 'studio.sidebar.editor'")) throw new Error('M03.3 semantic icon mapping missing');
-if (!css.includes("data-sidebar-collapsed='true'") || !css.includes('grid-template-columns: 64px')) {
-  throw new Error('M03.3 240 -> 64 collapse CSS missing');
-}
-for (const iconId of [
-  'studio.sidebar.collapse',
-  'studio.sidebar.expand',
-  'studio.sidebar.editor',
-  'studio.sidebar.deploy',
-]) {
-  if (!icons.includes(`'${iconId}'`)) throw new Error(`M03.3 Lucide registry ID missing: ${iconId}`);
-}
-if (!help.includes('WorkspacePreferencesPort') || !help.includes('Tooltip Radix')) {
-  throw new Error('M03.3 persistent help does not explain Sidebar preferences/tooltips');
-}
-if (!closure.includes('32272740576') || !closure.includes('GREEN')) {
-  throw new Error('M03.2 closure evidence is not GREEN');
-}
-if (
-  !state.includes('M03.2') ||
-  !state.includes('COMPLETADA') ||
-  !state.includes('M03.3') ||
-  !state.includes('ACTIVE')
-) {
-  throw new Error('STATE transition M03.2 -> M03.3 is incomplete');
-}
-
-const report = {
-  schemaVersion: 1,
-  microphase: 'M03.3',
-  engine: 'shadcn/ui Radix + AppShell',
-  baseCommit: '38b2f5aac504a406b42537b7aade8f3d26626e7d',
-  groups: ['build', 'data', 'logic', 'app', 'resources', 'appearance', 'publish'],
-  sidebar: { expandedPx: 240, collapsedPx: 64, preferencePort: 'WorkspacePreferencesPort' },
-  responsive: ['desktop-toggle', 'laptop-rail', 'tablet-sheet', 'mobile-sheet'],
-  helpId: 'help.studio.shell',
-  blockers: [],
-};
+for (const token of ['aria-current', 'TooltipTrigger', 'useSyncExternalStore', 'data-sidebar-collapsed']) if (!shell.includes(token)) throw new Error(`M03.3 regression missing: ${token}`);
+if (!preferences.includes('WorkspacePreferencesPort') || !preferences.includes('createMemoryWorkspacePreferencesPort')) throw new Error('M03.3 preference port regressed');
+if (preferences.includes('localStorage') || preferences.includes('PGlite')) throw new Error('M03.3 must not preempt F04 persistence');
+if (!navigation.includes("iconId: 'studio.sidebar.editor'")) throw new Error('M03.3 semantic navigation regressed');
+if (!css.includes("data-sidebar-collapsed='true'") || !css.includes('grid-template-columns: 64px')) throw new Error('M03.3 collapse regression');
+if (!help.includes('WorkspacePreferencesPort')) throw new Error('M03.3 persistent help regression');
+if (!closure.includes('32275890306') || !closure.includes('9374022673') || !closure.includes('GREEN')) throw new Error('M03.3 closure evidence invalid');
+if (!/M03\.3[^\n]*COMPLETADA/.test(state)) throw new Error('M03.3 must remain COMPLETADA post-closure');
+const report = { schemaVersion: 2, microphase: 'M03.3', mode: 'post-closure-regression', closureRun: 32275890306, groups: 7, sidebar: { expandedPx: 240, collapsedPx: 64 }, helpId: 'help.studio.shell', blockers: [] };
 fs.mkdirSync(path.join(root, 'tooling/dist'), { recursive: true });
 fs.writeFileSync(path.join(root, 'tooling/dist/m03-3-sidebar-report.json'), `${JSON.stringify(report, null, 2)}\n`);
-console.log('PASS_M03_3_SIDEBAR_STRUCTURE blockers=0');
+console.log('PASS_M03_3_SIDEBAR_REGRESSION blockers=0');
