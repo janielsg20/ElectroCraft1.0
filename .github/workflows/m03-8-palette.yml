@@ -1,0 +1,153 @@
+name: M03.8 Discoverable Palette Gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'apps/studio/src/shell/palette-*'
+      - 'apps/studio/src/shell/editor-workspace.tsx'
+      - 'apps/studio/src/i18n/palette.es.ts'
+      - 'apps/studio/src/i18n/editor.es.ts'
+      - 'apps/studio/src/help/help-registry.ts'
+      - 'packages/editor-puck/**'
+      - 'packages/design-system/**'
+      - 'tooling/vitest/**/palette*.test.ts'
+      - 'tooling/test/m03-8-palette.test.mjs'
+      - 'tooling/playwright/m03-8-palette.spec.ts'
+      - '.ai/PALETTE_CATALOG_MATRIX.md'
+      - '.ai/PALETTE_UX_SPEC.md'
+      - '.ai/PALETTE_SEARCH_SYNONYM_INDEX.md'
+      - '.ai/evidence/F03/M03.8/**'
+      - '.ai/STATE.md'
+      - '.ai/TRACKING.md'
+      - '.ai/HANDOFF.md'
+      - '.github/workflows/m03-8-palette.yml'
+  push:
+    branches:
+      - main
+      - agent/m03-8-palette-discoverability
+    paths:
+      - 'apps/studio/src/shell/palette-*'
+      - 'apps/studio/src/shell/editor-workspace.tsx'
+      - 'apps/studio/src/i18n/palette.es.ts'
+      - 'apps/studio/src/i18n/editor.es.ts'
+      - 'apps/studio/src/help/help-registry.ts'
+      - 'packages/editor-puck/**'
+      - 'packages/design-system/**'
+      - 'tooling/vitest/**/palette*.test.ts'
+      - 'tooling/test/m03-8-palette.test.mjs'
+      - 'tooling/playwright/m03-8-palette.spec.ts'
+      - '.ai/PALETTE_CATALOG_MATRIX.md'
+      - '.ai/PALETTE_UX_SPEC.md'
+      - '.ai/PALETTE_SEARCH_SYNONYM_INDEX.md'
+      - '.ai/evidence/F03/M03.8/**'
+      - '.ai/STATE.md'
+      - '.ai/TRACKING.md'
+      - '.ai/HANDOFF.md'
+      - '.github/workflows/m03-8-palette.yml'
+
+permissions:
+  contents: read
+  statuses: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  m03-8:
+    name: M03.8 Discoverable Palette
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Publish pending status
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createCommitStatus({ owner: context.repo.owner, repo: context.repo.repo, sha: context.sha, state: 'pending', context: 'electrocraft/M03.8', description: 'M03.8 Palette gate running', target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}` });
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Verify locked toolchain
+        run: |
+          test "$(node --version)" = 'v22.16.0'
+          test "$(npm --version)" = '10.9.2'
+          test "$(npm config get legacy-peer-deps)" = 'true'
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Verify M03.8 source formatting
+        run: >-
+          npx prettier --check
+          .github/workflows/m03-8-palette.yml
+          apps/studio/src/shell/palette-catalog.ts
+          apps/studio/src/shell/palette-preferences.ts
+          apps/studio/src/shell/palette-panel.tsx
+          apps/studio/src/shell/palette-panel.css
+          apps/studio/src/i18n/palette.es.ts
+          tooling/test/m03-8-palette.test.mjs
+          tooling/vitest/unit/palette-catalog.test.ts
+          tooling/vitest/unit/palette-preferences.test.ts
+          tooling/vitest/contract/palette-puck-boundary.test.ts
+          tooling/vitest/integration/palette-runtime.test.ts
+          tooling/playwright/m03-8-palette.spec.ts
+
+      - name: Execute dedicated M03.8 structural suite
+        run: node --test tooling/test/m03-8-palette.test.mjs
+
+      - name: Execute dedicated M03.8 unit contract integration suite
+        run: >-
+          npx vitest run --config vitest.config.ts
+          tooling/vitest/unit/palette-catalog.test.ts
+          tooling/vitest/unit/palette-preferences.test.ts
+          tooling/vitest/contract/palette-puck-boundary.test.ts
+          tooling/vitest/integration/palette-runtime.test.ts
+
+      - name: Install Playwright Chromium
+        timeout-minutes: 8
+        run: |
+          if ! timeout 240s npx playwright install chromium; then
+            echo 'First Chromium install attempt did not complete; retrying once on the same runner.'
+            npx playwright install chromium
+          fi
+
+      - name: Execute dedicated M03.8 browser audit
+        run: npx playwright test --config playwright.config.ts tooling/playwright/m03-8-palette.spec.ts
+
+      - name: Execute full repository gate
+        run: npm run check | tee m03-8-check.log
+
+      - name: Emit closure marker
+        run: echo PASS_M03_8_DISCOVERABLE_PALETTE | tee m03-8-closure.log
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m03-8-palette-evidence
+          path: |
+            m03-8-check.log
+            m03-8-closure.log
+            test-results/**
+            .ai/evidence/F03/M03.8/**
+          if-no-files-found: warn
+
+      - name: Publish final commit status
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createCommitStatus({ owner: context.repo.owner, repo: context.repo.repo, sha: context.sha, state: '${{ job.status }}' === 'success' ? 'success' : 'failure', context: 'electrocraft/M03.8', description: 'M03.8 discoverable Palette gate', target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}` });
