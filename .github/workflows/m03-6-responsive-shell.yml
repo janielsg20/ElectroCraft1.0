@@ -82,8 +82,13 @@ jobs:
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
 
-      - name: Verify M03.6 source formatting
-        run: npx prettier --check .github/workflows/m03-6-responsive-shell.yml tooling/test/m03-6-responsive-shell.test.mjs
+      - name: Emit exact M03.6 Prettier candidates
+        run: |
+          npx prettier --write apps/studio/src/shell/editor-workspace.tsx tooling/vitest/contract/responsive-shell-boundary.test.ts
+          echo '---BEGIN_M03_6_PRETTIER_DIFF---'
+          git diff -- apps/studio/src/shell/editor-workspace.tsx tooling/vitest/contract/responsive-shell-boundary.test.ts
+          echo '---END_M03_6_PRETTIER_DIFF---'
+          exit 1
 
       - name: Execute dedicated M03.6 structural suite
         run: node --test tooling/test/m03-6-responsive-shell.test.mjs
