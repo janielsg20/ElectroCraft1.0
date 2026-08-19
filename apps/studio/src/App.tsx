@@ -8,6 +8,7 @@ import './styles.css';
 import './shell/sidebar.css';
 import './shell/topbar.css';
 import './shell/editor-workspace.css';
+import './shell/responsive-shell.css';
 
 const projectHomeRoute = Object.freeze({
   id: 'project-home-development',

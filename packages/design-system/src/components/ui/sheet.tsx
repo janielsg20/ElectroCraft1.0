@@ -6,23 +6,31 @@ export const Sheet = DialogPrimitive.Root;
 export const SheetTrigger = DialogPrimitive.Trigger;
 export const SheetClose = DialogPrimitive.Close;
 
+export type SheetSide = 'left' | 'right' | 'bottom';
+
 export interface SheetContentProps extends ComponentProps<typeof DialogPrimitive.Content> {
-  readonly side?: 'left' | 'right';
+  readonly side?: SheetSide;
 }
 
 export function SheetContent({ side = 'right', className, children, ...props }: SheetContentProps) {
-  const sideClassName = side === 'left' ? 'left-0 border-r border-border' : 'right-0 border-l border-border';
+  const placementClassName =
+    side === 'left'
+      ? 'inset-y-0 left-0 w-[min(92vw,360px)] border-r border-border'
+      : side === 'bottom'
+        ? 'inset-x-0 bottom-0 max-h-[88dvh] w-full rounded-t-xl border-t border-border'
+        : 'inset-y-0 right-0 w-[min(92vw,360px)] border-l border-border';
 
   return (
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-overlay/45" />
       <DialogPrimitive.Content
         className={cn(
-          'fixed inset-y-0 z-50 w-[min(92vw,360px)] bg-surface p-4 [box-shadow:var(--ec-shadow)]',
+          'fixed z-50 bg-surface p-4 [box-shadow:var(--ec-shadow)]',
           'outline-none focus-visible:ring-2 focus-visible:ring-ring',
-          sideClassName,
+          placementClassName,
           className,
         )}
+        data-sheet-side={side}
         {...props}
       >
         {children}

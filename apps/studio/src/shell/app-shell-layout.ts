@@ -2,6 +2,7 @@ export const appShellLayout = Object.freeze({
   rootHeight: '100dvh',
   sidebarExpandedPx: 240,
   sidebarCollapsedPx: 64,
+  tabletRailPx: 56,
   topbarPx: 52,
   statusbarPx: 26,
   breakpoints: Object.freeze({

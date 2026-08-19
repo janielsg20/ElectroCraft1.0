@@ -48,5 +48,8 @@ Solo contiene hechos estables y decisiones vigentes. Progreso y siguiente paso p
 - Studio usa shadcn/ui con base Radix explícita sobre el paquete unificado `radix-ui`; no se mezclan Base UI/Aria sin ADR.
 - `packages/design-system` es el owner de tokens/primitives y Lucide se consume mediante un registry semántico tipado.
 - Theme light/dark/system y densidad High Density son preferencias del Studio, no Project Objects del modelo canónico.
-- El AppShell global usa 100dvh con scroll contenido en workspace; desktop reserva Sidebar 240px, laptop 64px y tablet/mobile trasladan navegación estructural a Sheet Radix.
-- El editor visual conserva cuatro regiones estables: Contexto 288px redimensionable 240–380px, Canvas dominante, Inspector 320px redimensionable 280–440px y Statusbar informativo 26px. Laptop reduce herramientas secundarias primero y tablet/móvil trasladan Contexto/Inspector a superficies Sheet sin comprimir el desktop.
+- El AppShell global usa 100dvh con scroll contenido en workspace; desktop reserva Sidebar 240px, laptop 64px y tablet usa un rail global de 56px con navegación completa en Sheet Radix. Móvil elimina el rail lateral y prioriza Topbar compacta + navegación inferior.
+- El editor visual conserva cuatro regiones estables: Contexto 288px redimensionable 240–380px, Canvas dominante, Inspector 320px redimensionable 280–440px y Statusbar informativo 26px.
+- En laptop, el editor usa split cuando existe ancho útil >=1152px y un único overlay de herramienta secundaria entre 1024–1151px. Tablet usa Contexto/Inspector en Sheets sin comprimir el Canvas.
+- En móvil, el dock inferior mide 58px y conserva exactamente `Componentes | Pantallas | Lienzo | Propiedades | Más`; Propiedades usa bottom Sheet y Más expone Outline/Capas en Sheet full-height. Pantallas reutiliza el registry canónico del Sidebar.
+- `SheetContent` del design-system admite `left | right | bottom`; es la única primitive de drawer/Sheet del AppShell y conserva restore-focus Radix mediante triggers reales.

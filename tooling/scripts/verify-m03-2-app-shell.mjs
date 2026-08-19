@@ -69,7 +69,10 @@ if (!shell.includes("from '@electrocraft/design-system'")) {
 }
 if (shell.includes('@electrocraft/design-system/')) throw new Error('M03.2 deep workspace import is forbidden');
 if (!help.includes("id: 'help.studio.shell'")) throw new Error('M03.2 help.studio.shell missing');
-if (!sheet.includes("side?: 'left' | 'right'")) throw new Error('M03.2 left/right Radix Sheet support missing');
+for (const side of ["'left'", "'right'"]) {
+  if (!sheet.includes(side)) throw new Error(`M03.2 Radix Sheet support missing side: ${side}`);
+}
+if (!sheet.includes("from 'radix-ui'")) throw new Error('M03.2 Sheet must keep Radix ownership');
 if (!icons.includes("'studio.menu': Menu")) throw new Error('M03.2 Lucide menu icon ID missing');
 if (!predecessorClosure.includes('32267795991') || !predecessorClosure.includes('GREEN')) {
   throw new Error('M03.1 closure evidence is not GREEN');
@@ -93,7 +96,7 @@ const report = {
   engine: 'shadcn/ui Radix + AppShell',
   baseCommit: 'c0ee291f29405a1f1dd9fb1c14afe7d13b3a45ae',
   geometry: { root: '100dvh', sidebar: [240, 64], topbar: 52, statusbar: 26 },
-  responsive: ['desktop', 'laptop', 'tablet-sheet', 'mobile-sheet'],
+  responsive: ['desktop', 'laptop', 'tablet-rail-sheet', 'mobile-sheet'],
   helpId: 'help.studio.shell',
   blockers: [],
 };
