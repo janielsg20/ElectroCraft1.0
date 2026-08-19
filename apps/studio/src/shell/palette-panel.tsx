@@ -116,12 +116,7 @@ function PaletteDiagnosticNotice({
           <strong>{paletteT('studio.palette.diagnosticTitle')}</strong>
           <code>{diagnostic.code}</code>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onDismiss}
-          aria-label={paletteT('studio.palette.diagnosticClose')}
-        >
+        <Button variant="ghost" size="icon" onClick={onDismiss} aria-label={paletteT('studio.palette.diagnosticClose')}>
           <CloseIcon aria-hidden="true" />
         </Button>
       </header>
