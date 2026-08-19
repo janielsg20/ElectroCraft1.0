@@ -151,6 +151,15 @@ const navigation = [
 export const studioSidebarNavigation = Object.freeze(navigation);
 export type SidebarNavigationItemId = (typeof navigation)[number]['items'][number]['id'];
 
+export function getStudioSidebarNavigationItem(itemId: SidebarNavigationItemId): SidebarNavigationItem {
+  for (const group of navigation) {
+    for (const item of group.items) {
+      if (item.id === itemId) return item;
+    }
+  }
+  throw new Error(`Unknown Studio navigation item: ${itemId}`);
+}
+
 export function resolveSidebarActiveItem(pathname: string): SidebarNavigationItemId | null {
   const normalized = pathname === '/' ? '/' : pathname.replace(/\/+$/, '');
   for (const group of navigation) {
