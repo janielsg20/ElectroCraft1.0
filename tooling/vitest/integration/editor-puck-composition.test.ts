@@ -7,12 +7,16 @@ const read = (file: string) => fs.readFileSync(path.join(root, file), 'utf8');
 
 describe('M03.5 Studio/Puck structural composition', () => {
   it('maps Context, Canvas and Inspector to public Puck composition surfaces', () => {
-    const source = read('apps/studio/src/shell/editor-workspace.tsx');
+    const workspace = read('apps/studio/src/shell/editor-workspace.tsx');
+    const palette = read('apps/studio/src/shell/palette-panel.tsx');
 
-    expect(source).toContain('<PuckEditorComponents />');
-    expect(source).toContain('<PuckEditorOutline />');
-    expect(source).toContain('<PuckEditorPreview id="electrocraft-editor-preview" />');
-    expect(source).toContain('<PuckEditorFields wrapFields={false} />');
+    expect(workspace).not.toContain("from '@puckeditor/core'");
+    expect(palette).not.toContain("from '@puckeditor/core'");
+    expect(workspace).toContain('<StudioPalette />');
+    expect(palette).toContain('<PuckEditorComponents />');
+    expect(workspace).toContain('<PuckEditorOutline />');
+    expect(workspace).toContain('<PuckEditorPreview id="electrocraft-editor-preview" />');
+    expect(workspace).toContain('<PuckEditorFields wrapFields={false} />');
   });
 
   it('uses Sheet for secondary tools instead of compressing the desktop editor', () => {
