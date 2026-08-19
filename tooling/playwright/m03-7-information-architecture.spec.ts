@@ -66,7 +66,7 @@ test.describe('M03.7 Progressive Disclosure and information architecture', () =>
   test('fails closed for a redundant or unknown route instead of inventing a success screen', async ({ page }) => {
     await page.goto('/content/detail');
     await expect(page.locator('[data-ia-route]')).toHaveCount(0);
-    await expect(page.getByText('Ruta no disponible', { exact: true })).toBeVisible();
+    await expect(page.getByText('Ruta no disponible en este bootstrap', { exact: true })).toBeVisible();
   });
 
   test('keeps mobile Properties reachable through the existing bottom Sheet', async ({ page }) => {
