@@ -1,0 +1,133 @@
+name: M03.7 Information Architecture Gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'apps/studio/**'
+      - 'packages/design-system/**'
+      - 'packages/editor-puck/**'
+      - 'tooling/vitest/**/information-architecture*.test.ts'
+      - 'tooling/test/m03-7-information-architecture.test.mjs'
+      - 'tooling/playwright/m03-7-information-architecture.spec.ts'
+      - '.ai/INFORMATION_ARCHITECTURE.md'
+      - '.ai/UX_INFORMATION_ARCHITECTURE.md'
+      - '.ai/evidence/F03/M03.6/**'
+      - '.ai/evidence/F03/M03.7/**'
+      - '.ai/STATE.md'
+      - '.ai/TRACKING.md'
+      - '.ai/HANDOFF.md'
+      - '.github/workflows/m03-7-information-architecture.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/studio/**'
+      - 'packages/design-system/**'
+      - 'packages/editor-puck/**'
+      - 'tooling/vitest/**/information-architecture*.test.ts'
+      - 'tooling/test/m03-7-information-architecture.test.mjs'
+      - 'tooling/playwright/m03-7-information-architecture.spec.ts'
+      - '.ai/INFORMATION_ARCHITECTURE.md'
+      - '.ai/UX_INFORMATION_ARCHITECTURE.md'
+      - '.ai/evidence/F03/M03.6/**'
+      - '.ai/evidence/F03/M03.7/**'
+      - '.ai/STATE.md'
+      - '.ai/TRACKING.md'
+      - '.ai/HANDOFF.md'
+      - '.github/workflows/m03-7-information-architecture.yml'
+
+permissions:
+  contents: read
+  statuses: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  m03-7:
+    name: M03.7 Progressive Disclosure and IA
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Publish pending status
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createCommitStatus({ owner: context.repo.owner, repo: context.repo.repo, sha: context.sha, state: 'pending', context: 'electrocraft/M03.7', description: 'M03.7 information architecture gate running', target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}` });
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Verify locked toolchain
+        run: |
+          test "$(node --version)" = 'v22.16.0'
+          test "$(npm --version)" = '10.9.2'
+          test "$(npm config get legacy-peer-deps)" = 'true'
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Verify M03.7 source formatting
+        run: >-
+          npx prettier --check
+          .github/workflows/m03-7-information-architecture.yml
+          tooling/test/m03-7-information-architecture.test.mjs
+          tooling/playwright/m03-7-information-architecture.spec.ts
+
+      - name: Execute dedicated M03.7 structural suite
+        run: node --test tooling/test/m03-7-information-architecture.test.mjs
+
+      - name: Execute dedicated M03.7 unit contract integration suite
+        run: >-
+          npx vitest run --config vitest.config.ts
+          tooling/vitest/unit/information-architecture.test.ts
+          tooling/vitest/contract/information-architecture-boundary.test.ts
+          tooling/vitest/integration/information-architecture-runtime.test.ts
+
+      - name: Install Playwright Chromium
+        timeout-minutes: 8
+        run: |
+          if ! timeout 240s npx playwright install chromium; then
+            echo 'First Chromium install attempt did not complete; retrying once on the same runner.'
+            npx playwright install chromium
+          fi
+
+      - name: Execute dedicated M03.7 browser audit
+        run: npx playwright test --config playwright.config.ts tooling/playwright/m03-7-information-architecture.spec.ts
+
+      - name: Execute full repository gate
+        run: npm run check | tee m03-7-check.log
+
+      - name: Emit closure marker
+        run: echo PASS_M03_7_INFORMATION_ARCHITECTURE | tee m03-7-closure.log
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m03-7-information-architecture-evidence
+          path: |
+            m03-7-check.log
+            m03-7-closure.log
+            test-results/**
+            .ai/evidence/F03/M03.7/**
+          if-no-files-found: warn
+
+      - name: Publish final commit status
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createCommitStatus({ owner: context.repo.owner, repo: context.repo.repo, sha: context.sha, state: '${{ job.status }}' === 'success' ? 'success' : 'failure', context: 'electrocraft/M03.7', description: 'M03.7 information architecture gate', target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}` });
