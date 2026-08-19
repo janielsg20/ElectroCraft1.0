@@ -4,7 +4,7 @@ import type { ButtonHTMLAttributes } from 'react';
 import { cn } from '../../lib/utils';
 
 export const buttonVariants = cva(
-  'inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+  'inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--ec-studio-button-radius,var(--radius))] text-sm font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -16,10 +16,10 @@ export const buttonVariants = cva(
         destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
       },
       size: {
-        sm: 'h-7 px-2.5 text-xs',
-        md: 'h-8 px-3',
-        lg: 'h-9 px-4',
-        icon: 'size-8 p-0',
+        sm: 'h-[var(--ec-control-sm)] px-2.5 text-xs',
+        md: 'h-[var(--ec-control-md)] px-3',
+        lg: 'h-[var(--ec-control-lg)] px-4',
+        icon: 'size-[var(--ec-control-md)] p-0',
       },
     },
     defaultVariants: {
