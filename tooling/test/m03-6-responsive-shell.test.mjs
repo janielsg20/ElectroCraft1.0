@@ -110,7 +110,15 @@ test('M03.6 structural gate preserves capabilities across responsive modes', () 
     assert.equal(closure.includes('32299990614'), true, 'M03.6 closure must pin the GREEN owner run');
     assert.equal(closure.includes('9382670739'), true, 'M03.6 closure must pin the GREEN artifact');
     assert.equal(closure.includes('GREEN'), true, 'M03.6 closure evidence must remain GREEN');
-    assert.match(state, /M03\.7[^\n]*ACTIVE/);
+
+    const m03_7Active = /M03\.7[^\n]*ACTIVE/.test(state);
+    const m03_7ClosedWithM03_8Active =
+      /M03\.7[^\n]*COMPLETADA[^\n]*GREEN/.test(state) && /M03\.8[^\n]*ACTIVE/.test(state);
+    assert.equal(
+      m03_7Active || m03_7ClosedWithM03_8Active,
+      true,
+      'M03.6 successor must remain M03.7 ACTIVE or advance only after M03.7 closes GREEN',
+    );
   }
 
   assert.equal(predecessor.includes('32297534296'), true, 'M03.5 main GREEN run must be recorded');
