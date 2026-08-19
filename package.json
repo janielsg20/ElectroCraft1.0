@@ -30,7 +30,7 @@
     "test:m02-7": "vitest run --config vitest.config.ts tooling/vitest/unit/export-ir.test.ts tooling/vitest/contract/export-ir-boundary.test.ts tooling/vitest/integration/export-ir-runtime.test.ts",
     "test:m02-8": "vitest run --config vitest.config.ts tooling/vitest/unit/model-ownership.test.ts tooling/vitest/contract/model-ownership-boundary.test.ts tooling/vitest/integration/model-ownership-runtime.test.ts",
     "test:m02-9": "vitest run --config vitest.config.ts tooling/vitest/unit/engine-payload.test.ts tooling/vitest/contract/engine-payload-boundary.test.ts tooling/vitest/integration/engine-payload-runtime.test.ts",
-    "test:m03-1": "vitest run --config vitest.config.ts tooling/vitest/unit/design-system-foundation.test.ts tooling/vitest/contract/design-system-foundation-boundary.test.ts tooling/vitest/integration/design-system-radix-runtime.test.tsx",
+    "test:m03-1": "vitest run --config vitest.config.ts tooling/vitest/unit/design-system-foundation.test.ts tooling/vitest/contract/design-system-foundation-boundary.test.ts tooling/vitest/integration/design-system-radix-runtime.test.ts",
     "test:f02": "npm run test:m02-1 && npm run test:m02-2 && npm run test:m02-3 && npm run test:m02-4 && npm run test:m02-5 && npm run test:m02-6 && npm run test:m02-7 && npm run test:m02-8 && npm run test:m02-9",
     "test": "npm run test:docs && npm run test:node && npm run build:offline && npm run build:studio && npm run test:vitest",
     "test:e2e": "playwright test --config playwright.config.ts",
