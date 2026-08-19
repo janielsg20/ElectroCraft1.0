@@ -83,6 +83,12 @@ export const studioIconRegistry = Object.freeze({
   'studio.topbar.undo': Undo2,
   'studio.topbar.redo': Redo2,
   'studio.topbar.zoom': ZoomIn,
+  'studio.mobile.components': Boxes,
+  'studio.mobile.screens': Monitor,
+  'studio.mobile.canvas': Pencil,
+  'studio.mobile.properties': PanelRight,
+  'studio.mobile.more': Menu,
+  'studio.mobile.outline': LayoutTemplate,
   'window.close': X,
 } satisfies Record<string, LucideIcon>);
 
