@@ -60,13 +60,7 @@ function NavigationVocabulary({
   );
 }
 
-export function AppShell({
-  copy,
-  navigationLabels,
-  helpId,
-  status = 'ready',
-  children,
-}: AppShellProps) {
+export function AppShell({ copy, navigationLabels, helpId, status = 'ready', children }: AppShellProps) {
   return (
     <div className="ec-design-system ec-app-shell" data-help-id={helpId} data-status={status}>
       <aside className="ec-app-shell-sidebar" aria-label={copy.sidebarLabel}>
@@ -84,12 +78,7 @@ export function AppShell({
       <header className="ec-app-shell-topbar">
         <Sheet>
           <SheetTrigger asChild>
-            <Button
-              className="ec-app-shell-menu-trigger"
-              variant="ghost"
-              size="icon"
-              aria-label={copy.menuLabel}
-            >
+            <Button className="ec-app-shell-menu-trigger" variant="ghost" size="icon" aria-label={copy.menuLabel}>
               <MenuIcon aria-hidden="true" />
             </Button>
           </SheetTrigger>
