@@ -101,7 +101,11 @@ if (complete) {
   if (!closure.includes('32278183037') || !closure.includes('GREEN')) {
     throw new Error('M03.4 post-closure evidence is not GREEN');
   }
-  if (!/M03\.5[^\n]*ACTIVE/.test(state)) throw new Error('M03.4 post-closure transition must activate M03.5');
+
+  const activeSuccessor = state.match(/M03\.(\d+)[^\n]*ACTIVE/);
+  if (!activeSuccessor || Number(activeSuccessor[1]) <= 4) {
+    throw new Error('M03.4 post-closure regression requires an ACTIVE F03 successor after M03.4');
+  }
 }
 
 const report = {
