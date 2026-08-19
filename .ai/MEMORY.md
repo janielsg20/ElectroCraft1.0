@@ -53,3 +53,6 @@ Solo contiene hechos estables y decisiones vigentes. Progreso y siguiente paso p
 - En laptop, el editor usa split cuando existe ancho útil >=1152px y un único overlay de herramienta secundaria entre 1024–1151px. Tablet usa Contexto/Inspector en Sheets sin comprimir el Canvas.
 - En móvil, el dock inferior mide 58px y conserva exactamente `Componentes | Pantallas | Lienzo | Propiedades | Más`; Propiedades usa bottom Sheet y Más expone Outline/Capas en Sheet full-height. Pantallas reutiliza el registry canónico del Sidebar.
 - `SheetContent` del design-system admite `left | right | bottom`; es la única primitive de drawer/Sheet del AppShell y conserva restore-focus Radix mediante triggers reales.
+- La arquitectura de información del Studio clasifica opciones como `primary | contextual | advanced | diagnostic`; `advanced` usa Progressive Disclosure con `Collapsible` Radix del design-system y un diagnostic que protege estado no puede quedar oculto únicamente dentro de Advanced.
+- Inspector mantiene propiedades principales bajo ownership de Puck; ElectroCraft solo compone la jerarquía y la presentación alrededor del owner.
+- `/content` es la ruta canónica única del patrón List/Detail del Studio. Las superficies aún no funcionales usan empty states honestos y las rutas redundantes/desconocidas fallan cerradas en vez de simular éxito.
