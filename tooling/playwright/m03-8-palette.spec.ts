@@ -1,5 +1,14 @@
 import { expect, test } from '@playwright/test';
 
+const conceptualSearchCases = [
+  ['posts', 'palette.dynamic.listing'],
+  ['menu', 'palette.navigation.navigation'],
+  ['login', 'palette.navigation.login'],
+  ['JetEngine', 'palette.dynamic.field'],
+  ['social', 'palette.social.icons'],
+  ['commerce', 'palette.commerce.product-card'],
+] as const;
+
 test.describe('M03.8 discoverable Palette', () => {
   test('renders search and the exact high-density catalog on desktop', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
@@ -21,21 +30,16 @@ test.describe('M03.8 discoverable Palette', () => {
     expect(overflow).toBe(false);
   });
 
-  test.each([
-    ['posts', 'palette.dynamic.listing'],
-    ['menu', 'palette.navigation.navigation'],
-    ['login', 'palette.navigation.login'],
-    ['JetEngine', 'palette.dynamic.field'],
-    ['social', 'palette.social.icons'],
-    ['commerce', 'palette.commerce.product-card'],
-  ])('discovers %s by conceptual search', async ({ page }, query, expectedId) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/');
-    const palette = page.locator('[data-studio-palette]').first();
-    const search = palette.getByRole('searchbox', { name: 'Buscar componentes' });
-    await search.fill(query);
-    await expect(palette.locator(`[data-palette-item="${expectedId}"]`).first()).toBeVisible();
-  });
+  for (const [query, expectedId] of conceptualSearchCases) {
+    test(`discovers ${query} by conceptual search`, async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.goto('/');
+      const palette = page.locator('[data-studio-palette]').first();
+      const search = palette.getByRole('searchbox', { name: 'Buscar componentes' });
+      await search.fill(query);
+      await expect(palette.locator(`[data-palette-item="${expectedId}"]`).first()).toBeVisible();
+    });
+  }
 
   test('persists favorites and recent by palette item id', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
