@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
-async function resetAppearance(page: Parameters<typeof test>[0]['page']) {
+async function resetAppearance(page: Page) {
   await page.goto('/');
   await page.evaluate(() => window.localStorage.removeItem('electrocraft.studio.appearance.v1'));
   await page.reload();
