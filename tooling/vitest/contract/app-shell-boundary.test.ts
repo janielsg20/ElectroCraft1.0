@@ -20,7 +20,7 @@ describe('M03.2 AppShell boundaries', () => {
     expect(route).not.toContain('@electrocraft/design-system/');
   });
 
-  it('exposes the exact 21 Spanish navigation labels without hardcoded shell copy', () => {
+  it('preserves the M03.2 Spanish vocabulary seam while later microphases extend the shell', () => {
     expect(studioNavigationMessageKeys).toHaveLength(21);
     expect(studioNavigationMessageKeys.map((key) => studioShellMessagesEs[key])).toEqual([
       'Editor',
@@ -51,13 +51,12 @@ describe('M03.2 AppShell boundaries', () => {
     expect(shell).not.toContain("'Configuración'");
   });
 
-  it('keeps M03.3 and M03.4 responsibilities out of the structural shell', () => {
-    const shell = read('apps/studio/src/shell/app-shell.tsx');
+  it('preserves exact AppShell geometry as the Sidebar gains its M03.3 behavior', () => {
     const layout = read('apps/studio/src/shell/app-shell-layout.ts');
-
-    expect(shell).not.toContain('WorkspacePreferencesPort');
-    expect(shell).not.toContain('aria-current');
-    expect(layout).not.toContain('WorkspacePreferencesPort');
+    expect(layout).toContain('sidebarExpandedPx: 240');
+    expect(layout).toContain('sidebarCollapsedPx: 64');
+    expect(layout).toContain('topbarPx: 52');
+    expect(layout).toContain('statusbarPx: 26');
   });
 
   it('uses persistent help and a left-capable real Radix Sheet for tablet/mobile navigation', () => {

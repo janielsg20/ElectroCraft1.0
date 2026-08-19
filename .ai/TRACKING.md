@@ -23,7 +23,8 @@ Historial detallado:
 | M02.9 | COMPLETADA | `.ai/evidence/F02/M02.9/CLOSURE_2026-08-18.md` |
 | F02 Gate | GREEN | `.ai/evidence/F02/CLOSURE_2026-08-18.md` |
 | M03.1 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.1/CLOSURE_2026-08-19.md` |
-| F03 / M03.2 | ACTIVE | `.ai/microphases/M03_2.md` + `.ai/evidence/F03/M03.2/IMPLEMENTATION_2026-08-19.md` |
+| M03.2 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.2/CLOSURE_2026-08-19.md` |
+| F03 / M03.3 | ACTIVE | `.ai/microphases/M03_3.md` + `.ai/evidence/F03/M03.3/IMPLEMENTATION_2026-08-19.md` |
 
 ## Cierre M02.1
 - PR `#3`; squash merge `cf4649d98f96a553daa020581a918d9559131137`.
@@ -129,10 +130,10 @@ Historial detallado:
 - Estado de ese run: M03.1 seguía `ACTIVE`; el cierre definitivo ocurrió en run `32267795991`.
 
 ## Gate actual
-F02 `COMPLETADA` / Gate F02 `GREEN`. F03 está `IN_PROGRESS`; M03.1 `COMPLETADA/GREEN` y M03.2 es la única microfase `ACTIVE`.
+F02 `COMPLETADA` / Gate F02 `GREEN`. F03 está `IN_PROGRESS`; M03.1 y M03.2 están `COMPLETADAS/GREEN`; M03.3 es la única microfase `ACTIVE`.
 
 ## Siguiente transición permitida
-Cerrar exclusivamente M03.2 con gate completo y validación visual/teclado. Solo después avanzar a M03.3 — Construir Sidebar global.
+Cerrar exclusivamente M03.3 con gate completo y validación visual/teclado. Solo después avanzar a M03.4 — Construir Topbar global + Settings.
 
 ## M03.1 — progreso adicional 2026-08-18
 - Se corrigió la primera implementación parcial: Tooltip/Dropdown/Sheet/ScrollArea/Separator ahora delegan en `radix-ui` real.
@@ -141,8 +142,7 @@ Cerrar exclusivamente M03.2 con gate completo y validación visual/teclado. Solo
 - Revisión 2026-08-19: el schema oficial en vivo de shadcn confirma `style: radix-nova`; no se migra a una forma experimental.
 - El gate M03.1 v4 convierte el bloqueo real en condición ejecutable: valida el grafo exacto en `package-lock.json`, documenta la validación visual Playwright en `tooling/dist/m03-1-design-system-report.json` y falla cerrado en CI.
 - Si el lock del commit está obsoleto, el mismo workflow genera un candidato, corre verifier/npm ci/tests/build/Playwright con él, lo sube como artifact y devuelve fallo intencional de sincronización; una segunda pasada con el lock versionado puede cerrar GREEN.
-- La especificación M03.2 fue preleída en ese corte; tras el cierre GREEN de M03.1, M03.2 quedó habilitada y ahora está `ACTIVE`.
-
+- La especificación M03.2 fue preleída en ese corte; tras el cierre GREEN de M03.1, M03.2 quedó habilitada y cerró GREEN posteriormente.
 
 ## Cierre M03.1 — 2026-08-19
 - Head definitivo: `c0ee291f29405a1f1dd9fb1c14afe7d13b3a45ae`.
@@ -151,10 +151,18 @@ Cerrar exclusivamente M03.2 con gate completo y validación visual/teclado. Solo
 - Lock y formato sincronizados; verifier, npm ci, suite dedicada, build y Playwright quedaron GREEN.
 - M03.1: `COMPLETADA`.
 
-## Inicio M03.2 — 2026-08-19
-- AppShell estructural `100dvh`, Sidebar `240/64`, Topbar `52`, workspace flexible y Statusbar `26`.
-- Responsive: desktop completo; laptop rail 64; tablet/mobile Sheet Radix.
-- Ayuda `help.studio.shell`, copy español tipado y `studio.menu` Lucide.
-- Suites dedicadas unit/contract/integration/E2E y workflow `m03-2-app-shell.yml` añadidos.
+## Cierre M03.2 — 2026-08-19
+- PR `#13`; merge `38b2f5aac504a406b42537b7aade8f3d26626e7d`.
+- Run propietario en `main`: `32272740576` — success.
+- Job `96132832137`: success; full `npm run check`, build y Playwright GREEN.
+- Artifact `9372820239`; digest `sha256:81531bf99ddd82d56ba813ec87f15305f6af0407498915363d802b174c97bce8`.
+- M03.2: `COMPLETADA / GREEN`.
+
+## Inicio M03.3 — 2026-08-19
+- Sidebar global con grupos exactos de `APP_SHELL_SPEC` y 24 destinos visibles.
+- Lucide por registry semántico; `aria-current`; Tooltip Radix en modo compacto.
+- Desktop 240→64; laptop rail 64; tablet/mobile reutilizan Sheet Radix.
+- `WorkspacePreferencesPort` + adapter in-memory; sin persistencia PGlite prematura.
+- Suites dedicadas unit/contract/integration/E2E y workflow `m03-3-sidebar.yml` preparados.
 - Estado: `ACTIVE` hasta Gate GREEN.
-- Próxima microfase permitida después del cierre: M03.3 — Construir Sidebar global.
+- Próxima microfase permitida después del cierre: M03.4 — Construir Topbar global + Settings.

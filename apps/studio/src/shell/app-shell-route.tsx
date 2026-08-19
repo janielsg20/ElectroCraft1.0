@@ -1,8 +1,10 @@
 import { ThemeProvider } from '@electrocraft/design-system';
 import type { ReactNode } from 'react';
 import { getStudioHelpDescriptor } from '../help/help-registry';
-import { studioNavigationMessageKeys, studioT } from '../i18n/studio-shell.es';
+import { studioT } from '../i18n/studio-shell.es';
 import { AppShell, type AppShellCopy, type AppShellStatus } from './app-shell';
+import { resolveSidebarActiveItem, studioSidebarNavigation } from './sidebar-navigation';
+import { createMemoryWorkspacePreferencesPort } from './workspace-preferences';
 
 const appShellCopy: AppShellCopy = Object.freeze({
   title: studioT('studio.appShell.title'),
@@ -12,6 +14,8 @@ const appShellCopy: AppShellCopy = Object.freeze({
   menuTitle: studioT('studio.appShell.menuTitle'),
   menuDescription: studioT('studio.appShell.menuDescription'),
   closeMenuLabel: studioT('studio.appShell.closeMenuLabel'),
+  collapseSidebarLabel: studioT('studio.appShell.collapseSidebarLabel'),
+  expandSidebarLabel: studioT('studio.appShell.expandSidebarLabel'),
   workspaceLabel: studioT('studio.appShell.workspaceLabel'),
   emptyWorkspace: studioT('studio.appShell.emptyWorkspace'),
   statusLabel: studioT('studio.appShell.statusLabel'),
@@ -23,7 +27,7 @@ const appShellCopy: AppShellCopy = Object.freeze({
   }),
 });
 
-const navigationLabels = Object.freeze(studioNavigationMessageKeys.map((key) => studioT(key)));
+const workspacePreferencesPort = createMemoryWorkspacePreferencesPort();
 
 export function StudioAppShellRoute({
   status,
@@ -33,10 +37,18 @@ export function StudioAppShellRoute({
   readonly children?: ReactNode;
 }) {
   const help = getStudioHelpDescriptor('help.studio.shell');
+  const activeItemId = resolveSidebarActiveItem(window.location.pathname);
 
   return (
     <ThemeProvider defaultTheme="system">
-      <AppShell copy={appShellCopy} navigationLabels={navigationLabels} helpId={help.id} status={status}>
+      <AppShell
+        copy={appShellCopy}
+        navigationGroups={studioSidebarNavigation}
+        activeItemId={activeItemId}
+        preferencesPort={workspacePreferencesPort}
+        helpId={help.id}
+        status={status}
+      >
         {children}
       </AppShell>
     </ThemeProvider>
