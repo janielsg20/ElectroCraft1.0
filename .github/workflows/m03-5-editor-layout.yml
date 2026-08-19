@@ -78,8 +78,13 @@ jobs:
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
 
-      - name: Verify M03.5 source formatting
-        run: npx prettier --check .github/workflows/m03-5-editor-layout.yml tooling/test/m03-5-editor-layout.test.mjs
+      - name: Emit exact resizable pane Prettier candidate
+        run: |
+          npx prettier --write packages/design-system/src/components/ui/resizable-pane-layout.tsx
+          echo '---BEGIN_RESIZABLE_PANE_PRETTIER_CANDIDATE---'
+          cat packages/design-system/src/components/ui/resizable-pane-layout.tsx
+          echo '---END_RESIZABLE_PANE_PRETTIER_CANDIDATE---'
+          exit 1
 
       - name: Execute dedicated M03.5 structural suite
         run: node --test tooling/test/m03-5-editor-layout.test.mjs
