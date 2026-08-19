@@ -40,14 +40,17 @@ for (const label of ['Construir', 'Datos', 'Lógica', 'App', 'Recursos', 'Aparie
 for (const token of ['aria-current', 'TooltipTrigger', 'useSyncExternalStore', 'data-sidebar-collapsed']) {
   if (!shell.includes(token)) throw new Error(`M03.3 AppShell behavior missing: ${token}`);
 }
-if (!preferences.includes('export interface WorkspacePreferencesPort')) throw new Error('M03.3 WorkspacePreferencesPort missing');
+if (!preferences.includes('export interface WorkspacePreferencesPort'))
+  throw new Error('M03.3 WorkspacePreferencesPort missing');
 if (!preferences.includes('createMemoryWorkspacePreferencesPort')) throw new Error('M03.3 in-memory adapter missing');
-if (preferences.includes('localStorage') || preferences.includes('PGlite')) throw new Error('M03.3 must not preempt F04 persistence');
+if (preferences.includes('localStorage') || preferences.includes('PGlite'))
+  throw new Error('M03.3 must not preempt F04 persistence');
 if (!navigation.includes("iconId: 'studio.sidebar.editor'")) throw new Error('M03.3 semantic icon mapping missing');
 if (!css.includes("data-sidebar-collapsed='true'") || !css.includes('grid-template-columns: 64px')) {
   throw new Error('M03.3 240 -> 64 collapse CSS missing');
 }
-if (!closure.includes('32272740576') || !closure.includes('GREEN')) throw new Error('M03.2 closure evidence is not GREEN');
+if (!closure.includes('32272740576') || !closure.includes('GREEN'))
+  throw new Error('M03.2 closure evidence is not GREEN');
 
 const active = /M03\.3[^\n]*ACTIVE/.test(state);
 const complete = /M03\.3[^\n]*COMPLETADA/.test(state);

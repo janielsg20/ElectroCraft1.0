@@ -93,11 +93,7 @@ function TopbarToolCluster({
 
   return (
     <div className="ec-topbar-tool-cluster" aria-label={copy.toolsTitle}>
-      <span
-        className="ec-topbar-tool"
-        data-topbar-tool="document"
-        aria-label={`${copy.documentLabel}: ${activeLabel}`}
-      >
+      <span className="ec-topbar-tool" data-topbar-tool="document" aria-label={`${copy.documentLabel}: ${activeLabel}`}>
         <DocumentIcon aria-hidden="true" />
         <span>{activeLabel}</span>
       </span>

@@ -51,7 +51,7 @@ if (topbar.lastIndexOf('data-topbar-settings-trigger') <= topbar.lastIndexOf('ec
   throw new Error('M03.4 Settings gear must be the final right-side action');
 }
 if (topbar.includes('onCloseAutoFocus')) throw new Error('M03.4 must preserve Radix default focus restoration');
-if (!sheet.includes("Dialog as DialogPrimitive")) throw new Error('M03.4 Settings must use the real Radix Sheet owner');
+if (!sheet.includes('Dialog as DialogPrimitive')) throw new Error('M03.4 Settings must use the real Radix Sheet owner');
 for (const token of ['max-width: 1279px', 'max-width: 1023px', 'max-width: 767px', '44px']) {
   if (!css.includes(token)) throw new Error(`M03.4 responsive contract missing: ${token}`);
 }
@@ -84,8 +84,8 @@ for (const iconId of [
   if (!icons.includes(`'${iconId}'`)) throw new Error(`M03.4 Lucide registry ID missing: ${iconId}`);
 }
 if (!route.includes('<StudioTopbar')) throw new Error('M03.4 Topbar is not composed inside AppShell route');
-if (!help.includes('Settings') || !help.includes('restaura el foco')) {
-  throw new Error('M03.4 persistent help does not explain Settings/focus behavior');
+if (!help.includes('Configuración') || !help.includes('restaura el foco')) {
+  throw new Error('M03.4 persistent help does not explain Configuración/focus behavior');
 }
 if (!closure.includes('32275890306') || !closure.includes('GREEN')) {
   throw new Error('M03.3 closure evidence is not GREEN');

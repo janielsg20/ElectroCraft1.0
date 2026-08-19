@@ -12,9 +12,9 @@ test.describe('M03.4 Topbar global + Settings', () => {
     await expect(page.locator('[data-topbar-tool="platform"]')).toContainText('Web');
     await expect(page.locator('[data-topbar-tool="breakpoint"]')).toContainText('Escritorio');
 
-    const settingsIsLast = await page.locator('.ec-topbar-right').evaluate((element) =>
-      element.lastElementChild?.hasAttribute('data-topbar-settings-trigger'),
-    );
+    const settingsIsLast = await page
+      .locator('.ec-topbar-right')
+      .evaluate((element) => element.lastElementChild?.hasAttribute('data-topbar-settings-trigger'));
     expect(settingsIsLast).toBe(true);
   });
 

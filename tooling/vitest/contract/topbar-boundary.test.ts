@@ -18,7 +18,9 @@ describe('M03.4 Topbar boundaries', () => {
 
   it('keeps Settings as the last right-side action and uses the same WorkspacePreferencesPort', () => {
     const topbar = read('apps/studio/src/shell/studio-topbar.tsx');
-    expect(topbar.lastIndexOf('data-topbar-settings-trigger')).toBeGreaterThan(topbar.lastIndexOf('ec-topbar-help-trigger'));
+    expect(topbar.lastIndexOf('data-topbar-settings-trigger')).toBeGreaterThan(
+      topbar.lastIndexOf('ec-topbar-help-trigger'),
+    );
     expect(topbar).toContain('preferencesPort.toggleSidebar');
     expect(topbar).toContain('data-topbar-settings-sheet');
   });
@@ -31,7 +33,7 @@ describe('M03.4 Topbar boundaries', () => {
     expect(topbar).toContain('SheetContent');
     expect(topbar).toContain('SheetClose');
     expect(topbar).not.toContain('onCloseAutoFocus');
-    expect(sheet).toContain("Dialog as DialogPrimitive");
+    expect(sheet).toContain('Dialog as DialogPrimitive');
   });
 
   it('keeps M03.5 Inspector behavior out of M03.4', () => {
