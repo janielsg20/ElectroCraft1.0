@@ -22,7 +22,8 @@ Historial detallado:
 | M02.8 | COMPLETADA | `.ai/evidence/F02/M02.8/CLOSURE_2026-08-18.md` |
 | M02.9 | COMPLETADA | `.ai/evidence/F02/M02.9/CLOSURE_2026-08-18.md` |
 | F02 Gate | GREEN | `.ai/evidence/F02/CLOSURE_2026-08-18.md` |
-| F03 / M03.1 | ACTIVE | `.ai/microphases/M03_1.md` + `.ai/evidence/F03/M03.1/IMPLEMENTATION_2026-08-18.md` |
+| M03.1 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.1/CLOSURE_2026-08-19.md` |
+| F03 / M03.2 | ACTIVE | `.ai/microphases/M03_2.md` + `.ai/evidence/F03/M03.2/IMPLEMENTATION_2026-08-19.md` |
 
 ## Cierre M02.1
 - PR `#3`; squash merge `cf4649d98f96a553daa020581a918d9559131137`.
@@ -94,7 +95,7 @@ Historial detallado:
 - Tailwind monorepo corregido: `@source` registra explícitamente `packages/design-system/src`; CI base y gate M03.1 instalan Chromium antes del E2E real.
 - Revisión React/shadcn 2026-08-19: se eliminó memoización trivial, se hoistaron lookups Lucide y el copy nuevo visible de M03.1 pasa por el catálogo tipado; i18next real se mantiene reservado para M03.10 según su spec.
 - `npm run lint`, `npm run typecheck`, `npm test`, `npm run build` y Playwright real: `NOT_RUN` por checkout/dependencias completas no disponibles.
-- M03.1 permanece `ACTIVE`; evidencia: `.ai/evidence/F03/M03.1/IMPLEMENTATION_2026-08-18.md`.
+- En ese corte M03.1 permanecía `ACTIVE`; quedó cerrada posteriormente en `.ai/evidence/F03/M03.1/CLOSURE_2026-08-19.md`.
 
 ## M03.1 — Actions run 32266099186 (2026-08-19)
 - Head: `1ab2ce7f9f1340cd07ad20c66370d65aa56d2bf9`.
@@ -109,7 +110,7 @@ Historial detallado:
 - Evidence artifact: `9370268489`, digest `sha256:a6100d24028f977c166437e6361622868bcf8314892a9e4d23e38ee1c5c4f91f`.
 - Lock recuperado: `package-lock.json` SHA-256 `1025aa726810d4fbbc313829ae59df9b4c5e85bf5f7ddb553daa754c75ca8789`.
 - Overlay v5 incorpora el lock real y convierte Prettier en candidato reproducible: formatea temporalmente, sube patch/tar exacto y continúa el full gate sobre el árbol ya formateado.
-- Estado: M03.1 `ACTIVE`; no activar M03.2 aún.
+- Estado de ese run: M03.1 seguía `ACTIVE`; este bloqueo quedó resuelto antes del cierre definitivo.
 
 ## M03.1 — Actions run 32267262219 (2026-08-19)
 - Head: `cecce5531050b3617911d21de8ac3d65cbf8892c`.
@@ -125,19 +126,35 @@ Historial detallado:
 - Artifact de formato: `9370734134`, digest `sha256:3cf346e520f2302250ca84e5bb81c920464a72b49ee989af7296ce6b69cd546a`.
 - Job final: `failure` esperado exclusivamente por `Require committed formatting synchronization`.
 - Overlay v6 incorpora exactamente esos 14 archivos; siguiente ejecución debe confirmar GREEN antes de activar M03.2.
-- Estado: M03.1 `ACTIVE`.
+- Estado de ese run: M03.1 seguía `ACTIVE`; el cierre definitivo ocurrió en run `32267795991`.
 
 ## Gate actual
-F02 `COMPLETADA` / Gate F02 `GREEN`. F03 está `IN_PROGRESS` con M03.1 como única microfase activa.
+F02 `COMPLETADA` / Gate F02 `GREEN`. F03 está `IN_PROGRESS`; M03.1 `COMPLETADA/GREEN` y M03.2 es la única microfase `ACTIVE`.
 
 ## Siguiente transición permitida
-Cerrar exclusivamente M03.1: regenerar `package-lock.json` desde npm real, instalar las dependencias fijadas, ejecutar gate completo y validación visual/teclado. Solo después avanzar a M03.2.
+Cerrar exclusivamente M03.2 con gate completo y validación visual/teclado. Solo después avanzar a M03.3 — Construir Sidebar global.
 
 ## M03.1 — progreso adicional 2026-08-18
 - Se corrigió la primera implementación parcial: Tooltip/Dropdown/Sheet/ScrollArea/Separator ahora delegan en `radix-ui` real.
 - Se añadieron Lucide registry, Tailwind v4, config versionada+migration/round-trip, `shell/`, `i18n/`, `help/`, Vitest y Playwright.
-- M03.1 continúa `ACTIVE`: lockfile/CI/browser siguen pendientes; M03.2 no está habilitada.
+- En ese corte M03.1 continuaba `ACTIVE`; lockfile/CI/browser fueron resueltos y M03.1 cerró GREEN posteriormente.
 - Revisión 2026-08-19: el schema oficial en vivo de shadcn confirma `style: radix-nova`; no se migra a una forma experimental.
 - El gate M03.1 v4 convierte el bloqueo real en condición ejecutable: valida el grafo exacto en `package-lock.json`, documenta la validación visual Playwright en `tooling/dist/m03-1-design-system-report.json` y falla cerrado en CI.
 - Si el lock del commit está obsoleto, el mismo workflow genera un candidato, corre verifier/npm ci/tests/build/Playwright con él, lo sube como artifact y devuelve fallo intencional de sincronización; una segunda pasada con el lock versionado puede cerrar GREEN.
-- La especificación M03.2 fue preleída únicamente para transición; su precondición exige M03.1 COMPLETADA y por tanto no está activa ni implementada.
+- La especificación M03.2 fue preleída en ese corte; tras el cierre GREEN de M03.1, M03.2 quedó habilitada y ahora está `ACTIVE`.
+
+
+## Cierre M03.1 — 2026-08-19
+- Head definitivo: `c0ee291f29405a1f1dd9fb1c14afe7d13b3a45ae`.
+- Run `32267795991`: success.
+- Artifact `9370938322`; digest `sha256:0aa9467b713fcc66f19d91acfd6d31c783b35aaa5ddddda04a8d5a379760156f`.
+- Lock y formato sincronizados; verifier, npm ci, suite dedicada, build y Playwright quedaron GREEN.
+- M03.1: `COMPLETADA`.
+
+## Inicio M03.2 — 2026-08-19
+- AppShell estructural `100dvh`, Sidebar `240/64`, Topbar `52`, workspace flexible y Statusbar `26`.
+- Responsive: desktop completo; laptop rail 64; tablet/mobile Sheet Radix.
+- Ayuda `help.studio.shell`, copy español tipado y `studio.menu` Lucide.
+- Suites dedicadas unit/contract/integration/E2E y workflow `m03-2-app-shell.yml` añadidos.
+- Estado: `ACTIVE` hasta Gate GREEN.
+- Próxima microfase permitida después del cierre: M03.3 — Construir Sidebar global.

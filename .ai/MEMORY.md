@@ -48,3 +48,4 @@ Solo contiene hechos estables y decisiones vigentes. Progreso y siguiente paso p
 - Studio usa shadcn/ui con base Radix explícita sobre el paquete unificado `radix-ui`; no se mezclan Base UI/Aria sin ADR.
 - `packages/design-system` es el owner de tokens/primitives y Lucide se consume mediante un registry semántico tipado.
 - Theme light/dark/system y densidad High Density son preferencias del Studio, no Project Objects del modelo canónico.
+- El AppShell global usa 100dvh con scroll contenido en workspace; desktop reserva Sidebar 240px, laptop 64px y tablet/mobile trasladan navegación estructural a Sheet Radix.

@@ -1,30 +1,25 @@
 # HANDOFF — ElectroCraft
 
 ## Current
-F03 / M03.1 — Inicializar shadcn/ui Radix, Lucide y tokens ElectroCraft — `ACTIVE`.
+F03 / M03.2 — Construir AppShell desktop — `ACTIVE`.
 
-## Estado heredado de esta sesión
-- `main` actual verificado: `cecce5531050b3617911d21de8ac3d65cbf8892c` (`Last Sync: 2026-08-19 10:58 (Mobile)`), que integra M03.1 v5.
-- Run M03.1 `32267262219` terminó en `failure` **solo** por el guard `Require committed formatting synchronization`.
-- Antes de ese guard quedaron verdes: toolchain Node/npm, lock sincronizado, verifier M03.1, `npm ci`, pins exactos, formatting candidate, suite dedicada `15/15`, Chromium y el full `npm run check` sobre el árbol formateado.
-- Por tanto typecheck, tests acumulados, build y Playwright E2E ya fueron ejecutados con éxito en Actions sobre el contenido funcional de v5 después de Prettier.
-- Artifact `9370734134` (`m03-1-formatting-candidate`, digest `sha256:3cf346e520f2302250ca84e5bb81c920464a72b49ee989af7296ce6b69cd546a`) fue recuperado y contiene exactamente 14 archivos. Overlay v6 los aplica byte por byte.
-- M03.1 sigue `ACTIVE` hasta versionar v6 y obtener el mismo gate GREEN sin diff de formato; M03.2 no está activa todavía.
+## Estado heredado
+- `main@c0ee291f29405a1f1dd9fb1c14afe7d13b3a45ae` cerró M03.1 con run `32267795991` success.
+- M03.1 artifact `9370938322`; digest `sha256:0aa9467b713fcc66f19d91acfd6d31c783b35aaa5ddddda04a8d5a379760156f`.
+- M03.2 implementa únicamente la estructura AppShell y responsive. No implementa el Sidebar agrupado/persistente de M03.3 ni la Topbar funcional/Settings de M03.4.
 
 ## Siguiente acción exacta
-1. Aplicar/publicar overlay M03.1 v6 sobre `main@cecce5531050b3617911d21de8ac3d65cbf8892c`.
-2. Dejar ejecutar `M03.1 Design System Gate`; lock y formatting deberían quedar sincronizados.
-3. Si el run queda GREEN, registrar cierre formal M03.1, actualizar STATE/TRACKING/HANDOFF y activar M03.2.
-4. Implementar inmediatamente M03.2 — AppShell desktop y producir su ZIP descargable.
+1. Aplicar el overlay M03.2 sobre `main@c0ee291f29405a1f1dd9fb1c14afe7d13b3a45ae`.
+2. Ejecutar `M03.2 AppShell Gate`.
+3. Resolver solo evidencia real del run si aparece un formatting/test/build/E2E blocker.
+4. Con M03.2 GREEN, registrar cierre y activar M03.3 — Construir Sidebar global.
 
-## APIs/decisiones vigentes
-- Gestor canónico: `npm@10.9.2`; no migrar a pnpm por ejemplos externos.
-- shadcn se mantiene con base Radix explícita; los primitives implementados delegan en `radix-ui`, no en controles simulados.
-- Tailwind v4 expone aliases semánticos mediante `@theme inline`; `@source` registra explícitamente el source del paquete compartido y los componentes consumen tokens ElectroCraft.
-- Lucide se consume mediante registry semántico tipado.
-- AI Elements heredará este foundation; no mezclar Base UI/Aria sin ADR.
+## Decisiones vigentes
+- `packages/design-system` sigue siendo único owner de primitives/tokens.
+- Studio consume solo `@electrocraft/design-system` root export.
+- Tablet/mobile usan Sheet Radix; no hay desktop comprimido.
+- Navigation grouping/icons/active/preferences pertenecen a M03.3.
+- Topbar completa y Settings pertenecen a M03.4.
 
 ## Read set
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M03_1.md`.
-
-F02 está cerrada con Gate GREEN. M03.1 es la única microfase activa.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M03_2.md`.

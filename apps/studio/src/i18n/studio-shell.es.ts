@@ -21,9 +21,25 @@ export const studioShellMessagesEs = Object.freeze({
   'studio.navigation.help': 'Ayuda',
   'studio.navigation.settings': 'Configuración',
 
-  'studio.bootstrap.m03Kicker': 'Studio · F03 / M03.1',
+  'studio.appShell.title': 'ElectroCraft Studio',
+  'studio.appShell.sidebarLabel': 'Navegación principal del Studio',
+  'studio.appShell.navigationLabel': 'Navegación del Studio',
+  'studio.appShell.menuLabel': 'Abrir navegación',
+  'studio.appShell.menuTitle': 'Navegación',
+  'studio.appShell.menuDescription':
+    'Acceso estructural del AppShell. La agrupación, iconos y estado activo se completan en M03.3.',
+  'studio.appShell.closeMenuLabel': 'Cerrar navegación',
+  'studio.appShell.workspaceLabel': 'Área de trabajo del Studio',
+  'studio.appShell.emptyWorkspace': 'Área de trabajo vacía',
+  'studio.appShell.statusLabel': 'Estado del Studio',
+  'studio.appShell.status.ready': 'Listo',
+  'studio.appShell.status.saving': 'Guardando',
+  'studio.appShell.status.error': 'Error',
+  'studio.appShell.status.blocked': 'Bloqueado',
+
+  'studio.bootstrap.m03Kicker': 'Studio · F03 / M03.2',
   'studio.bootstrap.foundationSummary':
-    'Bootstrap técnico temporal. La foundation Radix/Lucide se valida en una ruta interna sin adelantar el AppShell final.',
+    'AppShell estructural activo sobre la foundation Radix/Lucide. Sidebar, Topbar, workspace y Statusbar reservan su geometría real sin adelantar las capacidades de M03.3/M03.4.',
   'studio.bootstrap.openDesignSystemGallery': 'Abrir galería técnica del sistema de diseño',
   'studio.bootstrap.title': 'ElectroCraft — Desarrollo',
   'studio.bootstrap.environmentStatus': 'Estado del entorno',
