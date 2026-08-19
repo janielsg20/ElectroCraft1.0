@@ -1,29 +1,31 @@
 # HANDOFF — ElectroCraft
 
 ## Current
-F03 / M03.5 — Construir Context/Canvas/Inspector/Status — `ACTIVE`.
+F03 / M03.6 — Adaptar laptop/tablet/mobile — `ACTIVE`.
 
 ## Estado heredado
-- `main@dd6ac8ea28276d9a1fc05f387338cba5980462a5` cerró M03.4 con run `32278183037` success.
-- M03.4 artifact `9374817606`; digest `sha256:7f22461f600be17afa7b72a2cb54cccf0d08115ca9fe30c8dd2b583567847dd9`.
-- Full gate M03.4: Node `27/27`, Vitest `169/169`, build PASS, Playwright `16/16` y `npm run check` GREEN.
+- M03.5 cerró GREEN en PR `#18`, head validado `5044a3456cee87094f66d8c5f262b457ea338020`.
+- Run propietario `32296070741` success; job `96207545673`.
+- Artifact `9381289623`; digest `sha256:c78ebf5db9dd87d2235a08907f2f9e51ce9e00a070190540322530d026f4c73c`.
+- Gate M03.5: structural `1/1`, Vitest dedicado `7/7`, Playwright dedicado `4/4`, Node global `28/28`, Vitest global `176/176`, Playwright global `20/20`, typecheck/build GREEN.
 
 ## Siguiente acción exacta
-1. Aplicar el paquete M03.5 sobre `main@dd6ac8ea28276d9a1fc05f387338cba5980462a5` sin eliminar archivos no incluidos.
-2. Ejecutar `npm ci --ignore-scripts --no-audit --no-fund` y `npm run check`.
-3. Resolver únicamente fallos reales de formato, typecheck, tests, build o Playwright dentro del scope M03.5.
-4. Con M03.5 GREEN, registrar `CLOSURE` y solo entonces activar M03.6.
+1. Confirmar que el gate M03.5 post-cierre sigue GREEN con `M03.5 COMPLETADA` y `M03.6 ACTIVE`.
+2. Integrar PR `#18` en `main` sin introducir cambios ajenos al scope validado.
+3. Ejecutar/revisar el gate propietario M03.5 sobre `main` y exigir GREEN.
+4. Crear una rama limpia desde ese `main` y comenzar M03.6 según `.ai/microphases/M03_6.md`.
+5. No implementar M03.7 ni funciones futuras mientras M03.6 esté ACTIVE.
 
 ## Decisiones vigentes
 - Contexto desktop: 288px, min 240px, max 380px.
 - Canvas domina el espacio restante y usa `Puck.Preview` por medio del adapter propietario.
 - Inspector desktop: 320px, min 280px, max 440px.
 - Statusbar owner de AppShell se reutiliza a 26px y continúa solo informativo.
-- Laptop reduce primero Inspector a Sheet; tablet/móvil trasladan Contexto e Inspector a Sheet.
-- Separadores desktop admiten puntero y teclado con límites explícitos.
-- `@puckeditor/core` no se importa desde Studio; el owner es `@electrocraft/editor-puck`.
-- No hay widgets, datos demo, persistencia ni funciones simuladas adelantadas.
-- Ayuda crítica continúa bajo `help.studio.shell`.
+- Sheets de herramientas usan triggers Radix reales y restore-focus nativo.
+- `help.studio.shell` pertenece al AppShell y no se duplica en el workspace del editor.
+- M03.6 debe preservar capacidades: laptop usa colapso/overlay según ancho útil, tablet rail + Sheets y móvil Topbar compacta + bottom nav.
+- En móvil, Properties pertenece a bottom Sheet y Outline a Sheet full-height; objetivos táctiles y navegación por teclado deben seguir accesibles.
+- `@puckeditor/core` no se importa desde Studio; el owner continúa siendo `@electrocraft/editor-puck`.
 
 ## Read set
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M03_5.md → .ai/APP_SHELL_SPEC.md`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M03_6.md → .ai/APP_SHELL_SPEC.md`.
