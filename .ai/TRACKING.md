@@ -17,41 +17,37 @@ El historial detallado previo permanece versionado en Git y en los archivos de e
 | M03.5 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.5/CLOSURE_2026-08-19.md` |
 | M03.6 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.6/CLOSURE_2026-08-19.md` |
 | M03.7 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.7/CLOSURE_2026-08-19.md` |
-| F03 / M03.8 | ACTIVE | `.ai/microphases/M03_8.md` |
+| M03.8 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.8/CLOSURE_2026-08-19.md` |
+| F03 / M03.9 | ACTIVE | `.ai/microphases/M03_9.md` |
 
 ## Cierres canónicos recientes
-### M03.5
-- PR `#18`; squash merge `f7577871dcadb843ea59a4bec0378cbbf9cc396b`.
-- Run propietario PR `32296070741` — success; artifact `9381289623`.
-- Revalidación en `main`: run `32297534296`, job `96212236246` — success.
-- Artifact main `9381789348`; digest `sha256:b5d07c57b0a24e8c1a4cf9df94707cd5eaf23948639fd8e0ab24081e46ac361b`.
-- Full gate: Node `28/28`, Vitest `176/176`, Playwright `20/20`, typecheck/build GREEN.
-
-### M03.6
-- PR `#19`; head funcional validado `f82d119d4c65bad6908674801dcb18ff318bab88`.
-- Run propietario `32299990614` — success; job `96220101415`.
-- Artifact `9382670739`; digest `sha256:8220e02ccde96f013de24c4ee258f3bbe36fb1600d486e6b65277ba4353bb67f`.
-- Structural `1/1`; Vitest dedicado `12/12`; Playwright dedicado `4/4`.
-- Full gate: Node `29/29`, Vitest `188/188` en 56 archivos, Playwright `24/24`, typecheck/build GREEN.
-- Laptop conserva rail 64px y usa overlay secundario cuando viewport <1152 dentro de la banda laptop.
-- Tablet usa rail global 56px + navegación completa y herramientas secundarias en Sheets.
-- Móvil usa dock inferior 58px exacto `Componentes | Pantallas | Lienzo | Propiedades | Más`; Propiedades bottom Sheet y Más/Capas full-height.
-- Pantallas reutiliza el registry canónico del Sidebar; Puck permanece detrás de `@electrocraft/editor-puck`.
-
 ### M03.7
-- PR `#21`; head funcional validado `6f9acca7261f31ba38f79b286fa8e73124b89300`.
-- Workflow propietario `M03.7 Information Architecture Gate`: run `32304389329` — success; job `96233873445`.
-- Artifact `9384209280`; digest `sha256:d9b13f174fb36d64571bb1f200aa3f5a408130bd18d19bcfdf22227594001b84`.
+- PR `#21`; integrado en `main` mediante merge `8eeeb40cf0965db880bf6b451dee28c0c0c2041f`.
+- Workflow propietario `M03.7 Information Architecture Gate`: run `32304389329` — success; artifact `9384209280`.
 - Structural `1/1`; Vitest dedicado `17/17`; Playwright dedicado `10/10`.
 - Full gate: Node `30/30`, Vitest `205/205` en 59 archivos, Playwright `34/34`, lint/typecheck/build GREEN.
 - Implementa taxonomía `primary | contextual | advanced | diagnostic`; Advanced usa Progressive Disclosure Radix y diagnostics de estado no se esconden.
 - Inspector conserva ownership de Puck; `/content` es la ruta canónica List/Detail; rutas redundantes fallan cerradas.
-- Queries, Forms, Administración, Media y Export muestran empty states honestos mientras no exista la capacidad funcional.
 
-## Transición M03.8
-- M03.8 es la única microfase `ACTIVE` en esta rama de cierre.
-- Su contrato exige `PALETTE_UX_SPEC.md`, `palette search synonym index`, Palette E2E, categorías exactas y catálogo gobernado por `PALETTE_CATALOG_MATRIX.md` sin duplicar ComponentDefinitions.
-- Para iniciar M03.8 desde una rama limpia, integrar primero PR `#21` y revalidar M03.7 GREEN sobre `main`.
+### M03.8
+- Rama `agent/m03-8-palette-discoverability` creada desde `main` ya revalidado tras M03.7.
+- Head funcional canónico `b3e66bf4d85518ea3f3102e8ffe0db472aea9947`.
+- Workflow propietario `M03.8 Discoverable Palette Gate`: run `32308655658` — success; job `96246831243`.
+- Artifact `9385669357`; digest `sha256:1692ec47ef5cab4a30a480d8c3b7fb2763c9f2daf2faf5ad0e88b5aa1429434c`.
+- Structural M03.8 `7/7`; M03.5 successor composition `1/1`; Vitest dedicado `27/27`; Playwright dedicado `11/11`.
+- Full gate: Node `37/37`, Vitest `230/230` en 63 archivos, Playwright `45/45`, lint/format, TypeScript strict, boundaries y builds GREEN.
+- Palette gobernada por `.ai/PALETTE_CATALOG_MATRIX.md` con las 10 categorías exactas, search conceptual y UX High Density responsive.
+- Favoritos/Recientes persisten solo `paletteItemId` como workspace preferences.
+- Puck conserva drag/composition ownership; click-to-insert pasa por `@electrocraft/editor-puck` y los mappings ausentes quedan visibles como diagnostics fail-closed.
+- Los gates históricos M03.5/M03.6/M03.7 se adaptaron a la nueva composición/transición sin retirar sus checks funcionales, responsive o de boundary.
+
+## Transición M03.9
+- M03.9 es la única microfase `ACTIVE`.
+- Owner: `shadcn/ui Radix + ElectroCraft Studio tokens`.
+- Ubicación: `Configuración > Apariencia del Studio`.
+- Debe definir `StudioAppearanceProfile` como preference schema separada del theme del proyecto.
+- Debe soportar Modo/Colores/Tipografía/Iconos/Forma/Densidad/Movimiento, Preview/Apply/Revert, presets personales, reduced motion y Restore Accessible Defaults.
+- El E2E debe demostrar que cambiar la apariencia del Studio no modifica ElectroCraftDocument, Theme del proyecto ni ExportIR.
 
 ## Historial extendido
 - hasta M00.8: `.ai/TRACKING_HISTORY_THROUGH_M00.8.md`;

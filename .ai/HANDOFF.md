@@ -1,36 +1,35 @@
 # HANDOFF — ElectroCraft
 
 ## Current
-F03 / M03.8 — Diseñar Palette descubrible sin multiplicar componentes — `ACTIVE`.
+F03 / M03.9 — Apariencia del Studio Editor completo — `ACTIVE`.
 
 ## Estado heredado
-- M03.7 cerró GREEN en PR `#21`, head funcional `6f9acca7261f31ba38f79b286fa8e73124b89300`.
-- Workflow propietario `M03.7 Information Architecture Gate`: run `32304389329` success; job `96233873445`.
-- Artifact `9384209280`; digest `sha256:d9b13f174fb36d64571bb1f200aa3f5a408130bd18d19bcfdf22227594001b84`.
-- Gate M03.7: structural `1/1`, Vitest dedicado `17/17`, Playwright dedicado `10/10`, Node global `30/30`, Vitest global `205/205` en 59 archivos, Playwright global `34/34`, lint/typecheck/build GREEN.
+- M03.8 cerró GREEN en la rama `agent/m03-8-palette-discoverability` sobre head funcional `b3e66bf4d85518ea3f3102e8ffe0db472aea9947`.
+- Workflow propietario `M03.8 Discoverable Palette Gate`: run `32308655658` success; job `96246831243`.
+- Artifact `9385669357`; digest `sha256:1692ec47ef5cab4a30a480d8c3b7fb2763c9f2daf2faf5ad0e88b5aa1429434c`.
+- Gate M03.8: structural `7/7`, M03.5 successor `1/1`, Vitest dedicado `27/27`, Playwright dedicado `11/11`, Node global `37/37`, Vitest global `230/230` en 63 archivos, Playwright global `45/45`, lint/format/typecheck/build GREEN.
+- Palette discovery usa matriz ElectroCraft, Favoritos/Recientes por ID y fail-closed insertion; Puck mantiene ownership de drag/composition.
 
 ## Siguiente acción exacta
-1. Integrar PR `#21` en `main` solo con autorización explícita y sin introducir cambios ajenos al scope validado.
-2. Revalidar el gate propietario M03.7 sobre `main` y exigir GREEN.
-3. Crear una rama limpia desde ese `main` para M03.8.
-4. Leer `PALETTE_CATALOG_MATRIX.md` como fuente de verdad y `.ai/microphases/M03_8.md` como contrato ejecutable.
-5. Crear `PALETTE_UX_SPEC.md` y el índice de search/synonyms antes de renderizar UI nueva.
-6. Implementar Palette en `Construir > Editor > Componentes` y `Construir > Componentes` sin derivar directamente el catálogo desde ComponentRegistry.
-7. Mantener Puck como owner de drag/insert, ofrecer click-to-insert accesible y no duplicar ComponentDefinitions.
-8. No declarar M03.8 completa sin unit/contract/integration/negative/E2E, lint, typecheck, test y build GREEN.
+1. Leer `.ai/microphases/M03_9.md` como contrato ejecutable y auditar los tokens/preferences de Studio ya existentes antes de crear tipos nuevos.
+2. Definir `StudioAppearanceProfile` como workspace/user preference schema, nunca como `ElectroCraftTheme` del proyecto.
+3. Mapear todos los valores a design tokens existentes o añadir tokens compartidos en `packages/design-system` solo cuando falten.
+4. Implementar `Configuración > Apariencia del Studio` con grupos Modo/Colores/Tipografía/Iconos/Forma/Densidad/Movimiento y copy español antes de renderizar controles.
+5. Implementar Preview/Apply/Revert y presets personales; cerrar Settings con cambios pendientes debe ofrecer una decisión explícita.
+6. Respetar reduced-motion del sistema y advertir combinaciones de contraste/accesibilidad inválidas con Restore Accessible Defaults.
+7. Probar aislamiento: la apariencia del Studio no puede mutar ElectroCraftDocument, frontend Theme ni ExportIR.
+8. Añadir unit/contract/integration/negative/persistence/E2E y ejecutar lint, typecheck, test, build y browser gate antes de cerrar M03.9.
 
 ## Decisiones vigentes
 - La IA del Studio clasifica información como `primary | contextual | advanced | diagnostic`.
 - Advanced usa Progressive Disclosure Radix encapsulado por `packages/design-system`; diagnostics críticos no se ocultan en Advanced.
 - `/content` es la ruta canónica List/Detail; rutas redundantes/desconocidas fallan cerradas.
-- Desktop conserva geometría M03.5.
-- Laptop conserva rail 64px y usa split >=1152 / overlay secundario entre 1024–1151.
-- Tablet usa rail global 56px + navegación completa en Sheet.
-- Móvil usa dock 58px exacto `Componentes | Pantallas | Lienzo | Propiedades | Más`.
-- Propiedades usa bottom Sheet; Más expone Outline/Capas full-height.
-- Pantallas usa el registry canónico del Sidebar.
-- `SheetContent` Radix existente soporta `left | right | bottom`; no existe otro drawer subsystem.
+- Desktop conserva geometría M03.5; laptop, tablet y móvil conservan las adaptaciones M03.6.
 - Puck conserva ownership detrás de `@electrocraft/editor-puck`.
+- La Palette usa `.ai/PALETTE_CATALOG_MATRIX.md` como catálogo de descubrimiento, no el registry runtime de Puck.
+- Favoritos/Recientes de Palette son preferences por `paletteItemId` y no Project Objects.
+- Click-to-insert solo se habilita si el componentRef existe de verdad; mappings pendientes muestran diagnostics visibles.
+- Apariencia del Studio pertenece a workspace/user preferences y debe permanecer aislada del Theme del proyecto y ExportIR.
 
 ## Read set
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M03_8.md → PALETTE_CATALOG_MATRIX.md → UI_UX_LAYOUT_RULES.md`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M03_9.md → UI_UX_LAYOUT_RULES.md → packages/design-system → apps/studio/src/shell`.

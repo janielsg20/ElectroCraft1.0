@@ -56,3 +56,7 @@ Solo contiene hechos estables y decisiones vigentes. Progreso y siguiente paso p
 - La arquitectura de información del Studio clasifica opciones como `primary | contextual | advanced | diagnostic`; `advanced` usa Progressive Disclosure con `Collapsible` Radix del design-system y un diagnostic que protege estado no puede quedar oculto únicamente dentro de Advanced.
 - Inspector mantiene propiedades principales bajo ownership de Puck; ElectroCraft solo compone la jerarquía y la presentación alrededor del owner.
 - `/content` es la ruta canónica única del patrón List/Detail del Studio. Las superficies aún no funcionales usan empty states honestos y las rutas redundantes/desconocidas fallan cerradas en vez de simular éxito.
+- La Palette usa `.ai/PALETTE_CATALOG_MATRIX.md` como fuente de descubrimiento y no deriva su catálogo directamente del ComponentRegistry activo de Puck.
+- Las categorías estables de Palette son Layout, Basic, Content, Navigation, Dynamic Data, Forms, Filters, Social / Contact, Admin y Commerce Pack; aliases/presets/bindings pueden compartir un mismo `componentRef` sin crear ComponentDefinitions duplicados.
+- Favoritos y Recientes de Palette son workspace preferences que guardan únicamente `paletteItemId`; no persisten ComponentDefinitions, props de engine ni Project Objects.
+- Puck conserva ownership de drag/composition. El click-to-insert accesible cruza `@electrocraft/editor-puck` y solo despacha si el `componentRef` existe realmente; mappings pendientes permanecen visibles mediante diagnostics fail-closed.

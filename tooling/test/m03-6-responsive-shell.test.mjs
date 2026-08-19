@@ -112,13 +112,18 @@ test('M03.6 structural gate preserves capabilities across responsive modes', () 
     assert.equal(closure.includes('GREEN'), true, 'M03.6 closure evidence must remain GREEN');
 
     const m03_7Active = /M03\.7[^\n]*ACTIVE/.test(state);
-    const m03_7ClosedWithM03_8Active =
-      /M03\.7[^\n]*COMPLETADA[^\n]*GREEN/.test(state) && /M03\.8[^\n]*ACTIVE/.test(state);
-    assert.equal(
-      m03_7Active || m03_7ClosedWithM03_8Active,
-      true,
-      'M03.6 successor must remain M03.7 ACTIVE or advance only after M03.7 closes GREEN',
-    );
+    const m03_7Complete = /M03\.7[^\n]*COMPLETADA[^\n]*GREEN/.test(state);
+    assert.equal(m03_7Active || m03_7Complete, true, 'M03.6 successor M03.7 must be ACTIVE or COMPLETADA / GREEN');
+
+    if (m03_7Complete) {
+      const activeSuccessor = state.match(/M03\.(\d+)[^\n]*ACTIVE/);
+      assert.notEqual(activeSuccessor, null, 'A later F03 microphase must remain ACTIVE after M03.7 closes');
+      assert.equal(
+        Number(activeSuccessor?.[1]) > 7,
+        true,
+        'M03.6 post-closure regression requires an ACTIVE F03 successor after M03.7',
+      );
+    }
   }
 
   assert.equal(predecessor.includes('32297534296'), true, 'M03.5 main GREEN run must be recorded');

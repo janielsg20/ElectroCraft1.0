@@ -115,6 +115,13 @@ test('M03.7 structural gate enforces Progressive Disclosure and canonical inform
     assert.equal(exists(closurePath), true, 'Completed M03.7 requires closure evidence');
     const closure = read(closurePath);
     assert.equal(closure.includes('GREEN'), true, 'M03.7 closure evidence must remain GREEN');
-    assert.match(state, /M03\.8[^\n]*ACTIVE/);
+
+    const activeSuccessor = state.match(/M03\.(\d+)[^\n]*ACTIVE/);
+    assert.notEqual(activeSuccessor, null, 'A later F03 microphase must remain ACTIVE after M03.7 closes');
+    assert.equal(
+      Number(activeSuccessor?.[1]) > 7,
+      true,
+      'M03.7 post-closure regression requires an ACTIVE F03 successor after M03.7',
+    );
   }
 });

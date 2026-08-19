@@ -29,6 +29,11 @@ export const studioShellHelpDescriptor = Object.freeze({
     'Los diagnósticos que explican error, bloqueo, guardado o estado local nunca se esconden dentro de Advanced; permanecen visibles cuando son relevantes para entender el estado del sistema.',
     'Contenido usa un patrón List/Detail dentro de su ruta canónica: la lista permanece primaria y el detalle aparece de forma contextual sin crear una segunda ruta innecesaria.',
     'Los empty states describen ausencia real de proyecto, contenido, selección o configuración y no inyectan tarjetas, registros, widgets ni resultados demo para aparentar funcionalidad.',
+    'La Palette usa PALETTE_CATALOG_MATRIX.md como catálogo funcional visible y no deriva su inventario directamente de ComponentDefinitions de Puck.',
+    'La Palette organiza Layout, Basic, Content, Navigation, Dynamic Data, Forms, Filters, Social / Contact, Admin y Commerce Pack; el search reconoce nombre, función, categoría, keywords y referencias conceptuales como posts, menu, login, JetEngine, social y commerce.',
+    'Favoritos y Recientes guardan solo paletteItemId como preferencias del workspace. No clonan ComponentDefinitions ni forman parte de ElectroCraftDocument o ExportIR.',
+    'Puck.Components permanece como fuente de drag para componentes registrados. El click-to-insert pasa por el adapter Puck y solo se habilita cuando existe el mapping real; un item aún no mapeado muestra código, ubicación, causa y acción sugerida en vez de fingir éxito.',
+    'La Palette es navegable por teclado: el buscador precede al catálogo, ArrowDown entra en los items y Escape devuelve el foco al lienzo. En móvil vive dentro del Sheet inferior de Componentes, no como una versión desktop comprimida.',
   ]),
 } satisfies HelpDescriptor);
 

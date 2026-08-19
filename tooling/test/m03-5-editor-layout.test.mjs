@@ -13,6 +13,7 @@ const required = [
   'apps/studio/src/shell/editor-workspace.css',
   'apps/studio/src/shell/editor-layout-model.ts',
   'apps/studio/src/shell/use-editor-layout-mode.ts',
+  'apps/studio/src/shell/palette-panel.tsx',
   'apps/studio/src/i18n/editor.es.ts',
   'packages/design-system/src/components/ui/resizable-pane-layout.tsx',
   'packages/editor-puck/src/puck-editor-composition.ts',
@@ -30,6 +31,7 @@ test('M03.5 structural gate keeps exact editor dimensions and ownership', () => 
 
   const model = read('apps/studio/src/shell/editor-layout-model.ts');
   const studio = read('apps/studio/src/shell/editor-workspace.tsx');
+  const palette = read('apps/studio/src/shell/palette-panel.tsx');
   const css = read('apps/studio/src/shell/editor-workspace.css');
   const appCss = read('apps/studio/src/styles.css');
   const puck = read('packages/editor-puck/src/puck-editor-composition.ts');
@@ -51,8 +53,18 @@ test('M03.5 structural gate keeps exact editor dimensions and ownership', () => 
 
   assert.equal(appCss.includes('height: 26px'), true, 'M03.5 must preserve the AppShell 26px Statusbar');
   assert.equal(studio.includes("from '@puckeditor/core'"), false, 'Studio must not bypass editor-puck ownership');
+  assert.equal(palette.includes("from '@puckeditor/core'"), false, 'Palette must not bypass editor-puck ownership');
+  assert.equal(
+    studio.includes('<StudioPalette />'),
+    true,
+    'M03.5 Context must retain the successor Palette composition',
+  );
+  assert.equal(
+    palette.includes('PuckEditorComponents'),
+    true,
+    'M03.5 Puck Components composition must remain reachable through StudioPalette',
+  );
   for (const token of [
-    'PuckEditorComponents',
     'PuckEditorOutline',
     'PuckEditorPreview',
     'PuckEditorFields',
