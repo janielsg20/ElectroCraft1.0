@@ -57,7 +57,11 @@ test('M03.6 structural gate preserves capabilities across responsive modes', () 
   assert.equal(sheet.includes("export type SheetSide = 'left' | 'right' | 'bottom'"), true, 'M03.6 needs bottom Sheet');
   assert.equal(sheet.includes("from 'radix-ui'"), true, 'M03.6 must keep Radix Sheet ownership');
   assert.equal(workspace.includes("from '@puckeditor/core'"), false, 'Studio must not bypass editor-puck ownership');
-  assert.equal(workspace.includes("getStudioSidebarNavigationItem('screens')"), true, 'Screens must use canonical navigation');
+  assert.equal(
+    workspace.includes("getStudioSidebarNavigationItem('screens')"),
+    true,
+    'Screens must use canonical navigation',
+  );
 
   for (const destination of ['components', 'screens', 'canvas', 'properties', 'more']) {
     assert.equal(
@@ -95,7 +99,7 @@ test('M03.6 structural gate preserves capabilities across responsive modes', () 
 
   assert.match(state, /M03\.5[^\n]*COMPLETADA[^\n]*GREEN/);
   assert.match(state, /M03\.6[^\n]*ACTIVE/);
-  assert.equal((state.match(/`ACTIVE`|: `ACTIVE`/g) ?? []).length >= 1, true);
+  assert.equal((state.match(/`ACTIVE`/g) ?? []).length, 1, 'Exactly one microphase must remain ACTIVE');
   assert.equal(predecessor.includes('32297534296'), true, 'M03.5 main GREEN run must be recorded');
   assert.equal(predecessor.includes('9381789348'), true, 'M03.5 main artifact must be recorded');
 });
