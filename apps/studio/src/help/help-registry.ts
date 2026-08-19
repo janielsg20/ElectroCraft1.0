@@ -24,6 +24,11 @@ export const studioShellHelpDescriptor = Object.freeze({
     'El editor divide el workspace desktop en Contexto 288px redimensionable 240–380px, Lienzo flexible e Inspector 320px redimensionable 280–440px. El Statusbar existente permanece en 26px y solo informa estado.',
     'Puck conserva el ownership de composición visual: Contexto usa sus superficies de componentes/esquema, el Lienzo usa Puck.Preview y el Inspector usa Puck.Fields. La adaptación responsive no crea un editor paralelo ni datos demo.',
     'Los separadores desktop admiten puntero y teclado; tablet y móvil priorizan objetivos táctiles, foco visible y superficies que no comprimen el lienzo.',
+    'La arquitectura de información clasifica controles como primary, contextual, advanced o diagnostic. Los módulos principales permanecen en navegación y los detalles secundarios se anidan en su superficie propietaria.',
+    'Progressive Disclosure usa Collapsible Radix: Settings mantiene Espacio de trabajo visible y agrupa detalles técnicos en Avanzado; el Inspector mantiene propiedades principales visibles y agrupa detalles secundarios en Avanzado.',
+    'Los diagnósticos que explican error, bloqueo, guardado o estado local nunca se esconden dentro de Advanced; permanecen visibles cuando son relevantes para entender el estado del sistema.',
+    'Contenido usa un patrón List/Detail dentro de su ruta canónica: la lista permanece primaria y el detalle aparece de forma contextual sin crear una segunda ruta innecesaria.',
+    'Los empty states describen ausencia real de proyecto, contenido, selección o configuración y no inyectan tarjetas, registros, widgets ni resultados demo para aparentar funcionalidad.',
   ]),
 } satisfies HelpDescriptor);
 
