@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "project": "ElectroCraft1.0",
+  "microphase": "M03.5",
+  "baseBranch": "main",
+  "baseCommit": "dd6ac8ea28276d9a1fc05f387338cba5980462a5",
+  "date": "2026-08-19",
+  "state": "ACTIVE",
+  "fullGateStatus": "PENDING_ON_APPLIED_CHECKOUT",
+  "manifestSelfExcluded": true,
+  "fileCountExcludingManifest": 24,
+  "files": [
+    {
+      "path": ".ai/HANDOFF.md",
+      "bytes": 1689,
+      "sha256": "b59476b68ed28b9150897014b8b7d36faf0ce82d68591f2d2a653fb4014e0df0"
+    },
+    {
+      "path": ".ai/MEMORY.md",
+      "bytes": 5224,
+      "sha256": "e0173ba949cc529798f81026b9a6258c932f2679e018ca84ab4c1e2c8d99d7c7"
+    },
+    {
+      "path": ".ai/STATE.md",
+      "bytes": 1780,
+      "sha256": "afea83ec7e813a9ca2fd107df4c20773b2f5da57daa866c97ad40ad29f6d3f58"
+    },
+    {
+      "path": ".ai/TRACKING.md",
+      "bytes": 2925,
+      "sha256": "029bfd8c9efb2bb4d40e8c10d618dd8838b51429830e6e7c388fcdc40662e7b4"
+    },
+    {
+      "path": ".ai/evidence/F03/M03.4/CLOSURE_2026-08-19.md",
+      "bytes": 973,
+      "sha256": "bd3f1bcc21e7b626ffb08753c59791900b6faebaeef9c4effc7ca964c9856a7c"
+    },
+    {
+      "path": ".ai/evidence/F03/M03.5/IMPLEMENTATION_2026-08-19.md",
+      "bytes": 2034,
+      "sha256": "55ee65788eaa7fc97c2b90e9545cbdc73313be9e3aa198cdf9055f11b1dcea83"
+    },
+    {
+      "path": ".ai/evidence/F03/M03.5/LOCAL_STATIC_VALIDATION_2026-08-19.md",
+      "bytes": 1441,
+      "sha256": "535f0b347a3f31f166722d245f6a159892c6ae1e74e9a58d79e5ce681701cf3b"
+    },
+    {
+      "path": "apps/studio/src/App.tsx",
+      "bytes": 3499,
+      "sha256": "197e7a0a6156ce1a566ddb73c93caaa9a220c62bba277325e201972756c5cb51"
+    },
+    {
+      "path": "apps/studio/src/help/help-registry.ts",
+      "bytes": 2688,
+      "sha256": "f4f791e02130534a65cb03718c8e42f77786d326c823b4cd847197ac2877f65c"
+    },
+    {
+      "path": "apps/studio/src/i18n/editor.es.ts",
+      "bytes": 1756,
+      "sha256": "a461ac4c19a49261c6de9b1d05becf67838850589cabb20e60fdc5378e3fa568"
+    },
+    {
+      "path": "apps/studio/src/shell/editor-layout-model.ts",
+      "bytes": 515,
+      "sha256": "9217015e963ac244247e73f67cf8f33fde5fdc4dcc0cf7d82f4ec2663cc3f63f"
+    },
+    {
+      "path": "apps/studio/src/shell/editor-workspace.css",
+      "bytes": 4765,
+      "sha256": "79ab5159140a41afec33142504e0a024f8cec67f321ff35a5318622331c239c4"
+    },
+    {
+      "path": "apps/studio/src/shell/editor-workspace.tsx",
+      "bytes": 7318,
+      "sha256": "84e085dfb1b7e0f46361d588367dd4e044cb68aaab112179c933965c8f9179c9"
+    },
+    {
+      "path": "apps/studio/src/shell/use-editor-layout-mode.ts",
+      "bytes": 615,
+      "sha256": "d045697c2faade522fe365a0b16d2b6354034d40fc570027034d4e5351a6e04b"
+    },
+    {
+      "path": "packages/design-system/src/components/ui/index.ts",
+      "bytes": 237,
+      "sha256": "cff523a0e201451f6661a3ce6c59d571aafd34c67739e6a3d458a6ca87faa60a"
+    },
+    {
+      "path": "packages/design-system/src/components/ui/resizable-pane-layout.tsx",
+      "bytes": 4529,
+      "sha256": "316f62e72e9f39cabc54816b25b694f015c0a15514ffde8fcecfbf3a3ff1aa5a"
+    },
+    {
+      "path": "packages/editor-puck/src/index.ts",
+      "bytes": 489,
+      "sha256": "91b8a060b6a1b9a04acca38ebb4819d490f57abc4082acaed5dad5360b1c130f"
+    },
+    {
+      "path": "packages/editor-puck/src/puck-editor-composition.ts",
+      "bytes": 598,
+      "sha256": "29dc86d3cf388289665ea2b18d5ed4eb664aa94741ff18ee7d21d39deefbb5d6"
+    },
+    {
+      "path": "tooling/playwright/m03-5-editor-layout.spec.ts",
+      "bytes": 3347,
+      "sha256": "a6d36ae53de861c950cd43ebab024cf5fabec59fcbb0213a886d985341c12978"
+    },
+    {
+      "path": "tooling/scripts/verify-m03-4-topbar.mjs",
+      "bytes": 5252,
+      "sha256": "4b62f75db8a4db5c9b3118b14808727492d004fbab95fa6e3cab8bddeb897ed8"
+    },
+    {
+      "path": "tooling/test/m03-5-editor-layout.test.mjs",
+      "bytes": 3613,
+      "sha256": "537a72fe969cd07722fe096e4de5855e6862fe3bc02e3ab3002e92d99453693a"
+    },
+    {
+      "path": "tooling/vitest/contract/editor-workspace-boundary.test.ts",
+      "bytes": 1244,
+      "sha256": "8f40ee06057cf23afed105e04bede0452dc09535b0f6791a910c00c4d46af701"
+    },
+    {
+      "path": "tooling/vitest/integration/editor-puck-composition.test.ts",
+      "bytes": 1235,
+      "sha256": "27e8f23730e334c630d44680dd4ccfc4a5a15c5188825b4907c4b454bb5bb62c"
+    },
+    {
+      "path": "tooling/vitest/unit/editor-layout-model.test.ts",
+      "bytes": 1728,
+      "sha256": "0a602bc96b6164de2c0c6a324bd7f988de90834a14f121cc6834ce48393f44e9"
+    }
+  ]
+}

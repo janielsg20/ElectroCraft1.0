@@ -1,0 +1,248 @@
+.ec-editor-workspace,
+.ec-editor-desktop-layout,
+.ec-editor-responsive-layout,
+.ec-editor-responsive-canvas,
+.ec-editor-laptop-content,
+.ec-editor-region,
+.ec-editor-region-body,
+.ec-editor-canvas-stage,
+.ec-editor-puck-preview {
+  min-width: 0;
+  min-height: 0;
+}
+
+.ec-editor-workspace {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--background);
+}
+
+.ec-resizable-tri-pane {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: var(--ec-resizable-left) 10px minmax(0, 1fr) 10px var(--ec-resizable-right);
+  overflow: hidden;
+}
+
+.ec-resizable-tri-pane-left,
+.ec-resizable-tri-pane-center,
+.ec-resizable-tri-pane-right {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ec-resizable-pane-handle {
+  position: relative;
+  z-index: 3;
+  min-width: 10px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: col-resize;
+  touch-action: none;
+  background: var(--background);
+  outline: none;
+}
+
+.ec-resizable-pane-handle::before {
+  width: 1px;
+  height: 100%;
+  content: '';
+  background: var(--border);
+}
+
+.ec-resizable-pane-handle:hover::before,
+.ec-resizable-pane-handle:focus-visible::before {
+  width: 2px;
+  background: var(--ring);
+}
+
+.ec-resizable-pane-handle:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--ring);
+}
+
+.ec-resizable-pane-grip {
+  position: absolute;
+  width: 4px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--muted-foreground);
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.ec-resizable-pane-handle:hover .ec-resizable-pane-grip,
+.ec-resizable-pane-handle:focus-visible .ec-resizable-pane-grip {
+  opacity: 0.55;
+}
+
+.ec-editor-region {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: 36px minmax(0, 1fr);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.ec-editor-region[data-editor-region='canvas'] {
+  background: var(--background);
+}
+
+.ec-editor-region-header {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border-bottom: 1px solid var(--border);
+  padding: 0 10px;
+  color: var(--foreground);
+  font-size: var(--ec-text-xs);
+  font-weight: 700;
+}
+
+.ec-editor-region-header svg {
+  width: 14px;
+  height: 14px;
+  color: var(--muted-foreground);
+}
+
+.ec-editor-region-body {
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.ec-editor-region[data-editor-region='canvas'] .ec-editor-region-body {
+  overflow: hidden;
+}
+
+.ec-editor-structural-notice {
+  margin: 0;
+  border-bottom: 1px solid var(--border);
+  padding: 8px 10px;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.ec-editor-puck-slot {
+  min-width: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.ec-editor-canvas-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.ec-editor-puck-preview {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  padding: 12px;
+}
+
+.ec-editor-responsive-layout {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: 38px minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.ec-editor-responsive-toolbar {
+  min-width: 0;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+  padding: 4px 8px;
+  background: var(--surface);
+}
+
+.ec-editor-responsive-mode-label {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ec-editor-responsive-canvas,
+.ec-editor-laptop-content {
+  height: 100%;
+  overflow: hidden;
+}
+
+.ec-editor-laptop-content {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+}
+
+.ec-editor-laptop-content > .ec-editor-region[data-editor-region='context'] {
+  border-right: 1px solid var(--border);
+}
+
+.ec-editor-tool-sheet {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 10px;
+  overflow: hidden;
+}
+
+.ec-editor-tool-sheet-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+}
+
+.ec-editor-tool-sheet-body {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ec-editor-tool-sheet-body > .ec-editor-region {
+  border: 1px solid var(--border);
+  border-radius: var(--ec-radius-md);
+}
+
+@media (max-width: 1023px) {
+  .ec-editor-tool-sheet {
+    width: min(92vw, 380px);
+  }
+}
+
+@media (max-width: 767px) {
+  .ec-editor-responsive-toolbar {
+    gap: 6px;
+    padding-inline: 6px;
+  }
+
+  .ec-editor-responsive-toolbar .ec-button-label-optional {
+    display: none;
+  }
+
+  .ec-editor-tool-sheet {
+    width: min(100vw, 380px);
+    padding: 12px;
+  }
+
+  .ec-editor-puck-preview {
+    padding: 8px;
+  }
+}

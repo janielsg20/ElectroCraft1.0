@@ -3,9 +3,11 @@ import { studioWorkspaceDescriptor } from './index';
 import { studioT } from './i18n/studio-shell.es';
 import { StudioAppShellRoute } from './shell/app-shell-route';
 import { DesignSystemDevelopmentRoute } from './shell/design-system-route';
+import { StudioEditorWorkspace } from './shell/editor-workspace';
 import './styles.css';
 import './shell/sidebar.css';
 import './shell/topbar.css';
+import './shell/editor-workspace.css';
 
 const projectHomeRoute = Object.freeze({
   id: 'project-home-development',
@@ -79,7 +81,11 @@ export function App() {
 
   return (
     <StudioAppShellRoute status={shellStatus}>
-      <StudioWorkspaceBootstrap pathname={pathname} health={health} />
+      {pathname === projectHomeRoute.pathname ? (
+        <StudioEditorWorkspace />
+      ) : (
+        <StudioWorkspaceBootstrap pathname={pathname} health={health} />
+      )}
     </StudioAppShellRoute>
   );
 }

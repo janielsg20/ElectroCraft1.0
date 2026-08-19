@@ -33,7 +33,8 @@ const help = read('apps/studio/src/help/help-registry.ts');
 const icons = read('packages/design-system/src/icons/studio-icon-registry.ts');
 const sheet = read('packages/design-system/src/components/ui/sheet.tsx');
 const state = read('.ai/STATE.md');
-const closure = read('.ai/evidence/F03/M03.3/CLOSURE_2026-08-19.md');
+const predecessorClosure = read('.ai/evidence/F03/M03.3/CLOSURE_2026-08-19.md');
+const m034ClosurePath = path.join(root, '.ai/evidence/F03/M03.4/CLOSURE_2026-08-19.md');
 
 if (!appCss.includes('height: 52px')) throw new Error('M03.4 must preserve Topbar height 52px');
 for (const token of [
@@ -87,16 +88,26 @@ if (!route.includes('<StudioTopbar')) throw new Error('M03.4 Topbar is not compo
 if (!help.includes('Configuración') || !help.includes('restaura el foco')) {
   throw new Error('M03.4 persistent help does not explain Configuración/focus behavior');
 }
-if (!closure.includes('32275890306') || !closure.includes('GREEN')) {
+if (!predecessorClosure.includes('32275890306') || !predecessorClosure.includes('GREEN')) {
   throw new Error('M03.3 closure evidence is not GREEN');
 }
-if (!/M03\.3[^\n]*COMPLETADA/.test(state) || !/M03\.4[^\n]*ACTIVE/.test(state)) {
-  throw new Error('STATE transition M03.3 -> M03.4 is incomplete');
+
+const active = /M03\.4[^\n]*ACTIVE/.test(state);
+const complete = /M03\.4[^\n]*COMPLETADA[^\n]*GREEN/.test(state);
+if (!active && !complete) throw new Error('M03.4 must be ACTIVE or post-closure COMPLETADA/GREEN');
+if (complete) {
+  if (!fs.existsSync(m034ClosurePath)) throw new Error('M03.4 post-closure evidence missing');
+  const closure = fs.readFileSync(m034ClosurePath, 'utf8');
+  if (!closure.includes('32278183037') || !closure.includes('GREEN')) {
+    throw new Error('M03.4 post-closure evidence is not GREEN');
+  }
+  if (!/M03\.5[^\n]*ACTIVE/.test(state)) throw new Error('M03.4 post-closure transition must activate M03.5');
 }
 
 const report = {
   schemaVersion: 1,
   microphase: 'M03.4',
+  mode: complete ? 'post-closure-regression' : 'active-gate',
   engine: 'shadcn/ui Radix + AppShell',
   baseCommit: '5d6e5d341222b924c3f8eb40567ab15dc1628ff8',
   topbar: { heightPx: 52, regions: ['left', 'center', 'right'], settingsLast: true },
@@ -107,4 +118,4 @@ const report = {
 };
 fs.mkdirSync(path.join(root, 'tooling/dist'), { recursive: true });
 fs.writeFileSync(path.join(root, 'tooling/dist/m03-4-topbar-report.json'), `${JSON.stringify(report, null, 2)}\n`);
-console.log('PASS_M03_4_TOPBAR_STRUCTURE blockers=0');
+console.log(`PASS_M03_4_TOPBAR_STRUCTURE mode=${report.mode} blockers=0`);

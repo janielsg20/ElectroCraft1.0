@@ -49,3 +49,4 @@ Solo contiene hechos estables y decisiones vigentes. Progreso y siguiente paso p
 - `packages/design-system` es el owner de tokens/primitives y Lucide se consume mediante un registry semántico tipado.
 - Theme light/dark/system y densidad High Density son preferencias del Studio, no Project Objects del modelo canónico.
 - El AppShell global usa 100dvh con scroll contenido en workspace; desktop reserva Sidebar 240px, laptop 64px y tablet/mobile trasladan navegación estructural a Sheet Radix.
+- El editor visual conserva cuatro regiones estables: Contexto 288px redimensionable 240–380px, Canvas dominante, Inspector 320px redimensionable 280–440px y Statusbar informativo 26px. Laptop reduce herramientas secundarias primero y tablet/móvil trasladan Contexto/Inspector a superficies Sheet sin comprimir el desktop.
