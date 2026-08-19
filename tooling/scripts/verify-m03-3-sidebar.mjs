@@ -40,10 +40,30 @@ for (const group of ['Construir', 'Datos', 'Lógica', 'App', 'Recursos', 'Aparie
   if (!i18n.includes(`'${group}'`)) throw new Error(`M03.3 group missing: ${group}`);
 }
 for (const label of [
-  'Editor', 'Pantallas', 'Componentes', 'Plantillas', 'Generar con IA', 'Registros', 'Modelos', 'Fuentes de datos',
-  'Consultas', 'Acciones y workflows', 'Estado y variables', 'Formularios', 'Navegación', 'Usuarios y permisos',
-  'Administración', 'Medios', 'Extensiones', 'Temas', 'Sistema de diseño', 'Tokens', 'Vista previa', 'Compatibilidad',
-  'Exportar', 'Desplegar',
+  'Editor',
+  'Pantallas',
+  'Componentes',
+  'Plantillas',
+  'Generar con IA',
+  'Registros',
+  'Modelos',
+  'Fuentes de datos',
+  'Consultas',
+  'Acciones y workflows',
+  'Estado y variables',
+  'Formularios',
+  'Navegación',
+  'Usuarios y permisos',
+  'Administración',
+  'Medios',
+  'Extensiones',
+  'Temas',
+  'Sistema de diseño',
+  'Tokens',
+  'Vista previa',
+  'Compatibilidad',
+  'Exportar',
+  'Desplegar',
 ]) {
   if (!i18n.includes(`'${label}'`)) throw new Error(`M03.3 Spanish item missing: ${label}`);
 }
@@ -60,22 +80,47 @@ for (const token of ["data-sidebar-collapsed='true'", 'grid-template-columns: 64
   if (!css.includes(token)) throw new Error(`M03.3 Sidebar CSS missing: ${token}`);
 }
 for (const iconId of [
-  'studio.navigation.editor', 'studio.navigation.screens', 'studio.navigation.components', 'studio.navigation.templates',
-  'studio.navigation.aiGenerate', 'studio.navigation.records', 'studio.navigation.models', 'studio.navigation.dataSources',
-  'studio.navigation.queries', 'studio.navigation.actionsWorkflows', 'studio.navigation.stateVariables', 'studio.navigation.forms',
-  'studio.navigation.navigation', 'studio.navigation.usersPermissions', 'studio.navigation.admin', 'studio.navigation.media',
-  'studio.navigation.extensions', 'studio.navigation.themes', 'studio.navigation.designSystem', 'studio.navigation.tokens',
-  'studio.navigation.preview', 'studio.navigation.compatibility', 'studio.navigation.export', 'studio.navigation.deploy',
-  'studio.sidebar.collapse', 'studio.sidebar.expand',
+  'studio.navigation.editor',
+  'studio.navigation.screens',
+  'studio.navigation.components',
+  'studio.navigation.templates',
+  'studio.navigation.aiGenerate',
+  'studio.navigation.records',
+  'studio.navigation.models',
+  'studio.navigation.dataSources',
+  'studio.navigation.queries',
+  'studio.navigation.actionsWorkflows',
+  'studio.navigation.stateVariables',
+  'studio.navigation.forms',
+  'studio.navigation.navigation',
+  'studio.navigation.usersPermissions',
+  'studio.navigation.admin',
+  'studio.navigation.media',
+  'studio.navigation.extensions',
+  'studio.navigation.themes',
+  'studio.navigation.designSystem',
+  'studio.navigation.tokens',
+  'studio.navigation.preview',
+  'studio.navigation.compatibility',
+  'studio.navigation.export',
+  'studio.navigation.deploy',
+  'studio.sidebar.collapse',
+  'studio.sidebar.expand',
 ]) {
   if (!icons.includes(`'${iconId}'`)) throw new Error(`M03.3 Lucide registry ID missing: ${iconId}`);
 }
 if (!help.includes("id: 'help.studio.shell'")) throw new Error('M03.3 persistent help.studio.shell missing');
-if (!help.includes('WorkspacePreferencesPort')) throw new Error('M03.3 help must explain the workspace preference port');
+if (!help.includes('WorkspacePreferencesPort'))
+  throw new Error('M03.3 help must explain the workspace preference port');
 if (!closure.includes('32272564567') || !closure.includes('9372759537') || !closure.includes('GREEN')) {
   throw new Error('M03.2 closure evidence is incomplete');
 }
-if (!state.includes('M03.2') || !state.includes('COMPLETADA') || !state.includes('M03.3') || !state.includes('ACTIVE')) {
+if (
+  !state.includes('M03.2') ||
+  !state.includes('COMPLETADA') ||
+  !state.includes('M03.3') ||
+  !state.includes('ACTIVE')
+) {
   throw new Error('STATE transition M03.2 -> M03.3 is incomplete');
 }
 if (!workflow.includes('npx playwright install chromium') || workflow.includes('playwright install --with-deps')) {
