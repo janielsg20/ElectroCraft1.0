@@ -7,6 +7,7 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
+  SheetTrigger,
   getStudioIcon,
 } from '@electrocraft/design-system';
 import {
@@ -99,13 +100,15 @@ interface ToolSheetProps {
   readonly side: 'left' | 'right';
   readonly title: string;
   readonly description: string;
+  readonly trigger: ReactNode;
   readonly children: ReactNode;
   readonly testId: string;
 }
 
-function ToolSheet({ open, onOpenChange, side, title, description, children, testId }: ToolSheetProps) {
+function ToolSheet({ open, onOpenChange, side, title, description, trigger, children, testId }: ToolSheetProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetTrigger asChild>{trigger}</SheetTrigger>
       <SheetContent side={side} className="ec-editor-tool-sheet" data-editor-tool-sheet={testId}>
         <SheetHeader className="ec-editor-tool-sheet-header">
           <div>
@@ -133,60 +136,46 @@ function ResponsiveEditorLayout({ mode }: { readonly mode: Exclude<EditorLayoutM
     <div className="ec-editor-responsive-layout" data-editor-responsive-mode={mode}>
       <div className="ec-editor-responsive-toolbar" aria-label={editorT('studio.editor.toolsLabel')}>
         {!isLaptop ? (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setContextOpen(true)}
-            aria-haspopup="dialog"
-            aria-expanded={contextOpen}
-            data-editor-open-context
+          <ToolSheet
+            open={contextOpen}
+            onOpenChange={setContextOpen}
+            side="left"
+            title={editorT('studio.editor.contextTitle')}
+            description={editorT('studio.editor.contextSheetDescription')}
+            testId="context"
+            trigger={
+              <Button variant="outline" size="sm" data-editor-open-context>
+                <ContextIcon aria-hidden="true" />
+                {editorT('studio.editor.openContextLabel')}
+              </Button>
+            }
           >
-            <ContextIcon aria-hidden="true" />
-            {editorT('studio.editor.openContextLabel')}
-          </Button>
+            <ContextRegion />
+          </ToolSheet>
         ) : null}
         <span className="ec-editor-responsive-mode-label">{editorT(`studio.editor.mode.${mode}`)}</span>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setInspectorOpen(true)}
-          aria-haspopup="dialog"
-          aria-expanded={inspectorOpen}
-          data-editor-open-inspector
+        <ToolSheet
+          open={inspectorOpen}
+          onOpenChange={setInspectorOpen}
+          side="right"
+          title={editorT('studio.editor.inspectorTitle')}
+          description={editorT('studio.editor.inspectorSheetDescription')}
+          testId="inspector"
+          trigger={
+            <Button variant="outline" size="sm" data-editor-open-inspector>
+              <InspectorIcon aria-hidden="true" />
+              {editorT('studio.editor.openInspectorLabel')}
+            </Button>
+          }
         >
-          <InspectorIcon aria-hidden="true" />
-          {editorT('studio.editor.openInspectorLabel')}
-        </Button>
+          <InspectorRegion />
+        </ToolSheet>
       </div>
 
       <div className={isLaptop ? 'ec-editor-laptop-content' : 'ec-editor-responsive-canvas'}>
         {isLaptop ? <ContextRegion /> : null}
         <CanvasRegion />
       </div>
-
-      {!isLaptop ? (
-        <ToolSheet
-          open={contextOpen}
-          onOpenChange={setContextOpen}
-          side="left"
-          title={editorT('studio.editor.contextTitle')}
-          description={editorT('studio.editor.contextSheetDescription')}
-          testId="context"
-        >
-          <ContextRegion />
-        </ToolSheet>
-      ) : null}
-
-      <ToolSheet
-        open={inspectorOpen}
-        onOpenChange={setInspectorOpen}
-        side="right"
-        title={editorT('studio.editor.inspectorTitle')}
-        description={editorT('studio.editor.inspectorSheetDescription')}
-        testId="inspector"
-      >
-        <InspectorRegion />
-      </ToolSheet>
     </div>
   );
 }
