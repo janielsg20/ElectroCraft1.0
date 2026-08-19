@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "microphase": "M03.1",
+  "baseCommit": "0afa33651a677fb2a1d47cf45c38fa7b22df6239",
+  "status": "blocked-external-closure-inputs",
+  "packageManager": "npm@10.9.2",
+  "shadcnStyle": "radix-nova",
+  "primitiveBase": "radix",
+  "radixUiVersion": "1.6.7",
+  "lucideReactVersion": "1.31.0",
+  "tailwindVersion": "4.3.3",
+  "lockfileVersion": null,
+  "lockVerified": false,
+  "visualValidation": {
+    "route": "/__design-system",
+    "viewports": [
+      360,
+      768,
+      1440
+    ],
+    "required": [
+      "keyboard",
+      "focus-visible",
+      "theme",
+      "dropdown",
+      "sheet",
+      "responsive"
+    ],
+    "execution": "playwright"
+  },
+  "requiredFilesChecked": 18,
+  "blockers": [
+    "package-lock.json missing; exact M03.1 dependency graph is not locked"
+  ]
+}

@@ -22,7 +22,7 @@ Historial detallado:
 | M02.8 | COMPLETADA | `.ai/evidence/F02/M02.8/CLOSURE_2026-08-18.md` |
 | M02.9 | COMPLETADA | `.ai/evidence/F02/M02.9/CLOSURE_2026-08-18.md` |
 | F02 Gate | GREEN | `.ai/evidence/F02/CLOSURE_2026-08-18.md` |
-| F03 / M03.1 | ACTIVE | `.ai/microphases/M03_1.md` |
+| F03 / M03.1 | ACTIVE | `.ai/microphases/M03_1.md` + `.ai/evidence/F03/M03.1/IMPLEMENTATION_2026-08-18.md` |
 
 ## Cierre M02.1
 - PR `#3`; squash merge `cf4649d98f96a553daa020581a918d9559131137`.
@@ -55,7 +55,7 @@ Historial detallado:
 
 ## Cierre M02.7
 - PR `#9`; squash merge `572baebbd6aa5bb62b57d085f7d178d49dd699e2`.
-- `ElectroCraftExportIR` immutable/versionado y neutral a targets; nueve targets Core y `TargetCompileContext` separado.
+- `ElectroCraftExportIR` immutable/versionado y neutral a target; nueve targets Core y `TargetCompileContext` separado.
 - Checksum fixture `fnv1a64:3f5ab54591022ac0`; suite dedicada `11/11`; acumulada Node `27/27`, Vitest `108/108`, Playwright `1/1`.
 - Gate main `32191193359` success; artifact `9344256616`; digest `sha256:52f1fd78d673b8094bf29be9d1b47e8aa7a1b92aa8f8c4b9e6f219687a3d375b`.
 
@@ -69,7 +69,7 @@ Historial detallado:
 - PR `#11`; squash merge `53401b29df8ef44deb69468c92cd36ae5f547761`.
 - Wrapper portable determinista `{ engine, schemaVersion, value }`; domain permanece engine-agnostic.
 - RQB rules con `@react-querybuilder/core@8.23.0`; Tiptap rich-text JSON con grafo exacto `3.29.2` de core/html/Document/Paragraph/Text.
-- Runtime/editor state de Puck/Rete/Zustand/TanStack permanece fuera del modelo canónico.
+- Runtime/editor state de Puck/Rete/Zustand permanece fuera del modelo canónico.
 - Suite dedicada `11/11`; acumulada Node `27/27`, Vitest `128/128`, Playwright `1/1`.
 - Gate main `32196416073` success; artifact `9346006290`; digest `sha256:0083bf96e88e0935a9876a37d8fc465b8315e03ec836dcd1d8bd8609c0d8770b`.
 
@@ -81,8 +81,32 @@ Historial detallado:
 - Digest: `sha256:160658d864ba742265c958ecab629fe855e5d425a78a3f643ecfce908c0aaa12`.
 - Invariantes: 17 owners, sin `packages/contracts`, ProjectDefinition/Document v3, ownership 14/6/6, ExportIR target-neutral, wrappers OSS fail-closed, Node 27/27, Vitest 128/128, Playwright 1/1, blockers P0/P1 `0`.
 
+## Avance M03.1 — sesión local 2026-08-18
+- Base exacta: `main@0afa33651a677fb2a1d47cf45c38fa7b22df6239`.
+- Docs oficiales actuales de shadcn Vite/theming/components/CLI verificadas.
+- Foundation local preparada: tokens light/dark + High Density, primitives reales `radix-ui`, Lucide registry, Tailwind v4, galería `/__design-system`, i18n/help/shell y tests dedicados.
+- Parseo sintáctico TypeScript/TSX de archivos editados: `PASS` mediante TypeScript compiler API; el typecheck completo sigue pendiente de dependencias.
+- JSON de `components.json` y `packages/design-system/package.json`: `PASS` mediante parser estándar.
+- Auditoría del contrato visual: la spec M03.1 requiere visual/E2E responsive, pero no un SVG externo; se elimina ese falso blocker y la evidencia visual queda en `/__design-system` + Playwright.
+- Resolución/instalación npm local: `BLOCKED` por registry inaccesible. Se añadió bootstrap seguro en GitHub Actions: genera lock candidato real, ejecuta el gate completo, sube `m03-1-lockfile-candidate` y falla al final hasta versionarlo; no modifica el repo automáticamente.
+- Gate ejecutable offline: `PASS_M03_1_DESIGN_SYSTEM_STRUCTURE`; parseo TS/TSX `26 archivos / 0 errores`; JSON `5/5`; YAML `2/2`; runtime foundation/migración `PASS`.
+- Boundary compatibility corregida: sin subpath exports de workspace, sin aliases wildcard y sin deep import desde Studio; shadcn usa `package.json#imports` locales dentro del owner.
+- Tailwind monorepo corregido: `@source` registra explícitamente `packages/design-system/src`; CI base y gate M03.1 instalan Chromium antes del E2E real.
+- Revisión React/shadcn 2026-08-19: se eliminó memoización trivial, se hoistaron lookups Lucide y el copy nuevo visible de M03.1 pasa por el catálogo tipado; i18next real se mantiene reservado para M03.10 según su spec.
+- `npm run lint`, `npm run typecheck`, `npm test`, `npm run build` y Playwright real: `NOT_RUN` por checkout/dependencias completas no disponibles.
+- M03.1 permanece `ACTIVE`; evidencia: `.ai/evidence/F03/M03.1/IMPLEMENTATION_2026-08-18.md`.
+
 ## Gate actual
 F02 `COMPLETADA` / Gate F02 `GREEN`. F03 está `IN_PROGRESS` con M03.1 como única microfase activa.
 
 ## Siguiente transición permitida
-Implementar y cerrar exclusivamente M03.1: shadcn/ui sobre Radix, Lucide y tokens ElectroCraft en `packages/design-system`; después avanzar a M03.2.
+Cerrar exclusivamente M03.1: regenerar `package-lock.json` desde npm real, instalar las dependencias fijadas, ejecutar gate completo y validación visual/teclado. Solo después avanzar a M03.2.
+
+## M03.1 — progreso adicional 2026-08-18
+- Se corrigió la primera implementación parcial: Tooltip/Dropdown/Sheet/ScrollArea/Separator ahora delegan en `radix-ui` real.
+- Se añadieron Lucide registry, Tailwind v4, config versionada+migration/round-trip, `shell/`, `i18n/`, `help/`, Vitest y Playwright.
+- M03.1 continúa `ACTIVE`: lockfile/CI/browser siguen pendientes; M03.2 no está habilitada.
+- Revisión 2026-08-19: el schema oficial en vivo de shadcn confirma `style: radix-nova`; no se migra a una forma experimental.
+- El gate M03.1 v4 convierte el bloqueo real en condición ejecutable: valida el grafo exacto en `package-lock.json`, documenta la validación visual Playwright en `tooling/dist/m03-1-design-system-report.json` y falla cerrado en CI.
+- Si el lock del commit está obsoleto, el mismo workflow genera un candidato, corre verifier/npm ci/tests/build/Playwright con él, lo sube como artifact y devuelve fallo intencional de sincronización; una segunda pasada con el lock versionado puede cerrar GREEN.
+- La especificación M03.2 fue preleída únicamente para transición; su precondición exige M03.1 COMPLETADA y por tanto no está activa ni implementada.

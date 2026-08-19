@@ -8,4 +8,13 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: [['list']],
   outputDir: 'test-results/m01-4',
+  use: {
+    baseURL: 'http://127.0.0.1:4173',
+  },
+  webServer: {
+    command: 'npm run --workspace @electrocraft/studio dev -- --host 127.0.0.1 --port 4173',
+    url: 'http://127.0.0.1:4173',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120_000,
+  },
 });

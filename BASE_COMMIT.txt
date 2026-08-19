@@ -1,0 +1,5 @@
+Repository: janielsg20/ElectroCraft1.0
+Branch: main
+Base commit: 0afa33651a677fb2a1d47cf45c38fa7b22df6239
+Prepared: 2026-08-19
+Scope: F03 / M03.1 only

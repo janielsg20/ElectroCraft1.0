@@ -36,7 +36,15 @@ Solo contiene hechos estables y decisiones vigentes. Progreso y siguiente paso p
 - LAMP usa Slim 4 + PSR-7 + Slim-CSRF + PDO/MySQL/MariaDB.
 - WordPress usa Block Theme + Companion Plugin y APIs nativas antes de implementaciones custom.
 
+## Tooling estable
+- El package manager canónico del repositorio es `npm@10.9.2`; no cambiar a pnpm solo porque una microfase o documentación externa muestre comandos de ejemplo con pnpm.
+
 ## Reglas de continuidad
 - Una sola microfase puede estar `ACTIVE`.
 - `MEMORY.md` no guarda estado transitorio de ejecución, identificadores de CI, logs, hashes de cierre ni instrucciones de siguiente paso.
 - `DONE` requiere evidencia real; errores unsupported deben permanecer visibles y fail-closed.
+
+## UI foundation
+- Studio usa shadcn/ui con base Radix explícita sobre el paquete unificado `radix-ui`; no se mezclan Base UI/Aria sin ADR.
+- `packages/design-system` es el owner de tokens/primitives y Lucide se consume mediante un registry semántico tipado.
+- Theme light/dark/system y densidad High Density son preferencias del Studio, no Project Objects del modelo canónico.

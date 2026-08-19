@@ -1,8 +1,9 @@
-import { defineConfig } from 'vite';
+import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import { VitePWA } from 'vite-plugin-pwa';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { defineConfig } from 'vite';
+import { VitePWA } from 'vite-plugin-pwa';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -10,6 +11,7 @@ export default defineConfig({
   root: here,
   plugins: [
     react(),
+    tailwindcss(),
     VitePWA({
       injectRegister: 'script',
       registerType: 'prompt',
