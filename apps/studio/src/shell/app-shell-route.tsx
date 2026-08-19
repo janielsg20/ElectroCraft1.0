@@ -1,8 +1,8 @@
-import { ThemeProvider } from '@electrocraft/design-system';
 import type { ReactNode } from 'react';
 import { getStudioHelpDescriptor } from '../help/help-registry';
 import { iaT } from '../i18n/information-architecture.es';
 import { studioT } from '../i18n/studio-shell.es';
+import { StudioAppearanceProvider } from '../theme-provider';
 import { AppShell, type AppShellCopy, type AppShellStatus } from './app-shell';
 import { resolveSidebarActiveItem, studioSidebarNavigation } from './sidebar-navigation';
 import { StudioTopbar, type StudioTopbarCopy } from './studio-topbar';
@@ -103,7 +103,7 @@ export function StudioAppShellRoute({
   const activeLabel = resolveActiveLabel(activeItemId);
 
   return (
-    <ThemeProvider defaultTheme="system">
+    <StudioAppearanceProvider>
       <AppShell
         copy={appShellCopy}
         navigationGroups={studioSidebarNavigation}
@@ -123,6 +123,6 @@ export function StudioAppShellRoute({
       >
         {children}
       </AppShell>
-    </ThemeProvider>
+    </StudioAppearanceProvider>
   );
 }
