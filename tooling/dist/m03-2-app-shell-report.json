@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "microphase": "M03.2",
+  "engine": "shadcn/ui Radix + AppShell",
+  "baseCommit": "c0ee291f29405a1f1dd9fb1c14afe7d13b3a45ae",
+  "geometry": {
+    "root": "100dvh",
+    "sidebar": [
+      240,
+      64
+    ],
+    "topbar": 52,
+    "statusbar": 26
+  },
+  "responsive": [
+    "desktop",
+    "laptop",
+    "tablet-sheet",
+    "mobile-sheet"
+  ],
+  "helpId": "help.studio.shell",
+  "blockers": []
+}

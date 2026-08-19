@@ -7,13 +7,14 @@ export interface HelpDescriptor {
 
 export const studioShellHelpDescriptor = Object.freeze({
   id: 'help.studio.shell',
-  title: 'Sistema visual del Studio',
+  title: 'AppShell del Studio',
   summary:
-    'ElectroCraft usa una única foundation visual compartida por el Studio. Los primitives interactivos se apoyan en shadcn/ui con base Radix y los iconos semánticos usan Lucide.',
+    'ElectroCraft usa un único AppShell compartido para reservar navegación, Topbar, área de trabajo y Statusbar sobre la foundation shadcn/ui con base Radix.',
   details: Object.freeze([
-    'La densidad High Density mantiene controles compactos sin reducir legibilidad, foco visible ni objetivos táctiles esenciales.',
+    'El layout raíz usa 100dvh y mantiene el scroll dentro del área de trabajo; el body global no se usa como superficie desplazable del editor.',
+    'Desktop reserva 240px para la navegación; laptop reserva 64px. Tablet y móvil trasladan la navegación estructural a un Sheet de Radix en lugar de comprimir el layout desktop.',
+    'M03.2 define la geometría y los landmarks globales. La agrupación, iconos, estado activo y preferencias del Sidebar pertenecen a M03.3; la Topbar funcional y Settings pertenecen a M03.4.',
     'Claro, oscuro y sistema son preferencias del Studio; no forman parte del modelo canónico del proyecto.',
-    'AI Elements comparte esta misma foundation. Mezclar Radix con Base UI o Aria requiere una decisión arquitectónica explícita.',
   ]),
 } satisfies HelpDescriptor);
 
