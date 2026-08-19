@@ -29,7 +29,7 @@ describe('M03.9 appearance isolation contract', () => {
     expect(appearanceSources).not.toContain('packages/frontend');
   });
 
-  it('does not change serialized editor data, project theme or ExportIR across appearance cycles', () => {
+  it('does not change serialized editor data, canonical project theme or ExportIR across appearance cycles', () => {
     let persisted: string | null = null;
     const storage: EditorAppearanceStorage = {
       read: () => persisted,
@@ -42,8 +42,9 @@ describe('M03.9 appearance isolation contract', () => {
     };
     const source = canonicalExportIrSource();
     const editorBefore = JSON.stringify(structuralPuckData);
+    const projectThemeBefore = JSON.stringify(source.theme);
+    const sourceBefore = JSON.stringify(source);
     const exportBefore = serializeElectroCraftExportIR(buildElectroCraftExportIR(source).ir);
-    const frontendThemeBefore = read('packages/frontend/theme.css');
 
     const custom = persistEditorAppearanceProfile(storage, {
       ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
@@ -62,8 +63,9 @@ describe('M03.9 appearance isolation contract', () => {
     persistEditorAppearanceProfile(storage, resetEditorAppearanceProfile(custom));
 
     expect(JSON.stringify(structuralPuckData)).toBe(editorBefore);
+    expect(JSON.stringify(source.theme)).toBe(projectThemeBefore);
+    expect(JSON.stringify(source)).toBe(sourceBefore);
     expect(serializeElectroCraftExportIR(buildElectroCraftExportIR(source).ir)).toBe(exportBefore);
-    expect(read('packages/frontend/theme.css')).toBe(frontendThemeBefore);
     expect(DEFAULT_EDITOR_APPEARANCE_PROFILE.name).toBe('ElectroCraft');
   });
 
