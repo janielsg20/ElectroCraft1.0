@@ -1,0 +1,62 @@
+name: M03.9 One-shot Autofix
+
+on:
+  push:
+    branches:
+      - codex/m03-9-editor-session-appearance-profile
+    paths:
+      - '.github/workflows/m03-9-autofix.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  autofix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Apply TS annotation and canonical formatting
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('apps/studio/src/theme.ts')
+          text = p.read_text()
+          text = text.replace('write: (serialized) =>', 'write: (serialized: string) =>')
+          p.write_text(text)
+          PY
+          npx prettier --write \
+            apps/studio/src/theme.ts \
+            apps/studio/src/i18n/appearance.es.ts \
+            apps/studio/src/shell/appearance-panel.tsx \
+            tooling/playwright/m03-9-appearance.spec.ts
+          git diff --check
+      - name: Commit fixes to branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            apps/studio/src/theme.ts \
+            apps/studio/src/i18n/appearance.es.ts \
+            apps/studio/src/shell/appearance-panel.tsx \
+            tooling/playwright/m03-9-appearance.spec.ts
+          if git diff --cached --quiet; then
+            echo 'No autofix changes required.'
+            exit 0
+          fi
+          git commit -m 'fix(m03.9): apply canonical formatting and storage types'
+          git push origin HEAD:codex/m03-9-editor-session-appearance-profile
