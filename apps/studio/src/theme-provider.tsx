@@ -1,72 +1,149 @@
 import { ThemeProvider } from '@electrocraft/design-system';
 import { createContext, useContext, useEffect, useMemo, useState, type PropsWithChildren } from 'react';
 import {
+  BUILT_IN_STUDIO_APPEARANCE_PRESETS,
   createBrowserEditorAppearanceStorage,
+  createBrowserStudioAppearancePresetStorage,
+  createPersonalStudioAppearancePreset,
+  getStudioAppearanceAccessibilityWarnings,
   loadEditorAppearanceProfile,
+  loadPersonalStudioAppearancePresets,
   persistEditorAppearanceProfile,
+  persistPersonalStudioAppearancePresets,
   resetEditorAppearanceProfile,
   resolveEditorAppearanceProfile,
-  type EditorAppearanceProfile,
+  resolveStudioAnimationIntensity,
+  restoreAccessibleEditorAppearanceDefaults,
   type EditorAppearanceStorage,
+  type StudioAppearancePreset,
+  type StudioAppearancePresetStorage,
+  type StudioAppearanceProfile,
 } from './theme';
 
 interface StudioAppearanceContextValue {
-  readonly appliedProfile: EditorAppearanceProfile;
-  readonly previewProfile: EditorAppearanceProfile | null;
-  readonly resolvedProfile: EditorAppearanceProfile;
-  readonly preview: (profile: EditorAppearanceProfile) => void;
-  readonly apply: (profile?: EditorAppearanceProfile) => void;
+  readonly appliedProfile: StudioAppearanceProfile;
+  readonly previewProfile: StudioAppearanceProfile | null;
+  readonly resolvedProfile: StudioAppearanceProfile;
+  readonly personalPresets: readonly StudioAppearancePreset[];
+  readonly presets: readonly StudioAppearancePreset[];
+  readonly accessibilityWarnings: readonly string[];
+  readonly systemReducedMotion: boolean;
+  readonly resolvedAnimationIntensity: StudioAppearanceProfile['animationIntensity'];
+  readonly preview: (profile: StudioAppearanceProfile) => void;
+  readonly previewPreset: (presetId: string) => void;
+  readonly apply: (profile?: StudioAppearanceProfile) => void;
   readonly revert: () => void;
   readonly reset: () => void;
+  readonly restoreAccessibleDefaults: () => void;
+  readonly savePersonalPreset: () => StudioAppearancePreset;
 }
 
 const StudioAppearanceContext = createContext<StudioAppearanceContextValue | null>(null);
 
-const accentTokens = Object.freeze({
-  indigo: Object.freeze({ primary: 'oklch(0.52 0.22 260)', ring: 'oklch(0.62 0.19 258)' }),
-  blue: Object.freeze({ primary: 'oklch(0.55 0.2 245)', ring: 'oklch(0.65 0.16 245)' }),
-  emerald: Object.freeze({ primary: 'oklch(0.55 0.16 155)', ring: 'oklch(0.65 0.13 155)' }),
-  amber: Object.freeze({ primary: 'oklch(0.64 0.16 75)', ring: 'oklch(0.72 0.13 75)' }),
-  rose: Object.freeze({ primary: 'oklch(0.58 0.2 18)', ring: 'oklch(0.68 0.15 18)' }),
-});
+const appearanceDatasetKeys = [
+  'ecAppearanceProfile',
+  'ecAccent',
+  'ecSemanticColors',
+  'ecTypographyFamily',
+  'ecTypographyScale',
+  'ecIconSize',
+  'ecIconStyle',
+  'ecRadii',
+  'ecElevation',
+  'ecControlSize',
+  'ecButtonShape',
+  'ecFieldShape',
+  'ecMenuAppearance',
+  'ecSpacingScale',
+  'ecCanvasDensity',
+  'ecMotion',
+  'ecContrast',
+  'ecSystemReducedMotion',
+] as const;
 
 export interface StudioAppearanceProviderProps extends PropsWithChildren {
   readonly storage?: EditorAppearanceStorage;
+  readonly presetStorage?: StudioAppearancePresetStorage;
 }
 
-export function StudioAppearanceProvider({ storage, children }: StudioAppearanceProviderProps) {
+export function StudioAppearanceProvider({ storage, presetStorage, children }: StudioAppearanceProviderProps) {
   const storagePort = useMemo(() => storage ?? createBrowserEditorAppearanceStorage(), [storage]);
-  const [appliedProfile, setAppliedProfile] = useState<EditorAppearanceProfile>(() =>
+  const presetStoragePort = useMemo(
+    () => presetStorage ?? createBrowserStudioAppearancePresetStorage(),
+    [presetStorage],
+  );
+  const [appliedProfile, setAppliedProfile] = useState<StudioAppearanceProfile>(() =>
     loadEditorAppearanceProfile(storagePort),
   );
-  const [previewProfile, setPreviewProfile] = useState<EditorAppearanceProfile | null>(null);
+  const [previewProfile, setPreviewProfile] = useState<StudioAppearanceProfile | null>(null);
+  const [personalPresets, setPersonalPresets] = useState<readonly StudioAppearancePreset[]>(() =>
+    loadPersonalStudioAppearancePresets(presetStoragePort),
+  );
+  const [systemReducedMotion, setSystemReducedMotion] = useState(false);
   const resolvedProfile = resolveEditorAppearanceProfile(previewProfile, appliedProfile);
+  const resolvedAnimationIntensity = resolveStudioAnimationIntensity(
+    resolvedProfile.animationIntensity,
+    systemReducedMotion,
+  );
+  const presets = useMemo(
+    () => Object.freeze([...BUILT_IN_STUDIO_APPEARANCE_PRESETS, ...personalPresets]),
+    [personalPresets],
+  );
+  const accessibilityWarnings = useMemo(
+    () => getStudioAppearanceAccessibilityWarnings(resolvedProfile),
+    [resolvedProfile],
+  );
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return undefined;
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => setSystemReducedMotion(media.matches);
+    sync();
+    media.addEventListener('change', sync);
+    return () => media.removeEventListener('change', sync);
+  }, []);
 
   useEffect(() => {
     const root = document.documentElement;
-    const tokens = accentTokens[resolvedProfile.accent];
-
     root.dataset.ecAppearanceProfile = resolvedProfile.name;
     root.dataset.ecAccent = resolvedProfile.accent;
+    root.dataset.ecSemanticColors = resolvedProfile.semanticColors;
+    root.dataset.ecTypographyFamily = resolvedProfile.typographyFamily;
+    root.dataset.ecTypographyScale = resolvedProfile.typographyScale;
+    root.dataset.ecIconSize = resolvedProfile.iconSize;
+    root.dataset.ecIconStyle = resolvedProfile.iconStyle;
+    root.dataset.ecRadii = resolvedProfile.radii;
+    root.dataset.ecElevation = resolvedProfile.elevation;
+    root.dataset.ecControlSize = resolvedProfile.controlSize;
+    root.dataset.ecButtonShape = resolvedProfile.buttonShape;
+    root.dataset.ecFieldShape = resolvedProfile.fieldShape;
+    root.dataset.ecMenuAppearance = resolvedProfile.menuAppearance;
+    root.dataset.ecSpacingScale = resolvedProfile.spacingScale;
     root.dataset.ecCanvasDensity = resolvedProfile.canvasDensity;
-    root.style.setProperty('--ec-studio-accent-primary', tokens.primary);
-    root.style.setProperty('--ec-studio-accent-ring', tokens.ring);
+    root.dataset.ecMotion = resolvedAnimationIntensity;
+    root.dataset.ecContrast = resolvedProfile.contrastPreference;
+    root.dataset.ecSystemReducedMotion = systemReducedMotion ? 'true' : 'false';
 
     return () => {
-      delete root.dataset.ecAppearanceProfile;
-      delete root.dataset.ecAccent;
-      delete root.dataset.ecCanvasDensity;
-      root.style.removeProperty('--ec-studio-accent-primary');
-      root.style.removeProperty('--ec-studio-accent-ring');
+      for (const key of appearanceDatasetKeys) delete root.dataset[key];
     };
-  }, [resolvedProfile]);
+  }, [resolvedAnimationIntensity, resolvedProfile, systemReducedMotion]);
 
   const value = useMemo<StudioAppearanceContextValue>(
     () => ({
       appliedProfile,
       previewProfile,
       resolvedProfile,
+      personalPresets,
+      presets,
+      accessibilityWarnings,
+      systemReducedMotion,
+      resolvedAnimationIntensity,
       preview: setPreviewProfile,
+      previewPreset: (presetId) => {
+        const preset = presets.find((candidate) => candidate.id === presetId);
+        if (preset) setPreviewProfile(preset.profile);
+      },
       apply: (profile = previewProfile ?? appliedProfile) => {
         const persisted = persistEditorAppearanceProfile(storagePort, profile);
         setAppliedProfile(persisted);
@@ -79,8 +156,31 @@ export function StudioAppearanceProvider({ storage, children }: StudioAppearance
         setAppliedProfile(persisted);
         setPreviewProfile(null);
       },
+      restoreAccessibleDefaults: () => {
+        setPreviewProfile(restoreAccessibleEditorAppearanceDefaults(previewProfile ?? appliedProfile));
+      },
+      savePersonalPreset: () => {
+        const preset = createPersonalStudioAppearancePreset(
+          resolvedProfile,
+          `${Date.now()}-${personalPresets.length + 1}`,
+        );
+        const next = persistPersonalStudioAppearancePresets(presetStoragePort, [...personalPresets, preset]);
+        setPersonalPresets(next);
+        return preset;
+      },
     }),
-    [appliedProfile, previewProfile, resolvedProfile, storagePort],
+    [
+      accessibilityWarnings,
+      appliedProfile,
+      personalPresets,
+      presetStoragePort,
+      presets,
+      previewProfile,
+      resolvedAnimationIntensity,
+      resolvedProfile,
+      storagePort,
+      systemReducedMotion,
+    ],
   );
 
   return (
