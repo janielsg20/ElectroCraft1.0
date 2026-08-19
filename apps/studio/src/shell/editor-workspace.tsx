@@ -12,7 +12,6 @@ import {
   type SheetSide,
 } from '@electrocraft/design-system';
 import {
-  PuckEditorComponents,
   PuckEditorFields,
   PuckEditorOutline,
   PuckEditorPreview,
@@ -31,6 +30,7 @@ import {
   type LaptopPanelStrategy,
 } from './editor-layout-model';
 import { ProgressiveDisclosure, StudioEmptyState } from './information-architecture-ui';
+import { StudioPalette } from './palette-panel';
 import { getStudioSidebarNavigationItem } from './sidebar-navigation';
 import { useEditorViewportWidth } from './use-editor-layout-mode';
 
@@ -79,7 +79,7 @@ function StructuralNotice({ children }: { readonly children: ReactNode }) {
 function ComponentsContent() {
   return (
     <div className="ec-editor-puck-slot" data-puck-composition="components">
-      <PuckEditorComponents />
+      <StudioPalette />
     </div>
   );
 }
