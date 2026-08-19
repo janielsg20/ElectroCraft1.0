@@ -27,7 +27,12 @@ export interface ThemeProviderProps extends PropsWithChildren {
   readonly density?: RuntimeDensity;
 }
 
-export function ThemeProvider({ defaultTheme = 'system', theme: controlledTheme, density = 'high', children }: ThemeProviderProps) {
+export function ThemeProvider({
+  defaultTheme = 'system',
+  theme: controlledTheme,
+  density = 'high',
+  children,
+}: ThemeProviderProps) {
   const [uncontrolledTheme, setUncontrolledTheme] = useState<ThemePreference>(defaultTheme);
   const theme = controlledTheme ?? uncontrolledTheme;
   const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>(() => resolveTheme(theme));
