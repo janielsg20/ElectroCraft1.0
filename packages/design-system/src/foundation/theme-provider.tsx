@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState, type PropsWith
 import type { ThemePreference } from './design-system-foundation';
 
 type ResolvedTheme = Exclude<ThemePreference, 'system'>;
+export type RuntimeDensity = 'high' | 'comfortable';
 
 interface ThemeContextValue {
   readonly theme: ThemePreference;
@@ -22,11 +23,14 @@ function resolveTheme(theme: ThemePreference): ResolvedTheme {
 
 export interface ThemeProviderProps extends PropsWithChildren {
   readonly defaultTheme?: ThemePreference;
+  readonly theme?: ThemePreference;
+  readonly density?: RuntimeDensity;
 }
 
-export function ThemeProvider({ defaultTheme = 'system', children }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<ThemePreference>(defaultTheme);
-  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>(() => resolveTheme(defaultTheme));
+export function ThemeProvider({ defaultTheme = 'system', theme: controlledTheme, density = 'high', children }: ThemeProviderProps) {
+  const [uncontrolledTheme, setUncontrolledTheme] = useState<ThemePreference>(defaultTheme);
+  const theme = controlledTheme ?? uncontrolledTheme;
+  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>(() => resolveTheme(theme));
 
   useEffect(() => {
     const media = window.matchMedia('(prefers-color-scheme: dark)');
@@ -38,7 +42,7 @@ export function ThemeProvider({ defaultTheme = 'system', children }: ThemeProvid
       setResolvedTheme(nextResolved);
       root.dataset.ecTheme = nextResolved;
       root.dataset.ecThemePreference = theme;
-      root.dataset.ecDensity = 'high';
+      root.dataset.ecDensity = density;
       root.classList.toggle('dark', nextResolved === 'dark');
     };
 
@@ -48,9 +52,12 @@ export function ThemeProvider({ defaultTheme = 'system', children }: ThemeProvid
 
     media.addEventListener('change', applyTheme);
     return () => media.removeEventListener('change', applyTheme);
-  }, [theme]);
+  }, [density, theme]);
 
-  const value = useMemo<ThemeContextValue>(() => ({ theme, resolvedTheme, setTheme }), [resolvedTheme, theme]);
+  const value = useMemo<ThemeContextValue>(
+    () => ({ theme, resolvedTheme, setTheme: setUncontrolledTheme }),
+    [resolvedTheme, theme],
+  );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
