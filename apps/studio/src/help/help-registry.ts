@@ -7,13 +7,16 @@ export interface HelpDescriptor {
 
 export const studioShellHelpDescriptor = Object.freeze({
   id: 'help.studio.shell',
-  title: 'AppShell del Studio',
+  title: 'AppShell y navegación del Studio',
   summary:
-    'ElectroCraft usa un único AppShell compartido para reservar navegación, Topbar, área de trabajo y Statusbar sobre la foundation shadcn/ui con base Radix.',
+    'ElectroCraft usa un único AppShell con Sidebar global agrupado sobre la foundation shadcn/ui con base Radix y Lucide.',
   details: Object.freeze([
     'El layout raíz usa 100dvh y mantiene el scroll dentro del área de trabajo; el body global no se usa como superficie desplazable del editor.',
-    'Desktop reserva 240px para la navegación; laptop reserva 64px. Tablet y móvil trasladan la navegación estructural a un Sheet de Radix en lugar de comprimir el layout desktop.',
-    'M03.2 define la geometría y los landmarks globales. La agrupación, iconos, estado activo y preferencias del Sidebar pertenecen a M03.3; la Topbar funcional y Settings pertenecen a M03.4.',
+    'El Sidebar usa exactamente los grupos Construir, Datos, Lógica, App, Recursos, Apariencia y Publicar. Taxonomías y Relaciones no vuelven a aparecer como entradas top-level.',
+    'Desktop puede alternar 240px y 64px mediante WorkspacePreferencesPort. Laptop conserva un rail de 64px; tablet y móvil trasladan la navegación a un Sheet de Radix.',
+    'El item activo expone aria-current y cada entrada conserva icono Lucide, label y acceso por teclado. Los tooltips ayudan cuando el rail es compacto, pero no sustituyen esta ayuda persistente.',
+    'Durante F03 las preferencias usan un adapter in-memory explícito. F04 sustituirá únicamente ese adapter por persistencia PGlite sin cambiar el contrato de UI.',
+    'La Topbar funcional y Settings Gear pertenecen a M03.4; M03.3 no crea una implementación paralela de esas capacidades.',
     'Claro, oscuro y sistema son preferencias del Studio; no forman parte del modelo canónico del proyecto.',
   ]),
 } satisfies HelpDescriptor);

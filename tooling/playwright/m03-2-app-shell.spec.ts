@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test.describe('M03.2 AppShell', () => {
+test.describe('M03.2 AppShell post-closure regression', () => {
   test('reserves exact desktop geometry and keeps scrolling inside the workspace', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto('/');
@@ -13,8 +13,7 @@ test.describe('M03.2 AppShell', () => {
 
     await expect(shell).toBeVisible();
     await expect(page.locator('[data-help-id="help.studio.shell"]')).toBeVisible();
-    await expect(page.getByText('Editor', { exact: true })).toBeVisible();
-    await expect(page.getByText('Configuración', { exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Editor' }).first()).toBeVisible();
 
     const [sidebarBox, topbarBox, statusbarBox, workspaceBox] = await Promise.all([
       sidebar.boundingBox(),
@@ -40,7 +39,7 @@ test.describe('M03.2 AppShell', () => {
     expect(metrics.rootHeight).toBe(1000);
   });
 
-  test('collapses only the reserved rail on laptop without shrinking the workspace', async ({ page }) => {
+  test('keeps the reserved 64px rail on laptop without shrinking the workspace', async ({ page }) => {
     await page.setViewportSize({ width: 1100, height: 800 });
     await page.goto('/');
 
@@ -64,7 +63,7 @@ test.describe('M03.2 AppShell', () => {
     await expect(menuButton).toBeFocused();
     await page.keyboard.press('Enter');
     await expect(page.getByRole('dialog', { name: 'Navegación' })).toBeVisible();
-    await expect(page.getByRole('dialog', { name: 'Navegación' }).getByText('Editor', { exact: true })).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Navegación' }).getByRole('link', { name: 'Editor' })).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(page.getByRole('dialog', { name: 'Navegación' })).toHaveCount(0);
     await expect(menuButton).toBeFocused();

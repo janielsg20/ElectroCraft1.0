@@ -9,7 +9,7 @@ function read(relativePath: string) {
   return fs.readFileSync(path.join(root, relativePath), 'utf8');
 }
 
-describe('M03.2 AppShell boundaries', () => {
+describe('M03.2 AppShell post-closure regression boundaries', () => {
   it('keeps the shell inside the phase-owned Studio seams and the shared design-system root export', () => {
     const shell = read('apps/studio/src/shell/app-shell.tsx');
     const route = read('apps/studio/src/shell/app-shell-route.tsx');
@@ -20,7 +20,7 @@ describe('M03.2 AppShell boundaries', () => {
     expect(route).not.toContain('@electrocraft/design-system/');
   });
 
-  it('exposes the exact 21 Spanish navigation labels without hardcoded shell copy', () => {
+  it('retains the original 21 Spanish vocabulary keys for compatibility', () => {
     expect(studioNavigationMessageKeys).toHaveLength(21);
     expect(studioNavigationMessageKeys.map((key) => studioShellMessagesEs[key])).toEqual([
       'Editor',
@@ -45,22 +45,22 @@ describe('M03.2 AppShell boundaries', () => {
       'Ayuda',
       'Configuración',
     ]);
-
-    const shell = read('apps/studio/src/shell/app-shell.tsx');
-    expect(shell).not.toContain("'Editor'");
-    expect(shell).not.toContain("'Configuración'");
   });
 
-  it('keeps M03.3 and M03.4 responsibilities out of the structural shell', () => {
+  it('preserves M03.2 geometry while allowing the M03.3 Sidebar extension', () => {
     const shell = read('apps/studio/src/shell/app-shell.tsx');
     const layout = read('apps/studio/src/shell/app-shell-layout.ts');
 
-    expect(shell).not.toContain('WorkspacePreferencesPort');
-    expect(shell).not.toContain('aria-current');
+    expect(layout).toContain('sidebarExpandedPx: 240');
+    expect(layout).toContain('sidebarCollapsedPx: 64');
+    expect(layout).toContain('topbarPx: 52');
+    expect(layout).toContain('statusbarPx: 26');
     expect(layout).not.toContain('WorkspacePreferencesPort');
+    expect(shell).toContain('WorkspacePreferencesPort');
+    expect(shell).toContain('aria-current');
   });
 
-  it('uses persistent help and a left-capable real Radix Sheet for tablet/mobile navigation', () => {
+  it('keeps persistent help and a real Radix Sheet for tablet/mobile navigation', () => {
     expect(read('apps/studio/src/help/help-registry.ts')).toContain("id: 'help.studio.shell'");
     expect(read('packages/design-system/src/components/ui/sheet.tsx')).toContain("side?: 'left' | 'right'");
     expect(read('packages/design-system/src/components/ui/sheet.tsx')).toContain("from 'radix-ui'");

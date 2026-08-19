@@ -1,7 +1,12 @@
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { AppShell, type AppShellCopy } from '../../../apps/studio/src/shell/app-shell';
+import {
+  AppShell,
+  type AppShellCopy,
+  type AppShellNavigationGroup,
+} from '../../../apps/studio/src/shell/app-shell';
+import { createInMemoryWorkspacePreferencesPort } from '../../../apps/studio/src/shell/workspace-preferences-port';
 
 const copy: AppShellCopy = Object.freeze({
   title: 'ElectroCraft Studio',
@@ -11,6 +16,8 @@ const copy: AppShellCopy = Object.freeze({
   menuTitle: 'Navegación',
   menuDescription: 'Navegación responsive',
   closeMenuLabel: 'Cerrar navegación',
+  collapseSidebarLabel: 'Contraer barra lateral',
+  expandSidebarLabel: 'Expandir barra lateral',
   workspaceLabel: 'Área de trabajo del Studio',
   emptyWorkspace: 'Área de trabajo vacía',
   statusLabel: 'Estado del Studio',
@@ -22,14 +29,25 @@ const copy: AppShellCopy = Object.freeze({
   }),
 });
 
-const navigationLabels = Object.freeze(['Editor', 'Pantallas', 'Plantillas', 'Componentes']);
+const navigationGroups: readonly AppShellNavigationGroup[] = Object.freeze([
+  Object.freeze({
+    id: 'build',
+    label: 'Construir',
+    items: Object.freeze([
+      Object.freeze({ id: 'editor', label: 'Editor', href: '/', iconId: 'studio.navigation.editor' }),
+      Object.freeze({ id: 'screens', label: 'Pantallas', href: '/pantallas', iconId: 'studio.navigation.screens' }),
+    ]),
+  }),
+]);
 
-describe('M03.2 AppShell runtime integration', () => {
+describe('M03.2 AppShell runtime regression integration', () => {
   it('renders the real shell landmarks and an empty workspace without demo data', () => {
     const markup = renderToStaticMarkup(
       createElement(AppShell, {
         copy,
-        navigationLabels,
+        navigationGroups,
+        activeItemId: 'editor',
+        preferencesPort: createInMemoryWorkspacePreferencesPort(),
         helpId: 'help.studio.shell',
         status: 'ready',
       }),
@@ -45,13 +63,15 @@ describe('M03.2 AppShell runtime integration', () => {
     expect(markup).toContain('Listo');
   });
 
-  it('routes navigation vocabulary and accessible mobile menu intent through the shared Radix composition', () => {
+  it('keeps responsive menu intent and route content through the shared Radix composition', () => {
     const markup = renderToStaticMarkup(
       createElement(
         AppShell,
         {
           copy,
-          navigationLabels,
+          navigationGroups,
+          activeItemId: 'editor',
+          preferencesPort: createInMemoryWorkspacePreferencesPort(),
           helpId: 'help.studio.shell',
           status: 'blocked',
         },
@@ -59,10 +79,8 @@ describe('M03.2 AppShell runtime integration', () => {
       ),
     );
 
-    for (const label of navigationLabels) {
-      expect(markup).toContain(label);
-    }
-
+    expect(markup).toContain('Editor');
+    expect(markup).toContain('Pantallas');
     expect(markup).toContain('aria-label="Abrir navegación"');
     expect(markup).toContain('data-status="blocked"');
     expect(markup).toContain('Bloqueado');
