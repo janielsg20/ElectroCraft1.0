@@ -44,7 +44,9 @@ test.describe('M03.9 editor session appearance profile', () => {
     expect(stored).toContain('comfortable');
 
     await page.reload();
-    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecAppearanceProfile)).toBe('Mi Studio');
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.dataset.ecAppearanceProfile))
+      .toBe('Mi Studio');
     await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecThemePreference)).toBe('dark');
     await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecAccent)).toBe('emerald');
     await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecDensity)).toBe('comfortable');
@@ -63,7 +65,9 @@ test.describe('M03.9 editor session appearance profile', () => {
     await sheet.locator('[data-appearance-apply]').click();
     await sheet.locator('[data-appearance-reset]').click();
 
-    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecAppearanceProfile)).toBe('Perfil conservado');
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.dataset.ecAppearanceProfile))
+      .toBe('Perfil conservado');
     await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecThemePreference)).toBe('system');
     await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecAccent)).toBe('indigo');
     await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecDensity)).toBe('high');
