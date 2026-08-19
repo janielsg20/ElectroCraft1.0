@@ -10,7 +10,7 @@ describe('M03.6 responsive shell boundaries', () => {
     const sheet = read('packages/design-system/src/components/ui/sheet.tsx');
     expect(sheet).toContain("export type SheetSide = 'left' | 'right' | 'bottom'");
     expect(sheet).toContain("from 'radix-ui'");
-    expect(sheet).toContain("data-sheet-side={side}");
+    expect(sheet).toContain('data-sheet-side={side}');
   });
 
   it('keeps mobile editor icons behind the semantic design-system registry', () => {
@@ -48,8 +48,8 @@ describe('M03.6 responsive shell boundaries', () => {
 
   it('keeps one controlled secondary surface active at a time', () => {
     const workspace = read('apps/studio/src/shell/editor-workspace.tsx');
-    expect(workspace).toContain("useState<SecondaryTool | null>(null)");
-    expect(workspace).toContain("useState<MobileTool | null>(null)");
+    expect(workspace).toContain('useState<SecondaryTool | null>(null)');
+    expect(workspace).toContain('useState<MobileTool | null>(null)');
     expect(workspace).toContain("activeTool === 'properties'");
     expect(workspace).toContain("activeTool === 'outline'");
   });
