@@ -1,11 +1,7 @@
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import {
-  AppShell,
-  type AppShellCopy,
-  type AppShellNavigationGroup,
-} from '../../../apps/studio/src/shell/app-shell';
+import { AppShell, type AppShellCopy, type AppShellNavigationGroup } from '../../../apps/studio/src/shell/app-shell';
 import { createInMemoryWorkspacePreferencesPort } from '../../../apps/studio/src/shell/workspace-preferences-port';
 
 const copy: AppShellCopy = Object.freeze({
