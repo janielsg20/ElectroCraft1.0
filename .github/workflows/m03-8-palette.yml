@@ -12,6 +12,7 @@ on:
       - 'packages/editor-puck/**'
       - 'packages/design-system/**'
       - 'tooling/vitest/**/palette*.test.ts'
+      - 'tooling/vitest/integration/editor-puck-composition.test.ts'
       - 'tooling/test/m03-5-editor-layout.test.mjs'
       - 'tooling/test/m03-8-palette.test.mjs'
       - 'tooling/playwright/m03-8-palette.spec.ts'
@@ -36,6 +37,7 @@ on:
       - 'packages/editor-puck/**'
       - 'packages/design-system/**'
       - 'tooling/vitest/**/palette*.test.ts'
+      - 'tooling/vitest/integration/editor-puck-composition.test.ts'
       - 'tooling/test/m03-5-editor-layout.test.mjs'
       - 'tooling/test/m03-8-palette.test.mjs'
       - 'tooling/playwright/m03-8-palette.spec.ts'
@@ -49,7 +51,7 @@ on:
       - '.github/workflows/m03-8-palette.yml'
 
 permissions:
-  contents: write
+  contents: read
   statuses: write
 
 defaults:
@@ -72,7 +74,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          persist-credentials: true
+          persist-credentials: false
 
       - name: Setup Node
         uses: actions/setup-node@v7
@@ -90,17 +92,6 @@ jobs:
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
 
-      - name: Persist exact M03.5 successor gate formatting
-        run: |
-          npx prettier --write tooling/test/m03-5-editor-layout.test.mjs
-          if ! git diff --quiet -- tooling/test/m03-5-editor-layout.test.mjs; then
-            git config user.name 'electrocraft-actions'
-            git config user.email 'actions@users.noreply.github.com'
-            git add tooling/test/m03-5-editor-layout.test.mjs
-            git commit -m 'style(m03.8): format M03.5 successor gate'
-            git push origin HEAD:agent/m03-8-palette-discoverability
-          fi
-
       - name: Verify M03.8 source formatting
         run: >-
           npx prettier --check
@@ -112,6 +103,7 @@ jobs:
           apps/studio/src/i18n/palette.es.ts
           tooling/test/m03-5-editor-layout.test.mjs
           tooling/test/m03-8-palette.test.mjs
+          tooling/vitest/integration/editor-puck-composition.test.ts
           tooling/vitest/unit/palette-catalog.test.ts
           tooling/vitest/unit/palette-preferences.test.ts
           tooling/vitest/contract/palette-puck-boundary.test.ts
@@ -131,6 +123,7 @@ jobs:
           tooling/vitest/unit/palette-preferences.test.ts
           tooling/vitest/contract/palette-puck-boundary.test.ts
           tooling/vitest/integration/palette-runtime.test.ts
+          tooling/vitest/integration/editor-puck-composition.test.ts
 
       - name: Install Playwright Chromium
         timeout-minutes: 8
