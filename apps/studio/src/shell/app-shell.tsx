@@ -98,7 +98,11 @@ function NavigationGroups({
     <nav className="ec-app-shell-navigation" aria-label={ariaLabel}>
       <div className="ec-app-shell-navigation-groups">
         {groups.map((group) => (
-          <section className="ec-app-shell-navigation-group" key={group.id} aria-labelledby={`sidebar-group-${group.id}`}>
+          <section
+            className="ec-app-shell-navigation-group"
+            key={group.id}
+            aria-labelledby={`sidebar-group-${group.id}`}
+          >
             <h2 id={`sidebar-group-${group.id}`} className="ec-app-shell-navigation-group-label">
               {group.label}
             </h2>
@@ -128,7 +132,9 @@ export function AppShell({
     preferencesPort.getSnapshot,
     preferencesPort.getSnapshot,
   );
-  const CollapseIcon = getStudioIcon(preferences.sidebarCollapsed ? 'studio.sidebar.expand' : 'studio.sidebar.collapse');
+  const CollapseIcon = getStudioIcon(
+    preferences.sidebarCollapsed ? 'studio.sidebar.expand' : 'studio.sidebar.collapse',
+  );
   const collapseLabel = preferences.sidebarCollapsed ? copy.expandSidebarLabel : copy.collapseSidebarLabel;
 
   return (
@@ -189,7 +195,11 @@ export function AppShell({
                 </SheetClose>
               </SheetHeader>
               <ScrollArea label={copy.navigationLabel} className="ec-app-shell-mobile-nav-scroll">
-                <NavigationGroups groups={navigationGroups} activeItemId={activeItemId} ariaLabel={copy.navigationLabel} />
+                <NavigationGroups
+                  groups={navigationGroups}
+                  activeItemId={activeItemId}
+                  ariaLabel={copy.navigationLabel}
+                />
               </ScrollArea>
             </SheetContent>
           </Sheet>
