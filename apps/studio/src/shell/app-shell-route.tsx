@@ -1,3 +1,4 @@
+import type { DesignSystemPackageDescriptor } from '@electrocraft/design-system';
 import type { ReactNode } from 'react';
 import { getStudioHelpDescriptor } from '../help/help-registry';
 import { iaT } from '../i18n/information-architecture.es';
@@ -7,6 +8,8 @@ import { AppShell, type AppShellCopy, type AppShellStatus } from './app-shell';
 import { resolveSidebarActiveItem, studioSidebarNavigation } from './sidebar-navigation';
 import { StudioTopbar, type StudioTopbarCopy } from './studio-topbar';
 import { createMemoryWorkspacePreferencesPort } from './workspace-preferences';
+
+export const studioDesignSystemOwner: DesignSystemPackageDescriptor['name'] = '@electrocraft/design-system';
 
 const appShellCopy: AppShellCopy = Object.freeze({
   title: studioT('studio.appShell.title'),
