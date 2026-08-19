@@ -2,10 +2,7 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { AppearancePanelTrigger } from '../../../apps/studio/src/shell/appearance-panel';
-import {
-  StudioAppearanceProvider,
-  useStudioAppearance,
-} from '../../../apps/studio/src/theme-provider';
+import { StudioAppearanceProvider, useStudioAppearance } from '../../../apps/studio/src/theme-provider';
 import type { EditorAppearanceStorage } from '../../../apps/studio/src/theme';
 
 function ProfileProbe() {
