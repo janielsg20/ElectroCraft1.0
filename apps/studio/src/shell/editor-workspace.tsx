@@ -104,7 +104,11 @@ function FieldsContent() {
 function InspectorContent() {
   return (
     <>
-      <section className="ec-ia-inspector-section" data-information-level="primary" aria-label={iaT('studio.ia.inspector.primaryTitle')}>
+      <section
+        className="ec-ia-inspector-section"
+        data-information-level="primary"
+        aria-label={iaT('studio.ia.inspector.primaryTitle')}
+      >
         <h3>{iaT('studio.ia.inspector.primaryTitle')}</h3>
         <p>{iaT('studio.ia.inspector.primarySummary')}</p>
         {!hasStructuralContent ? <StudioEmptyState id="inspector" /> : null}
