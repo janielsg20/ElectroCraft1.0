@@ -29,7 +29,7 @@ describe('M03.9 appearance isolation contract', () => {
     expect(appearanceSources).not.toContain('packages/frontend');
   });
 
-  it('does not change serialized editor data or ExportIR across appearance apply/reset cycles', () => {
+  it('does not change serialized editor data, project theme or ExportIR across appearance cycles', () => {
     let persisted: string | null = null;
     const storage: EditorAppearanceStorage = {
       read: () => persisted,
@@ -46,11 +46,18 @@ describe('M03.9 appearance isolation contract', () => {
     const frontendThemeBefore = read('packages/frontend/theme.css');
 
     const custom = persistEditorAppearanceProfile(storage, {
+      ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
       name: 'Aislamiento',
       tone: 'dark',
       accent: 'rose',
+      typographyFamily: 'mono',
+      iconStyle: 'strong',
+      radii: 'rounded',
+      elevation: 'raised',
       density: 'comfortable',
       canvasDensity: 'spacious',
+      animationIntensity: 'high',
+      contrastPreference: 'high',
     });
     persistEditorAppearanceProfile(storage, resetEditorAppearanceProfile(custom));
 
@@ -60,11 +67,12 @@ describe('M03.9 appearance isolation contract', () => {
     expect(DEFAULT_EDITOR_APPEARANCE_PROFILE.name).toBe('ElectroCraft');
   });
 
-  it('wires appearance into the shell without replacing existing editor destinations', () => {
+  it('wires appearance through Settings and mobile without replacing editor destinations', () => {
     const topbar = read('apps/studio/src/shell/studio-topbar.tsx');
     const workspace = read('apps/studio/src/shell/editor-workspace.tsx');
     const responsive = read('apps/studio/src/shell/responsive-shell.css');
 
+    expect(topbar).toContain('data-settings-destination="appearance"');
     expect(topbar).toContain('<AppearancePanelTrigger />');
     expect(workspace).toContain('<AppearancePanelTrigger presentation="mobile" />');
     expect(workspace).toContain('data-mobile-destination="components"');
@@ -73,5 +81,17 @@ describe('M03.9 appearance isolation contract', () => {
     expect(workspace).toContain('data-mobile-destination="properties"');
     expect(workspace).toContain('data-mobile-destination="more"');
     expect(responsive).toContain('grid-template-columns: repeat(6, minmax(0, 1fr));');
+  });
+
+  it('keeps appearance values in the design-system token layer instead of feature CSS magic values', () => {
+    const provider = read('apps/studio/src/theme-provider.tsx');
+    const appearanceCss = read('apps/studio/src/shell/appearance.css');
+    const tokens = read('packages/design-system/src/styles/studio-appearance-tokens.css');
+
+    expect(provider).not.toContain('oklch(');
+    expect(appearanceCss).not.toContain('oklch(');
+    expect(tokens).toContain("[data-ec-typography-family='humanist']");
+    expect(tokens).toContain("[data-ec-motion='high']");
+    expect(tokens).toContain("[data-ec-contrast='high']");
   });
 });
