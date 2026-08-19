@@ -11,6 +11,7 @@ import {
 } from '@electrocraft/design-system';
 import { useSyncExternalStore } from 'react';
 import type { HelpDescriptor } from '../help/help-registry';
+import { appearanceT } from '../i18n/appearance.es';
 import type { AppShellStatus } from './app-shell';
 import { AppearancePanelTrigger } from './appearance-panel';
 import { ProgressiveDisclosure } from './information-architecture-ui';
@@ -277,6 +278,22 @@ export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help 
                   <Button variant="outline" size="sm" onClick={preferencesPort.toggleSidebar}>
                     {sidebarAction}
                   </Button>
+                </div>
+              </section>
+
+              <section
+                className="ec-topbar-settings-section"
+                aria-labelledby="appearance-settings-title"
+                data-information-level="primary"
+                data-settings-destination="appearance"
+              >
+                <h2 id="appearance-settings-title">{appearanceT('title')}</h2>
+                <div className="ec-topbar-setting-row">
+                  <div>
+                    <strong>{appearanceT('title')}</strong>
+                    <p>{appearanceT('description')}</p>
+                  </div>
+                  <AppearancePanelTrigger />
                 </div>
               </section>
 
