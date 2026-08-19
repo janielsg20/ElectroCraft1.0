@@ -50,15 +50,35 @@ test('M03.7 structural gate enforces Progressive Disclosure and canonical inform
   for (const token of ["'primary'", "'contextual'", "'advanced'", "'diagnostic'"]) {
     assert.equal(ia.includes(token), true, `M03.7 information level missing: ${token}`);
   }
-  assert.equal(ia.includes("level: 'advanced', visibility: 'disclosure'"), true, 'Advanced options must use disclosure');
+  assert.equal(
+    ia.includes("level: 'advanced', visibility: 'disclosure'"),
+    true,
+    'Advanced options must use disclosure',
+  );
   assert.equal(ia.includes('protectsSystemState: true'), true, 'Diagnostic system-state metadata must exist');
 
   assert.equal(collapsible.includes("from 'radix-ui'"), true, 'Progressive Disclosure must use the Radix owner');
-  assert.equal(iaUi.includes('CollapsibleTrigger asChild'), true, 'Progressive Disclosure must use the design-system Collapsible');
+  assert.equal(
+    iaUi.includes('CollapsibleTrigger asChild'),
+    true,
+    'Progressive Disclosure must use the design-system Collapsible',
+  );
   assert.equal(emptyState.includes('export function EmptyState'), true, 'Reusable EmptyState composition is required');
 
-  for (const forbidden of ["id: 'elements'", "id: 'layers'", "id: 'fields'", "id: 'filters'", "id: 'dashboards'", "id: 'settings'", "id: 'import'"]) {
-    assert.equal(navigation.includes(forbidden), false, `Secondary concept leaked into top-level navigation: ${forbidden}`);
+  for (const forbidden of [
+    "id: 'elements'",
+    "id: 'layers'",
+    "id: 'fields'",
+    "id: 'filters'",
+    "id: 'dashboards'",
+    "id: 'settings'",
+    "id: 'import'",
+  ]) {
+    assert.equal(
+      navigation.includes(forbidden),
+      false,
+      `Secondary concept leaked into top-level navigation: ${forbidden}`,
+    );
   }
 
   assert.equal(editor.includes('<PuckEditorFields'), true, 'Inspector must preserve Puck.Fields ownership');
@@ -75,7 +95,11 @@ test('M03.7 structural gate enforces Progressive Disclosure and canonical inform
   for (const concept of ['Progressive Disclosure', 'primary', 'contextual', 'advanced', 'diagnostic']) {
     assert.equal(ownerDoc.includes(concept), true, `Canonical IA document missing concept: ${concept}`);
   }
-  assert.equal(aliasDoc.includes('INFORMATION_ARCHITECTURE.md'), true, 'UX_INFORMATION_ARCHITECTURE must remain a compatibility alias');
+  assert.equal(
+    aliasDoc.includes('INFORMATION_ARCHITECTURE.md'),
+    true,
+    'UX_INFORMATION_ARCHITECTURE must remain a compatibility alias',
+  );
   for (const surface of ['Settings', 'Inspector', 'List/Detail']) {
     assert.equal(audit.includes(surface), true, `Screen IA audit missing surface: ${surface}`);
   }
