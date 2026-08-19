@@ -177,6 +177,10 @@
 }
 
 @media (max-width: 1023px) {
+  .ec-app-shell-sidebar {
+    display: none;
+  }
+
   .ec-app-shell-mobile-sheet .ec-app-shell-navigation {
     padding: 0;
   }
