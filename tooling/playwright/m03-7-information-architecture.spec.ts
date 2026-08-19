@@ -24,7 +24,9 @@ test.describe('M03.7 Progressive Disclosure and information architecture', () =>
     await expect(settingsTrigger).toBeFocused();
   });
 
-  test('keeps Inspector primary properties visible while advanced content is disclosed separately', async ({ page }) => {
+  test('keeps Inspector primary properties visible while advanced content is disclosed separately', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/');
 
