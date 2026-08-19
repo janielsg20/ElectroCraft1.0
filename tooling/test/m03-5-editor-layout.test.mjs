@@ -6,6 +6,7 @@ import test from 'node:test';
 const root = process.cwd();
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const exists = (file) => fs.existsSync(path.join(root, file));
+const closurePath = '.ai/evidence/F03/M03.5/CLOSURE_2026-08-19.md';
 
 const required = [
   'apps/studio/src/shell/editor-workspace.tsx',
@@ -19,6 +20,7 @@ const required = [
   'tooling/playwright/m03-5-editor-layout.spec.ts',
   '.ai/evidence/F03/M03.4/CLOSURE_2026-08-19.md',
   '.ai/evidence/F03/M03.5/IMPLEMENTATION_2026-08-19.md',
+  closurePath,
 ];
 
 test('M03.5 structural gate keeps exact editor dimensions and ownership', () => {
@@ -86,7 +88,19 @@ test('M03.5 structural gate keeps exact editor dimensions and ownership', () => 
   }
   assert.equal(help.includes('Contexto 288px'), true, 'Persistent help must explain the M03.5 editor geometry');
   assert.match(state, /M03\.4[^\n]*COMPLETADA[^\n]*GREEN/);
-  assert.match(state, /M03\.5[^\n]*ACTIVE/);
+
+  const active = /M03\.5[^\n]*ACTIVE/.test(state);
+  const complete = /M03\.5[^\n]*COMPLETADA[^\n]*GREEN/.test(state);
+  assert.equal(active || complete, true, 'M03.5 must be ACTIVE or post-closure COMPLETADA / GREEN');
+
+  if (complete) {
+    const closure = read(closurePath);
+    assert.equal(closure.includes('32296070741'), true, 'M03.5 closure must pin the GREEN owner run');
+    assert.equal(closure.includes('9381289623'), true, 'M03.5 closure must pin the GREEN artifact');
+    assert.equal(closure.includes('GREEN'), true, 'M03.5 closure evidence must remain GREEN');
+    assert.match(state, /M03\.6[^\n]*ACTIVE/);
+  }
+
   assert.equal(
     m034Verifier.includes('post-closure-regression'),
     true,
