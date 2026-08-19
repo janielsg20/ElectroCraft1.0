@@ -79,20 +79,11 @@ jobs:
         run: npm ci --ignore-scripts --no-audit --no-fund
 
       - name: Verify M03.7 source formatting
-        run: |
-          files=(
-            apps/studio/src/shell/editor-workspace.tsx
-            apps/studio/src/shell/information-architecture-ui.tsx
-            apps/studio/src/shell/information-architecture.ts
-            tooling/test/m03-7-information-architecture.test.mjs
-            tooling/playwright/m03-7-information-architecture.spec.ts
-          )
-          if ! npx prettier --check "${files[@]}"; then
-            npx prettier --write "${files[@]}"
-            git diff -- "${files[@]}"
-            exit 1
-          fi
-          npx prettier --check .github/workflows/m03-7-information-architecture.yml
+        run: >-
+          npx prettier --check
+          .github/workflows/m03-7-information-architecture.yml
+          tooling/test/m03-7-information-architecture.test.mjs
+          tooling/playwright/m03-7-information-architecture.spec.ts
 
       - name: Execute dedicated M03.7 structural suite
         run: node --test tooling/test/m03-7-information-architecture.test.mjs
