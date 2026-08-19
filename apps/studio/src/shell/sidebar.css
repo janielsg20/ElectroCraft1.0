@@ -157,6 +157,10 @@
 }
 
 @media (max-width: 1023px) {
+  .ec-app-shell-sidebar {
+    display: none;
+  }
+
   .ec-app-shell-navigation-groups {
     gap: 12px;
     padding: 0;
