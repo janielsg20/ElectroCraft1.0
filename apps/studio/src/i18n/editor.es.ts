@@ -5,7 +5,7 @@ export const editorMessagesEs = Object.freeze({
   'studio.editor.inspectorTitle': 'Inspector',
   'studio.editor.outlineTitle': 'Capas',
   'studio.editor.contextStructural':
-    'Estructura M03.5: componentes y capas de Puck. Los widgets se registrarán en su microfase propietaria.',
+    'Palette ElectroCraft sobre Puck: catálogo descubrible sin duplicar ComponentDefinitions. La inserción solo se habilita cuando el mapping propietario existe.',
   'studio.editor.canvasStructural':
     'Lienzo Puck integrado. Esta microfase valida la estructura del editor sin inventar contenido demo.',
   'studio.editor.inspectorStructural':
@@ -30,7 +30,7 @@ export const editorMessagesEs = Object.freeze({
   'studio.editor.mobile.properties': 'Propiedades',
   'studio.editor.mobile.more': 'Más',
   'studio.editor.mobile.componentsDescription':
-    'Biblioteca de componentes Puck en un panel inferior táctil. El lienzo permanece visible al cerrar.',
+    'Palette buscable con categorías, favoritos y recientes en un panel inferior táctil. Puck conserva el ownership de la composición.',
   'studio.editor.mobile.propertiesDescription':
     'Propiedades de la selección actual en un panel inferior; Puck conserva el ownership de los campos.',
   'studio.editor.mobile.moreDescription':
