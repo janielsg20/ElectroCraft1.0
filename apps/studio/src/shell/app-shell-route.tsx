@@ -4,10 +4,7 @@ import { getStudioHelpDescriptor } from '../help/help-registry';
 import { studioT } from '../i18n/studio-shell.es';
 import { AppShell, type AppShellCopy, type AppShellNavigationGroup, type AppShellStatus } from './app-shell';
 import { resolveStudioSidebarItemId, studioSidebarNavigationGroups } from './sidebar-navigation';
-import {
-  createInMemoryWorkspacePreferencesPort,
-  type WorkspacePreferencesPort,
-} from './workspace-preferences-port';
+import { createInMemoryWorkspacePreferencesPort, type WorkspacePreferencesPort } from './workspace-preferences-port';
 
 const appShellCopy: AppShellCopy = Object.freeze({
   title: studioT('studio.appShell.title'),
