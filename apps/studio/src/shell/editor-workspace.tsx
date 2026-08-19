@@ -9,6 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
   getStudioIcon,
+  type SheetSide,
 } from '@electrocraft/design-system';
 import {
   PuckEditorComponents,
@@ -19,15 +20,31 @@ import {
   structuralPuckConfig,
   structuralPuckData,
 } from '@electrocraft/editor-puck';
-import { useState, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode, type RefObject } from 'react';
 import { editorT } from '../i18n/editor.es';
-import { editorPaneContract, type EditorLayoutMode } from './editor-layout-model';
-import { useEditorLayoutMode } from './use-editor-layout-mode';
+import {
+  editorPaneContract,
+  resolveEditorLayoutMode,
+  resolveLaptopPanelStrategy,
+  type EditorLayoutMode,
+  type LaptopPanelStrategy,
+} from './editor-layout-model';
+import { getStudioSidebarNavigationItem } from './sidebar-navigation';
+import { useEditorViewportWidth } from './use-editor-layout-mode';
 
 const ContextIcon = getStudioIcon('studio.sidebar.components');
 const CanvasIcon = getStudioIcon('studio.sidebar.editor');
 const InspectorIcon = getStudioIcon('studio.inspector');
 const CloseIcon = getStudioIcon('window.close');
+const MobileComponentsIcon = getStudioIcon('studio.mobile.components');
+const MobileScreensIcon = getStudioIcon('studio.mobile.screens');
+const MobileCanvasIcon = getStudioIcon('studio.mobile.canvas');
+const MobilePropertiesIcon = getStudioIcon('studio.mobile.properties');
+const MobileMoreIcon = getStudioIcon('studio.mobile.more');
+const screensDestination = getStudioSidebarNavigationItem('screens');
+
+type SecondaryTool = 'context' | 'inspector';
+type MobileTool = 'components' | 'properties' | 'outline';
 
 interface EditorRegionProps {
   readonly region: 'context' | 'canvas' | 'inspector';
@@ -56,24 +73,44 @@ function StructuralNotice({ children }: { readonly children: ReactNode }) {
   );
 }
 
+function ComponentsContent() {
+  return (
+    <div className="ec-editor-puck-slot" data-puck-composition="components">
+      <PuckEditorComponents />
+    </div>
+  );
+}
+
+function OutlineContent() {
+  return (
+    <div className="ec-editor-puck-slot" data-puck-composition="outline">
+      <PuckEditorOutline />
+    </div>
+  );
+}
+
+function FieldsContent() {
+  return (
+    <div className="ec-editor-puck-slot" data-puck-composition="fields">
+      <PuckEditorFields wrapFields={false} />
+    </div>
+  );
+}
+
 function ContextRegion() {
   return (
     <EditorRegion region="context" title={editorT('studio.editor.contextTitle')} icon={ContextIcon}>
       <StructuralNotice>{editorT('studio.editor.contextStructural')}</StructuralNotice>
-      <div className="ec-editor-puck-slot" data-puck-composition="components">
-        <PuckEditorComponents />
-      </div>
-      <div className="ec-editor-puck-slot" data-puck-composition="outline">
-        <PuckEditorOutline />
-      </div>
+      <ComponentsContent />
+      <OutlineContent />
     </EditorRegion>
   );
 }
 
-function CanvasRegion() {
+function CanvasRegion({ stageRef }: { readonly stageRef?: RefObject<HTMLDivElement | null> }) {
   return (
     <EditorRegion region="canvas" title={editorT('studio.editor.canvasTitle')} icon={CanvasIcon}>
-      <div className="ec-editor-canvas-stage" data-editor-canvas-stage>
+      <div className="ec-editor-canvas-stage" data-editor-canvas-stage ref={stageRef} tabIndex={-1}>
         <StructuralNotice>{editorT('studio.editor.canvasStructural')}</StructuralNotice>
         <div className="ec-editor-puck-preview" data-puck-composition="preview">
           <PuckEditorPreview id="electrocraft-editor-preview" />
@@ -87,9 +124,7 @@ function InspectorRegion() {
   return (
     <EditorRegion region="inspector" title={editorT('studio.editor.inspectorTitle')} icon={InspectorIcon}>
       <StructuralNotice>{editorT('studio.editor.inspectorStructural')}</StructuralNotice>
-      <div className="ec-editor-puck-slot" data-puck-composition="fields">
-        <PuckEditorFields wrapFields={false} />
-      </div>
+      <FieldsContent />
     </EditorRegion>
   );
 }
@@ -97,7 +132,7 @@ function InspectorRegion() {
 interface ToolSheetProps {
   readonly open: boolean;
   readonly onOpenChange: (open: boolean) => void;
-  readonly side: 'left' | 'right';
+  readonly side: SheetSide;
   readonly title: string;
   readonly description: string;
   readonly trigger: ReactNode;
@@ -127,18 +162,37 @@ function ToolSheet({ open, onOpenChange, side, title, description, trigger, chil
   );
 }
 
-function ResponsiveEditorLayout({ mode }: { readonly mode: Exclude<EditorLayoutMode, 'desktop'> }) {
-  const [contextOpen, setContextOpen] = useState(false);
-  const [inspectorOpen, setInspectorOpen] = useState(false);
+function setControlledTool(
+  setter: (value: SecondaryTool | null | ((current: SecondaryTool | null) => SecondaryTool | null)) => void,
+  tool: SecondaryTool,
+  open: boolean,
+) {
+  setter((current) => (open ? tool : current === tool ? null : current));
+}
+
+function ResponsiveEditorLayout({
+  mode,
+  viewportWidth,
+}: {
+  readonly mode: Exclude<EditorLayoutMode, 'desktop' | 'mobile'>;
+  readonly viewportWidth: number;
+}) {
+  const [activeTool, setActiveTool] = useState<SecondaryTool | null>(null);
   const isLaptop = mode === 'laptop';
+  const laptopStrategy: LaptopPanelStrategy = isLaptop ? resolveLaptopPanelStrategy(viewportWidth) : 'overlay';
+  const showContextInline = isLaptop && laptopStrategy === 'split';
 
   return (
-    <div className="ec-editor-responsive-layout" data-editor-responsive-mode={mode}>
+    <div
+      className="ec-editor-responsive-layout"
+      data-editor-responsive-mode={mode}
+      data-laptop-panel-strategy={isLaptop ? laptopStrategy : undefined}
+    >
       <div className="ec-editor-responsive-toolbar" aria-label={editorT('studio.editor.toolsLabel')}>
-        {!isLaptop ? (
+        {!showContextInline ? (
           <ToolSheet
-            open={contextOpen}
-            onOpenChange={setContextOpen}
+            open={activeTool === 'context'}
+            onOpenChange={(open) => setControlledTool(setActiveTool, 'context', open)}
             side="left"
             title={editorT('studio.editor.contextTitle')}
             description={editorT('studio.editor.contextSheetDescription')}
@@ -155,8 +209,8 @@ function ResponsiveEditorLayout({ mode }: { readonly mode: Exclude<EditorLayoutM
         ) : null}
         <span className="ec-editor-responsive-mode-label">{editorT(`studio.editor.mode.${mode}`)}</span>
         <ToolSheet
-          open={inspectorOpen}
-          onOpenChange={setInspectorOpen}
+          open={activeTool === 'inspector'}
+          onOpenChange={(open) => setControlledTool(setActiveTool, 'inspector', open)}
           side="right"
           title={editorT('studio.editor.inspectorTitle')}
           description={editorT('studio.editor.inspectorSheetDescription')}
@@ -172,16 +226,164 @@ function ResponsiveEditorLayout({ mode }: { readonly mode: Exclude<EditorLayoutM
         </ToolSheet>
       </div>
 
-      <div className={isLaptop ? 'ec-editor-laptop-content' : 'ec-editor-responsive-canvas'}>
-        {isLaptop ? <ContextRegion /> : null}
+      <div className={showContextInline ? 'ec-editor-laptop-content' : 'ec-editor-responsive-canvas'}>
+        {showContextInline ? <ContextRegion /> : null}
         <CanvasRegion />
       </div>
     </div>
   );
 }
 
+function MobileEditorLayout() {
+  const [activeTool, setActiveTool] = useState<MobileTool | null>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
+
+  const setMobileTool = (tool: MobileTool, open: boolean) => {
+    setActiveTool((current) => (open ? tool : current === tool ? null : current));
+  };
+
+  return (
+    <div className="ec-editor-mobile-layout" data-editor-responsive-mode="mobile">
+      <div className="ec-editor-mobile-canvas">
+        <CanvasRegion stageRef={canvasRef} />
+      </div>
+
+      <nav className="ec-editor-mobile-dock" aria-label={editorT('studio.editor.mobileNavigationLabel')}>
+        <Sheet open={activeTool === 'components'} onOpenChange={(open) => setMobileTool('components', open)}>
+          <SheetTrigger asChild>
+            <button
+              className="ec-editor-mobile-action"
+              type="button"
+              aria-pressed={activeTool === 'components'}
+              data-mobile-destination="components"
+            >
+              <MobileComponentsIcon aria-hidden="true" />
+              <span>{editorT('studio.editor.mobile.components')}</span>
+            </button>
+          </SheetTrigger>
+          <SheetContent
+            side="bottom"
+            className="ec-editor-mobile-bottom-sheet"
+            data-editor-mobile-sheet="components"
+          >
+            <SheetHeader className="ec-editor-mobile-sheet-header">
+              <div>
+                <SheetTitle>{editorT('studio.editor.mobile.components')}</SheetTitle>
+                <SheetDescription>{editorT('studio.editor.mobile.componentsDescription')}</SheetDescription>
+              </div>
+              <SheetClose asChild>
+                <Button variant="ghost" size="icon" aria-label={editorT('studio.editor.mobile.closeComponents')}>
+                  <CloseIcon aria-hidden="true" />
+                </Button>
+              </SheetClose>
+            </SheetHeader>
+            <div className="ec-editor-mobile-sheet-body">
+              <StructuralNotice>{editorT('studio.editor.contextStructural')}</StructuralNotice>
+              <div className="ec-editor-mobile-puck-panel">
+                <ComponentsContent />
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
+
+        <a
+          className="ec-editor-mobile-action"
+          href={screensDestination.href}
+          aria-label={screensDestination.label}
+          data-mobile-destination="screens"
+        >
+          <MobileScreensIcon aria-hidden="true" />
+          <span>{editorT('studio.editor.mobile.screens')}</span>
+        </a>
+
+        <button
+          className="ec-editor-mobile-action"
+          type="button"
+          aria-current="page"
+          aria-label={editorT('studio.editor.mobile.canvasFocusLabel')}
+          data-mobile-destination="canvas"
+          onClick={() => canvasRef.current?.focus()}
+        >
+          <MobileCanvasIcon aria-hidden="true" />
+          <span>{editorT('studio.editor.mobile.canvas')}</span>
+        </button>
+
+        <Sheet open={activeTool === 'properties'} onOpenChange={(open) => setMobileTool('properties', open)}>
+          <SheetTrigger asChild>
+            <button
+              className="ec-editor-mobile-action"
+              type="button"
+              aria-pressed={activeTool === 'properties'}
+              data-mobile-destination="properties"
+            >
+              <MobilePropertiesIcon aria-hidden="true" />
+              <span>{editorT('studio.editor.mobile.properties')}</span>
+            </button>
+          </SheetTrigger>
+          <SheetContent
+            side="bottom"
+            className="ec-editor-mobile-bottom-sheet"
+            data-editor-mobile-sheet="properties"
+          >
+            <SheetHeader className="ec-editor-mobile-sheet-header">
+              <div>
+                <SheetTitle>{editorT('studio.editor.mobile.properties')}</SheetTitle>
+                <SheetDescription>{editorT('studio.editor.mobile.propertiesDescription')}</SheetDescription>
+              </div>
+              <SheetClose asChild>
+                <Button variant="ghost" size="icon" aria-label={editorT('studio.editor.mobile.closeProperties')}>
+                  <CloseIcon aria-hidden="true" />
+                </Button>
+              </SheetClose>
+            </SheetHeader>
+            <div className="ec-editor-mobile-sheet-body">
+              <StructuralNotice>{editorT('studio.editor.inspectorStructural')}</StructuralNotice>
+              <div className="ec-editor-mobile-puck-panel">
+                <FieldsContent />
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
+
+        <Sheet open={activeTool === 'outline'} onOpenChange={(open) => setMobileTool('outline', open)}>
+          <SheetTrigger asChild>
+            <button
+              className="ec-editor-mobile-action"
+              type="button"
+              aria-pressed={activeTool === 'outline'}
+              data-mobile-destination="more"
+            >
+              <MobileMoreIcon aria-hidden="true" />
+              <span>{editorT('studio.editor.mobile.more')}</span>
+            </button>
+          </SheetTrigger>
+          <SheetContent side="right" className="ec-editor-mobile-full-sheet" data-editor-mobile-sheet="outline">
+            <SheetHeader className="ec-editor-mobile-sheet-header">
+              <div>
+                <SheetTitle>{editorT('studio.editor.mobile.more')}</SheetTitle>
+                <SheetDescription>{editorT('studio.editor.mobile.moreDescription')}</SheetDescription>
+              </div>
+              <SheetClose asChild>
+                <Button variant="ghost" size="icon" aria-label={editorT('studio.editor.mobile.closeMore')}>
+                  <CloseIcon aria-hidden="true" />
+                </Button>
+              </SheetClose>
+            </SheetHeader>
+            <div className="ec-editor-mobile-sheet-body" aria-label={editorT('studio.editor.outlineTitle')}>
+              <div className="ec-editor-mobile-puck-panel" data-mobile-tool="outline">
+                <OutlineContent />
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </nav>
+    </div>
+  );
+}
+
 export function StudioEditorWorkspace() {
-  const mode = useEditorLayoutMode();
+  const viewportWidth = useEditorViewportWidth();
+  const mode = resolveEditorLayoutMode(viewportWidth);
 
   return (
     <PuckEditorRoot config={structuralPuckConfig} data={structuralPuckData}>
@@ -201,8 +403,10 @@ export function StudioEditorWorkspace() {
             leftConstraint={editorPaneContract.context}
             rightConstraint={editorPaneContract.inspector}
           />
+        ) : mode === 'mobile' ? (
+          <MobileEditorLayout />
         ) : (
-          <ResponsiveEditorLayout mode={mode} />
+          <ResponsiveEditorLayout mode={mode} viewportWidth={viewportWidth} />
         )}
       </section>
     </PuckEditorRoot>
