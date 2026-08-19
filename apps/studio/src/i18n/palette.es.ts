@@ -15,6 +15,7 @@ export const paletteMessagesEs = Object.freeze({
   'studio.palette.insertUnavailable': 'Inserción no disponible todavía',
   'studio.palette.dragSource': 'Componentes registrados en Puck para arrastrar',
   'studio.palette.diagnosticTitle': 'No se puede insertar este elemento',
+  'studio.palette.diagnosticClose': 'Cerrar diagnóstico',
   'studio.palette.diagnosticLocation': 'Ubicación',
   'studio.palette.diagnosticCause': 'Causa',
   'studio.palette.diagnosticAction': 'Acción sugerida',
