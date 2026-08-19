@@ -88,23 +88,29 @@ jobs:
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
 
-      - name: Produce and persist exact M03.8 Prettier output
+      - name: Apply focused M03.8 type fixes and persist formatting
         run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('apps/studio/src/shell/palette-catalog.ts')
+          source = path.read_text()
+          old = 'const directIds = new Set(directSynonyms);'
+          new = "const directIds = new Set<PaletteItemDescriptor['id']>(directSynonyms);"
+          if old in source:
+              path.write_text(source.replace(old, new, 1))
+          PY
           npx prettier --write \
             apps/studio/src/shell/palette-catalog.ts \
-            apps/studio/src/shell/palette-preferences.ts \
             apps/studio/src/shell/palette-panel.tsx
           if ! git diff --quiet -- \
             apps/studio/src/shell/palette-catalog.ts \
-            apps/studio/src/shell/palette-preferences.ts \
             apps/studio/src/shell/palette-panel.tsx; then
             git config user.name 'electrocraft-actions'
             git config user.email 'actions@users.noreply.github.com'
             git add \
               apps/studio/src/shell/palette-catalog.ts \
-              apps/studio/src/shell/palette-preferences.ts \
               apps/studio/src/shell/palette-panel.tsx
-            git commit -m 'style(m03.8): apply Prettier'
+            git commit -m 'fix(m03.8): resolve Palette type errors'
             git push origin HEAD:agent/m03-8-palette-discoverability
           fi
 
