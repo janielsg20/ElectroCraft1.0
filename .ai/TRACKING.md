@@ -15,39 +15,37 @@ El historial detallado previo permanece versionado en Git y en los archivos de e
 | M03.3 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.3/CLOSURE_2026-08-19.md` |
 | M03.4 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.4/CLOSURE_2026-08-19.md` |
 | M03.5 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.5/CLOSURE_2026-08-19.md` |
-| F03 / M03.6 | ACTIVE | `.ai/microphases/M03_6.md` |
+| F03 / M03.6 | ACTIVE | `.ai/microphases/M03_6.md` + `.ai/evidence/F03/M03.6/IMPLEMENTATION_2026-08-19.md` |
 
 ## Cierres canónicos recientes
-### M03.3
-- PR `#15`; merge `5d6e5d341222b924c3f8eb40567ab15dc1628ff8`.
-- Run en `main` `32275890306` — success.
-- Artifact `9374022673`; digest `sha256:3068924b873f9ccbff75f5ddfbfefa57ee8ddbb55c7baa2fce5bd0d0ce153923`.
-- Node `27/27`, Vitest `161/161`, build PASS, Playwright `12/12`.
-
 ### M03.4
 - Head `dd6ac8ea28276d9a1fc05f387338cba5980462a5`.
 - Run en `main` `32278183037` — success; job `96150413578`.
 - Artifact `9374817606`; digest `sha256:7f22461f600be17afa7b72a2cb54cccf0d08115ca9fe30c8dd2b583567847dd9`.
-- Closure marker `PASS_M03_4_TOPBAR_SETTINGS`.
 - Node `27/27`, Vitest `169/169`, build PASS, Playwright `16/16` y `npm run check` GREEN.
-- Topbar 52px, Settings gear último, Sheet Radix, restore-focus y WorkspacePreferencesPort compartido.
 
 ### M03.5
-- PR `#18`; base `main@dd6ac8ea28276d9a1fc05f387338cba5980462a5`.
-- Head validado `5044a3456cee87094f66d8c5f262b457ea338020`.
-- Run propietario `32296070741` — success; job `96207545673`.
-- Artifact `9381289623`; digest `sha256:c78ebf5db9dd87d2235a08907f2f9e51ce9e00a070190540322530d026f4c73c`.
-- Closure marker `PASS_M03_5_EDITOR_LAYOUT`.
-- Structural `1/1`; Vitest dedicado `7/7`; Playwright dedicado `4/4`.
-- Full gate: Node `28/28`, Vitest `176/176` en 53 archivos, Playwright `20/20`, typecheck/build GREEN.
+- PR `#18`; squash merge `f7577871dcadb843ea59a4bec0378cbbf9cc396b`.
+- Head funcional validado `5044a3456cee87094f66d8c5f262b457ea338020`.
+- Run propietario PR `32296070741` — success; artifact `9381289623`.
+- Revalidación en `main`: run `32297534296`, job `96212236246` — success.
+- Artifact main `9381789348`; digest `sha256:b5d07c57b0a24e8c1a4cf9df94707cd5eaf23948639fd8e0ab24081e46ac361b`.
+- Full gate: Node `28/28`, Vitest `176/176`, Playwright `20/20`, typecheck/build GREEN.
 - Contexto 288px 240–380, Canvas dominante, Inspector 320px 280–440 y Statusbar AppShell 26px.
-- Radix `SheetTrigger` preserva restore-focus y `help.studio.shell` conserva ownership único en AppShell.
 
-## Transición M03.6
-- M03.6 es la única microfase `ACTIVE`.
-- Su implementación permanece bloqueada únicamente por la integración de PR `#18` y la revalidación M03.5 sobre `main`; no existe blocker funcional P0/P1 conocido.
-- Scope siguiente: laptop con colapso/overlay cuando Canvas sea estrecho; tablet con rail + Sheets; móvil con Topbar compacta + bottom nav `Components | Screens | Canvas | Properties | More`, Properties en bottom Sheet y Outline en Sheet full-height.
-- No puede desaparecer ninguna capacidad primaria ni adelantarse scope de M03.7+.
+## Implementación M03.6 en curso
+- Rama limpia: `agent/m03-6-responsive-shell`, creada desde `main` después del GREEN de M03.5.
+- Owner: `shadcn/ui Radix + AppShell`; Puck sigue detrás de `@electrocraft/editor-puck`.
+- Laptop: rail AppShell 64px; estrategia `split` cuando viewport >=1152 y `overlay` para herramientas secundarias cuando viewport 1024–1151.
+- Tablet 768–1023: rail global 56px + navegación completa en Sheet; Contexto/Inspector permanecen en Sheets y el Canvas domina.
+- Móvil <768: Topbar compacta + dock inferior exacto `Componentes | Pantallas | Lienzo | Propiedades | Más`.
+- `Pantallas` resuelve su href desde el registry canónico del Sidebar; no hardcodea una ruta paralela.
+- `Propiedades` usa `Sheet side="bottom"`; `Más` expone Outline/Capas en Sheet full-height.
+- `Sheet` Radix existente se extendió con `side="bottom"`; no se añadió otro drawer subsystem.
+- Iconos móviles viven en el registry semántico Lucide del design-system.
+- Objetivos táctiles del rail, dock y cierres de Sheets: >=44px; dock móvil 58px.
+- Tests añadidos: unit, contract, integration y Playwright M03.6. M03.2 tablet se actualizó al contrato superseding de rail 56px.
+- Pendiente: structural gate M03.6, workflow propietario, ejecución real de lint/typecheck/tests/build/E2E y cierre documental.
 
 ## Historial extendido
 - hasta M00.8: `.ai/TRACKING_HISTORY_THROUGH_M00.8.md`;
