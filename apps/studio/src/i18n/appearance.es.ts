@@ -47,9 +47,11 @@ export const appearanceMessagesEs = Object.freeze({
   keepEditing: 'Seguir editando',
   accessibilityTitle: 'Revisión de accesibilidad',
   restoreAccessible: 'Restaurar valores accesibles',
-  reducedMotionSystem: 'El sistema solicita movimiento reducido; ElectroCraft limita las animaciones aunque el perfil pida más movimiento.',
+  reducedMotionSystem:
+    'El sistema solicita movimiento reducido; ElectroCraft limita las animaciones aunque el perfil pida más movimiento.',
   helpTitle: 'Qué modifica Apariencia',
-  helpBody: 'Solo cambia tokens visuales del Studio. El documento, el tema del frontend, el tema de Administración y ExportIR permanecen aislados.',
+  helpBody:
+    'Solo cambia tokens visuales del Studio. El documento, el tema del frontend, el tema de Administración y ExportIR permanecen aislados.',
   system: 'Sistema',
   light: 'Claro',
   dark: 'Oscuro',

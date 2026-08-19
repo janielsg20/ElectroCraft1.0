@@ -36,11 +36,7 @@ import type {
   StudioTypographyFamily,
   StudioTypographyScale,
 } from '../theme';
-import {
-  StudioAppearanceProvider,
-  useOptionalStudioAppearance,
-  useStudioAppearance,
-} from '../theme-provider';
+import { StudioAppearanceProvider, useOptionalStudioAppearance, useStudioAppearance } from '../theme-provider';
 import './appearance.css';
 
 const AppearanceIcon = getStudioIcon('studio.sidebar.themes');
@@ -381,18 +377,81 @@ function AppearancePanelContent({ presentation = 'topbar' }: AppearancePanelTrig
           </AppearanceSection>
 
           <AppearanceSection title={appearanceT('shapeGroup')}>
-            <AppearanceChoiceGroup label={appearanceT('radii')} values={radii} selected={resolvedProfile.radii} labels={radiiLabels} dataGroup="radii" onSelect={(value) => preview({ ...resolvedProfile, radii: value })} />
-            <AppearanceChoiceGroup label={appearanceT('elevation')} values={elevations} selected={resolvedProfile.elevation} labels={elevationLabels} dataGroup="elevation" onSelect={(value) => preview({ ...resolvedProfile, elevation: value })} />
-            <AppearanceChoiceGroup label={appearanceT('buttonShape')} values={buttonShapes} selected={resolvedProfile.buttonShape} labels={buttonShapeLabels} dataGroup="button-shape" onSelect={(value) => preview({ ...resolvedProfile, buttonShape: value })} />
-            <AppearanceChoiceGroup label={appearanceT('fieldShape')} values={fieldShapes} selected={resolvedProfile.fieldShape} labels={fieldShapeLabels} dataGroup="field-shape" onSelect={(value) => preview({ ...resolvedProfile, fieldShape: value })} />
-            <AppearanceChoiceGroup label={appearanceT('menuAppearance')} values={menuAppearances} selected={resolvedProfile.menuAppearance} labels={menuLabels} dataGroup="menu-appearance" onSelect={(value) => preview({ ...resolvedProfile, menuAppearance: value })} />
+            <AppearanceChoiceGroup
+              label={appearanceT('radii')}
+              values={radii}
+              selected={resolvedProfile.radii}
+              labels={radiiLabels}
+              dataGroup="radii"
+              onSelect={(value) => preview({ ...resolvedProfile, radii: value })}
+            />
+            <AppearanceChoiceGroup
+              label={appearanceT('elevation')}
+              values={elevations}
+              selected={resolvedProfile.elevation}
+              labels={elevationLabels}
+              dataGroup="elevation"
+              onSelect={(value) => preview({ ...resolvedProfile, elevation: value })}
+            />
+            <AppearanceChoiceGroup
+              label={appearanceT('buttonShape')}
+              values={buttonShapes}
+              selected={resolvedProfile.buttonShape}
+              labels={buttonShapeLabels}
+              dataGroup="button-shape"
+              onSelect={(value) => preview({ ...resolvedProfile, buttonShape: value })}
+            />
+            <AppearanceChoiceGroup
+              label={appearanceT('fieldShape')}
+              values={fieldShapes}
+              selected={resolvedProfile.fieldShape}
+              labels={fieldShapeLabels}
+              dataGroup="field-shape"
+              onSelect={(value) => preview({ ...resolvedProfile, fieldShape: value })}
+            />
+            <AppearanceChoiceGroup
+              label={appearanceT('menuAppearance')}
+              values={menuAppearances}
+              selected={resolvedProfile.menuAppearance}
+              labels={menuLabels}
+              dataGroup="menu-appearance"
+              onSelect={(value) => preview({ ...resolvedProfile, menuAppearance: value })}
+            />
           </AppearanceSection>
 
           <AppearanceSection title={appearanceT('densityGroup')}>
-            <AppearanceChoiceGroup label={appearanceT('density')} values={densities} selected={resolvedProfile.density} labels={densityLabels} dataGroup="density" onSelect={(value) => preview({ ...resolvedProfile, density: value })} />
-            <AppearanceChoiceGroup label={appearanceT('controlSize')} values={controlSizes} selected={resolvedProfile.controlSize} labels={scaleLabels} dataGroup="control-size" onSelect={(value) => preview({ ...resolvedProfile, controlSize: value })} />
-            <AppearanceChoiceGroup label={appearanceT('spacingScale')} values={spacingScales} selected={resolvedProfile.spacingScale} labels={spacingLabels} dataGroup="spacing-scale" onSelect={(value) => preview({ ...resolvedProfile, spacingScale: value })} />
-            <AppearanceChoiceGroup label={appearanceT('canvasDensity')} values={canvasDensities} selected={resolvedProfile.canvasDensity} labels={canvasLabels} dataGroup="canvas-density" onSelect={(value) => preview({ ...resolvedProfile, canvasDensity: value })} />
+            <AppearanceChoiceGroup
+              label={appearanceT('density')}
+              values={densities}
+              selected={resolvedProfile.density}
+              labels={densityLabels}
+              dataGroup="density"
+              onSelect={(value) => preview({ ...resolvedProfile, density: value })}
+            />
+            <AppearanceChoiceGroup
+              label={appearanceT('controlSize')}
+              values={controlSizes}
+              selected={resolvedProfile.controlSize}
+              labels={scaleLabels}
+              dataGroup="control-size"
+              onSelect={(value) => preview({ ...resolvedProfile, controlSize: value })}
+            />
+            <AppearanceChoiceGroup
+              label={appearanceT('spacingScale')}
+              values={spacingScales}
+              selected={resolvedProfile.spacingScale}
+              labels={spacingLabels}
+              dataGroup="spacing-scale"
+              onSelect={(value) => preview({ ...resolvedProfile, spacingScale: value })}
+            />
+            <AppearanceChoiceGroup
+              label={appearanceT('canvasDensity')}
+              values={canvasDensities}
+              selected={resolvedProfile.canvasDensity}
+              labels={canvasLabels}
+              dataGroup="canvas-density"
+              onSelect={(value) => preview({ ...resolvedProfile, canvasDensity: value })}
+            />
           </AppearanceSection>
 
           <AppearanceSection title={appearanceT('motionGroup')}>
@@ -404,14 +463,25 @@ function AppearancePanelContent({ presentation = 'topbar' }: AppearancePanelTrig
               dataGroup="animation-intensity"
               onSelect={(value) => preview({ ...resolvedProfile, animationIntensity: value })}
             />
-            {systemReducedMotion ? <p className="ec-appearance-system-note">{appearanceT('reducedMotionSystem')}</p> : null}
+            {systemReducedMotion ? (
+              <p className="ec-appearance-system-note">{appearanceT('reducedMotionSystem')}</p>
+            ) : null}
           </AppearanceSection>
 
           {accessibilityWarnings.length > 0 ? (
             <div className="ec-appearance-warning" role="alert" data-appearance-accessibility-warning>
               <strong>{appearanceT('accessibilityTitle')}</strong>
-              <ul>{accessibilityWarnings.map((warning) => <li key={warning}>{warning}</li>)}</ul>
-              <Button variant="outline" size="sm" onClick={restoreAccessibleDefaults} data-appearance-restore-accessible>
+              <ul>
+                {accessibilityWarnings.map((warning) => (
+                  <li key={warning}>{warning}</li>
+                ))}
+              </ul>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={restoreAccessibleDefaults}
+                data-appearance-restore-accessible
+              >
                 {appearanceT('restoreAccessible')}
               </Button>
             </div>
@@ -422,30 +492,64 @@ function AppearancePanelContent({ presentation = 'topbar' }: AppearancePanelTrig
             <p>{appearanceT('helpBody')}</p>
           </div>
 
-          <p className="ec-appearance-preview-hint" role="status" data-appearance-preview-active={hasPreview || undefined}>
+          <p
+            className="ec-appearance-preview-hint"
+            role="status"
+            data-appearance-preview-active={hasPreview || undefined}
+          >
             {hasPreview ? appearanceT('previewHint') : `${appearanceT('appliedHint')}: ${appliedProfile.name}`}
           </p>
 
           {pendingCloseDecision ? (
-            <div className="ec-appearance-close-decision" role="alertdialog" aria-labelledby="appearance-close-title" data-appearance-close-decision>
+            <div
+              className="ec-appearance-close-decision"
+              role="alertdialog"
+              aria-labelledby="appearance-close-title"
+              data-appearance-close-decision
+            >
               <strong id="appearance-close-title">{appearanceT('closePendingTitle')}</strong>
               <p>{appearanceT('closePendingDescription')}</p>
               <div>
-                <Button size="sm" onClick={applyAndClose} data-appearance-apply-close>{appearanceT('applyAndClose')}</Button>
-                <Button size="sm" variant="outline" onClick={discardAndClose} data-appearance-discard-close>{appearanceT('discardAndClose')}</Button>
-                <Button size="sm" variant="ghost" onClick={() => setPendingCloseDecision(false)}>{appearanceT('keepEditing')}</Button>
+                <Button size="sm" onClick={applyAndClose} data-appearance-apply-close>
+                  {appearanceT('applyAndClose')}
+                </Button>
+                <Button size="sm" variant="outline" onClick={discardAndClose} data-appearance-discard-close>
+                  {appearanceT('discardAndClose')}
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => setPendingCloseDecision(false)}>
+                  {appearanceT('keepEditing')}
+                </Button>
               </div>
             </div>
           ) : null}
 
           <div className="ec-appearance-actions">
-            <Button type="button" size="sm" onClick={() => apply()} disabled={!hasPreview} data-appearance-apply>{appearanceT('apply')}</Button>
-            <Button type="button" size="sm" variant="outline" onClick={revert} disabled={!hasPreview} data-appearance-revert>{appearanceT('revert')}</Button>
-            <Button type="button" size="sm" variant="outline" onClick={reset} data-appearance-reset>{appearanceT('reset')}</Button>
+            <Button type="button" size="sm" onClick={() => apply()} disabled={!hasPreview} data-appearance-apply>
+              {appearanceT('apply')}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={revert}
+              disabled={!hasPreview}
+              data-appearance-revert
+            >
+              {appearanceT('revert')}
+            </Button>
+            <Button type="button" size="sm" variant="outline" onClick={reset} data-appearance-reset>
+              {appearanceT('reset')}
+            </Button>
           </div>
         </div>
 
-        <Button className="ec-appearance-close" variant="ghost" size="sm" aria-label={appearanceT('close')} onClick={() => requestOpenChange(false)}>
+        <Button
+          className="ec-appearance-close"
+          variant="ghost"
+          size="sm"
+          aria-label={appearanceT('close')}
+          onClick={() => requestOpenChange(false)}
+        >
           <CloseIcon aria-hidden="true" />
           {appearanceT('close')}
         </Button>

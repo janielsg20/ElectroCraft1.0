@@ -210,7 +210,7 @@ export function createBrowserEditorAppearanceStorage(): EditorAppearanceStorage 
         return null;
       }
     },
-    write: (serialized) => {
+    write: (serialized: string) => {
       try {
         window.localStorage.setItem(EDITOR_APPEARANCE_STORAGE_KEY, serialized);
       } catch {
@@ -236,7 +236,7 @@ export function createBrowserStudioAppearancePresetStorage(): StudioAppearancePr
         return null;
       }
     },
-    write: (serialized) => {
+    write: (serialized: string) => {
       try {
         window.localStorage.setItem(STUDIO_APPEARANCE_PRESETS_STORAGE_KEY, serialized);
       } catch {
@@ -351,7 +351,9 @@ export function deserializePersonalStudioAppearancePresets(serialized: string): 
   try {
     const parsed = JSON.parse(serialized) as unknown;
     if (!Array.isArray(parsed)) return Object.freeze([]);
-    return Object.freeze(parsed.map(normalizePersonalPreset).filter((preset): preset is StudioAppearancePreset => preset !== null));
+    return Object.freeze(
+      parsed.map(normalizePersonalPreset).filter((preset): preset is StudioAppearancePreset => preset !== null),
+    );
   } catch {
     return Object.freeze([]);
   }

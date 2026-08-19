@@ -22,7 +22,9 @@ test.describe('M03.9 editor session appearance profile', () => {
     await resetAppearance(page);
     const sheet = await openDesktopAppearance(page);
 
-    await expect(sheet.getByText('No modifica el documento, el tema del proyecto ni lo exportado.', { exact: false })).toBeVisible();
+    await expect(
+      sheet.getByText('No modifica el documento, el tema del proyecto ni lo exportado.', { exact: false }),
+    ).toBeVisible();
     await sheet.locator('[data-appearance-group="tone"] [data-appearance-value="dark"]').click();
     await sheet.locator('[data-appearance-group="accent"] [data-appearance-value="rose"]').click();
     await sheet.locator('[data-appearance-group="semantic-colors"] [data-appearance-value="vivid"]').click();
@@ -77,7 +79,9 @@ test.describe('M03.9 editor session appearance profile', () => {
     expect(stored).toContain('mono');
 
     await page.reload();
-    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecAppearanceProfile)).toBe('Mi Studio');
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.dataset.ecAppearanceProfile))
+      .toBe('Mi Studio');
     await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecThemePreference)).toBe('dark');
     await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecAccent)).toBe('emerald');
     await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecTypographyFamily)).toBe('mono');
@@ -166,7 +170,9 @@ test.describe('M03.9 editor session appearance profile', () => {
     await sheet.locator('[data-appearance-apply]').click();
     await sheet.locator('[data-appearance-reset]').click();
 
-    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecAppearanceProfile)).toBe('Perfil conservado');
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.dataset.ecAppearanceProfile))
+      .toBe('Perfil conservado');
     await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecThemePreference)).toBe('system');
     await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecAccent)).toBe('indigo');
     await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecCanvasDensity)).toBe('comfortable');
