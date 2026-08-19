@@ -54,13 +54,23 @@ test('M03.5 structural gate keeps exact editor dimensions and ownership', () => 
   assert.equal(appCss.includes('height: 26px'), true, 'M03.5 must preserve the AppShell 26px Statusbar');
   assert.equal(studio.includes("from '@puckeditor/core'"), false, 'Studio must not bypass editor-puck ownership');
   assert.equal(palette.includes("from '@puckeditor/core'"), false, 'Palette must not bypass editor-puck ownership');
-  assert.equal(studio.includes('<StudioPalette />'), true, 'M03.5 Context must retain the successor Palette composition');
+  assert.equal(
+    studio.includes('<StudioPalette />'),
+    true,
+    'M03.5 Context must retain the successor Palette composition',
+  );
   assert.equal(
     palette.includes('PuckEditorComponents'),
     true,
     'M03.5 Puck Components composition must remain reachable through StudioPalette',
   );
-  for (const token of ['PuckEditorOutline', 'PuckEditorPreview', 'PuckEditorFields', 'ResizableTriPane', '<ToolSheet']) {
+  for (const token of [
+    'PuckEditorOutline',
+    'PuckEditorPreview',
+    'PuckEditorFields',
+    'ResizableTriPane',
+    '<ToolSheet',
+  ]) {
     assert.equal(studio.includes(token), true, `M03.5 composition missing: ${token}`);
   }
   for (const token of ['Puck.Components', 'Puck.Outline', 'Puck.Preview', 'Puck.Fields']) {
