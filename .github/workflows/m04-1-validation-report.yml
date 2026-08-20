@@ -10,6 +10,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: m04-1-validation-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate-and-report:
     runs-on: ubuntu-latest
@@ -17,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: codex/m04-1-storage-foundation
+          ref: ${{ github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: '22.13.0'
@@ -96,8 +100,7 @@ jobs:
           {
             echo "# M04.1 validation report"
             echo
-            echo "- Event commit: \`$GITHUB_SHA\`"
-            echo "- Checked-out branch head: \`$(git rev-parse HEAD)\`"
+            echo "- Source commit: \`$GITHUB_SHA\`"
             echo "- Runner: \`ubuntu-latest\` / Node \`22.13.0\`"
             echo "- Formatting: Prettier --write applied before validation"
             echo "- Overall: \`$overall\`"
