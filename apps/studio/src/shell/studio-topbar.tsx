@@ -254,7 +254,11 @@ export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help 
               {hasVisibleDiagnostic ? (
                 <div className="ec-ia-diagnostic-alert" role="alert" data-information-level="diagnostic">
                   <strong>{copy.settingsStatusErrorTitle}</strong>
-                  <p>{storage.state === 'error' || storage.state === 'blocked' ? storage.message : copy.settingsStatusErrorSummary}</p>
+                  <p>
+                    {storage.state === 'error' || storage.state === 'blocked'
+                      ? storage.message
+                      : copy.settingsStatusErrorSummary}
+                  </p>
                 </div>
               ) : null}
 

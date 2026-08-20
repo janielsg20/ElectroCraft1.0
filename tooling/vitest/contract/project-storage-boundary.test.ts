@@ -20,7 +20,10 @@ describe('M04.1 storage ownership boundary', () => {
     expect(boundaries.invariants.expectedStablePackageCount).toBe(19);
     expect(Object.keys(boundaries.packages)).toHaveLength(19);
     expect(Object.keys(boundaries.publicAliases)).toHaveLength(21);
-    expect(boundaries.packages['@electrocraft/data-web']).toEqual(['@electrocraft/domain', '@electrocraft/application']);
+    expect(boundaries.packages['@electrocraft/data-web']).toEqual([
+      '@electrocraft/domain',
+      '@electrocraft/application',
+    ]);
   });
 
   it('pins one physical schema independent of user-defined model count', () => {

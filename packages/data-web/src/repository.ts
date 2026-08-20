@@ -79,7 +79,10 @@ export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
           await tx
             .delete(schema.projectObjects)
             .where(
-              and(eq(schema.projectObjects.projectId, request.project.id), eq(schema.projectObjects.objectId, objectId)),
+              and(
+                eq(schema.projectObjects.projectId, request.project.id),
+                eq(schema.projectObjects.objectId, objectId),
+              ),
             );
         }
       }
@@ -125,7 +128,10 @@ export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
     const projectRows = await db.select().from(schema.projects).where(eq(schema.projects.id, projectId));
     const project = projectRows[0];
     if (!project) return null;
-    const objectRows = await db.select().from(schema.projectObjects).where(eq(schema.projectObjects.projectId, projectId));
+    const objectRows = await db
+      .select()
+      .from(schema.projectObjects)
+      .where(eq(schema.projectObjects.projectId, projectId));
     const revisionRows = await db
       .select()
       .from(schema.projectRevisions)
@@ -139,13 +145,18 @@ export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
         name: project.name,
         metadata: project.metadata as ElectroCraftMetadata,
       }),
-      objects: Object.freeze(objectRows.map(toStoredObject).sort((left, right) => left.objectId.localeCompare(right.objectId))),
+      objects: Object.freeze(
+        objectRows.map(toStoredObject).sort((left, right) => left.objectId.localeCompare(right.objectId)),
+      ),
       revision: revisionRows[0] ? toRevision(revisionRows[0]) : null,
     });
   }
 
   async function verifyProject(projectId: string): Promise<ProjectIntegrityReport> {
-    const projectRows = await db.select({ id: schema.projects.id }).from(schema.projects).where(eq(schema.projects.id, projectId));
+    const projectRows = await db
+      .select({ id: schema.projects.id })
+      .from(schema.projects)
+      .where(eq(schema.projects.id, projectId));
     if (!projectRows[0]) {
       return Object.freeze({
         projectId,
@@ -156,7 +167,10 @@ export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
       });
     }
 
-    const objectRows = await db.select().from(schema.projectObjects).where(eq(schema.projectObjects.projectId, projectId));
+    const objectRows = await db
+      .select()
+      .from(schema.projectObjects)
+      .where(eq(schema.projectObjects.projectId, projectId));
     const invalidObjectIds = objectRows
       .filter((object) => createElectroCraftCanonicalSnapshotChecksum(object.payload) !== object.checksum)
       .map(({ objectId }) => objectId)

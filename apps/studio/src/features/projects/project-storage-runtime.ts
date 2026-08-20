@@ -37,9 +37,12 @@ export const projectStorageRuntime = Object.freeze({
   async initialize() {
     if (!initializePromise) {
       publish(Object.freeze({ ...snapshot, state: 'loading', message: 'Inicializando almacenamiento local…' }));
-      initializePromise = service.initialize().then(publish).finally(() => {
-        initializePromise = null;
-      });
+      initializePromise = service
+        .initialize()
+        .then(publish)
+        .finally(() => {
+          initializePromise = null;
+        });
     }
     return initializePromise;
   },

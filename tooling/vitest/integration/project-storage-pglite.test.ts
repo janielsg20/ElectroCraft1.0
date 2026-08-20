@@ -44,9 +44,9 @@ describe('M04.1 PGlite + Drizzle persistence', () => {
       const tables = await client.query<{ tablename: string }>(
         "SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename",
       );
-      const physical = tables.rows.map(({ tablename }) => tablename).filter((name) =>
-        (STUDIO_STORAGE_TABLES as readonly string[]).includes(name),
-      );
+      const physical = tables.rows
+        .map(({ tablename }) => tablename)
+        .filter((name) => (STUDIO_STORAGE_TABLES as readonly string[]).includes(name));
       expect(physical.sort()).toEqual([...STUDIO_STORAGE_TABLES].sort());
     } finally {
       await client.close();

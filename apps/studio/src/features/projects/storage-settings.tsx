@@ -46,16 +46,22 @@ export function StorageSettings() {
       <div className="ec-topbar-setting-row">
         <div>
           <strong>Estado</strong>
-          <p role="status" aria-live="polite">{diagnostics.message}</p>
+          <p role="status" aria-live="polite">
+            {diagnostics.message}
+          </p>
         </div>
         <span className="ec-ia-setting-detail-value">{backendLabel(diagnostics.backend)}</span>
       </div>
       <div className="ec-topbar-setting-row">
         <div>
           <strong>Uso local</strong>
-          <p>{used} usados de {quota}</p>
+          <p>
+            {used} usados de {quota}
+          </p>
         </div>
-        <span className="ec-ia-setting-detail-value">{diagnostics.durable ? 'Persistencia protegida' : 'Persistencia estándar'}</span>
+        <span className="ec-ia-setting-detail-value">
+          {diagnostics.durable ? 'Persistencia protegida' : 'Persistencia estándar'}
+        </span>
       </div>
       {diagnostics.fallbackReason ? (
         <div className="ec-ia-diagnostic-alert" role="status" data-information-level="diagnostic">
