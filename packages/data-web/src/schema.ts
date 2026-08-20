@@ -15,6 +15,7 @@ export const projects = pgTable('projects', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   metadata: jsonb('metadata').$type<ElectroCraftMetadata>().notNull().default({}),
+  currentRevisionBase: text('current_revision_base'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
