@@ -231,6 +231,12 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
         });
         return diagnostics;
       } catch (error) {
+        unsubscribeLeaderChange?.();
+        unsubscribeLeaderChange = null;
+        const failedRuntime = runtime;
+        runtime = null;
+        repository = null;
+        await failedRuntime?.client.close().catch(() => undefined);
         diagnostics = Object.freeze({
           ...diagnostics,
           state: 'blocked',
