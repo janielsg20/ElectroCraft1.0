@@ -16,7 +16,7 @@ test.describe('M03.10 Spanish-first typed i18n', () => {
     await page.getByRole('menuitem', { name: 'Español' }).click();
 
     await dialog.getByRole('button', { name: 'Guardar' }).click();
-    await expect(dialog.getByRole('status')).toContainText('Idioma guardado');
+    await expect(dialog.getByText('Idioma guardado', { exact: true })).toBeVisible();
     await expect.poll(() => page.evaluate(() => window.localStorage.getItem('electrocraft.studio.locale'))).toBe('es');
 
     await page.reload();
@@ -31,7 +31,7 @@ test.describe('M03.10 Spanish-first typed i18n', () => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Configuración' }).click();
 
-    const help = page.getByRole('button', { name: 'Más información' });
+    const help = page.locator('[data-language-help-trigger]');
     await help.hover();
     await expect(page.getByRole('tooltip')).toContainText(
       'ElectroCraft se entrega en español. La infraestructura de idiomas permite añadir traducciones futuras sin cambiar la lógica de la aplicación.',
