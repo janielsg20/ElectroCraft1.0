@@ -12,7 +12,7 @@ jobs:
   validate-and-report:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
         with:
@@ -31,12 +31,20 @@ jobs:
           surface=(
             packages/application/src/projects
             packages/data-web
+            apps/studio/package.json
+            apps/studio/vite.config.ts
             apps/studio/src/features/projects
             apps/studio/src/shell/studio-topbar.tsx
             apps/studio/src/help/help-registry.ts
+            apps/studio/src/i18n/information-architecture.es.ts
+            locales/es/help.json
+            tooling/package-boundaries.json
             tooling/vitest/unit/project-storage-contract.test.ts
             tooling/vitest/contract/project-storage-boundary.test.ts
             tooling/vitest/integration/project-storage-pglite.test.ts
+            tooling/playwright/m04-1-storage.spec.ts
+            tsconfig.base.json
+            .github/workflows/m04-1-storage-foundation.yml
           )
 
           npm ci > /tmp/npm-ci.log 2>&1
@@ -62,8 +70,19 @@ jobs:
           npm run build:studio > /tmp/build.log 2>&1
           build=$?
 
+          npx playwright install --with-deps chromium > /tmp/playwright-install.log 2>&1
+          playwright_install=$?
+
+          if [ "$playwright_install" -eq 0 ]; then
+            npx playwright test tooling/playwright/m04-1-storage.spec.ts --config playwright.config.ts > /tmp/browser.log 2>&1
+            browser=$?
+          else
+            browser=1
+            echo "Chromium installation failed; browser test not executed." > /tmp/browser.log
+          fi
+
           overall=GREEN
-          if [ "$npm_ci" -ne 0 ] || [ "$format_write" -ne 0 ] || [ "$format" -ne 0 ] || [ "$lint" -ne 0 ] || [ "$typecheck" -ne 0 ] || [ "$boundaries" -ne 0 ] || [ "$tests" -ne 0 ] || [ "$build" -ne 0 ]; then
+          if [ "$npm_ci" -ne 0 ] || [ "$format_write" -ne 0 ] || [ "$format" -ne 0 ] || [ "$lint" -ne 0 ] || [ "$typecheck" -ne 0 ] || [ "$boundaries" -ne 0 ] || [ "$tests" -ne 0 ] || [ "$build" -ne 0 ] || [ "$playwright_install" -ne 0 ] || [ "$browser" -ne 0 ]; then
             overall=RED
           fi
 
@@ -71,7 +90,8 @@ jobs:
           {
             echo "# M04.1 validation report"
             echo
-            echo "- Source commit: \`$GITHUB_SHA\`"
+            echo "- Event commit: \`$GITHUB_SHA\`"
+            echo "- Checked-out branch head: \`$(git rev-parse HEAD)\`"
             echo "- Runner: \`ubuntu-latest\` / Node \`22.13.0\`"
             echo "- Formatting: Prettier --write applied before validation"
             echo "- Overall: \`$overall\`"
@@ -86,9 +106,11 @@ jobs:
             echo "| npm run test:boundaries | $boundaries |"
             echo "| targeted M04.1 Vitest | $tests |"
             echo "| npm run build:studio | $build |"
+            echo "| Playwright Chromium install | $playwright_install |"
+            echo "| M04.1 browser storage smoke | $browser |"
           } > "$report"
 
-          for pair in "npm-ci:/tmp/npm-ci.log:$npm_ci" "format-write:/tmp/format-write.log:$format_write" "format:/tmp/format.log:$format" "lint:/tmp/lint.log:$lint" "typecheck:/tmp/typecheck.log:$typecheck" "boundaries:/tmp/boundaries.log:$boundaries" "tests:/tmp/tests.log:$tests" "build:/tmp/build.log:$build"; do
+          for pair in "npm-ci:/tmp/npm-ci.log:$npm_ci" "format-write:/tmp/format-write.log:$format_write" "format:/tmp/format.log:$format" "lint:/tmp/lint.log:$lint" "typecheck:/tmp/typecheck.log:$typecheck" "boundaries:/tmp/boundaries.log:$boundaries" "tests:/tmp/tests.log:$tests" "build:/tmp/build.log:$build" "playwright-install:/tmp/playwright-install.log:$playwright_install" "browser:/tmp/browser.log:$browser"; do
             name=${pair%%:*}
             rest=${pair#*:}
             log=${rest%%:*}
@@ -99,7 +121,7 @@ jobs:
                 echo "## Failure tail: $name"
                 echo
                 echo '```text'
-                tail -n 120 "$log"
+                tail -n 160 "$log"
                 echo '```'
               } >> "$report"
             fi
@@ -112,7 +134,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add packages/application/src/projects packages/data-web apps/studio/src/features/projects apps/studio/src/shell/studio-topbar.tsx apps/studio/src/help/help-registry.ts tooling/vitest/unit/project-storage-contract.test.ts tooling/vitest/contract/project-storage-boundary.test.ts tooling/vitest/integration/project-storage-pglite.test.ts .ai/evidence/F04/M04.1/VALIDATION_LATEST.md
+          git add packages/application/src/projects packages/data-web apps/studio/package.json apps/studio/vite.config.ts apps/studio/src/features/projects apps/studio/src/shell/studio-topbar.tsx apps/studio/src/help/help-registry.ts apps/studio/src/i18n/information-architecture.es.ts locales/es/help.json tooling/package-boundaries.json tooling/vitest/unit/project-storage-contract.test.ts tooling/vitest/contract/project-storage-boundary.test.ts tooling/vitest/integration/project-storage-pglite.test.ts tooling/playwright/m04-1-storage.spec.ts tsconfig.base.json .github/workflows/m04-1-storage-foundation.yml .ai/evidence/F04/M04.1/VALIDATION_LATEST.md
           if git diff --cached --quiet; then
             echo "Validation surface unchanged."
           else
