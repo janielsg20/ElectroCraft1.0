@@ -90,6 +90,11 @@ function isInside(parent, candidate) {
   return rel === '' || (!rel.startsWith('..') && !path.isAbsolute(rel));
 }
 
+function isInsideOwnedResourceRoot(ownerName, resolved, snapshot) {
+  const roots = snapshot.boundaries.ownedResourceRoots?.[ownerName] ?? [];
+  return roots.some((relativeRoot) => isInside(path.join(snapshot.rootDir, relativeRoot), resolved));
+}
+
 export function validateImportRecords(ownerName, records, snapshot) {
   const errors = [];
   const { boundaries, ownerDirs, rootDir } = snapshot;
@@ -111,7 +116,9 @@ export function validateImportRecords(ownerName, records, snapshot) {
     if ((specifier.startsWith('./') || specifier.startsWith('../')) && boundaries.invariants.forbidCrossPackageRelativeImports) {
       const sourceAbsolute = path.join(rootDir, record.file);
       const resolved = path.resolve(path.dirname(sourceAbsolute), specifier);
-      if (!isInside(ownerDir, resolved)) errors.push(`${ownerName} crosses package boundary via relative import ${specifier}`);
+      if (!isInside(ownerDir, resolved) && !isInsideOwnedResourceRoot(ownerName, resolved, snapshot)) {
+        errors.push(`${ownerName} crosses package boundary via relative import ${specifier}`);
+      }
     }
   }
 
@@ -157,8 +164,11 @@ export function validateWorkspaceSnapshot(snapshot) {
   const { boundaries, rootManifest, manifests, importRecords } = snapshot;
   const errors = [];
   const allExpected = { ...boundaries.packages, ...boundaries.apps };
+  const expectedStablePackageCount = boundaries.invariants.expectedStablePackageCount ?? 17;
 
-  if (Object.keys(boundaries.packages).length !== 17) errors.push('expected exactly 17 stable owner packages');
+  if (Object.keys(boundaries.packages).length !== expectedStablePackageCount) {
+    errors.push(`expected exactly ${expectedStablePackageCount} stable owner packages`);
+  }
   if (JSON.stringify(rootManifest.workspaces) !== JSON.stringify(['apps/*', 'packages/*'])) {
     errors.push('root workspaces must be apps/* and packages/*');
   }
