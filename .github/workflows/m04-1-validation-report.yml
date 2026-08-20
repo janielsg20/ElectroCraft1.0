@@ -1,0 +1,112 @@
+name: M04.1 Validation Report
+
+on:
+  push:
+    branches:
+      - 'codex/m04-1-storage-foundation'
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-report:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/m04-1-storage-foundation
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.13.0'
+          cache: npm
+      - name: Run M04.1 gates and write report
+        id: gates
+        shell: bash
+        run: |
+          set +e
+          mkdir -p .ai/evidence/F04/M04.1
+
+          npm ci > /tmp/npm-ci.log 2>&1
+          npm_ci=$?
+
+          npx prettier --check packages/application/src/projects packages/data-web apps/studio/src/features/projects apps/studio/src/shell/studio-topbar.tsx apps/studio/src/help/help-registry.ts tooling/vitest/unit/project-storage-contract.test.ts tooling/vitest/contract/project-storage-boundary.test.ts tooling/vitest/integration/project-storage-pglite.test.ts > /tmp/format.log 2>&1
+          format=$?
+
+          npm run typecheck > /tmp/typecheck.log 2>&1
+          typecheck=$?
+
+          npm run test:boundaries > /tmp/boundaries.log 2>&1
+          boundaries=$?
+
+          npx vitest run --config vitest.config.ts tooling/vitest/unit/project-storage-contract.test.ts tooling/vitest/contract/project-storage-boundary.test.ts tooling/vitest/integration/project-storage-pglite.test.ts > /tmp/tests.log 2>&1
+          tests=$?
+
+          npm run build:studio > /tmp/build.log 2>&1
+          build=$?
+
+          overall=GREEN
+          if [ "$npm_ci" -ne 0 ] || [ "$format" -ne 0 ] || [ "$typecheck" -ne 0 ] || [ "$boundaries" -ne 0 ] || [ "$tests" -ne 0 ] || [ "$build" -ne 0 ]; then
+            overall=RED
+          fi
+
+          report=.ai/evidence/F04/M04.1/VALIDATION_LATEST.md
+          {
+            echo "# M04.1 validation report"
+            echo
+            echo "- Tested commit: \`$GITHUB_SHA\`"
+            echo "- Runner: \`ubuntu-latest\` / Node \`22.13.0\`"
+            echo "- Overall: \`$overall\`"
+            echo
+            echo "| Gate | Exit code |"
+            echo "| --- | ---: |"
+            echo "| npm ci | $npm_ci |"
+            echo "| Prettier M04.1 surface | $format |"
+            echo "| npm run typecheck | $typecheck |"
+            echo "| npm run test:boundaries | $boundaries |"
+            echo "| targeted M04.1 Vitest | $tests |"
+            echo "| npm run build:studio | $build |"
+          } > "$report"
+
+          for pair in "npm-ci:/tmp/npm-ci.log:$npm_ci" "format:/tmp/format.log:$format" "typecheck:/tmp/typecheck.log:$typecheck" "boundaries:/tmp/boundaries.log:$boundaries" "tests:/tmp/tests.log:$tests" "build:/tmp/build.log:$build"; do
+            name=${pair%%:*}
+            rest=${pair#*:}
+            log=${rest%%:*}
+            code=${rest##*:}
+            if [ "$code" -ne 0 ]; then
+              {
+                echo
+                echo "## Failure tail: $name"
+                echo
+                echo '```text'
+                tail -n 120 "$log"
+                echo '```'
+              } >> "$report"
+            fi
+          done
+
+          echo "overall=$overall" >> "$GITHUB_OUTPUT"
+          echo "npm_ci=$npm_ci" >> "$GITHUB_OUTPUT"
+          echo "format=$format" >> "$GITHUB_OUTPUT"
+          echo "typecheck=$typecheck" >> "$GITHUB_OUTPUT"
+          echo "boundaries=$boundaries" >> "$GITHUB_OUTPUT"
+          echo "tests=$tests" >> "$GITHUB_OUTPUT"
+          echo "build=$build" >> "$GITHUB_OUTPUT"
+
+      - name: Commit validation report
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .ai/evidence/F04/M04.1/VALIDATION_LATEST.md
+          if git diff --cached --quiet; then
+            echo "Validation report unchanged."
+          else
+            git commit -m "test: record M04.1 validation result"
+            git push origin HEAD:codex/m04-1-storage-foundation
+          fi
+
+      - name: Fail workflow when a gate failed
+        if: steps.gates.outputs.overall != 'GREEN'
+        run: exit 1
