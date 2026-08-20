@@ -12,7 +12,7 @@ jobs:
   validate-and-report:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 50
     steps:
       - uses: actions/checkout@v4
         with:
@@ -69,8 +69,11 @@ jobs:
           npx vitest run --config vitest.config.ts tooling/vitest/unit/project-storage-contract.test.ts tooling/vitest/contract/project-storage-boundary.test.ts tooling/vitest/integration/project-storage-pglite.test.ts > /tmp/tests.log 2>&1
           tests=$?
 
-          npm run build:studio > /tmp/build.log 2>&1
-          build=$?
+          npm run test > /tmp/full-test.log 2>&1
+          full_test=$?
+
+          npm run build > /tmp/full-build.log 2>&1
+          full_build=$?
 
           npx playwright install --with-deps chromium > /tmp/playwright-install.log 2>&1
           playwright_install=$?
@@ -84,7 +87,7 @@ jobs:
           fi
 
           overall=GREEN
-          if [ "$npm_ci" -ne 0 ] || [ "$format_write" -ne 0 ] || [ "$format" -ne 0 ] || [ "$lint" -ne 0 ] || [ "$typecheck" -ne 0 ] || [ "$boundaries" -ne 0 ] || [ "$tests" -ne 0 ] || [ "$build" -ne 0 ] || [ "$playwright_install" -ne 0 ] || [ "$browser" -ne 0 ]; then
+          if [ "$npm_ci" -ne 0 ] || [ "$format_write" -ne 0 ] || [ "$format" -ne 0 ] || [ "$lint" -ne 0 ] || [ "$typecheck" -ne 0 ] || [ "$boundaries" -ne 0 ] || [ "$tests" -ne 0 ] || [ "$full_test" -ne 0 ] || [ "$full_build" -ne 0 ] || [ "$playwright_install" -ne 0 ] || [ "$browser" -ne 0 ]; then
             overall=RED
           fi
 
@@ -107,12 +110,13 @@ jobs:
             echo "| npm run typecheck | $typecheck |"
             echo "| npm run test:boundaries | $boundaries |"
             echo "| targeted M04.1 Vitest | $tests |"
-            echo "| npm run build:studio | $build |"
+            echo "| npm run test | $full_test |"
+            echo "| npm run build | $full_build |"
             echo "| Playwright Chromium install | $playwright_install |"
             echo "| M04.1 browser storage smoke | $browser |"
           } > "$report"
 
-          for pair in "npm-ci:/tmp/npm-ci.log:$npm_ci" "format-write:/tmp/format-write.log:$format_write" "format:/tmp/format.log:$format" "lint:/tmp/lint.log:$lint" "typecheck:/tmp/typecheck.log:$typecheck" "boundaries:/tmp/boundaries.log:$boundaries" "tests:/tmp/tests.log:$tests" "build:/tmp/build.log:$build" "playwright-install:/tmp/playwright-install.log:$playwright_install" "browser:/tmp/browser.log:$browser"; do
+          for pair in "npm-ci:/tmp/npm-ci.log:$npm_ci" "format-write:/tmp/format-write.log:$format_write" "format:/tmp/format.log:$format" "lint:/tmp/lint.log:$lint" "typecheck:/tmp/typecheck.log:$typecheck" "boundaries:/tmp/boundaries.log:$boundaries" "tests:/tmp/tests.log:$tests" "full-test:/tmp/full-test.log:$full_test" "full-build:/tmp/full-build.log:$full_build" "playwright-install:/tmp/playwright-install.log:$playwright_install" "browser:/tmp/browser.log:$browser"; do
             name=${pair%%:*}
             rest=${pair#*:}
             log=${rest%%:*}
