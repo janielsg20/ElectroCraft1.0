@@ -49,6 +49,7 @@ test.describe('M04.1 almacenamiento local real', () => {
     });
 
     expect(savedProjectId).toBe('m04-1-browser-roundtrip');
+    await expect(page.locator('.ec-topbar-save')).toHaveText('Guardado');
     await page.reload();
 
     const reopened = await page.evaluate(async () => {
