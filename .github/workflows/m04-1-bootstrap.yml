@@ -1,0 +1,36 @@
+name: M04.1 Bootstrap
+on:
+  push:
+    branches: [codex/m04-1-pglite-drizzle-schema]
+permissions:
+  contents: write
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm install --ignore-scripts --no-audit --no-fund
+      - run: >-
+          npx prettier --write
+          packages/application/src/projects/*.ts
+          packages/application/src/index.ts
+          packages/data-web/package.json
+          "packages/data-web/src/**/*.ts"
+          packages/data-web/drizzle.config.ts
+          tooling/package-boundaries.json
+          tooling/test/workspace-boundaries.test.mjs
+          tsconfig.base.json
+          apps/studio/package.json
+      - run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add package-lock.json packages/application/src packages/data-web tooling/package-boundaries.json tooling/test/workspace-boundaries.test.mjs tsconfig.base.json apps/studio/package.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'chore(m04.1): sync storage lockfile and formatting'
+          git push
