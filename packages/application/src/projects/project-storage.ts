@@ -10,12 +10,7 @@ export const PROJECT_STORAGE_SCHEMA_VERSION = 1 as const;
 export type ProjectStorageBackend = 'opfs-ahp' | 'indexeddb' | 'memory';
 export type ProjectStorageState = 'initial' | 'loading' | 'ready' | 'saving' | 'saved' | 'error' | 'blocked';
 export type ProjectStorageLifecyclePhase =
-  | 'idle'
-  | 'bootstrap'
-  | 'migrations'
-  | 'health-check'
-  | 'ready'
-  | 'leader-handoff';
+  'idle' | 'bootstrap' | 'migrations' | 'health-check' | 'ready' | 'leader-handoff';
 export type ProjectStorageCoordinationRole = 'leader' | 'follower' | 'unknown';
 
 export interface ProjectStorageCoordinationDiagnostics {

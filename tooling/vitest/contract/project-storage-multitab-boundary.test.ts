@@ -8,7 +8,7 @@ describe('M04.2 multi-tab worker boundary', () => {
   it('keeps IndexedDB as the browser baseline and OPFS as an explicit optimization', () => {
     expect(DEFAULT_BROWSER_STORAGE_BACKEND).toBe('indexeddb');
     const browser = read('packages/data-web/src/browser.ts');
-    expect(browser).toContain("preferredBackend ?? DEFAULT_BROWSER_STORAGE_BACKEND");
+    expect(browser).toContain('preferredBackend ?? DEFAULT_BROWSER_STORAGE_BACKEND');
     expect(browser).toContain("preferredBackend === 'opfs-ahp'");
     expect(browser).toContain('idb://');
     expect(browser).toContain('opfs-ahp://');
