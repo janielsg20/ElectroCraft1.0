@@ -4,17 +4,11 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-  getStudioIcon,
 } from '@electrocraft/design-system';
 import { electroCraftI18n, translateStrict, type ElectroCraftResourceKey } from '@electrocraft/i18n';
 import { useState } from 'react';
-import { getStudioHelpDescriptor } from '../help/help-registry';
+import { HelpTrigger } from '../help/help-ui';
 
-const HelpIcon = getStudioIcon('studio.help');
 const LANGUAGE_STORAGE_KEY = 'electrocraft.studio.locale';
 
 type SettingsKey = ElectroCraftResourceKey<'settings'>;
@@ -33,7 +27,6 @@ export function LanguageSettings() {
   const [appliedLocale, setAppliedLocale] = useState<StudioLocale>(readStoredLocale);
   const [draftLocale, setDraftLocale] = useState<StudioLocale>(appliedLocale);
   const [saved, setSaved] = useState(false);
-  const help = getStudioHelpDescriptor('help.studio.language');
 
   const save = () => {
     if (typeof window !== 'undefined') window.localStorage.setItem(LANGUAGE_STORAGE_KEY, draftLocale);
@@ -56,21 +49,7 @@ export function LanguageSettings() {
     >
       <div className="flex items-center gap-2">
         <h2 id="general-settings-title">{settingsT('settings.general.title')}</h2>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label={settingsT('settings.language.moreInfo')}
-                data-language-help-trigger
-              >
-                <HelpIcon aria-hidden="true" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>{help.summary}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <HelpTrigger helpId="help.studio.language" data-language-help-trigger />
       </div>
 
       <div className="ec-topbar-setting-row" data-language-settings>
