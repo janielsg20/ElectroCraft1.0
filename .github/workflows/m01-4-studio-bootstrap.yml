@@ -80,6 +80,9 @@ jobs:
         run: |
           node -e "for (const [n,v] of Object.entries({react:'19.2.8','react-dom':'19.2.8','@vitejs/plugin-react':'6.0.5','vite-plugin-pwa':'1.3.0'})) { const p=require('./node_modules/'+n+'/package.json'); if(p.version!==v) throw new Error(n+': expected '+v+', got '+p.version); console.log(n+'@'+p.version) }"
 
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
       - name: Execute full repository pipeline
         run: npm run check | tee m01-4-check.log
 
