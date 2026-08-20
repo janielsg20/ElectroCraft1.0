@@ -66,7 +66,7 @@ for (const fragment of [
   "settingsT('settings.language.spanish')",
   "settingsT('settings.language.save')",
   "settingsT('settings.language.cancel')",
-  "getStudioIcon('studio.help')",
+  '<HelpTrigger helpId="help.studio.language"',
   'data-language-help-trigger',
 ]) {
   if (!settings.includes(fragment)) fail(`language settings missing ${fragment}`);
@@ -75,9 +75,11 @@ if (settings.includes('<select') || settings.includes('<option'))
   fail('language selector must not use native select/option');
 
 const help = read('apps/studio/src/help/help-registry.ts');
+const helpCatalog = json('locales/es/help.json');
 const exactSummary =
   'ElectroCraft se entrega en español. La infraestructura de idiomas permite añadir traducciones futuras sin cambiar la lógica de la aplicación.';
-if (!help.includes(exactSummary)) fail('language HelpDescriptor summary must match the contract');
+if (helpCatalog['help.language.summary'] !== exactSummary)
+  fail('language HelpDescriptor summary must match the contract');
 if (!help.includes("id: 'help.studio.language'")) fail('language HelpDescriptor id missing');
 
 const navigation = read('apps/studio/src/shell/sidebar-navigation.ts');
@@ -101,9 +103,8 @@ if (Object.keys(boundaries.packages).length !== 18) fail('workspace must own 18 
 const state = read('.ai/STATE.md');
 const active = /M03\.10[^\n]*ACTIVE/.test(state);
 const closed = /M03\.10[^\n]*COMPLETADA[^\n]*GREEN/.test(state);
-if (closed && !/M03\.11[^\n]*ACTIVE/.test(state)) {
-  fail('M03.11 must become ACTIVE immediately after M03.10 closes GREEN');
-}
+const successorReady = /M03\.11[^\n]*(?:ACTIVE|COMPLETADA[^\n]*GREEN)/.test(state);
+if (closed && !successorReady) fail('M03.11 must be ACTIVE or closed GREEN after M03.10 closes');
 if (!active && !closed) fail('M03.10 must remain ACTIVE or close GREEN before F03 advances');
 
 console.log(`PASS_M03_10_I18N_CONTRACT namespaces=${namespaces.length} locale=es packages=18`);
