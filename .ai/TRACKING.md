@@ -8,21 +8,31 @@ Date: 2026-08-20.
 | F01 | COMPLETADA / GREEN | `.ai/evidence/F01/` |
 | F02 | COMPLETADA / GREEN | `.ai/evidence/F02/` |
 | F03 / M03.1–M03.12 | COMPLETADA / GREEN | `.ai/evidence/F03/CLOSURE_2026-08-20.md` |
-| F04 / M04.1 | ACTIVE | `.ai/microphases/M04_1.md` |
+| F04 / M04.1 | COMPLETADA / GREEN | `.ai/evidence/F04/M04.1/CLOSURE_2026-08-20.md` |
+| F04 / M04.2 | ACTIVE | `.ai/microphases/M04_2.md` |
 
-## Cierre M03.12 / F03
-- Rama `codex/m03-12-appshell-e2e`; PR `#26`.
-- Head funcional `af88c60264a243d97cd8e5ca708eedc8ded04028`.
-- Gate M03.12 run `32320810295` success; job `96282469768`.
-- Artifact `9389767563`; digest `sha256:f810fda738509fca06660cc248ddbe576ebe68a885bb2d8ba026944668d4c015`.
-- Dedicado `7/7`; matriz E2E 6 viewports GREEN; full `npm run check` GREEN.
-- Base CI `32320810328` success; artifact `9389760505`.
-- F03 queda COMPLETADA/GREEN; blockers P0/P1 `0`.
+## Cierre M04.1
+- Rama `codex/m04-1-storage-foundation`; PR `#27`.
+- Source funcional validado `8fd9460a43a4a3b5eaf91e62b83f4b3cb7edf10b`.
+- Informe `.ai/evidence/F04/M04.1/VALIDATION_LATEST.md`: `GREEN`.
+- `npm ci`, Prettier, lint, typecheck, boundaries, Vitest dedicado, full `npm run test`, full `npm run build`, instalación Chromium y smoke browser: exit code `0`.
+- Browser E2E: inicialización real de storage; save mediante runtime; reload; reopen del mismo proyecto; Settings > Almacenamiento usable en móvil sin overflow.
+- Owner `@electrocraft/data-web` con PGlite `0.5.5` + Drizzle `0.45.2`, Worker, schema físico versionado y migration journal.
+- Backend persistente capability-aware: OPFS AHP cuando funciona/está soportado; fallback visible a IndexedDB; no existe degradación volátil silenciosa.
+- Schema estable: projects, project_objects, project_revisions, content_records, taxonomy_terms, record_terms, relation_edges, record_field_index, workspace_preferences, media_metadata, audit_events, storage_migration_journal.
+- Save/reopen/checksum/integrity/rollback/repair cubiertos por tests reales.
+- Monorepo: 19 owner packages, 21 aliases, 2 apps.
+- Blockers P0/P1 al cierre: `0`.
 
-## Entrada M04.1
-- Owner nuevo previsto: `@electrocraft/data-web` detrás de ports en `@electrocraft/application`.
-- PGlite + Drizzle deben quedar versionados exactamente tras revalidación de paquetes disponibles.
-- Persistencia browser debe ejecutarse detrás de Worker y seleccionar backend persistente según capacidad: OPFS cuando sea seguro/soportado, fallback compatible documentado cuando no.
-- Schema obligatorio: project, project_object, project_revision, app_extension_state, capability_snapshot, user_preference + búsqueda FTS/migration journal.
-- Deben existir transacciones save/open, recovery, rollback/atomicidad, Settings > Almacenamiento, ayuda española y tests browser capability.
-- Añadir owner cambia el invariant del monorepo de 18 a 19 paquetes; aliases públicos de 20 a 21.
+## Entrada M04.2
+- Usar el Worker multi-tab oficial de PGlite con una sola DB lógica del Studio.
+- Baseline compatible: `idb://...`; OPFS AHP permanece optimización capability-aware, no default universal.
+- Lifecycle requerido: bootstrap → migrations → health check → repositories ready.
+- Escuchar leader change y revalidar health/query invalidation sin abrir otra DB.
+- Probar dos tabs/worker clients escribiendo/leyendo el mismo proyecto y handoff del leader.
+- Mantener Drizzle/PGlite detrás de ports/adapters; UI nunca recibe client raw.
+- Reutilizar schema/repository de M04.1; no crear un subsystem paralelo.
+- Añadir integration fixture de migrations y persistence/reopen/recovery.
+
+## Próxima microfase exacta
+`M04.2 — Inicializar PGlite Multi-Tab Worker y migrations`.
