@@ -41,7 +41,8 @@ for (const forbiddenId of ['help.section.taxonomies', 'help.section.relations', 
   if (registry.includes(forbiddenId)) fail(`obsolete top-level Help ID leaked into registry: ${forbiddenId}`);
 }
 for (const forbiddenRow of ['| Datos | Taxonomías |', '| Datos | Relaciones |', '| App | Roles |']) {
-  if (catalog.includes(forbiddenRow)) fail(`obsolete top-level destination leaked into canonical table: ${forbiddenRow}`);
+  if (catalog.includes(forbiddenRow))
+    fail(`obsolete top-level destination leaked into canonical table: ${forbiddenRow}`);
 }
 
 for (const key of [
