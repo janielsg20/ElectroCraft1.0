@@ -52,9 +52,22 @@ export const studioAppearanceHelpDescriptor = Object.freeze({
   ]),
 } satisfies HelpDescriptor);
 
+export const studioLanguageHelpDescriptor = Object.freeze({
+  id: 'help.studio.language',
+  title: 'Idioma del Studio',
+  summary:
+    'ElectroCraft se entrega en español. La infraestructura de idiomas permite añadir traducciones futuras sin cambiar la lógica de la aplicación.',
+  details: Object.freeze([
+    'Español es el idioma inicial y fallback del Studio.',
+    'Los IDs de componentes, rutas, slugs y contratos canónicos permanecen estables aunque cambie el copy visible.',
+    'Las traducciones pertenecen al owner @electrocraft/i18n y a locales/es; no se duplican dentro del documento del proyecto.',
+  ]),
+} satisfies HelpDescriptor);
+
 export const studioHelpRegistry = Object.freeze({
   [studioShellHelpDescriptor.id]: studioShellHelpDescriptor,
   [studioAppearanceHelpDescriptor.id]: studioAppearanceHelpDescriptor,
+  [studioLanguageHelpDescriptor.id]: studioLanguageHelpDescriptor,
 });
 
 export type StudioHelpId = keyof typeof studioHelpRegistry;
