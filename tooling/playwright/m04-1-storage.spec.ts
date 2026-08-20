@@ -16,14 +16,50 @@ test.describe('M04.1 almacenamiento local real', () => {
     await expect(storage).toBeVisible();
     await expect(storage.getByRole('heading', { name: 'Almacenamiento' })).toBeVisible();
 
-    await expect(storage.getByRole('status').first()).toContainText(/Base local persistente lista mediante (OPFS|IndexedDB)\./, {
-      timeout: 30_000,
-    });
+    await expect(storage.getByRole('status').first()).toContainText(
+      /Base local persistente lista mediante (OPFS|IndexedDB)\./,
+      { timeout: 30_000 },
+    );
     await expect(storage).toContainText(/(OPFS persistente|IndexedDB persistente)/);
     await expect(storage.getByRole('button', { name: 'Revisar' })).toBeEnabled();
     await expect(storage).not.toContainText('No se pudo inicializar el almacenamiento local');
 
     expect(pageErrors).toEqual([]);
+  });
+
+  test('saves and reopens a project through the application runtime after reload', async ({ page }) => {
+    await page.goto('/');
+
+    const savedProjectId = await page.evaluate(async () => {
+      const { projectStorageRuntime } = await import('/src/features/projects/project-storage-runtime.ts');
+      await projectStorageRuntime.initialize();
+      const revision = await projectStorageRuntime.saveProject({
+        project: { id: 'm04-1-browser-roundtrip', name: 'Proyecto Browser', metadata: {} },
+        objects: [
+          {
+            objectId: 'screen-home',
+            kind: 'screen',
+            schemaVersion: 1,
+            payload: { title: 'Persistencia M04.1', enabled: true },
+          },
+        ],
+        reason: 'playwright-roundtrip',
+      });
+      return revision.projectId;
+    });
+
+    expect(savedProjectId).toBe('m04-1-browser-roundtrip');
+    await page.reload();
+
+    const reopened = await page.evaluate(async () => {
+      const { projectStorageRuntime } = await import('/src/features/projects/project-storage-runtime.ts');
+      await projectStorageRuntime.initialize();
+      return projectStorageRuntime.openProject('m04-1-browser-roundtrip');
+    });
+
+    expect(reopened?.project.name).toBe('Proyecto Browser');
+    expect(reopened?.objects).toHaveLength(1);
+    expect(reopened?.objects[0]?.payload).toEqual({ title: 'Persistencia M04.1', enabled: true });
   });
 
   test('keeps storage diagnostics usable on mobile without horizontal overflow', async ({ page }) => {
@@ -34,9 +70,10 @@ test.describe('M04.1 almacenamiento local real', () => {
     const dialog = page.getByRole('dialog', { name: 'Configuración' });
     const storage = dialog.locator('[data-project-storage-settings]');
 
-    await expect(storage.getByRole('status').first()).toContainText(/Base local persistente lista mediante (OPFS|IndexedDB)\./, {
-      timeout: 30_000,
-    });
+    await expect(storage.getByRole('status').first()).toContainText(
+      /Base local persistente lista mediante (OPFS|IndexedDB)\./,
+      { timeout: 30_000 },
+    );
     const repair = storage.getByRole('button', { name: 'Revisar' });
     const repairBox = await repair.boundingBox();
     expect(repairBox?.height ?? 0).toBeGreaterThanOrEqual(36);
