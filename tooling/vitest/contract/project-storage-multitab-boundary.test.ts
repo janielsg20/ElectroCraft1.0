@@ -16,11 +16,16 @@ describe('M04.2 multi-tab worker boundary', () => {
 
   it('uses the official PGlite multi-tab worker and revalidates leader handoff', () => {
     const browser = read('packages/data-web/src/browser.ts');
+    const worker = read('packages/data-web/src/pglite.worker.ts');
     expect(browser).toContain('PGliteWorker.create');
     expect(browser).toContain('id: databaseName');
+    expect(browser).toContain('meta: { clientId, leaderSignalChannel }');
     expect(browser).toContain('.onLeaderChange');
     expect(browser).toContain("lifecyclePhase: 'leader-handoff'");
     expect(browser).toContain('verifyStudioStorageHealth');
+    expect(browser).not.toContain('runtime.client.isLeader');
+    expect(worker).toContain('createLeaderSignal(options.meta');
+    expect(worker).toContain('leaderSignal?.announce()');
   });
 
   it('keeps PGlite/Drizzle behind data-web while application exposes generic coordination diagnostics', () => {
