@@ -1,0 +1,6 @@
+{
+  "help.language.title": "Idioma del Studio",
+  "help.language.summary": "ElectroCraft se entrega en español. La infraestructura de idiomas permite añadir traducciones futuras sin cambiar la lógica de la aplicación.",
+  "help.language.detail": "Los identificadores internos permanecen estables aunque el copy visible cambie de idioma.",
+  "help.moreInfo": "Más información"
+}

@@ -1,0 +1,23 @@
+{
+  "studio.navigation.editor": "Editor",
+  "studio.navigation.screens": "Pantallas",
+  "studio.navigation.templates": "Plantillas",
+  "studio.navigation.components": "Componentes",
+  "studio.navigation.aiGenerate": "Generar con IA",
+  "studio.navigation.content": "Contenido",
+  "studio.navigation.models": "Modelos",
+  "studio.navigation.queries": "Consultas",
+  "studio.navigation.forms": "Formularios",
+  "studio.navigation.automations": "Automatizaciones",
+  "studio.navigation.admin": "Administración",
+  "studio.navigation.roles": "Roles",
+  "studio.navigation.media": "Medios",
+  "studio.navigation.extensions": "Extensiones",
+  "studio.navigation.themes": "Temas",
+  "studio.navigation.preview": "Vista previa",
+  "studio.navigation.compatibility": "Compatibilidad",
+  "studio.navigation.export": "Exportar",
+  "studio.navigation.deploy": "Desplegar",
+  "studio.navigation.help": "Ayuda",
+  "studio.navigation.settings": "Configuración"
+}

@@ -15,6 +15,7 @@
     "@electrocraft/domain": "0.0.0-m01.3",
     "@electrocraft/application": "0.0.0-m01.3",
     "@electrocraft/design-system": "0.0.0-m01.3",
+    "@electrocraft/i18n": "0.0.0-m03.10",
     "@electrocraft/editor-puck": "0.0.0-m01.3",
     "@electrocraft/data-core": "0.0.0-m01.3",
     "@electrocraft/query-rqb": "0.0.0-m01.3",

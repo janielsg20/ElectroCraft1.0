@@ -1,0 +1,20 @@
+{
+  "studio.appShell.title": "ElectroCraft Studio",
+  "studio.appShell.sidebarLabel": "Navegación principal del Studio",
+  "studio.appShell.navigationLabel": "Navegación del Studio",
+  "studio.appShell.menuLabel": "Abrir navegación",
+  "studio.appShell.menuTitle": "Navegación",
+  "studio.appShell.menuDescription": "Navegación global agrupada del Studio.",
+  "studio.appShell.closeMenuLabel": "Cerrar navegación",
+  "studio.appShell.collapseSidebarLabel": "Contraer barra lateral",
+  "studio.appShell.expandSidebarLabel": "Expandir barra lateral",
+  "studio.appShell.workspaceLabel": "Área de trabajo del Studio",
+  "studio.appShell.emptyWorkspace": "Área de trabajo vacía",
+  "studio.appShell.statusLabel": "Estado del Studio",
+  "studio.status.ready": "Listo",
+  "studio.status.saving": "Guardando",
+  "studio.status.error": "Error",
+  "studio.status.blocked": "Bloqueado",
+  "action.save": "Guardar",
+  "action.cancel": "Cancelar"
+}

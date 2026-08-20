@@ -10,22 +10,23 @@ const root = path.resolve(here, '../..');
 
 function clone(value) { return structuredClone(value); }
 
-test('workspace owns exactly 17 stable packages and two apps', () => {
+test('workspace owns exactly 18 stable packages and two apps', () => {
   const snapshot = collectWorkspace(root);
-  assert.equal(Object.keys(snapshot.boundaries.packages).length, 17);
+  assert.equal(Object.keys(snapshot.boundaries.packages).length, 18);
   assert.deepEqual(Object.keys(snapshot.boundaries.apps).sort(), ['@electrocraft/native-preview', '@electrocraft/studio']);
   assert.deepEqual(validateWorkspaceSnapshot(snapshot), { ok: true, errors: [] });
+});
+
+test('i18n is a stable adapter package and Studio is its only current app consumer', () => {
+  const snapshot = collectWorkspace(root);
+  assert.deepEqual(snapshot.boundaries.packages['@electrocraft/i18n'], []);
+  assert.equal(snapshot.boundaries.apps['@electrocraft/studio'].includes('@electrocraft/i18n'), true);
 });
 
 test('domain remains framework-free with Zod as its only external boundary dependency', () => {
   const snapshot = collectWorkspace(root);
   assert.deepEqual(snapshot.boundaries.packages['@electrocraft/domain'], []);
-
-  const externalImports = [
-    ...new Set(
-      snapshot.imports['@electrocraft/domain'].filter((specifier) => !specifier.startsWith('.')),
-    ),
-  ].sort();
+  const externalImports = [...new Set(snapshot.imports['@electrocraft/domain'].filter((specifier) => !specifier.startsWith('.')))].sort();
   assert.deepEqual(externalImports, ['zod']);
   assert.deepEqual(snapshot.manifests['@electrocraft/domain'].dependencies, { zod: '4.4.3' });
 });
