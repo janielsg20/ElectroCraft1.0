@@ -12,9 +12,9 @@ function clone(value) {
   return structuredClone(value);
 }
 
-test('workspace owns exactly 18 stable packages and two apps', () => {
+test('workspace owns exactly 19 stable packages and two apps', () => {
   const snapshot = collectWorkspace(root);
-  assert.equal(Object.keys(snapshot.boundaries.packages).length, 18);
+  assert.equal(Object.keys(snapshot.boundaries.packages).length, 19);
   assert.deepEqual(Object.keys(snapshot.boundaries.apps).sort(), [
     '@electrocraft/native-preview',
     '@electrocraft/studio',
@@ -22,10 +22,21 @@ test('workspace owns exactly 18 stable packages and two apps', () => {
   assert.deepEqual(validateWorkspaceSnapshot(snapshot), { ok: true, errors: [] });
 });
 
-test('i18n is a stable adapter package and Studio is its only current app consumer', () => {
+test('i18n remains a stable adapter package and Studio is its only current app consumer', () => {
   const snapshot = collectWorkspace(root);
   assert.deepEqual(snapshot.boundaries.packages['@electrocraft/i18n'], []);
   assert.equal(snapshot.boundaries.apps['@electrocraft/studio'].includes('@electrocraft/i18n'), true);
+});
+
+test('data-web owns browser persistence without entering native/exporter boundaries', () => {
+  const snapshot = collectWorkspace(root);
+  assert.deepEqual(snapshot.boundaries.packages['@electrocraft/data-web'], [
+    '@electrocraft/domain',
+    '@electrocraft/application',
+  ]);
+  assert.equal(snapshot.boundaries.apps['@electrocraft/studio'].includes('@electrocraft/data-web'), true);
+  assert.equal(snapshot.boundaries.packages['@electrocraft/runtime-native'].includes('@electrocraft/data-web'), false);
+  assert.equal(snapshot.boundaries.packages['@electrocraft/exporters'].includes('@electrocraft/data-web'), false);
 });
 
 test('domain remains framework-free with Zod as its only external boundary dependency', () => {
