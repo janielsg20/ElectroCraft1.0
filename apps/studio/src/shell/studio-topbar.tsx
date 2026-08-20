@@ -15,6 +15,7 @@ import { appearanceT } from '../i18n/appearance.es';
 import type { AppShellStatus } from './app-shell';
 import { AppearancePanelTrigger } from './appearance-panel';
 import { ProgressiveDisclosure } from './information-architecture-ui';
+import { LanguageSettings } from './language-settings';
 import { normalizeZoomPercent, resolveStudioViewportBreakpoint, type StudioViewportBreakpoint } from './topbar-model';
 import type { WorkspacePreferencesPort } from './workspace-preferences';
 
@@ -263,6 +264,8 @@ export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help 
                   <p>{copy.settingsStatusErrorSummary}</p>
                 </div>
               ) : null}
+
+              <LanguageSettings />
 
               <section
                 className="ec-topbar-settings-section"
