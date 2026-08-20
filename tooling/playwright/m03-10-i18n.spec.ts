@@ -46,7 +46,7 @@ test.describe('M03.10 Spanish-first typed i18n', () => {
       await expect(body).not.toContainText(forbidden);
     }
     await expect(page.getByRole('button', { name: 'Configuración' })).toBeVisible();
-    await expect(page.getByRole('link', { name: /Exportar/ })).toBeVisible();
+    await expect(page.getByRole('banner').getByRole('link', { name: 'Exportar' })).toBeVisible();
   });
 
   test('keeps language settings usable on mobile without horizontal overflow', async ({ page }) => {
