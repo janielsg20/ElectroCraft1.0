@@ -1,8 +1,10 @@
 import {
   PROJECT_STORAGE_SCHEMA_VERSION,
+  type NormalizedSaveProjectRequest,
   type ProjectStorageDiagnostics,
   type ProjectStoragePort,
 } from '@electrocraft/application';
+import type { PGlite } from '@electric-sql/pglite';
 import { PGliteWorker } from '@electric-sql/pglite/worker';
 import { drizzle } from 'drizzle-orm/pglite';
 import { applyStudioStorageMigrations } from './migration';
@@ -23,12 +25,21 @@ function canAttemptOpfs() {
 }
 
 async function openWorkerClient(dataDir: string) {
-  const client = new PGliteWorker(
-    new Worker(new URL('./pglite.worker.ts', import.meta.url), { type: 'module', name: 'electrocraft-storage' }),
+  return PGliteWorker.create(
+    new Worker(new URL('./pglite.worker.ts', import.meta.url), {
+      type: 'module',
+      name: 'electrocraft-storage',
+    }),
     { dataDir, id: 'electrocraft-studio-storage' },
   );
-  await client.waitReady;
-  return client;
+}
+
+function createWorkerDrizzleDatabase(client: PGliteWorker) {
+  // PGlite documents PGliteWorker as exposing the same database API as PGlite.
+  // Drizzle 0.45.x still types its pglite driver nominally as PGlite, so the
+  // compatibility bridge remains isolated inside data-web rather than leaking
+  // a raw engine client through the application port or Studio UI.
+  return drizzle(client as unknown as PGlite, { schema });
 }
 
 async function createPersistentWorkerClient(): Promise<BrowserStorageClient> {
@@ -56,7 +67,7 @@ async function storageEstimate() {
     return { usageBytes: null, quotaBytes: null, durable: false } as const;
   }
   const [estimate, durable] = await Promise.all([
-    navigator.storage.estimate().catch(() => ({})),
+    navigator.storage.estimate().catch((): StorageEstimate => ({})),
     navigator.storage.persisted?.().catch(() => false) ?? Promise.resolve(false),
   ]);
   return {
@@ -72,7 +83,7 @@ export function createBrowserProjectStoragePort(): ProjectStoragePort {
   let diagnostics: ProjectStorageDiagnostics = Object.freeze({
     state: 'initial',
     backend: 'indexeddb',
-    persistent: true,
+    persistent: false,
     durable: false,
     usageBytes: null,
     quotaBytes: null,
@@ -87,8 +98,7 @@ export function createBrowserProjectStoragePort(): ProjectStoragePort {
     try {
       runtime = await createPersistentWorkerClient();
       await applyStudioStorageMigrations(runtime.client);
-      const db = drizzle(runtime.client, { schema });
-      repository = createDrizzleProjectRepository(db);
+      repository = createDrizzleProjectRepository(createWorkerDrizzleDatabase(runtime.client));
       const estimate = await storageEstimate();
       diagnostics = Object.freeze({
         state: 'ready',
@@ -138,7 +148,7 @@ export function createBrowserProjectStoragePort(): ProjectStoragePort {
 
   return Object.freeze({
     initialize,
-    async saveProject(request) {
+    async saveProject(request: NormalizedSaveProjectRequest) {
       const repo = await ensureRepository();
       diagnostics = Object.freeze({ ...diagnostics, state: 'saving', message: 'Guardando proyecto…' });
       try {
@@ -154,10 +164,10 @@ export function createBrowserProjectStoragePort(): ProjectStoragePort {
         throw error;
       }
     },
-    async openProject(projectId) {
+    async openProject(projectId: string) {
       return (await ensureRepository()).openProject(projectId);
     },
-    async verifyProject(projectId) {
+    async verifyProject(projectId: string) {
       return (await ensureRepository()).verifyProject(projectId);
     },
     getDiagnostics,
@@ -176,7 +186,12 @@ export function createBrowserProjectStoragePort(): ProjectStoragePort {
       await runtime?.client.close();
       runtime = null;
       repository = null;
-      diagnostics = Object.freeze({ ...diagnostics, state: 'initial', message: 'Almacenamiento local cerrado.' });
+      diagnostics = Object.freeze({
+        ...diagnostics,
+        state: 'initial',
+        persistent: false,
+        message: 'Almacenamiento local cerrado.',
+      });
     },
   });
 }
