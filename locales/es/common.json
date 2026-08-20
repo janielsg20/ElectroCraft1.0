@@ -53,6 +53,8 @@
   "studio.topbar.sidebarCollapsedLabel": "Contraída",
   "studio.topbar.collapseSidebarAction": "Contraer",
   "studio.topbar.expandSidebarAction": "Expandir",
+  "items.count_one": "{{count}} elemento",
+  "items.count_other": "{{count}} elementos",
   "action.save": "Guardar",
   "action.cancel": "Cancelar"
 }
