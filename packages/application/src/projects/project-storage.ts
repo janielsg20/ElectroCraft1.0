@@ -59,6 +59,7 @@ export interface ProjectRevisionManifestEntry {
   readonly kind: string;
   readonly schemaVersion: number;
   readonly checksum: ElectroCraftCanonicalSnapshotChecksum;
+  readonly payload?: JsonValue;
 }
 
 export interface ProjectRevisionManifest {
@@ -88,6 +89,35 @@ export interface NormalizedSaveProjectRequest {
   readonly revision: ProjectStorageRevision;
 }
 
+export interface IncrementalSaveProjectRequest {
+  readonly project: StoredProjectDefinition;
+  readonly dirtyObjects: readonly StoredProjectObjectInput[];
+  readonly deletedObjectIds?: readonly string[];
+}
+
+export interface NormalizedIncrementalSaveProjectRequest {
+  readonly project: StoredProjectDefinition;
+  readonly dirtyObjects: readonly StoredProjectObject[];
+  readonly deletedObjectIds: readonly string[];
+  readonly updatedAt: string;
+}
+
+export interface ProjectIncrementalSaveResult {
+  readonly projectId: string;
+  readonly updatedAt: string;
+  readonly upsertedObjectIds: readonly string[];
+  readonly deletedObjectIds: readonly string[];
+  readonly currentRevisionBase: string | null;
+}
+
+export interface ProjectRecoveryCandidate {
+  readonly projectId: string;
+  readonly revisionId: string;
+  readonly reason: string;
+  readonly createdAt: string;
+  readonly objectCount: number;
+}
+
 export interface OpenProjectResult {
   readonly project: StoredProjectDefinition;
   readonly objects: readonly StoredProjectObject[];
@@ -105,6 +135,10 @@ export interface ProjectIntegrityReport {
 export interface ProjectStoragePort {
   initialize(): Promise<ProjectStorageDiagnostics>;
   saveProject(request: NormalizedSaveProjectRequest): Promise<ProjectStorageRevision>;
+  saveProjectIncremental(request: NormalizedIncrementalSaveProjectRequest): Promise<ProjectIncrementalSaveResult>;
+  createCheckpoint(projectId: string, reason: string): Promise<ProjectStorageRevision>;
+  findRecoveryCandidate(projectId: string): Promise<ProjectRecoveryCandidate | null>;
+  restoreRevision(projectId: string, revisionId: string): Promise<ProjectStorageRevision>;
   openProject(projectId: string): Promise<OpenProjectResult | null>;
   verifyProject(projectId: string): Promise<ProjectIntegrityReport>;
   getDiagnostics(): Promise<ProjectStorageDiagnostics>;
@@ -116,6 +150,14 @@ function requireNonEmpty(value: string, field: string) {
   const normalized = value.trim();
   if (!normalized) throw new TypeError(`${field} must not be empty`);
   return normalized;
+}
+
+function normalizeStoredProjectDefinition(project: StoredProjectDefinition) {
+  return Object.freeze({
+    ...project,
+    id: requireNonEmpty(project.id, 'project.id'),
+    name: requireNonEmpty(project.name, 'project.name'),
+  });
 }
 
 export function normalizeStoredProjectObject(
@@ -165,8 +207,8 @@ export function createProjectStorageRevision(
     objects: Object.freeze(
       [...objects]
         .sort(({ objectId: left }, { objectId: right }) => left.localeCompare(right))
-        .map(({ objectId, kind, schemaVersion, checksum }) =>
-          Object.freeze({ objectId, kind, schemaVersion, checksum }),
+        .map(({ objectId, kind, schemaVersion, checksum, payload }) =>
+          Object.freeze({ objectId, kind, schemaVersion, checksum, payload }),
         ),
     ),
   });
@@ -193,22 +235,70 @@ export function validateProjectStorageRevision(input: ProjectStorageRevision): P
   return input;
 }
 
+export function projectRevisionSnapshotObjects(
+  revisionInput: ProjectStorageRevision,
+): readonly StoredProjectObjectInput[] | null {
+  const revision = validateProjectStorageRevision(revisionInput);
+  const objects: StoredProjectObjectInput[] = [];
+  for (const entry of revision.manifest.objects) {
+    if (entry.payload === undefined) return null;
+    if (createElectroCraftCanonicalSnapshotChecksum(entry.payload) !== entry.checksum) return null;
+    objects.push(
+      Object.freeze({
+        objectId: entry.objectId,
+        kind: entry.kind,
+        schemaVersion: entry.schemaVersion,
+        payload: entry.payload,
+        checksum: entry.checksum,
+      }),
+    );
+  }
+  return Object.freeze(objects);
+}
+
 export function normalizeSaveProjectRequest(
   request: SaveProjectRequest,
   now = new Date().toISOString(),
 ): NormalizedSaveProjectRequest {
-  const projectId = requireNonEmpty(request.project.id, 'project.id');
-  const name = requireNonEmpty(request.project.name, 'project.name');
+  const project = normalizeStoredProjectDefinition(request.project);
   const objectIds = new Set<string>();
   const objects = request.objects.map((object) => {
-    const normalized = normalizeStoredProjectObject(projectId, object, now);
+    const normalized = normalizeStoredProjectObject(project.id, object, now);
     if (objectIds.has(normalized.objectId)) throw new TypeError(`duplicate project object: ${normalized.objectId}`);
     objectIds.add(normalized.objectId);
     return normalized;
   });
-  const project = Object.freeze({ ...request.project, id: projectId, name });
-  const revision = createProjectStorageRevision(projectId, objects, request.reason, undefined, now);
+  const revision = createProjectStorageRevision(project.id, objects, request.reason, undefined, now);
   return Object.freeze({ project, objects: Object.freeze(objects), revision });
+}
+
+export function normalizeIncrementalSaveProjectRequest(
+  request: IncrementalSaveProjectRequest,
+  now = new Date().toISOString(),
+): NormalizedIncrementalSaveProjectRequest {
+  const project = normalizeStoredProjectDefinition(request.project);
+  const dirtyIds = new Set<string>();
+  const dirtyObjects = request.dirtyObjects.map((object) => {
+    const normalized = normalizeStoredProjectObject(project.id, object, now);
+    if (dirtyIds.has(normalized.objectId)) throw new TypeError(`duplicate dirty project object: ${normalized.objectId}`);
+    dirtyIds.add(normalized.objectId);
+    return normalized;
+  });
+
+  const deletedIds = new Set<string>();
+  for (const input of request.deletedObjectIds ?? []) {
+    const objectId = requireNonEmpty(input, 'deletedObjectId');
+    if (deletedIds.has(objectId)) throw new TypeError(`duplicate deleted project object: ${objectId}`);
+    if (dirtyIds.has(objectId)) throw new TypeError(`project object cannot be dirty and deleted: ${objectId}`);
+    deletedIds.add(objectId);
+  }
+
+  return Object.freeze({
+    project,
+    dirtyObjects: Object.freeze(dirtyObjects),
+    deletedObjectIds: Object.freeze([...deletedIds]),
+    updatedAt: now,
+  });
 }
 
 export function createProjectStorageService(port: ProjectStoragePort) {
@@ -218,6 +308,13 @@ export function createProjectStorageService(port: ProjectStoragePort) {
     openProject: (projectId: string) => port.openProject(requireNonEmpty(projectId, 'projectId')),
     verifyProject: (projectId: string) => port.verifyProject(requireNonEmpty(projectId, 'projectId')),
     saveProject: (request: SaveProjectRequest) => port.saveProject(normalizeSaveProjectRequest(request)),
+    saveProjectIncremental: (request: IncrementalSaveProjectRequest) =>
+      port.saveProjectIncremental(normalizeIncrementalSaveProjectRequest(request)),
+    createCheckpoint: (projectId: string, reason = 'manual') =>
+      port.createCheckpoint(requireNonEmpty(projectId, 'projectId'), requireNonEmpty(reason, 'reason')),
+    recoveryCandidate: (projectId: string) => port.findRecoveryCandidate(requireNonEmpty(projectId, 'projectId')),
+    restoreRevision: (projectId: string, revisionId: string) =>
+      port.restoreRevision(requireNonEmpty(projectId, 'projectId'), requireNonEmpty(revisionId, 'revisionId')),
     repair: () => port.repair(),
     close: () => port.close(),
   });
