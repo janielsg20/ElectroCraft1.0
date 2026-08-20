@@ -14,9 +14,9 @@ export interface PuckLabelResolver {
 }
 
 const fallbackPuckLabelResolver: PuckLabelResolver = Object.freeze({
-  component: (definition) => definition.label,
-  field: (_definition, field) => field.label,
-  booleanOption: (value) => (value ? 'Sí' : 'No'),
+  component: (definition: ElectroCraftComponentDefinition) => definition.label,
+  field: (_definition: ElectroCraftComponentDefinition, field: ElectroCraftComponentField) => field.label,
+  booleanOption: (value: boolean) => (value ? 'Sí' : 'No'),
 });
 
 function toPuckField(
