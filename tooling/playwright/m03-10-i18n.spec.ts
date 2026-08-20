@@ -21,9 +21,9 @@ test.describe('M03.10 Spanish-first typed i18n', () => {
 
     await page.reload();
     await page.getByRole('button', { name: 'Configuración' }).click();
-    await expect(page.getByRole('dialog', { name: 'Configuración' }).getByRole('button', { name: 'Idioma' })).toContainText(
-      'Español',
-    );
+    await expect(
+      page.getByRole('dialog', { name: 'Configuración' }).getByRole('button', { name: 'Idioma' }),
+    ).toContainText('Español');
   });
 
   test('exposes persistent Spanish help for language infrastructure', async ({ page }) => {

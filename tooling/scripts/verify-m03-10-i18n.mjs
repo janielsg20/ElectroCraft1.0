@@ -71,7 +71,8 @@ for (const fragment of [
 ]) {
   if (!settings.includes(fragment)) fail(`language settings missing ${fragment}`);
 }
-if (settings.includes('<select') || settings.includes('<option')) fail('language selector must not use native select/option');
+if (settings.includes('<select') || settings.includes('<option'))
+  fail('language selector must not use native select/option');
 
 const help = read('apps/studio/src/help/help-registry.ts');
 const exactSummary =

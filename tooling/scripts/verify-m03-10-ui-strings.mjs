@@ -32,13 +32,7 @@ for (const relativePath of migratedUiFiles) {
 }
 
 const language = read('apps/studio/src/shell/language-settings.tsx');
-const forbiddenHardcodedSpanish = [
-  '>Idioma<',
-  '>Español<',
-  '>Configuración general<',
-  '>Guardar<',
-  '>Cancelar<',
-];
+const forbiddenHardcodedSpanish = ['>Idioma<', '>Español<', '>Configuración general<', '>Guardar<', '>Cancelar<'];
 for (const fragment of forbiddenHardcodedSpanish) {
   if (language.includes(fragment)) fail(`language-settings must obtain ${fragment} from translation keys`);
 }
@@ -48,6 +42,9 @@ if (route.includes("studioT('studio.appShell.")) fail('AppShell visible copy mus
 if (route.includes("studioT('studio.topbar.")) fail('Topbar visible copy must not fall back to legacy TS catalog');
 
 const navigation = read('apps/studio/src/shell/sidebar-navigation.ts');
-if (navigation.includes("studioT('studio.sidebar.")) fail('Sidebar visible copy must not fall back to legacy TS catalog');
+if (navigation.includes("studioT('studio.sidebar."))
+  fail('Sidebar visible copy must not fall back to legacy TS catalog');
 
-console.log(`PASS_M03_10_UI_STRING_LINT files=${migratedUiFiles.length} forbiddenEnglish=${forbiddenVisibleEnglish.length}`);
+console.log(
+  `PASS_M03_10_UI_STRING_LINT files=${migratedUiFiles.length} forbiddenEnglish=${forbiddenVisibleEnglish.length}`,
+);

@@ -20,9 +20,7 @@ function Probe() {
 describe('M03.10 react-i18next integration', () => {
   it('renders Spanish through the shared provider and typed hook', async () => {
     await initializeElectroCraftI18n();
-    const html = renderToStaticMarkup(
-      createElement(ElectroCraftI18nProvider, null, createElement(Probe)),
-    );
+    const html = renderToStaticMarkup(createElement(ElectroCraftI18nProvider, null, createElement(Probe)));
     expect(html).toContain('Español');
   });
 

@@ -32,7 +32,8 @@ describe('M03.10 Spanish-first i18n runtime', () => {
       'help',
       'ai',
     ]);
-    for (const namespace of electroCraftNamespaces) expect(Object.keys(resourcesEs[namespace]).length).toBeGreaterThan(0);
+    for (const namespace of electroCraftNamespaces)
+      expect(Object.keys(resourcesEs[namespace]).length).toBeGreaterThan(0);
     expect(electroCraftI18n.language).toBe('es');
   });
 

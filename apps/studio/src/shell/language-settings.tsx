@@ -10,11 +10,7 @@ import {
   TooltipTrigger,
   getStudioIcon,
 } from '@electrocraft/design-system';
-import {
-  electroCraftI18n,
-  translateStrict,
-  type ElectroCraftResourceKey,
-} from '@electrocraft/i18n';
+import { electroCraftI18n, translateStrict, type ElectroCraftResourceKey } from '@electrocraft/i18n';
 import { useState } from 'react';
 import { getStudioHelpDescriptor } from '../help/help-registry';
 
