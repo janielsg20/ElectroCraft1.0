@@ -9,8 +9,9 @@ test('M01.4 Studio PWA build and Native fixture remain reproducible', async () =
   const studio = JSON.parse(
     fs.readFileSync(path.join(root, 'tooling/dist/m01-4-studio-bootstrap-report.json'), 'utf8'),
   );
+  const boundaries = JSON.parse(fs.readFileSync(path.join(root, 'tooling/package-boundaries.json'), 'utf8'));
 
-  expect(workspace.packageCount).toBe(17);
+  expect(workspace.packageCount).toBe(boundaries.invariants.expectedStablePackageCount);
   expect(workspace.appCount).toBe(2);
   expect(quality.microphase).toBe('M01.3');
   expect(studio.microphase).toBe('M01.4');
