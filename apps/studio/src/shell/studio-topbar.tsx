@@ -10,6 +10,7 @@ import {
   getStudioIcon,
 } from '@electrocraft/design-system';
 import { useSyncExternalStore } from 'react';
+import { HelpDrawerTrigger } from '../help/help-ui';
 import type { HelpDescriptor } from '../help/help-registry';
 import { appearanceT } from '../i18n/appearance.es';
 import type { AppShellStatus } from './app-shell';
@@ -77,7 +78,6 @@ const RedoIcon = getStudioIcon('studio.topbar.redo');
 const ZoomIcon = getStudioIcon('studio.topbar.zoom');
 const PreviewIcon = getStudioIcon('studio.sidebar.preview');
 const ExportIcon = getStudioIcon('studio.sidebar.export');
-const HelpIcon = getStudioIcon('studio.help');
 const SettingsIcon = getStudioIcon('studio.settings');
 const CloseIcon = getStudioIcon('window.close');
 
@@ -211,34 +211,7 @@ export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help 
 
         <AppearancePanelTrigger />
 
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button className="ec-topbar-help-trigger" variant="ghost" size="sm" aria-label={copy.helpLabel}>
-              <HelpIcon aria-hidden="true" />
-              <span className="ec-topbar-action-label">{copy.helpLabel}</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right" className="ec-topbar-sheet" data-topbar-help-sheet>
-            <SheetHeader>
-              <SheetTitle>{help.title}</SheetTitle>
-              <SheetDescription>{help.summary}</SheetDescription>
-            </SheetHeader>
-            <div className="ec-topbar-sheet-body" id="studio-shell-help">
-              <p>{copy.helpDescription}</p>
-              <ul className="ec-topbar-help-list">
-                {help.details.map((detail) => (
-                  <li key={detail}>{detail}</li>
-                ))}
-              </ul>
-              <SheetClose asChild>
-                <Button variant="outline" size="sm" aria-label={copy.closeHelpLabel}>
-                  <CloseIcon aria-hidden="true" />
-                  {copy.closeHelpLabel}
-                </Button>
-              </SheetClose>
-            </div>
-          </SheetContent>
-        </Sheet>
+        <HelpDrawerTrigger initialHelpId={help.id} label={copy.helpLabel} className="ec-topbar-help-trigger" />
 
         <Sheet>
           <SheetTrigger asChild>
