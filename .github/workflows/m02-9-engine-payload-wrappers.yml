@@ -88,7 +88,7 @@ jobs:
         run: |
           node -e "const p=require('./node_modules/@react-querybuilder/core/package.json'); if(p.version!=='8.23.0') throw new Error('expected RQB 8.23.0, got '+p.version); console.log('rqb@'+p.version)"
           npm ls @tiptap/core@3.29.2 @tiptap/html@3.29.2 @tiptap/extension-document@3.29.2 @tiptap/extension-paragraph@3.29.2 @tiptap/extension-text@3.29.2 --workspace @electrocraft/media-tiptap --depth=0
-          node -e "const p=require('./tooling/package-boundaries.json'); if(Object.keys(p.packages).length!==17) throw new Error('F01 owner package count drift'); console.log('ownerPackages='+Object.keys(p.packages).length)"
+          node -e "const p=require('./tooling/package-boundaries.json'); const expected=p.invariants.expectedStablePackageCount; const actual=Object.keys(p.packages).length; if(actual!==expected) throw new Error('owner package count drift: expected '+expected+', got '+actual); console.log('ownerPackages='+actual)"
           test -f .ai/ENGINE_PAYLOAD_POLICY.md
 
       - name: Execute M02.9 tests with generated evidence
