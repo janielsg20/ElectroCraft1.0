@@ -99,8 +99,11 @@ if (!boundaries.apps?.['@electrocraft/studio']?.includes('@electrocraft/i18n')) 
 if (Object.keys(boundaries.packages).length !== 18) fail('workspace must own 18 stable packages after M03.10');
 
 const state = read('.ai/STATE.md');
-if (!state.includes('M03.10 — Infraestructura español-primero e i18n tipado: `ACTIVE`')) {
-  fail('M03.10 must be the active microphase during implementation');
+const active = /M03\.10[^\n]*ACTIVE/.test(state);
+const closed = /M03\.10[^\n]*COMPLETADA[^\n]*GREEN/.test(state);
+if (closed && !/M03\.11[^\n]*ACTIVE/.test(state)) {
+  fail('M03.11 must become ACTIVE immediately after M03.10 closes GREEN');
 }
+if (!active && !closed) fail('M03.10 must remain ACTIVE or close GREEN before F03 advances');
 
 console.log(`PASS_M03_10_I18N_CONTRACT namespaces=${namespaces.length} locale=es packages=18`);
