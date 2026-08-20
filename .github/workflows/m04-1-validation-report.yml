@@ -4,13 +4,14 @@ on:
   push:
     branches:
       - 'codex/m04-1-storage-foundation'
+    paths-ignore:
+      - '.ai/evidence/F04/M04.1/VALIDATION_LATEST.md'
 
 permissions:
   contents: write
 
 jobs:
   validate-and-report:
-    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 50
     steps:
