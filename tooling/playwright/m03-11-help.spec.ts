@@ -10,7 +10,11 @@ test.describe('M03.11 contextual Help system', () => {
     const ordering = await page.locator('.ec-topbar-right').evaluate((element) => {
       const helpButton = element.querySelector('[data-topbar-help-trigger]');
       const settingsButton = element.querySelector('[data-topbar-settings-trigger]');
-      return Boolean(helpButton && settingsButton && (helpButton.compareDocumentPosition(settingsButton) & Node.DOCUMENT_POSITION_FOLLOWING));
+      return Boolean(
+        helpButton &&
+        settingsButton &&
+        helpButton.compareDocumentPosition(settingsButton) & Node.DOCUMENT_POSITION_FOLLOWING,
+      );
     });
     expect(ordering).toBe(true);
 
@@ -81,7 +85,9 @@ test.describe('M03.11 contextual Help system', () => {
     await expect(page.locator('body')).not.toContainText('Demo');
   });
 
-  test('attaches contextual help to canonical bootstrap H1 routes without inventing obsolete destinations', async ({ page }) => {
+  test('attaches contextual help to canonical bootstrap H1 routes without inventing obsolete destinations', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 1280, height: 820 });
     await page.goto('/screens');
     await expect(page.locator('[data-help-trigger="help.section.screens"]')).toBeVisible();

@@ -19,7 +19,7 @@ describe('M03.11 Help system boundaries', () => {
     const primitive = read('packages/design-system/src/components/ui/popover.tsx');
     expect(primitive).toContain("Popover as PopoverPrimitive } from 'radix-ui'");
     expect(primitive).toContain('PopoverPrimitive.Portal');
-    expect(primitive).toContain("w-[360px]");
+    expect(primitive).toContain('w-[360px]');
 
     const helpUi = read('apps/studio/src/help/help-ui.tsx');
     expect(helpUi).toContain("from '@electrocraft/design-system'");

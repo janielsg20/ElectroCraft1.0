@@ -85,14 +85,7 @@ export function StudioEmptyState({
       icon={<EmptyIcon aria-hidden="true" />}
       title={iaT(descriptor.titleKey)}
       description={iaT(descriptor.descriptionKey)}
-      action={
-        <HelpTrigger
-          helpId={emptyStateHelpIds[id]}
-          labelKey="help.whatCanIDo"
-          showLabel
-          className="px-0"
-        />
-      }
+      action={<HelpTrigger helpId={emptyStateHelpIds[id]} labelKey="help.whatCanIDo" showLabel className="px-0" />}
     />
   );
 }

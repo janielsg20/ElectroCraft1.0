@@ -19,12 +19,7 @@ import {
 } from '@electrocraft/design-system';
 import { translateStrict, type ElectroCraftResourceKey } from '@electrocraft/i18n';
 import { useState, useSyncExternalStore } from 'react';
-import {
-  getStudioHelpDescriptor,
-  searchStudioHelp,
-  type HelpDescriptor,
-  type StudioHelpId,
-} from './help-registry';
+import { getStudioHelpDescriptor, searchStudioHelp, type HelpDescriptor, type StudioHelpId } from './help-registry';
 
 const HelpIcon = getStudioIcon('studio.help');
 const CloseIcon = getStudioIcon('window.close');
@@ -87,7 +82,10 @@ function HelpArticle({
                   {related.title}
                 </Button>
               ) : (
-                <span key={relatedId} className="rounded-md border border-border px-2 py-1 text-xs text-muted-foreground">
+                <span
+                  key={relatedId}
+                  className="rounded-md border border-border px-2 py-1 text-xs text-muted-foreground"
+                >
                   {related.title}
                 </span>
               );

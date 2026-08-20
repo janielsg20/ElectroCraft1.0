@@ -28,7 +28,9 @@ describe('M03.11 Help runtime integration', () => {
   });
 
   it('describes unavailable capabilities without creating extra navigation ids', () => {
-    expect(getStudioHelpDescriptor('help.section.ai-generate').summary).toContain('cuando la capacidad esté disponible');
+    expect(getStudioHelpDescriptor('help.section.ai-generate').summary).toContain(
+      'cuando la capacidad esté disponible',
+    );
     expect(allNavigationItems().map((item) => item.id)).not.toContain('taxonomies');
     expect(allNavigationItems().map((item) => item.id)).not.toContain('relations');
     expect(allNavigationItems().map((item) => item.id)).not.toContain('roles');

@@ -37,7 +37,7 @@ if (!registry.includes('searchStudioHelp')) fail('HelpRegistry must expose local
 if (!registry.includes('navigationKeywords')) fail('HelpRegistry must index keywords');
 if (!registry.includes('navigationSection')) fail('HelpRegistry must index canonical navigation section');
 
-for (const forbidden of ['Taxonomías', 'Relaciones', "help.section.roles"]) {
+for (const forbidden of ['Taxonomías', 'Relaciones', 'help.section.roles']) {
   if (catalog.includes(forbidden) && !catalog.includes(`listados antiguos que mencionen ${forbidden}`)) {
     fail(`obsolete top-level destination leaked into canonical help catalog: ${forbidden}`);
   }
@@ -57,9 +57,30 @@ if (helpCatalog['help.drawer.search'] !== 'Buscar en la ayuda') fail('search lab
 if (helpCatalog['help.whatCanIDo'] !== '¿Qué puedo hacer aquí?') fail('empty-state help label drift');
 
 for (const itemId of [
-  'editor', 'screens', 'components', 'templates', 'ai-generate', 'records', 'models', 'data-sources', 'queries',
-  'workflows', 'state', 'forms', 'navigation', 'users', 'admin', 'media', 'extensions', 'themes', 'design-system',
-  'tokens', 'preview', 'compatibility', 'export', 'deploy',
+  'editor',
+  'screens',
+  'components',
+  'templates',
+  'ai-generate',
+  'records',
+  'models',
+  'data-sources',
+  'queries',
+  'workflows',
+  'state',
+  'forms',
+  'navigation',
+  'users',
+  'admin',
+  'media',
+  'extensions',
+  'themes',
+  'design-system',
+  'tokens',
+  'preview',
+  'compatibility',
+  'export',
+  'deploy',
 ]) {
   for (const suffix of ['title', 'short', 'long', 'example']) {
     if (!(`help.section.${itemId}.${suffix}` in helpCatalog)) fail(`missing help.section.${itemId}.${suffix}`);
@@ -78,10 +99,10 @@ for (const fragment of [
 ]) {
   if (!helpUi.includes(fragment)) fail(`Help UI missing ${fragment}`);
 }
-if (!popover.includes("Popover as PopoverPrimitive") || !popover.includes('PopoverPrimitive.Portal')) {
+if (!popover.includes('Popover as PopoverPrimitive') || !popover.includes('PopoverPrimitive.Portal')) {
   fail('Design System Popover must use radix-ui owner and Portal');
 }
-if (!popover.includes("w-[360px]")) fail('desktop contextual Popover must use contractual 360px width');
+if (!popover.includes('w-[360px]')) fail('desktop contextual Popover must use contractual 360px width');
 if (!uiIndex.includes("export * from './popover'")) fail('Popover must be exported from Design System public root');
 
 const helpIndex = topbar.indexOf('ec-topbar-help-trigger');
@@ -89,7 +110,7 @@ const settingsIndex = topbar.indexOf('data-topbar-settings-trigger');
 if (helpIndex < 0 || settingsIndex < 0 || helpIndex >= settingsIndex) fail('Ayuda must remain before Settings');
 if (!topbar.includes('<HelpDrawerTrigger')) fail('Topbar must consume the reusable Help Drawer');
 
-if (!iaUi.includes("labelKey=\"help.whatCanIDo\"")) fail('empty states must link ¿Qué puedo hacer aquí?');
+if (!iaUi.includes('labelKey="help.whatCanIDo"')) fail('empty states must link ¿Qué puedo hacer aquí?');
 if (!iaUi.includes('<HelpTrigger helpId={helpId}')) fail('module H1 must expose contextual HelpTrigger');
 
 const languageSettings = read('apps/studio/src/shell/language-settings.tsx');
