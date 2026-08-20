@@ -25,7 +25,7 @@ const forbiddenVisibleEnglish = [
 for (const relativePath of migratedUiFiles) {
   const source = read(relativePath);
   for (const text of forbiddenVisibleEnglish) {
-    if (source.includes(`>${text}<`) || source.includes(`'${text}'`) || source.includes(`\"${text}\"`)) {
+    if (source.includes(`>${text}<`) || source.includes(`'${text}'`) || source.includes(`"${text}"`)) {
       fail(`${relativePath} contains forbidden visible English: ${text}`);
     }
   }
