@@ -10,7 +10,10 @@ import { studioSidebarNavigation, type SidebarNavigationItemId } from '../shell/
 type HelpMessageKey = ElectroCraftResourceKey<'help'>;
 
 export type StudioHelpId =
-  'help.studio.shell' | 'help.studio.appearance' | 'help.studio.language' | `help.section.${SidebarNavigationItemId}`;
+  | 'help.studio.shell'
+  | 'help.studio.appearance'
+  | 'help.studio.language'
+  | `help.section.${SidebarNavigationItemId}`;
 
 export interface HelpDescriptor {
   readonly id: StudioHelpId;
@@ -69,7 +72,7 @@ const studioDefinitions = Object.freeze([
     titleKey: 'help.shell.title',
     shortKey: 'help.shell.short',
     longKey: 'help.shell.long',
-    exampleKeys: ['help.shell.example'],
+    exampleKeys: ['help.shell.behavior', 'help.shell.example'],
     relatedIds: ['help.section.editor', 'help.studio.appearance', 'help.studio.language'],
     keywords: ['appshell', 'sidebar', 'topbar', 'statusbar', 'workspace', 'configuración', 'navegación'],
     learnMoreRef: '.ai/APP_SHELL_SPEC.md',
@@ -164,6 +167,12 @@ export const studioHelpRegistry = Object.freeze(
 );
 
 export const studioHelpDescriptors = Object.freeze(resolvedDescriptors);
+
+// Compatibility aliases: older F03 gates import these names directly, but all three
+// resolve to entries owned by the single typed registry above.
+export const studioShellHelpDescriptor = studioHelpRegistry['help.studio.shell'];
+export const studioAppearanceHelpDescriptor = studioHelpRegistry['help.studio.appearance'];
+export const studioLanguageHelpDescriptor = studioHelpRegistry['help.studio.language'];
 
 export function getStudioHelpDescriptor(helpId: StudioHelpId): HelpDescriptor {
   const descriptor = studioHelpRegistry[helpId];
