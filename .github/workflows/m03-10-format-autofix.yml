@@ -1,0 +1,59 @@
+name: M03.10 Format Autofix
+
+on:
+  push:
+    branches:
+      - codex/m03-10-spanish-first-i18n
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Format M03.10 files
+        run: >-
+          npx prettier --write
+          packages/i18n/package.json
+          "packages/i18n/src/**/*.{ts,tsx}"
+          "locales/es/*.json"
+          i18next.config.ts
+          tsconfig.base.json
+          apps/studio/package.json
+          apps/studio/src/main.tsx
+          apps/studio/src/help/help-registry.ts
+          apps/studio/src/shell/language-settings.tsx
+          apps/studio/src/shell/sidebar-navigation.ts
+          apps/studio/src/shell/app-shell-route.tsx
+          apps/studio/src/shell/studio-topbar.tsx
+          packages/editor-puck/src/puck-component-adapter.ts
+          tooling/package-boundaries.json
+          tooling/test/workspace-boundaries.test.mjs
+          tooling/scripts/verify-m03-10-i18n.mjs
+          tooling/scripts/verify-m03-10-ui-strings.mjs
+          tooling/vitest/unit/i18n-runtime.test.ts
+          tooling/vitest/contract/i18n-boundary.test.ts
+          tooling/vitest/integration/i18n-react-runtime.test.ts
+          tooling/playwright/m03-10-i18n.spec.ts
+          .github/workflows/m03-10-i18n.yml
+          .ai/I18N_SPEC.md
+      - name: Commit formatted sources
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add packages/i18n locales/es i18next.config.ts tsconfig.base.json apps/studio/package.json apps/studio/src packages/editor-puck/src/puck-component-adapter.ts tooling/package-boundaries.json tooling/test/workspace-boundaries.test.mjs tooling/scripts/verify-m03-10-i18n.mjs tooling/scripts/verify-m03-10-ui-strings.mjs tooling/vitest/unit/i18n-runtime.test.ts tooling/vitest/contract/i18n-boundary.test.ts tooling/vitest/integration/i18n-react-runtime.test.ts tooling/playwright/m03-10-i18n.spec.ts .github/workflows/m03-10-i18n.yml .ai/I18N_SPEC.md
+          if git diff --cached --quiet; then
+            echo 'No formatting changes required.'
+            exit 0
+          fi
+          git commit -m 'style(m03.10): apply reproducible formatting'
+          git push
