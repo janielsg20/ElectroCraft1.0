@@ -40,7 +40,7 @@ function toRevision(row: typeof schema.projectRevisions.$inferSelect): ProjectSt
     id: row.id,
     projectId: row.projectId,
     reason: row.reason,
-    manifest: row.manifest as ProjectStorageRevision['manifest'],
+    manifest: row.manifest as unknown as ProjectStorageRevision['manifest'],
     checksum: asChecksum(row.checksum),
     createdAt: row.createdAt.toISOString(),
   });
