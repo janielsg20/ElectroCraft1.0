@@ -1,6 +1,6 @@
 # TRACKING — ElectroCraft current position
 
-Date: 2026-08-19.
+Date: 2026-08-20.
 
 El historial detallado previo permanece versionado en Git y en los archivos de evidencia/archivo. Este documento mantiene la posición operativa actual sin duplicar logs extensos.
 
@@ -19,27 +19,33 @@ El historial detallado previo permanece versionado en Git y en los archivos de e
 | M03.7 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.7/CLOSURE_2026-08-19.md` |
 | M03.8 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.8/CLOSURE_2026-08-19.md` |
 | M03.9 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.9/CLOSURE_2026-08-19.md` |
-| F03 / M03.10 | ACTIVE | `.ai/microphases/M03_10.md` |
+| M03.10 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.10/CLOSURE_2026-08-20.md` |
+| F03 / M03.11 | ACTIVE | `.ai/microphases/M03_11.md` |
 
-## Cierre canónico M03.9
-- Rama `codex/m03-9-editor-session-appearance-profile`; PR `#23` abierto contra `main`.
-- Head final `457375512fcc3cc9da056720b86bad0c7233d920`.
-- Workflow propietario `M03.9 Editor Appearance Profile Gate`: run `32315742507` success; job `96267423764`.
-- Artifact `9388009972`; digest `sha256:d802096889a8ffed4a3806e5bb3bce8e11e570676cdee142afc9ba74a3a3cb5d`.
-- Suite dedicada: unit `8/8`, contract `4/4`, integration `2/2`; Playwright dedicado `7/7`.
-- Full gate: Node `37/37`, Vitest `244/244` en 66 archivos, Playwright `52/52`, lint/format/typecheck/boundaries/build GREEN.
-- `StudioAppearanceProfile` permanece fuera de ElectroCraftDocument/Theme/ExportIR y se aplica mediante tokens del Studio.
-- M01.4 histórico quedó reparado para instalación bloqueada + Chromium; run `32315742430` success.
-- Base CI run `32315742400` success y gates M03.1–M03.8 revalidados GREEN.
+## Cierre canónico M03.10
+- Rama `codex/m03-10-spanish-first-i18n`; PR `#24` apilado sobre M03.9.
+- Head funcional `4731b1056bf8e75377e45f3ff1b438a4d9e9a101`.
+- Workflow propietario `M03.10 Spanish-first i18n Gate`: run `32318184912` success; job `96274840342`.
+- Artifact `9388906418`; digest `sha256:3f7573c3af3da92fd002097155d926505d1711feb6b09da336caf42511b0dba6`.
+- Owner `@electrocraft/i18n`; pins i18next `26.3.6`, react-i18next `17.0.11`, i18next-cli `1.69.0`.
+- 13 namespaces españoles; `es` inicial/fallback; strict keys; missing-key failure; Intl/error-code mapping.
+- Settings > General > Idioma, AppShell/Sidebar centralizados y PuckLabelResolver preservando IDs internos.
+- Suite dedicada `12/12`; browser audit `4/4`.
+- Full gate: Node `39/39`, Vitest `256/256` en 69 archivos, Playwright `56/56`, lint/format/typecheck/boundaries/build/PWA GREEN.
+- Boundary marker: aliases `20`, packages `18`, apps `2`.
+- Base CI run `32318184871` success; artifact `9388919028`.
+- M03.2 full repository gate independiente también GREEN sobre el mismo head.
+- Blockers funcionales P0/P1: `0`.
 
-## Transición M03.10
-- M03.10 es la única microfase `ACTIVE`.
-- Owner OSS: `i18next + react-i18next + i18next CLI/tooling` detrás de adapters ElectroCraft.
-- Ubicación transversal; selector visible en `Configuración > General > Idioma`.
-- Debe consolidar los catálogos españoles ya existentes en una infraestructura tipada y verificable, sin crear un segundo sistema i18n paralelo.
-- Debe mantener IDs/slugs/component IDs canónicos estables en inglés y traducir únicamente copy visible.
-- Artefactos obligatorios: `packages/i18n/`, `locales/es/`, `I18N_SPEC.md` y ui-string lint/test.
-- Gates obligatorios: namespaces, fallback español, missing-key failure, Intl/pluralización, E2E sin labels inglesas, lint/typecheck/test/build.
+## Transición M03.11
+- M03.11 es la única microfase `ACTIVE`.
+- Owner UI: Lucide + shadcn/ui Radix Tooltip/Popover/Sheet + infraestructura i18n M03.10.
+- Debe crear un único HelpRegistry tipado, no popovers ad hoc por módulo.
+- Debe crear HelpTrigger reutilizable y Help Drawer global con búsqueda por título, descripción, keyword y sección.
+- Desktop usa Tooltip + Popover; móvil usa Sheet.
+- Ayuda debe ser accesible por teclado, devolver foco al trigger y usar copy español del namespace `help`.
+- Empty states reales deben enlazar `¿Qué puedo hacer aquí?` sin inventar datos ni capacidades.
+- Debe respetar la navegación canónica cerrada por M03.3/APP_SHELL_SPEC aunque el wording antiguo de M03.11 enumere destinos obsoletos.
 
 ## Historial extendido
 - hasta M00.8: `.ai/TRACKING_HISTORY_THROUGH_M00.8.md`;
