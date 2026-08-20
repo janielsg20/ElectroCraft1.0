@@ -31,7 +31,7 @@ function canAttemptOpfs() {
   return typeof navigator !== 'undefined' && typeof navigator.storage?.getDirectory === 'function';
 }
 
-function normalizeDatabaseName(value = DEFAULT_BROWSER_DATABASE_NAME) {
+function normalizeDatabaseName(value: string = DEFAULT_BROWSER_DATABASE_NAME) {
   const normalized = value.trim();
   if (!normalized) throw new TypeError('databaseName must not be empty');
   return normalized;
