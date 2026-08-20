@@ -8,6 +8,14 @@ const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const exists = (file) => fs.existsSync(path.join(root, file));
 const closurePath = '.ai/evidence/F03/M03.7/CLOSURE_2026-08-19.md';
 
+function hasActiveSuccessor(state, phase, microphase) {
+  const match = state.match(/M(\d+)\.(\d+)[^\n]*ACTIVE/);
+  if (!match) return false;
+  const activePhase = Number(match[1]);
+  const activeMicrophase = Number(match[2]);
+  return activePhase > phase || (activePhase === phase && activeMicrophase > microphase);
+}
+
 const required = [
   '.ai/INFORMATION_ARCHITECTURE.md',
   '.ai/UX_INFORMATION_ARCHITECTURE.md',
@@ -115,13 +123,10 @@ test('M03.7 structural gate enforces Progressive Disclosure and canonical inform
     assert.equal(exists(closurePath), true, 'Completed M03.7 requires closure evidence');
     const closure = read(closurePath);
     assert.equal(closure.includes('GREEN'), true, 'M03.7 closure evidence must remain GREEN');
-
-    const activeSuccessor = state.match(/M03\.(\d+)[^\n]*ACTIVE/);
-    assert.notEqual(activeSuccessor, null, 'A later F03 microphase must remain ACTIVE after M03.7 closes');
     assert.equal(
-      Number(activeSuccessor?.[1]) > 7,
+      hasActiveSuccessor(state, 3, 7),
       true,
-      'M03.7 post-closure regression requires an ACTIVE F03 successor after M03.7',
+      'M03.7 post-closure regression requires a later ACTIVE microphase, including a later phase',
     );
   }
 });
