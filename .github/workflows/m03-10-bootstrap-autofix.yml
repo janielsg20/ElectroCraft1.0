@@ -1,0 +1,45 @@
+name: M03.10 Bootstrap Autofix
+
+on:
+  push:
+    branches:
+      - codex/m03-10-spanish-first-i18n
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Synchronize workspace lockfile and install
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Format M03.10 sources
+        run: >-
+          npx prettier --write
+          packages/i18n/package.json
+          "packages/i18n/src/**/*.{ts,tsx}"
+          "locales/es/*.json"
+          i18next.config.ts
+          tsconfig.base.json
+          apps/studio/package.json
+          tooling/package-boundaries.json
+          tooling/test/workspace-boundaries.test.mjs
+      - name: Commit reproducible bootstrap
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add package-lock.json packages/i18n locales/es i18next.config.ts tsconfig.base.json apps/studio/package.json tooling/package-boundaries.json tooling/test/workspace-boundaries.test.mjs
+          if git diff --cached --quiet; then
+            echo 'No bootstrap changes required.'
+            exit 0
+          fi
+          git commit -m 'chore(m03.10): sync i18n lockfile and formatting'
+          git push
