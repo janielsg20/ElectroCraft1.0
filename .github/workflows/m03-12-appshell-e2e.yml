@@ -1,0 +1,115 @@
+name: M03.12 AppShell E2E Gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'apps/studio/**'
+      - 'packages/design-system/**'
+      - 'packages/i18n/**'
+      - 'tooling/**'
+      - 'playwright.config.ts'
+      - 'docs/qa/**'
+      - '.ai/SCREEN_SPECS/**'
+      - '.ai/APP_SHELL_SPEC.md'
+      - '.ai/STATE.md'
+      - '.ai/TRACKING.md'
+      - '.github/workflows/m03-12-appshell-e2e.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/studio/**'
+      - 'packages/design-system/**'
+      - 'packages/i18n/**'
+      - 'tooling/**'
+      - 'playwright.config.ts'
+      - 'docs/qa/**'
+      - '.ai/SCREEN_SPECS/**'
+      - '.ai/APP_SHELL_SPEC.md'
+      - '.ai/STATE.md'
+      - '.ai/TRACKING.md'
+      - '.github/workflows/m03-12-appshell-e2e.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: m03-12-appshell-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  verify:
+    name: M03.12 AppShell E2E closure
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Verify locked toolchain
+        run: |
+          test "$(node --version)" = 'v22.16.0'
+          test "$(npm --version)" = '10.9.2'
+          test "$(npm config get legacy-peer-deps)" = 'true'
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Verify M03.12 formatting
+        run: >-
+          npx prettier --check
+          playwright.config.ts
+          tooling/playwright/m03-12-appshell.spec.ts
+          tooling/vitest/contract/app-shell-e2e-boundary.test.ts
+          tooling/vitest/integration/app-shell-e2e-matrix.test.ts
+          tooling/scripts/verify-m03-12-appshell.mjs
+          docs/qa/F03_APPSHELL_E2E.md
+          .ai/SCREEN_SPECS/F03_APPSHELL.md
+          .github/workflows/m03-12-appshell-e2e.yml
+
+      - name: Verify structural M03.12 contract
+        run: node tooling/scripts/verify-m03-12-appshell.mjs | tee m03-12-contract.log
+
+      - name: Execute dedicated contract integration suite
+        run: >-
+          npx vitest run --config vitest.config.ts
+          tooling/vitest/contract/app-shell-e2e-boundary.test.ts
+          tooling/vitest/integration/app-shell-e2e-matrix.test.ts
+          | tee m03-12-vitest.log
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Execute M03.12 viewport and accessibility audit
+        run: npx playwright test tooling/playwright/m03-12-appshell.spec.ts --config playwright.config.ts | tee m03-12-playwright.log
+
+      - name: Execute full repository gate
+        run: npm run check | tee m03-12-full-gate.log
+
+      - name: Emit closure marker
+        run: echo PASS_M03_12_APPSHELL_E2E | tee m03-12-closure.log
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m03-12-appshell-e2e-evidence
+          path: |
+            m03-12-contract.log
+            m03-12-vitest.log
+            m03-12-playwright.log
+            m03-12-full-gate.log
+            m03-12-closure.log
+            test-results/m01-4
+            apps/studio/dist
+            docs/qa/F03_APPSHELL_E2E.md
+            .ai/SCREEN_SPECS/F03_APPSHELL.md
