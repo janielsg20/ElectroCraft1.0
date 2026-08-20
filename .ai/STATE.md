@@ -5,7 +5,18 @@
 - F01 — Monorepo, límites, documentación y CI: `COMPLETADA`; Gate `GREEN`.
 - F02 — Modelo canónico del proyecto: `COMPLETADA`; Gate `GREEN`.
 - F03 — Design System, AppShell, español y ayuda: `COMPLETADA`; Gate `GREEN`.
-- M03.1–M03.12: `COMPLETADAS`; Gates `GREEN`.
+- M03.1 — Design System del Studio: `COMPLETADA`; Gate `GREEN`.
+- M03.2 — AppShell base del Studio: `COMPLETADA`; Gate `GREEN`.
+- M03.3 — Sidebar global: `COMPLETADA`; Gate `GREEN`.
+- M03.4 — Topbar global + Settings: `COMPLETADA`; Gate `GREEN`.
+- M03.5 — Context / Canvas / Inspector / Status: `COMPLETADA`; Gate `GREEN`.
+- M03.6 — AppShell y editor responsive: `COMPLETADA`; Gate `GREEN`.
+- M03.7 — Progressive Disclosure y arquitectura de información: `COMPLETADA`; Gate `GREEN`.
+- M03.8 — Palette descubrible: `COMPLETADA`; Gate `GREEN`.
+- M03.9 — Apariencia del Studio Editor: `COMPLETADA`; Gate `GREEN`.
+- M03.10 — Infraestructura español-primero e i18n tipado: `COMPLETADA`; Gate `GREEN`.
+- M03.11 — Sistema de ayuda contextual: `COMPLETADA`; Gate `GREEN`.
+- M03.12 — E2E AppShell completo: `COMPLETADA`; Gate `GREEN`.
 - F04 — Persistencia local real del Studio: `IN_PROGRESS`.
 - M04.1 — Schema físico estable con PGlite/Drizzle + storage browser: `ACTIVE`.
 - Blockers P0/P1 funcionales conocidos: `0`.
