@@ -92,7 +92,9 @@ test.describe('M03.12 AppShell E2E closure matrix', () => {
     });
   }
 
-  test('renders the exact canonical Spanish navigation and excludes obsolete top-level destinations', async ({ page }) => {
+  test('renders the exact canonical Spanish navigation and excludes obsolete top-level destinations', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto('/');
     const sidebar = page.locator('.ec-app-shell-sidebar');
@@ -106,7 +108,9 @@ test.describe('M03.12 AppShell E2E closure matrix', () => {
     await expect(sidebar.getByRole('link', { name: 'Editor' })).toHaveAttribute('aria-current', 'page');
   });
 
-  test('keeps Help before Settings and supports keyboard open/search/close with focus return', async ({ page }, testInfo) => {
+  test('keeps Help before Settings and supports keyboard open/search/close with focus return', async ({
+    page,
+  }, testInfo) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/');
 
@@ -117,8 +121,8 @@ test.describe('M03.12 AppShell E2E closure matrix', () => {
       const settingsButton = element.querySelector('[data-topbar-settings-trigger]');
       return Boolean(
         helpButton &&
-          settingsButton &&
-          (helpButton.compareDocumentPosition(settingsButton) & Node.DOCUMENT_POSITION_FOLLOWING),
+        settingsButton &&
+        helpButton.compareDocumentPosition(settingsButton) & Node.DOCUMENT_POSITION_FOLLOWING,
       );
     });
     expect(ordered).toBe(true);
@@ -165,13 +169,17 @@ test.describe('M03.12 AppShell E2E closure matrix', () => {
 
     const storage = await page.evaluate(() => ({
       appearance: window.localStorage.getItem('electrocraft.studio.appearance.v1'),
-      projectKeys: Object.keys(window.localStorage).filter((key) => /^electrocraft\.(?:project|theme|export)/i.test(key)),
+      projectKeys: Object.keys(window.localStorage).filter((key) =>
+        /^electrocraft\.(?:project|theme|export)/i.test(key),
+      ),
     }));
     expect(storage.appearance).toContain('amber');
     expect(storage.projectKeys).toEqual([]);
   });
 
-  test('does not leak known English release labels, raw translation keys or missing-key diagnostics', async ({ page }) => {
+  test('does not leak known English release labels, raw translation keys or missing-key diagnostics', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/');
     const body = page.locator('body');

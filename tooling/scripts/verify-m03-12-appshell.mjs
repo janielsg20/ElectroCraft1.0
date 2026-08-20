@@ -27,7 +27,8 @@ if (e2e.includes('waitForTimeout') || /setTimeout\s*\(/.test(e2e)) fail('fixed t
 if (!config.includes("trace: 'retain-on-failure'")) fail('Playwright trace retention missing');
 if (!config.includes("screenshot: 'only-on-failure'")) fail('Playwright failure screenshot retention missing');
 if (!e2e.includes('testInfo.outputPath')) fail('meaningful viewport screenshot evidence missing');
-if (!e2e.includes("name: 'Ayuda'" ) || !e2e.includes("name: 'Configuración'")) fail('Topbar Help/Settings audit missing');
+if (!e2e.includes("name: 'Ayuda'") || !e2e.includes("name: 'Configuración'"))
+  fail('Topbar Help/Settings audit missing');
 if (!e2e.includes('I18N_MISSING_KEY')) fail('missing-key release audit missing');
 if (!e2e.includes('electrocraft.studio.appearance.v1')) fail('appearance isolation audit missing');
 

@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { studioHelpDescriptors } from '../../../apps/studio/src/help/help-registry';
-import { resolveEditorLayoutMode, resolveLaptopPanelStrategy } from '../../../apps/studio/src/shell/editor-layout-model';
+import {
+  resolveEditorLayoutMode,
+  resolveLaptopPanelStrategy,
+} from '../../../apps/studio/src/shell/editor-layout-model';
 import { resolveSidebarActiveItem, studioSidebarNavigation } from '../../../apps/studio/src/shell/sidebar-navigation';
 
 const matrix = [
