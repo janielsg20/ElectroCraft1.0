@@ -33,10 +33,12 @@ jobs:
             packages/data-web
             apps/studio/package.json
             apps/studio/vite.config.ts
+            apps/studio/src/App.tsx
             apps/studio/src/features/projects
             apps/studio/src/shell/studio-topbar.tsx
             apps/studio/src/help/help-registry.ts
             apps/studio/src/i18n/information-architecture.es.ts
+            locales/es/common.json
             locales/es/help.json
             tooling/package-boundaries.json
             tooling/vitest/unit/project-storage-contract.test.ts
@@ -134,7 +136,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add packages/application/src/projects packages/data-web apps/studio/package.json apps/studio/vite.config.ts apps/studio/src/features/projects apps/studio/src/shell/studio-topbar.tsx apps/studio/src/help/help-registry.ts apps/studio/src/i18n/information-architecture.es.ts locales/es/help.json tooling/package-boundaries.json tooling/vitest/unit/project-storage-contract.test.ts tooling/vitest/contract/project-storage-boundary.test.ts tooling/vitest/integration/project-storage-pglite.test.ts tooling/playwright/m04-1-storage.spec.ts tsconfig.base.json .github/workflows/m04-1-storage-foundation.yml .ai/evidence/F04/M04.1/VALIDATION_LATEST.md
+          git add packages/application/src/projects packages/data-web apps/studio/package.json apps/studio/vite.config.ts apps/studio/src/App.tsx apps/studio/src/features/projects apps/studio/src/shell/studio-topbar.tsx apps/studio/src/help/help-registry.ts apps/studio/src/i18n/information-architecture.es.ts locales/es/common.json locales/es/help.json tooling/package-boundaries.json tooling/vitest/unit/project-storage-contract.test.ts tooling/vitest/contract/project-storage-boundary.test.ts tooling/vitest/integration/project-storage-pglite.test.ts tooling/playwright/m04-1-storage.spec.ts tsconfig.base.json .github/workflows/m04-1-storage-foundation.yml .ai/evidence/F04/M04.1/VALIDATION_LATEST.md
           if git diff --cached --quiet; then
             echo "Validation surface unchanged."
           else
