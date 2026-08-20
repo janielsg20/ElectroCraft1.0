@@ -45,15 +45,17 @@ describe('M03.10 i18n ownership contract', () => {
     expect(route).toContain("commonT('studio.appShell.title')");
   });
 
-  it('exposes General > Idioma with Spanish copy, Help and explicit Save/Cancel', () => {
+  it('exposes General > Idioma with Spanish copy, reusable Help and explicit Save/Cancel', () => {
     const settings = read('apps/studio/src/shell/language-settings.tsx');
+    const helpUi = read('apps/studio/src/help/help-ui.tsx');
     expect(settings).toContain('data-settings-destination="general-language"');
     expect(settings).toContain("settingsT('settings.general.title')");
     expect(settings).toContain("settingsT('settings.language.label')");
     expect(settings).toContain("settingsT('settings.language.spanish')");
     expect(settings).toContain("settingsT('settings.language.save')");
     expect(settings).toContain("settingsT('settings.language.cancel')");
-    expect(settings).toContain("getStudioIcon('studio.help')");
+    expect(settings).toContain('<HelpTrigger helpId="help.studio.language"');
+    expect(helpUi).toContain("getStudioIcon('studio.help')");
   });
 
   it('prevents known English shell labels from entering Spanish catalogs', () => {
