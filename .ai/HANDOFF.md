@@ -1,35 +1,35 @@
 # HANDOFF — ElectroCraft
 
 ## Current
-F03 / M03.9 — Apariencia del Studio Editor completo — `ACTIVE`.
+F03 / M03.10 — Infraestructura español-primero e i18n tipado — `ACTIVE`.
 
 ## Estado heredado
-- M03.8 cerró GREEN en la rama `agent/m03-8-palette-discoverability` sobre head funcional `b3e66bf4d85518ea3f3102e8ffe0db472aea9947`.
-- Workflow propietario `M03.8 Discoverable Palette Gate`: run `32308655658` success; job `96246831243`.
-- Artifact `9385669357`; digest `sha256:1692ec47ef5cab4a30a480d8c3b7fb2763c9f2daf2faf5ad0e88b5aa1429434c`.
-- Gate M03.8: structural `7/7`, M03.5 successor `1/1`, Vitest dedicado `27/27`, Playwright dedicado `11/11`, Node global `37/37`, Vitest global `230/230` en 63 archivos, Playwright global `45/45`, lint/format/typecheck/build GREEN.
-- Palette discovery usa matriz ElectroCraft, Favoritos/Recientes por ID y fail-closed insertion; Puck mantiene ownership de drag/composition.
+- M03.9 cerró GREEN sobre `codex/m03-9-editor-session-appearance-profile`, head `457375512fcc3cc9da056720b86bad0c7233d920`, PR `#23` abierto contra `main`.
+- Workflow propietario M03.9: run `32315742507` success; job `96267423764`; artifact `9388009972`; digest `sha256:d802096889a8ffed4a3806e5bb3bce8e11e570676cdee142afc9ba74a3a3cb5d`.
+- M03.9 dedicado: unit `8/8`, contract `4/4`, integration `2/2`, Playwright `7/7`; full gate Node `37/37`, Vitest `244/244`, Playwright `52/52`, lint/typecheck/build GREEN.
+- Base CI run `32315742400` GREEN y gates históricos M03.1–M03.8 revalidados GREEN.
+- M01.4 Studio PWA Bootstrap fue reparado para usar `npm ci` y provisionar Chromium; run `32315742430` GREEN.
 
 ## Siguiente acción exacta
-1. Leer `.ai/microphases/M03_9.md` como contrato ejecutable y auditar los tokens/preferences de Studio ya existentes antes de crear tipos nuevos.
-2. Definir `StudioAppearanceProfile` como workspace/user preference schema, nunca como `ElectroCraftTheme` del proyecto.
-3. Mapear todos los valores a design tokens existentes o añadir tokens compartidos en `packages/design-system` solo cuando falten.
-4. Implementar `Configuración > Apariencia del Studio` con grupos Modo/Colores/Tipografía/Iconos/Forma/Densidad/Movimiento y copy español antes de renderizar controles.
-5. Implementar Preview/Apply/Revert y presets personales; cerrar Settings con cambios pendientes debe ofrecer una decisión explícita.
-6. Respetar reduced-motion del sistema y advertir combinaciones de contraste/accesibilidad inválidas con Restore Accessible Defaults.
-7. Probar aislamiento: la apariencia del Studio no puede mutar ElectroCraftDocument, frontend Theme ni ExportIR.
-8. Añadir unit/contract/integration/negative/persistence/E2E y ejecutar lint, typecheck, test, build y browser gate antes de cerrar M03.9.
+1. Leer `.ai/microphases/M03_10.md`, `.ai/I18N_SPEC.md` y los catálogos actuales de `apps/studio/src/i18n/` como contrato ejecutable.
+2. Introducir `packages/i18n/` como owner/adaptador estable, no un segundo catálogo paralelo.
+3. Configurar `i18next + react-i18next` con `es` inicial/fallback y namespaces `common`, `navigation`, `editor`, `content`, `queries`, `forms`, `backend`, `media`, `themes`, `export`, `settings`, `help`, `ai`.
+4. Crear `locales/es/*.json` y migrar primero el AppShell/Settings conservando los wrappers tipados existentes durante la transición.
+5. Implementar missing-key failure en dev/test, type-safe keys, ui-string lint/test e impedir labels inglesas OSS visibles.
+6. Mantener component IDs, route IDs y slugs internos estables en inglés; solo el copy visible se traduce.
+7. Implementar `Configuración > General > Idioma`, español por defecto, Guardar/Cancelar y HelpDescriptor con `Más información`.
+8. Añadir Intl para fecha/número/moneda/pluralización y normalización error-code -> texto español.
+9. Actualizar boundaries/aliases/grafo del monorepo para el nuevo owner `@electrocraft/i18n` sin relajar reglas arquitectónicas.
+10. Añadir unit/contract/integration/E2E y gate M03.10; ejecutar lint, typecheck, test, build y browser audit antes de cerrar.
 
 ## Decisiones vigentes
+- M03.9 Studio appearance es workspace/user preference y permanece aislada del Theme del proyecto y ExportIR.
+- El Design System se consume solo desde su root público.
 - La IA del Studio clasifica información como `primary | contextual | advanced | diagnostic`.
-- Advanced usa Progressive Disclosure Radix encapsulado por `packages/design-system`; diagnostics críticos no se ocultan en Advanced.
-- `/content` es la ruta canónica List/Detail; rutas redundantes/desconocidas fallan cerradas.
-- Desktop conserva geometría M03.5; laptop, tablet y móvil conservan las adaptaciones M03.6.
+- Advanced usa Progressive Disclosure Radix; diagnostics críticos no se ocultan.
+- `/content` es la ruta canónica List/Detail; rutas desconocidas fallan cerradas.
 - Puck conserva ownership detrás de `@electrocraft/editor-puck`.
-- La Palette usa `.ai/PALETTE_CATALOG_MATRIX.md` como catálogo de descubrimiento, no el registry runtime de Puck.
-- Favoritos/Recientes de Palette son preferences por `paletteItemId` y no Project Objects.
-- Click-to-insert solo se habilita si el componentRef existe de verdad; mappings pendientes muestran diagnostics visibles.
-- Apariencia del Studio pertenece a workspace/user preferences y debe permanecer aislada del Theme del proyecto y ExportIR.
+- Los catálogos TS españoles existentes son seam de compatibilidad que M03.10 debe centralizar, no duplicar.
 
 ## Read set
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M03_9.md → UI_UX_LAYOUT_RULES.md → packages/design-system → apps/studio/src/shell`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M03_10.md → .ai/I18N_SPEC.md → UI_UX_LAYOUT_RULES.md → apps/studio/src/i18n → apps/studio/src/shell → packages/design-system`.

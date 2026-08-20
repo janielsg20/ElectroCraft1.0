@@ -22,6 +22,7 @@ import {
 import { useRef, useState, type ReactNode, type RefObject } from 'react';
 import { editorT } from '../i18n/editor.es';
 import { iaT } from '../i18n/information-architecture.es';
+import { AppearancePanelTrigger } from './appearance-panel';
 import {
   editorPaneContract,
   resolveEditorLayoutMode,
@@ -365,6 +366,8 @@ function MobileEditorLayout() {
             </div>
           </SheetContent>
         </Sheet>
+
+        <AppearancePanelTrigger presentation="mobile" />
 
         <Sheet open={activeTool === 'outline'} onOpenChange={(open) => setMobileTool('outline', open)}>
           <SheetTrigger asChild>

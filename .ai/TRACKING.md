@@ -18,36 +18,28 @@ El historial detallado previo permanece versionado en Git y en los archivos de e
 | M03.6 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.6/CLOSURE_2026-08-19.md` |
 | M03.7 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.7/CLOSURE_2026-08-19.md` |
 | M03.8 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.8/CLOSURE_2026-08-19.md` |
-| F03 / M03.9 | ACTIVE | `.ai/microphases/M03_9.md` |
+| M03.9 | COMPLETADA / GREEN | `.ai/evidence/F03/M03.9/CLOSURE_2026-08-19.md` |
+| F03 / M03.10 | ACTIVE | `.ai/microphases/M03_10.md` |
 
-## Cierres canónicos recientes
-### M03.7
-- PR `#21`; integrado en `main` mediante merge `8eeeb40cf0965db880bf6b451dee28c0c0c2041f`.
-- Workflow propietario `M03.7 Information Architecture Gate`: run `32304389329` — success; artifact `9384209280`.
-- Structural `1/1`; Vitest dedicado `17/17`; Playwright dedicado `10/10`.
-- Full gate: Node `30/30`, Vitest `205/205` en 59 archivos, Playwright `34/34`, lint/typecheck/build GREEN.
-- Implementa taxonomía `primary | contextual | advanced | diagnostic`; Advanced usa Progressive Disclosure Radix y diagnostics de estado no se esconden.
-- Inspector conserva ownership de Puck; `/content` es la ruta canónica List/Detail; rutas redundantes fallan cerradas.
+## Cierre canónico M03.9
+- Rama `codex/m03-9-editor-session-appearance-profile`; PR `#23` abierto contra `main`.
+- Head final `457375512fcc3cc9da056720b86bad0c7233d920`.
+- Workflow propietario `M03.9 Editor Appearance Profile Gate`: run `32315742507` success; job `96267423764`.
+- Artifact `9388009972`; digest `sha256:d802096889a8ffed4a3806e5bb3bce8e11e570676cdee142afc9ba74a3a3cb5d`.
+- Suite dedicada: unit `8/8`, contract `4/4`, integration `2/2`; Playwright dedicado `7/7`.
+- Full gate: Node `37/37`, Vitest `244/244` en 66 archivos, Playwright `52/52`, lint/format/typecheck/boundaries/build GREEN.
+- `StudioAppearanceProfile` permanece fuera de ElectroCraftDocument/Theme/ExportIR y se aplica mediante tokens del Studio.
+- M01.4 histórico quedó reparado para instalación bloqueada + Chromium; run `32315742430` success.
+- Base CI run `32315742400` success y gates M03.1–M03.8 revalidados GREEN.
 
-### M03.8
-- Rama `agent/m03-8-palette-discoverability` creada desde `main` ya revalidado tras M03.7.
-- Head funcional canónico `b3e66bf4d85518ea3f3102e8ffe0db472aea9947`.
-- Workflow propietario `M03.8 Discoverable Palette Gate`: run `32308655658` — success; job `96246831243`.
-- Artifact `9385669357`; digest `sha256:1692ec47ef5cab4a30a480d8c3b7fb2763c9f2daf2faf5ad0e88b5aa1429434c`.
-- Structural M03.8 `7/7`; M03.5 successor composition `1/1`; Vitest dedicado `27/27`; Playwright dedicado `11/11`.
-- Full gate: Node `37/37`, Vitest `230/230` en 63 archivos, Playwright `45/45`, lint/format, TypeScript strict, boundaries y builds GREEN.
-- Palette gobernada por `.ai/PALETTE_CATALOG_MATRIX.md` con las 10 categorías exactas, search conceptual y UX High Density responsive.
-- Favoritos/Recientes persisten solo `paletteItemId` como workspace preferences.
-- Puck conserva drag/composition ownership; click-to-insert pasa por `@electrocraft/editor-puck` y los mappings ausentes quedan visibles como diagnostics fail-closed.
-- Los gates históricos M03.5/M03.6/M03.7 se adaptaron a la nueva composición/transición sin retirar sus checks funcionales, responsive o de boundary.
-
-## Transición M03.9
-- M03.9 es la única microfase `ACTIVE`.
-- Owner: `shadcn/ui Radix + ElectroCraft Studio tokens`.
-- Ubicación: `Configuración > Apariencia del Studio`.
-- Debe definir `StudioAppearanceProfile` como preference schema separada del theme del proyecto.
-- Debe soportar Modo/Colores/Tipografía/Iconos/Forma/Densidad/Movimiento, Preview/Apply/Revert, presets personales, reduced motion y Restore Accessible Defaults.
-- El E2E debe demostrar que cambiar la apariencia del Studio no modifica ElectroCraftDocument, Theme del proyecto ni ExportIR.
+## Transición M03.10
+- M03.10 es la única microfase `ACTIVE`.
+- Owner OSS: `i18next + react-i18next + i18next CLI/tooling` detrás de adapters ElectroCraft.
+- Ubicación transversal; selector visible en `Configuración > General > Idioma`.
+- Debe consolidar los catálogos españoles ya existentes en una infraestructura tipada y verificable, sin crear un segundo sistema i18n paralelo.
+- Debe mantener IDs/slugs/component IDs canónicos estables en inglés y traducir únicamente copy visible.
+- Artefactos obligatorios: `packages/i18n/`, `locales/es/`, `I18N_SPEC.md` y ui-string lint/test.
+- Gates obligatorios: namespaces, fallback español, missing-key failure, Intl/pluralización, E2E sin labels inglesas, lint/typecheck/test/build.
 
 ## Historial extendido
 - hasta M00.8: `.ai/TRACKING_HISTORY_THROUGH_M00.8.md`;

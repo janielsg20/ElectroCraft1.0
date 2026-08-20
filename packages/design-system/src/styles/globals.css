@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import './tokens.css';
+@import './studio-appearance-tokens.css';
 @source '../';
 
 @theme inline {

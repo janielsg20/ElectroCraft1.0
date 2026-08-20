@@ -147,7 +147,7 @@
   width: 100%;
   height: 100%;
   overflow: auto;
-  padding: 12px;
+  padding: var(--ec-editor-canvas-padding, 12px);
 }
 
 .ec-editor-responsive-layout {
@@ -243,6 +243,6 @@
   }
 
   .ec-editor-puck-preview {
-    padding: 8px;
+    padding: var(--ec-editor-canvas-padding, 8px);
   }
 }
