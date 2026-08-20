@@ -27,7 +27,7 @@ on:
 jobs:
   storage-gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -65,7 +65,10 @@ jobs:
           tooling/vitest/unit/project-storage-contract.test.ts
           tooling/vitest/contract/project-storage-boundary.test.ts
           tooling/vitest/integration/project-storage-pglite.test.ts
-      - run: npm run build:studio
+      - name: Full repository test gate
+        run: npm run test
+      - name: Full repository build gate
+        run: npm run build
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
       - name: M04.1 browser storage smoke
