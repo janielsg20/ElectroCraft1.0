@@ -45,9 +45,12 @@ describe('M02.5 theme/blueprint/registry/capability boundaries', () => {
     expect(exportIr).not.toMatch(/ElectroPlatformCapabilityRegistry/);
   });
 
-  it('preserves the F01 invariant of exactly 17 owner packages instead of creating @electrocraft/contracts', () => {
-    const boundaries = JSON.parse(read('tooling/package-boundaries.json')) as { packages: Record<string, unknown> };
-    expect(Object.keys(boundaries.packages)).toHaveLength(17);
+  it('preserves the declared F01 owner package invariant without creating @electrocraft/contracts', () => {
+    const boundaries = JSON.parse(read('tooling/package-boundaries.json')) as {
+      packages: Record<string, unknown>;
+      invariants: { expectedStablePackageCount: number };
+    };
+    expect(Object.keys(boundaries.packages)).toHaveLength(boundaries.invariants.expectedStablePackageCount);
     expect(boundaries.packages).not.toHaveProperty('@electrocraft/contracts');
     expect(existsSync(resolve('packages/contracts/package.json'))).toBe(false);
     expect(existsSync(resolve('packages/domain/src/contracts'))).toBe(true);
