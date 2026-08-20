@@ -7,11 +7,22 @@ import {
 } from '../../../apps/studio/src/help/help-registry';
 import { studioSidebarNavigation } from '../../../apps/studio/src/shell/sidebar-navigation';
 
+const studioScopedHelpIds = [
+  'help.studio.shell',
+  'help.studio.appearance',
+  'help.studio.language',
+  'help.projects',
+] as const;
+
 describe('M03.11 typed HelpRegistry', () => {
-  it('owns one descriptor for every canonical top-level destination plus three Studio descriptors', () => {
+  it('owns one descriptor for every canonical top-level destination plus Studio-level concepts', () => {
     const navigationItems = studioSidebarNavigation.flatMap((group) => group.items);
     expect(navigationItems).toHaveLength(24);
-    expect(studioHelpDescriptors).toHaveLength(27);
+    expect(studioHelpDescriptors).toHaveLength(navigationItems.length + studioScopedHelpIds.length);
+
+    for (const helpId of studioScopedHelpIds) {
+      expect(() => getStudioHelpDescriptor(helpId)).not.toThrow();
+    }
 
     for (const item of navigationItems) {
       const descriptor = getStudioHelpDescriptor(getHelpIdForNavigationItem(item.id));
