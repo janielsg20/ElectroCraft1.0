@@ -11,6 +11,19 @@ describe('M04.1 storage ownership boundary', () => {
     expect(application).not.toContain('drizzle-orm');
   });
 
+  it('keeps raw storage engines out of Studio project UI and runtime wiring', () => {
+    const studioSources = [
+      read('apps/studio/src/features/projects/project-storage-runtime.ts'),
+      read('apps/studio/src/features/projects/storage-settings.tsx'),
+      read('apps/studio/src/shell/studio-topbar.tsx'),
+    ].join('\n');
+
+    expect(studioSources).not.toContain('@electric-sql/pglite');
+    expect(studioSources).not.toContain('drizzle-orm');
+    expect(studioSources).not.toMatch(/\bPGlite(?:Worker)?\b/);
+    expect(studioSources).toContain('@electrocraft/data-web');
+  });
+
   it('registers data-web as the nineteenth stable package and twenty-first public alias', () => {
     const boundaries = JSON.parse(read('tooling/package-boundaries.json')) as {
       packages: Record<string, readonly string[]>;
