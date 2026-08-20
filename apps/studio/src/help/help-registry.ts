@@ -10,10 +10,7 @@ import { studioSidebarNavigation, type SidebarNavigationItemId } from '../shell/
 type HelpMessageKey = ElectroCraftResourceKey<'help'>;
 
 export type StudioHelpId =
-  | 'help.studio.shell'
-  | 'help.studio.appearance'
-  | 'help.studio.language'
-  | `help.section.${SidebarNavigationItemId}`;
+  'help.studio.shell' | 'help.studio.appearance' | 'help.studio.language' | `help.section.${SidebarNavigationItemId}`;
 
 export interface HelpDescriptor {
   readonly id: StudioHelpId;
