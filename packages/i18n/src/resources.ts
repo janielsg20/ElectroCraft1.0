@@ -45,4 +45,5 @@ export const resourcesEs = Object.freeze({
 } as const);
 
 export type ElectroCraftNamespace = (typeof electroCraftNamespaces)[number];
-export type ElectroCraftResourceKey<Namespace extends ElectroCraftNamespace> = keyof (typeof resourcesEs)[Namespace] & string;
+export type ElectroCraftResourceKey<Namespace extends ElectroCraftNamespace> = keyof (typeof resourcesEs)[Namespace] &
+  string;

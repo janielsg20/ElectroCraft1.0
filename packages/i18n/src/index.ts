@@ -44,7 +44,10 @@ export function initializeElectroCraftI18n(): Promise<i18n> {
 export class MissingTranslationError extends Error {
   readonly code = 'I18N_MISSING_KEY';
 
-  constructor(readonly namespace: ElectroCraftNamespace, readonly translationKey: string) {
+  constructor(
+    readonly namespace: ElectroCraftNamespace,
+    readonly translationKey: string,
+  ) {
     super(`I18N_MISSING_KEY:${namespace}:${translationKey}`);
     this.name = 'MissingTranslationError';
   }
