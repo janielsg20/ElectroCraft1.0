@@ -1,10 +1,13 @@
 import { evaluateStudioBootstrapHealth } from './bootstrap-health';
+import { HelpTrigger } from './help/help-ui';
+import { getHelpIdForNavigationItem } from './help/help-registry';
 import { studioWorkspaceDescriptor } from './index';
 import { studioT } from './i18n/studio-shell.es';
 import { StudioAppShellRoute } from './shell/app-shell-route';
 import { DesignSystemDevelopmentRoute } from './shell/design-system-route';
 import { StudioEditorWorkspace } from './shell/editor-workspace';
 import { StudioContentListDetailRoute, StudioModuleEmptyStateRoute } from './shell/information-architecture-ui';
+import { resolveSidebarActiveItem } from './shell/sidebar-navigation';
 import './styles.css';
 import './shell/sidebar.css';
 import './shell/topbar.css';
@@ -30,11 +33,16 @@ function StudioWorkspaceBootstrap({
   readonly health: ReturnType<typeof evaluateStudioBootstrapHealth>;
 }) {
   const isProjectHome = pathname === projectHomeRoute.pathname;
+  const activeItemId = resolveSidebarActiveItem(pathname);
+  const helpId = activeItemId ? getHelpIdForNavigationItem(activeItemId) : 'help.studio.shell';
 
   return (
     <section className="workspace-bootstrap" data-help-id={studioWorkspaceDescriptor.helpId}>
       <p className="development-kicker">{studioT('studio.bootstrap.m03Kicker')}</p>
-      <h1 id="development-title">{studioT('studio.bootstrap.title')}</h1>
+      <div className="flex items-center gap-2">
+        <h1 id="development-title">{studioT('studio.bootstrap.title')}</h1>
+        <HelpTrigger helpId={helpId} />
+      </div>
       <p className="development-summary">{studioT('studio.bootstrap.foundationSummary')}</p>
 
       <div className="development-status" data-state={health.state}>
