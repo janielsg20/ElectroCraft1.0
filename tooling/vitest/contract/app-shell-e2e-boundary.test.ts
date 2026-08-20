@@ -24,10 +24,13 @@ describe('M03.12 AppShell QA boundary', () => {
   it('keeps StudioAppearanceProfile outside canonical project Theme and ExportIR', () => {
     const provider = read('apps/studio/src/theme-provider.tsx');
     const theme = read('apps/studio/src/theme.ts');
-    expect(provider).toContain('electrocraft.studio.appearance.v1');
+    expect(theme).toContain("EDITOR_APPEARANCE_STORAGE_KEY = 'electrocraft.studio.appearance.v1'");
     expect(provider).not.toContain('ElectroCraftDocument');
     expect(provider).not.toContain('ExportIR');
     expect(provider).not.toContain('source.theme');
+    expect(theme).not.toContain('ElectroCraftDocument');
+    expect(theme).not.toContain('ExportIR');
+    expect(theme).not.toContain('source.theme');
     expect(theme).not.toContain('@electrocraft/export-ir');
   });
 
