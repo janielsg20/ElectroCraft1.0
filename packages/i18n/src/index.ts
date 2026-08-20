@@ -34,7 +34,7 @@ export function initializeElectroCraftI18n(): Promise<i18n> {
       keySeparator: false,
       returnNull: false,
       interpolation: { escapeValue: false },
-      initImmediate: false,
+      initAsync: false,
     })
     .then(() => electroCraftI18n);
 
@@ -61,7 +61,9 @@ export function translateStrict<Namespace extends ElectroCraftNamespace>(
   const resource = resourcesEs[namespace] as Readonly<Record<string, string>>;
   if (!(key in resource)) throw new MissingTranslationError(namespace, key);
   if (!electroCraftI18n.isInitialized) return resource[key] ?? '';
-  return String(electroCraftI18n.t(key, { ...options, ns: namespace }));
+
+  const fixedT = electroCraftI18n.getFixedT(DEFAULT_LOCALE, namespace);
+  return String(fixedT(key as never, options as never));
 }
 
 export function useElectroCraftTranslation<Namespace extends ElectroCraftNamespace>(namespace: Namespace) {
