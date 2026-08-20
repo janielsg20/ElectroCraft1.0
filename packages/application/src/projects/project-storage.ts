@@ -9,6 +9,20 @@ export const PROJECT_STORAGE_SCHEMA_VERSION = 1 as const;
 
 export type ProjectStorageBackend = 'opfs-ahp' | 'indexeddb' | 'memory';
 export type ProjectStorageState = 'initial' | 'loading' | 'ready' | 'saving' | 'saved' | 'error' | 'blocked';
+export type ProjectStorageLifecyclePhase =
+  | 'idle'
+  | 'bootstrap'
+  | 'migrations'
+  | 'health-check'
+  | 'ready'
+  | 'leader-handoff';
+export type ProjectStorageCoordinationRole = 'leader' | 'follower' | 'unknown';
+
+export interface ProjectStorageCoordinationDiagnostics {
+  readonly mode: 'multi-tab';
+  readonly role: ProjectStorageCoordinationRole;
+  readonly leaderChanges: number;
+}
 
 export interface ProjectStorageDiagnostics {
   readonly state: ProjectStorageState;
@@ -21,6 +35,8 @@ export interface ProjectStorageDiagnostics {
   readonly repairSupported: boolean;
   readonly message: string;
   readonly fallbackReason?: string;
+  readonly lifecyclePhase?: ProjectStorageLifecyclePhase;
+  readonly coordination?: ProjectStorageCoordinationDiagnostics;
 }
 
 export interface StoredProjectDefinition {
