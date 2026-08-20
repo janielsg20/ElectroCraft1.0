@@ -1,0 +1,11 @@
+{
+  "settings.title": "Configuración",
+  "settings.general.title": "Configuración general",
+  "settings.language.label": "Idioma",
+  "settings.language.spanish": "Español",
+  "settings.language.description": "Idioma de la interfaz del Studio.",
+  "settings.language.saved": "Idioma guardado",
+  "settings.language.save": "Guardar",
+  "settings.language.cancel": "Cancelar",
+  "settings.language.moreInfo": "Más información"
+}

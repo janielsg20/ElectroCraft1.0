@@ -7,6 +7,8 @@ import {
   getStudioIcon,
 } from '@electrocraft/design-system';
 import type { ReactNode } from 'react';
+import { HelpTrigger } from '../help/help-ui';
+import { getHelpIdForNavigationItem, type StudioHelpId } from '../help/help-registry';
 import { iaT } from '../i18n/information-architecture.es';
 import {
   getEmptyState,
@@ -18,6 +20,20 @@ import { getStudioSidebarNavigationItem, resolveSidebarActiveItem } from './side
 
 const DisclosureIcon = getStudioIcon('navigation.chevron-down');
 const EmptyIcon = getStudioIcon('studio.help');
+
+const emptyStateHelpIds: Readonly<Record<EmptyStateDescriptor['id'], StudioHelpId>> = Object.freeze({
+  'project-home': 'help.studio.shell',
+  canvas: 'help.section.editor',
+  outline: 'help.section.editor',
+  inspector: 'help.section.editor',
+  content: 'help.section.records',
+  'content-detail': 'help.section.records',
+  queries: 'help.section.queries',
+  forms: 'help.section.forms',
+  administration: 'help.section.admin',
+  media: 'help.section.media',
+  export: 'help.section.export',
+});
 
 export interface ProgressiveDisclosureProps {
   readonly id: string;
@@ -69,6 +85,7 @@ export function StudioEmptyState({
       icon={<EmptyIcon aria-hidden="true" />}
       title={iaT(descriptor.titleKey)}
       description={iaT(descriptor.descriptionKey)}
+      action={<HelpTrigger helpId={emptyStateHelpIds[id]} labelKey="help.whatCanIDo" showLabel className="px-0" />}
     />
   );
 }
@@ -81,7 +98,10 @@ export function StudioContentListDetailRoute() {
           <p className="ec-ia-route-kicker">
             {iaT('studio.ia.listDetail.listLabel')} / {iaT('studio.ia.listDetail.detailLabel')}
           </p>
-          <h1 id="content-route-title">{iaT('studio.ia.content.title')}</h1>
+          <div className="flex items-center gap-2">
+            <h1 id="content-route-title">{iaT('studio.ia.content.title')}</h1>
+            <HelpTrigger helpId="help.section.records" />
+          </div>
         </div>
       </header>
       <div className="ec-ia-list-detail" data-list-detail-pattern>
@@ -108,18 +128,18 @@ export function StudioModuleEmptyStateRoute({ pathname }: { readonly pathname: s
   const activeItemId = resolveSidebarActiveItem(pathname);
   if (!activeItemId) return null;
   const navigationItem = getStudioSidebarNavigationItem(activeItemId);
+  const helpId = getHelpIdForNavigationItem(activeItemId);
 
   return (
     <section className="ec-ia-route" aria-labelledby="module-empty-title" data-ia-route="module-empty-state">
       <header className="ec-ia-route-header">
-        <h1 id="module-empty-title">{navigationItem.label}</h1>
+        <div className="flex items-center gap-2">
+          <h1 id="module-empty-title">{navigationItem.label}</h1>
+          <HelpTrigger helpId={helpId} />
+        </div>
       </header>
       <div className="ec-ia-module-empty" data-information-level="primary">
-        <EmptyState
-          icon={<EmptyIcon aria-hidden="true" />}
-          title={iaT(descriptor.titleKey)}
-          description={iaT(descriptor.descriptionKey)}
-        />
+        <StudioEmptyState id={descriptor.id} />
       </div>
     </section>
   );

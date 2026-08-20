@@ -1,5 +1,5 @@
 import type { StudioIconId } from '@electrocraft/design-system';
-import { studioT } from '../i18n/studio-shell.es';
+import { translateStrict, type ElectroCraftResourceKey } from '@electrocraft/i18n';
 
 export interface SidebarNavigationItem {
   readonly id: string;
@@ -14,33 +14,36 @@ export interface SidebarNavigationGroup {
   readonly items: readonly SidebarNavigationItem[];
 }
 
+type NavigationKey = ElectroCraftResourceKey<'navigation'>;
+const navigationT = (key: NavigationKey) => translateStrict('navigation', key);
+
 const navigation = [
   {
     id: 'build',
-    label: studioT('studio.sidebar.group.build'),
+    label: navigationT('studio.sidebar.group.build'),
     items: [
-      { id: 'editor', label: studioT('studio.sidebar.item.editor'), href: '/', iconId: 'studio.sidebar.editor' },
+      { id: 'editor', label: navigationT('studio.sidebar.item.editor'), href: '/', iconId: 'studio.sidebar.editor' },
       {
         id: 'screens',
-        label: studioT('studio.sidebar.item.screens'),
+        label: navigationT('studio.sidebar.item.screens'),
         href: '/screens',
         iconId: 'studio.sidebar.screens',
       },
       {
         id: 'components',
-        label: studioT('studio.sidebar.item.components'),
+        label: navigationT('studio.sidebar.item.components'),
         href: '/components',
         iconId: 'studio.sidebar.components',
       },
       {
         id: 'templates',
-        label: studioT('studio.sidebar.item.templates'),
+        label: navigationT('studio.sidebar.item.templates'),
         href: '/templates',
         iconId: 'studio.sidebar.templates',
       },
       {
         id: 'ai-generate',
-        label: studioT('studio.sidebar.item.aiGenerate'),
+        label: navigationT('studio.sidebar.item.aiGenerate'),
         href: '/ai',
         iconId: 'studio.sidebar.aiGenerate',
       },
@@ -48,24 +51,29 @@ const navigation = [
   },
   {
     id: 'data',
-    label: studioT('studio.sidebar.group.data'),
+    label: navigationT('studio.sidebar.group.data'),
     items: [
       {
         id: 'records',
-        label: studioT('studio.sidebar.item.records'),
+        label: navigationT('studio.sidebar.item.records'),
         href: '/content',
         iconId: 'studio.sidebar.records',
       },
-      { id: 'models', label: studioT('studio.sidebar.item.models'), href: '/models', iconId: 'studio.sidebar.models' },
+      {
+        id: 'models',
+        label: navigationT('studio.sidebar.item.models'),
+        href: '/models',
+        iconId: 'studio.sidebar.models',
+      },
       {
         id: 'data-sources',
-        label: studioT('studio.sidebar.item.dataSources'),
+        label: navigationT('studio.sidebar.item.dataSources'),
         href: '/data-sources',
         iconId: 'studio.sidebar.dataSources',
       },
       {
         id: 'queries',
-        label: studioT('studio.sidebar.item.queries'),
+        label: navigationT('studio.sidebar.item.queries'),
         href: '/queries',
         iconId: 'studio.sidebar.queries',
       },
@@ -73,40 +81,65 @@ const navigation = [
   },
   {
     id: 'logic',
-    label: studioT('studio.sidebar.group.logic'),
+    label: navigationT('studio.sidebar.group.logic'),
     items: [
       {
         id: 'workflows',
-        label: studioT('studio.sidebar.item.workflows'),
+        label: navigationT('studio.sidebar.item.workflows'),
         href: '/workflows',
         iconId: 'studio.sidebar.workflows',
       },
-      { id: 'state', label: studioT('studio.sidebar.item.state'), href: '/state', iconId: 'studio.sidebar.state' },
-      { id: 'forms', label: studioT('studio.sidebar.item.forms'), href: '/forms', iconId: 'studio.sidebar.forms' },
+      {
+        id: 'state',
+        label: navigationT('studio.sidebar.item.state'),
+        href: '/state',
+        iconId: 'studio.sidebar.state',
+      },
+      {
+        id: 'forms',
+        label: navigationT('studio.sidebar.item.forms'),
+        href: '/forms',
+        iconId: 'studio.sidebar.forms',
+      },
     ],
   },
   {
     id: 'app',
-    label: studioT('studio.sidebar.group.app'),
+    label: navigationT('studio.sidebar.group.app'),
     items: [
       {
         id: 'navigation',
-        label: studioT('studio.sidebar.item.navigation'),
+        label: navigationT('studio.sidebar.item.navigation'),
         href: '/navigation',
         iconId: 'studio.sidebar.navigation',
       },
-      { id: 'users', label: studioT('studio.sidebar.item.users'), href: '/users', iconId: 'studio.sidebar.users' },
-      { id: 'admin', label: studioT('studio.sidebar.item.admin'), href: '/admin', iconId: 'studio.sidebar.admin' },
+      {
+        id: 'users',
+        label: navigationT('studio.sidebar.item.users'),
+        href: '/users',
+        iconId: 'studio.sidebar.users',
+      },
+      {
+        id: 'admin',
+        label: navigationT('studio.sidebar.item.admin'),
+        href: '/admin',
+        iconId: 'studio.sidebar.admin',
+      },
     ],
   },
   {
     id: 'resources',
-    label: studioT('studio.sidebar.group.resources'),
+    label: navigationT('studio.sidebar.group.resources'),
     items: [
-      { id: 'media', label: studioT('studio.sidebar.item.media'), href: '/media', iconId: 'studio.sidebar.media' },
+      {
+        id: 'media',
+        label: navigationT('studio.sidebar.item.media'),
+        href: '/media',
+        iconId: 'studio.sidebar.media',
+      },
       {
         id: 'extensions',
-        label: studioT('studio.sidebar.item.extensions'),
+        label: navigationT('studio.sidebar.item.extensions'),
         href: '/extensions',
         iconId: 'studio.sidebar.extensions',
       },
@@ -114,36 +147,56 @@ const navigation = [
   },
   {
     id: 'appearance',
-    label: studioT('studio.sidebar.group.appearance'),
+    label: navigationT('studio.sidebar.group.appearance'),
     items: [
-      { id: 'themes', label: studioT('studio.sidebar.item.themes'), href: '/themes', iconId: 'studio.sidebar.themes' },
+      {
+        id: 'themes',
+        label: navigationT('studio.sidebar.item.themes'),
+        href: '/themes',
+        iconId: 'studio.sidebar.themes',
+      },
       {
         id: 'design-system',
-        label: studioT('studio.sidebar.item.designSystem'),
+        label: navigationT('studio.sidebar.item.designSystem'),
         href: '/__design-system',
         iconId: 'studio.sidebar.designSystem',
       },
-      { id: 'tokens', label: studioT('studio.sidebar.item.tokens'), href: '/tokens', iconId: 'studio.sidebar.tokens' },
+      {
+        id: 'tokens',
+        label: navigationT('studio.sidebar.item.tokens'),
+        href: '/tokens',
+        iconId: 'studio.sidebar.tokens',
+      },
     ],
   },
   {
     id: 'publish',
-    label: studioT('studio.sidebar.group.publish'),
+    label: navigationT('studio.sidebar.group.publish'),
     items: [
       {
         id: 'preview',
-        label: studioT('studio.sidebar.item.preview'),
+        label: navigationT('studio.sidebar.item.preview'),
         href: '/preview',
         iconId: 'studio.sidebar.preview',
       },
       {
         id: 'compatibility',
-        label: studioT('studio.sidebar.item.compatibility'),
+        label: navigationT('studio.sidebar.item.compatibility'),
         href: '/compatibility',
         iconId: 'studio.sidebar.compatibility',
       },
-      { id: 'export', label: studioT('studio.sidebar.item.export'), href: '/export', iconId: 'studio.sidebar.export' },
-      { id: 'deploy', label: studioT('studio.sidebar.item.deploy'), href: '/deploy', iconId: 'studio.sidebar.deploy' },
+      {
+        id: 'export',
+        label: navigationT('studio.sidebar.item.export'),
+        href: '/export',
+        iconId: 'studio.sidebar.export',
+      },
+      {
+        id: 'deploy',
+        label: navigationT('studio.sidebar.item.deploy'),
+        href: '/deploy',
+        iconId: 'studio.sidebar.deploy',
+      },
     ],
   },
 ] as const satisfies readonly SidebarNavigationGroup[];

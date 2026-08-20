@@ -90,7 +90,7 @@ jobs:
       - name: Verify M02.5 canonical boundary engine
         run: |
           node -e "const p=require('./node_modules/zod/package.json'); if(p.version!=='4.4.3') throw new Error('expected zod@4.4.3, got '+p.version); console.log('zod@'+p.version)"
-          node -e "const p=require('./tooling/package-boundaries.json'); if(Object.keys(p.packages).length!==17) throw new Error('F01 owner package count drift'); if(p.packages['@electrocraft/contracts']) throw new Error('parallel contracts package detected'); console.log('ownerPackages='+Object.keys(p.packages).length)"
+          node -e "const p=require('./tooling/package-boundaries.json'); const expected=p.invariants.expectedStablePackageCount; const actual=Object.keys(p.packages).length; if(actual!==expected) throw new Error('owner package count drift: expected '+expected+', got '+actual); if(p.packages['@electrocraft/contracts']) throw new Error('parallel contracts package detected'); console.log('ownerPackages='+actual)"
 
       - name: Execute M02.5 tests with generated evidence
         run: |

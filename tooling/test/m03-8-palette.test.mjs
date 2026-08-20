@@ -85,10 +85,16 @@ test('Unsupported insertion remains a visible diagnostic', () => {
   assert.equal(panel.includes('diagnostic.action'), true);
 });
 
-test('M03.8 continuity is active or advances only after GREEN closure', () => {
+test('M03.8 continuity remains GREEN before later F03 microphases advance', () => {
   const state = read('.ai/STATE.md');
   const active = /M03\.8[^\n]*ACTIVE/.test(state);
   const closed = /M03\.8[^\n]*COMPLETADA[^\n]*GREEN/.test(state);
-  if (closed) assert.match(state, /M03\.9[^\n]*ACTIVE/);
-  assert.equal(active || closed, true, 'M03.8 must remain ACTIVE or close GREEN before M03.9 becomes ACTIVE');
+  if (closed) {
+    assert.match(
+      state,
+      /M03\.9[^\n]*(?:ACTIVE|COMPLETADA[^\n]*GREEN)/,
+      'M03.9 must have become ACTIVE or closed GREEN before F03 advances beyond M03.8',
+    );
+  }
+  assert.equal(active || closed, true, 'M03.8 must remain ACTIVE or close GREEN before later F03 microphases advance');
 });

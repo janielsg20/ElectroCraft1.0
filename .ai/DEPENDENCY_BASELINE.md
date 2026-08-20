@@ -1,5 +1,5 @@
 # DEPENDENCY BASELINE — ElectroCraft Eighth Final
-Review date: 2026-08-17 (M00.2).
+Review date: 2026-08-17 (M00.2); i18n owner reverified 2026-08-19 (M03.10).
 
 Versions are reverified immediately before product installation. M00.2 freezes responsibility/stability lanes; the owning implementation/POC phase pins the final workspace versions.
 
@@ -7,7 +7,13 @@ Versions are reverified immediately before product installation. M00.2 freezes r
 React 19 / Vite / Tailwind 4 compatible stack.
 shadcn/ui uses explicit `radix` base. Since July 2026 Base UI is the default for new shadcn projects, ElectroCraft must never rely on the implicit default: initialize with `shadcn init --base radix` (or equivalent current CLI flag). React Aria is also a supported upstream base, but it is not ElectroCraft Core unless a future ADR changes the base.
 Lucide.
-i18next/react-i18next with typed resources and mandatory Spanish fallback.
+
+M03.10 i18n owner exact workspace pins:
+- `i18next@26.3.6`;
+- `react-i18next@17.0.11`;
+- `i18next-cli@1.69.0`.
+
+The runtime is consumed only through `@electrocraft/i18n`; Spanish is the initial/fallback locale and `locales/es/*.json` is the catalog source of truth for migrated surfaces. i18next CLI owns translation lint/tooling while TypeScript `CustomTypeOptions` plus ElectroCraft strict-key wrappers enforce compile/runtime key contracts.
 
 AI Elements: install only named components required by AI Workbench. Never install the whole registry or graph/canvas pieces just because they exist.
 
@@ -85,4 +91,4 @@ Package observations captured during the 2026-08-17 audit include:
 - Drizzle ORM 0.45.2 stable observed release;
 - Zod 4.4.3 latest observed release.
 
-These observations are audit evidence, not a substitute for the owning phase workspace lockfile.
+These observations are audit evidence, not a substitute for the owning phase workspace lockfile. M03.10 is the owning implementation for the i18n lane and therefore supersedes the earlier unpinned i18n observation with the exact lockfile pins listed above.

@@ -3,43 +3,17 @@
   "packageVersion": "0.0.0-m01.3",
   "packages": {
     "@electrocraft/domain": [],
-    "@electrocraft/application": [
-      "@electrocraft/domain"
-    ],
-    "@electrocraft/design-system": [
-      "@electrocraft/domain"
-    ],
-    "@electrocraft/editor-puck": [
-      "@electrocraft/domain",
-      "@electrocraft/application"
-    ],
-    "@electrocraft/data-core": [
-      "@electrocraft/domain",
-      "@electrocraft/application"
-    ],
-    "@electrocraft/query-rqb": [
-      "@electrocraft/domain",
-      "@electrocraft/application",
-      "@electrocraft/data-core"
-    ],
-    "@electrocraft/media-tiptap": [
-      "@electrocraft/domain"
-    ],
-    "@electrocraft/state-zustand": [
-      "@electrocraft/domain"
-    ],
-    "@electrocraft/auth-core": [
-      "@electrocraft/domain",
-      "@electrocraft/application"
-    ],
-    "@electrocraft/workflow-rete": [
-      "@electrocraft/domain",
-      "@electrocraft/application"
-    ],
-    "@electrocraft/forms": [
-      "@electrocraft/domain",
-      "@electrocraft/application"
-    ],
+    "@electrocraft/application": ["@electrocraft/domain"],
+    "@electrocraft/design-system": ["@electrocraft/domain"],
+    "@electrocraft/i18n": [],
+    "@electrocraft/editor-puck": ["@electrocraft/domain", "@electrocraft/application"],
+    "@electrocraft/data-core": ["@electrocraft/domain", "@electrocraft/application"],
+    "@electrocraft/query-rqb": ["@electrocraft/domain", "@electrocraft/application", "@electrocraft/data-core"],
+    "@electrocraft/media-tiptap": ["@electrocraft/domain"],
+    "@electrocraft/state-zustand": ["@electrocraft/domain"],
+    "@electrocraft/auth-core": ["@electrocraft/domain", "@electrocraft/application"],
+    "@electrocraft/workflow-rete": ["@electrocraft/domain", "@electrocraft/application"],
+    "@electrocraft/forms": ["@electrocraft/domain", "@electrocraft/application"],
     "@electrocraft/admin-refine": [
       "@electrocraft/domain",
       "@electrocraft/application",
@@ -65,24 +39,16 @@
       "@electrocraft/auth-core",
       "@electrocraft/forms"
     ],
-    "@electrocraft/export-ir": [
-      "@electrocraft/domain"
-    ],
-    "@electrocraft/exporters": [
-      "@electrocraft/domain",
-      "@electrocraft/application",
-      "@electrocraft/export-ir"
-    ],
-    "@electrocraft/testing": [
-      "@electrocraft/domain",
-      "@electrocraft/export-ir"
-    ]
+    "@electrocraft/export-ir": ["@electrocraft/domain"],
+    "@electrocraft/exporters": ["@electrocraft/domain", "@electrocraft/application", "@electrocraft/export-ir"],
+    "@electrocraft/testing": ["@electrocraft/domain", "@electrocraft/export-ir"]
   },
   "apps": {
     "@electrocraft/studio": [
       "@electrocraft/domain",
       "@electrocraft/application",
       "@electrocraft/design-system",
+      "@electrocraft/i18n",
       "@electrocraft/editor-puck",
       "@electrocraft/data-core",
       "@electrocraft/query-rqb",
@@ -104,7 +70,11 @@
       "@electrocraft/testing"
     ]
   },
+  "ownedResourceRoots": {
+    "@electrocraft/i18n": ["locales/es"]
+  },
   "invariants": {
+    "expectedStablePackageCount": 18,
     "domainForbiddenImports": [
       "react",
       "@puckeditor/core",
@@ -133,14 +103,13 @@
     ],
     "forbidDeepPackageImports": true,
     "forbidCrossPackageRelativeImports": true,
-    "applicationAllowedPackages": [
-      "@electrocraft/domain"
-    ]
+    "applicationAllowedPackages": ["@electrocraft/domain"]
   },
   "publicAliases": {
     "@electrocraft/domain": "packages/domain/src/index.ts",
     "@electrocraft/application": "packages/application/src/index.ts",
     "@electrocraft/design-system": "packages/design-system/src/index.ts",
+    "@electrocraft/i18n": "packages/i18n/src/index.ts",
     "@electrocraft/editor-puck": "packages/editor-puck/src/index.ts",
     "@electrocraft/data-core": "packages/data-core/src/index.ts",
     "@electrocraft/query-rqb": "packages/query-rqb/src/index.ts",

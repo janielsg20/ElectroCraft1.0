@@ -81,7 +81,7 @@ jobs:
 
       - name: Verify F02 ownership and closure preconditions
         run: |
-          node -e "const p=require('./tooling/package-boundaries.json'); if(Object.keys(p.packages).length!==17) throw new Error('expected exactly 17 owner packages'); console.log('ownerPackages=17')"
+          node -e "const p=require('./tooling/package-boundaries.json'); const expected=p.invariants.expectedStablePackageCount; const actual=Object.keys(p.packages).length; if(actual!==expected) throw new Error('owner package count drift: expected '+expected+', got '+actual); console.log('ownerPackages='+actual)"
           test ! -d packages/contracts
           grep -q 'F02.*COMPLETADA' .ai/STATE.md
           grep -q 'M02.1–M02.9.*COMPLETADAS' .ai/STATE.md

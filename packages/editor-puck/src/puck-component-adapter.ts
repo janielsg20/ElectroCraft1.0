@@ -7,9 +7,25 @@ export type PuckCanonicalRenderer = PuckCanonicalComponentConfig['render'];
 export type PuckRendererRegistry = Readonly<Record<string, PuckCanonicalRenderer>>;
 export type PuckCanonicalConfig = Config;
 
-function toPuckField(field: ElectroCraftComponentField): Field {
+export interface PuckLabelResolver {
+  readonly component: (definition: ElectroCraftComponentDefinition) => string;
+  readonly field: (definition: ElectroCraftComponentDefinition, field: ElectroCraftComponentField) => string;
+  readonly booleanOption: (value: boolean) => string;
+}
+
+const fallbackPuckLabelResolver: PuckLabelResolver = Object.freeze({
+  component: (definition: ElectroCraftComponentDefinition) => definition.label,
+  field: (_definition: ElectroCraftComponentDefinition, field: ElectroCraftComponentField) => field.label,
+  booleanOption: (value: boolean) => (value ? 'Sí' : 'No'),
+});
+
+function toPuckField(
+  definition: ElectroCraftComponentDefinition,
+  field: ElectroCraftComponentField,
+  labels: PuckLabelResolver,
+): Field {
   const base = {
-    label: field.label,
+    label: labels.field(definition, field),
     metadata: {
       electrocraftRequired: field.required,
     },
@@ -25,8 +41,8 @@ function toPuckField(field: ElectroCraftComponentField): Field {
         ...base,
         type: 'radio',
         options: [
-          { label: 'Sí', value: true },
-          { label: 'No', value: false },
+          { label: labels.booleanOption(true), value: true },
+          { label: labels.booleanOption(false), value: false },
         ],
       };
     case 'select':
@@ -41,14 +57,15 @@ function toPuckField(field: ElectroCraftComponentField): Field {
 export function createPuckComponentConfig(
   definition: ElectroCraftComponentDefinition,
   renderer: PuckCanonicalRenderer,
+  labels: PuckLabelResolver = fallbackPuckLabelResolver,
 ): PuckCanonicalComponentConfig {
   const fields: Record<string, Field> = {};
   for (const field of definition.fields) {
-    fields[field.key] = toPuckField(field);
+    fields[field.key] = toPuckField(definition, field, labels);
   }
 
   return {
-    label: definition.label,
+    label: labels.component(definition),
     fields,
     defaultProps: definition.defaultProps,
     metadata: {
@@ -64,6 +81,7 @@ export function createPuckComponentConfig(
 export function createPuckConfig(
   definitions: readonly ElectroCraftComponentDefinition[],
   renderers: PuckRendererRegistry,
+  labels: PuckLabelResolver = fallbackPuckLabelResolver,
 ): PuckCanonicalConfig {
   const components: PuckCanonicalConfig['components'] = {};
   const seen = new Set<string>();
@@ -79,7 +97,7 @@ export function createPuckConfig(
       throw new TypeError(`missing Puck renderer for component key: ${definition.key}`);
     }
 
-    components[definition.key] = createPuckComponentConfig(definition, renderer);
+    components[definition.key] = createPuckComponentConfig(definition, renderer, labels);
   }
 
   return { components };

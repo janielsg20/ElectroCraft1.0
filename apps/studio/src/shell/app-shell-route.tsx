@@ -1,8 +1,8 @@
 import type { DesignSystemPackageDescriptor } from '@electrocraft/design-system';
+import { translateStrict, type ElectroCraftResourceKey } from '@electrocraft/i18n';
 import type { ReactNode } from 'react';
 import { getStudioHelpDescriptor } from '../help/help-registry';
 import { iaT } from '../i18n/information-architecture.es';
-import { studioT } from '../i18n/studio-shell.es';
 import { StudioAppearanceProvider } from '../theme-provider';
 import { AppShell, type AppShellCopy, type AppShellStatus } from './app-shell';
 import { resolveSidebarActiveItem, studioSidebarNavigation } from './sidebar-navigation';
@@ -11,69 +11,72 @@ import { createMemoryWorkspacePreferencesPort } from './workspace-preferences';
 
 export const studioDesignSystemOwner: DesignSystemPackageDescriptor['name'] = '@electrocraft/design-system';
 
+type CommonKey = ElectroCraftResourceKey<'common'>;
+const commonT = (key: CommonKey) => translateStrict('common', key);
+
 const appShellCopy: AppShellCopy = Object.freeze({
-  title: studioT('studio.appShell.title'),
-  sidebarLabel: studioT('studio.appShell.sidebarLabel'),
-  navigationLabel: studioT('studio.appShell.navigationLabel'),
-  menuLabel: studioT('studio.appShell.menuLabel'),
-  menuTitle: studioT('studio.appShell.menuTitle'),
-  menuDescription: studioT('studio.appShell.menuDescription'),
-  closeMenuLabel: studioT('studio.appShell.closeMenuLabel'),
-  collapseSidebarLabel: studioT('studio.appShell.collapseSidebarLabel'),
-  expandSidebarLabel: studioT('studio.appShell.expandSidebarLabel'),
-  workspaceLabel: studioT('studio.appShell.workspaceLabel'),
-  emptyWorkspace: studioT('studio.appShell.emptyWorkspace'),
-  statusLabel: studioT('studio.appShell.statusLabel'),
+  title: commonT('studio.appShell.title'),
+  sidebarLabel: commonT('studio.appShell.sidebarLabel'),
+  navigationLabel: commonT('studio.appShell.navigationLabel'),
+  menuLabel: commonT('studio.appShell.menuLabel'),
+  menuTitle: commonT('studio.appShell.menuTitle'),
+  menuDescription: commonT('studio.appShell.menuDescription'),
+  closeMenuLabel: commonT('studio.appShell.closeMenuLabel'),
+  collapseSidebarLabel: commonT('studio.appShell.collapseSidebarLabel'),
+  expandSidebarLabel: commonT('studio.appShell.expandSidebarLabel'),
+  workspaceLabel: commonT('studio.appShell.workspaceLabel'),
+  emptyWorkspace: commonT('studio.appShell.emptyWorkspace'),
+  statusLabel: commonT('studio.appShell.statusLabel'),
   statusLabels: Object.freeze({
-    ready: studioT('studio.appShell.status.ready'),
-    saving: studioT('studio.appShell.status.saving'),
-    error: studioT('studio.appShell.status.error'),
-    blocked: studioT('studio.appShell.status.blocked'),
+    ready: commonT('studio.appShell.status.ready'),
+    saving: commonT('studio.appShell.status.saving'),
+    error: commonT('studio.appShell.status.error'),
+    blocked: commonT('studio.appShell.status.blocked'),
   }),
 });
 
 const topbarCopy: StudioTopbarCopy = Object.freeze({
-  breadcrumbRoot: studioT('studio.topbar.breadcrumbRoot'),
-  projectLabel: studioT('studio.topbar.projectLabel'),
+  breadcrumbRoot: commonT('studio.topbar.breadcrumbRoot'),
+  projectLabel: commonT('studio.topbar.projectLabel'),
   saveLabels: Object.freeze({
-    ready: studioT('studio.topbar.save.ready'),
-    saving: studioT('studio.topbar.save.saving'),
-    error: studioT('studio.topbar.save.error'),
-    blocked: studioT('studio.topbar.save.blocked'),
+    ready: commonT('studio.topbar.save.ready'),
+    saving: commonT('studio.topbar.save.saving'),
+    error: commonT('studio.topbar.save.error'),
+    blocked: commonT('studio.topbar.save.blocked'),
   }),
-  documentLabel: studioT('studio.topbar.documentLabel'),
-  platformLabel: studioT('studio.topbar.platformLabel'),
-  platformValue: studioT('studio.topbar.platformValue'),
-  breakpointLabel: studioT('studio.topbar.breakpointLabel'),
+  documentLabel: commonT('studio.topbar.documentLabel'),
+  platformLabel: commonT('studio.topbar.platformLabel'),
+  platformValue: commonT('studio.topbar.platformValue'),
+  breakpointLabel: commonT('studio.topbar.breakpointLabel'),
   breakpointLabels: Object.freeze({
-    mobile: studioT('studio.topbar.breakpoint.mobile'),
-    tablet: studioT('studio.topbar.breakpoint.tablet'),
-    laptop: studioT('studio.topbar.breakpoint.laptop'),
-    desktop: studioT('studio.topbar.breakpoint.desktop'),
+    mobile: commonT('studio.topbar.breakpoint.mobile'),
+    tablet: commonT('studio.topbar.breakpoint.tablet'),
+    laptop: commonT('studio.topbar.breakpoint.laptop'),
+    desktop: commonT('studio.topbar.breakpoint.desktop'),
   }),
-  undoLabel: studioT('studio.topbar.undoLabel'),
-  redoLabel: studioT('studio.topbar.redoLabel'),
-  historyUnavailable: studioT('studio.topbar.historyUnavailable'),
-  zoomLabel: studioT('studio.topbar.zoomLabel'),
-  toolsLabel: studioT('studio.topbar.toolsLabel'),
-  toolsTitle: studioT('studio.topbar.toolsTitle'),
-  toolsDescription: studioT('studio.topbar.toolsDescription'),
-  previewLabel: studioT('studio.topbar.previewLabel'),
-  exportLabel: studioT('studio.topbar.exportLabel'),
-  localLabel: studioT('studio.topbar.localLabel'),
-  helpLabel: studioT('studio.topbar.helpLabel'),
-  helpDescription: studioT('studio.topbar.helpDescription'),
-  closeHelpLabel: studioT('studio.topbar.closeHelpLabel'),
-  settingsLabel: studioT('studio.topbar.settingsLabel'),
-  settingsTitle: studioT('studio.topbar.settingsTitle'),
-  settingsDescription: studioT('studio.topbar.settingsDescription'),
-  closeSettingsLabel: studioT('studio.topbar.closeSettingsLabel'),
-  workspaceSettingsTitle: studioT('studio.topbar.workspaceSettingsTitle'),
-  sidebarPreferenceLabel: studioT('studio.topbar.sidebarPreferenceLabel'),
-  sidebarExpandedLabel: studioT('studio.topbar.sidebarExpandedLabel'),
-  sidebarCollapsedLabel: studioT('studio.topbar.sidebarCollapsedLabel'),
-  collapseSidebarAction: studioT('studio.topbar.collapseSidebarAction'),
-  expandSidebarAction: studioT('studio.topbar.expandSidebarAction'),
+  undoLabel: commonT('studio.topbar.undoLabel'),
+  redoLabel: commonT('studio.topbar.redoLabel'),
+  historyUnavailable: commonT('studio.topbar.historyUnavailable'),
+  zoomLabel: commonT('studio.topbar.zoomLabel'),
+  toolsLabel: commonT('studio.topbar.toolsLabel'),
+  toolsTitle: commonT('studio.topbar.toolsTitle'),
+  toolsDescription: commonT('studio.topbar.toolsDescription'),
+  previewLabel: commonT('studio.topbar.previewLabel'),
+  exportLabel: commonT('studio.topbar.exportLabel'),
+  localLabel: commonT('studio.topbar.localLabel'),
+  helpLabel: commonT('studio.topbar.helpLabel'),
+  helpDescription: commonT('studio.topbar.helpDescription'),
+  closeHelpLabel: commonT('studio.topbar.closeHelpLabel'),
+  settingsLabel: commonT('studio.topbar.settingsLabel'),
+  settingsTitle: commonT('studio.topbar.settingsTitle'),
+  settingsDescription: commonT('studio.topbar.settingsDescription'),
+  closeSettingsLabel: commonT('studio.topbar.closeSettingsLabel'),
+  workspaceSettingsTitle: commonT('studio.topbar.workspaceSettingsTitle'),
+  sidebarPreferenceLabel: commonT('studio.topbar.sidebarPreferenceLabel'),
+  sidebarExpandedLabel: commonT('studio.topbar.sidebarExpandedLabel'),
+  sidebarCollapsedLabel: commonT('studio.topbar.sidebarCollapsedLabel'),
+  collapseSidebarAction: commonT('studio.topbar.collapseSidebarAction'),
+  expandSidebarAction: commonT('studio.topbar.expandSidebarAction'),
   settingsAdvancedTitle: iaT('studio.ia.settings.advancedTitle'),
   settingsAdvancedSummary: iaT('studio.ia.settings.advancedSummary'),
   settingsPersistenceLabel: iaT('studio.ia.settings.persistenceLabel'),
@@ -91,7 +94,7 @@ function resolveActiveLabel(activeItemId: ReturnType<typeof resolveSidebarActive
       if (item.id === activeItemId) return item.label;
     }
   }
-  return studioT('studio.topbar.documentFallback');
+  return commonT('studio.topbar.documentFallback');
 }
 
 export function StudioAppShellRoute({

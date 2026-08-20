@@ -14,25 +14,28 @@
 - M03.7 — Aplicar Progressive Disclosure y arquitectura de información: `COMPLETADA`; Gate `GREEN`.
 - M03.8 — Diseñar Palette descubrible sin multiplicar componentes: `COMPLETADA`; Gate `GREEN`.
 - M03.9 — Apariencia del Studio Editor completo: `COMPLETADA`; Gate `GREEN`.
-- M03.10 — Infraestructura español-primero e i18n tipado: `ACTIVE`.
+- M03.10 — Infraestructura español-primero e i18n tipado: `COMPLETADA`; Gate `GREEN`.
+- M03.11 — Sistema de ayuda contextual y explicación de todas las secciones: `COMPLETADA`; Gate `GREEN`.
+- M03.12 — E2E AppShell completo, responsive, estados y accesibilidad: `ACTIVE`.
 - Blockers P0/P1 funcionales conocidos: `0`.
 
-## Cierre M03.9
-M03.9 cerró sobre head `457375512fcc3cc9da056720b86bad0c7233d920` con workflow propietario `M03.9 Editor Appearance Profile Gate`, run `32315742507` success, job `96267423764`, artifact `9388009972` y digest `sha256:d802096889a8ffed4a3806e5bb3bce8e11e570676cdee142afc9ba74a3a3cb5d`.
+## Cierre M03.11
+M03.11 cerró sobre head `afcb2c304332a4a3819ef878cb9d3e3c3e91ea9d` con workflow propietario `M03.11 Contextual Help Gate`, run `32320190802`, job `96280687167`, artifact `9389415829` y digest `sha256:500c49b1ab6c73ceec1ba80324964cc9b5d64b72cb867ec0707ca33edbaec2a8`.
 
-Suite dedicada: unit `8/8`, contract `4/4`, integration `2/2`, Playwright `7/7`. Full gate: Node `37/37`, Vitest `244/244` en 66 archivos, Playwright `52/52`, lint/format, TypeScript strict, boundaries y build GREEN. Base CI `32315742400` GREEN. M01.4 reparado y GREEN en run `32315742430`.
+Suite dedicada `12/12`, browser `5/5` y full repository gate GREEN. Base CI `32320190809` confirmó lint, typecheck, tests, build y Playwright repository gate GREEN sobre el mismo head.
 
 ## Microfase activa
-`M03.10` — Infraestructura español-primero e i18n tipado.
+`M03.12` — E2E AppShell completo, responsive, estados y accesibilidad.
 
-Objetivo: consolidar copy español, namespaces, fallback, tipado estricto, errores/Intl y selector `Configuración > General > Idioma` sobre `i18next + react-i18next`, preservando IDs internos estables y evitando fugas de labels inglesas desde engines OSS.
+Objetivo: cerrar F03 mediante una matriz Playwright semántica en 1440/1280/1024/768/375/320, sin esperas fijas, validando navegación, Settings, Help, Editor, estados, responsive, teclado/foco, ausencia de labels inglesas y aislamiento de StudioAppearanceProfile respecto al documento/Theme/ExportIR.
 
 ## Referencias
-- Spec M03.10: `.ai/microphases/M03_10.md`.
+- Spec M03.12: `.ai/microphases/M03_12.md`.
 - Fase: `.ai/phases/F03.md`.
-- Evidencia M03.9: `.ai/evidence/F03/M03.9/CLOSURE_2026-08-19.md`.
-- I18N spec: `.ai/I18N_SPEC.md`.
+- AppShell canónico: `.ai/APP_SHELL_SPEC.md`.
+- Evidencia M03.11: `.ai/evidence/F03/M03.11/CLOSURE_2026-08-20.md`.
+- Help catalog: `.ai/SECTION_HELP_CATALOG_ES.md`.
 - Tracking: `.ai/TRACKING.md`.
 - Handoff: `.ai/HANDOFF.md`.
 
-No declarar M03.10 completada sin `packages/i18n/`, `locales/es/`, catálogo tipado/fallback, ui-string lint/test, selector real de idioma, HelpDescriptor y evidencia GREEN de lint/typecheck/test/build/E2E.
+No declarar M03.12/F03 completada sin viewport matrix, estados, keyboard/focus, screenshot/trace de fallos, no-English audit, aislamiento de apariencia y gate completo GREEN.

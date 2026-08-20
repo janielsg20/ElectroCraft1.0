@@ -1,0 +1,22 @@
+{
+  "name": "@electrocraft/i18n",
+  "version": "0.0.0-m03.10",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "dependencies": {
+    "i18next": "26.3.6",
+    "react-i18next": "17.0.11"
+  },
+  "devDependencies": {
+    "i18next-cli": "1.69.0"
+  },
+  "peerDependencies": {
+    "react": "^19.2.0"
+  }
+}

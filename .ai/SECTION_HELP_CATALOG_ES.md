@@ -1,122 +1,63 @@
-# CATÁLOGO DE AYUDA — ElectroCraft Eighth Final
+# SECTION HELP CATALOG ES — ElectroCraft
 
-# Construir
+Fecha operativa: 2026-08-20.
 
-## Editor — PanelsTopLeft
-Construye visualmente la pantalla seleccionada con componentes, datos y acciones.
+Este catálogo documenta la ayuda contextual visible del Studio. La navegación canónica es la cerrada por M03.3 y `.ai/APP_SHELL_SPEC.md`; los listados antiguos que mencionen Taxonomías, Relaciones o Roles como destinos superiores no deben reintroducirse.
 
-## Pantallas — Files
-Organiza las vistas de la app y su relación con rutas/navegadores.
+## Reglas
 
-## Componentes — Blocks
-Biblioteca de elementos visuales/reutilizables.
+- Cada destino superior canónico tiene exactamente un `HelpDescriptor` en `studioHelpRegistry`.
+- El copy visible pertenece a `locales/es/help.json`.
+- `HelpTrigger` es la única composición contextual reutilizable: Tooltip + Popover en desktop y Sheet en móvil.
+- El botón global `Ayuda` abre el Help Drawer buscable y permanece inmediatamente antes de Configuración.
+- Los empty states reales enlazan `¿Qué puedo hacer aquí?` al descriptor de su superficie.
+- La ayuda explica propósito, estado y relaciones; nunca inventa datos, registros o capacidades todavía no implementadas.
+- Métricas de ayuda son locales y están desactivadas por defecto.
 
-## Plantillas — LayoutTemplate
-Diseños reutilizables de pantallas, secciones, formularios o Administración.
+## Catálogo canónico
 
-## Generar con IA — Sparkles
-Gemini crea borradores de UI, datos, lógica, Apps y extensiones. La IA no puede aplicar cambios por sí sola.
+| Grupo      | Destino visible      | Route              | Help ID                      |
+| ---------- | -------------------- | ------------------ | ---------------------------- |
+| Construir  | Editor               | `/`                | `help.section.editor`        |
+| Construir  | Pantallas            | `/screens`         | `help.section.screens`       |
+| Construir  | Componentes          | `/components`      | `help.section.components`    |
+| Construir  | Plantillas           | `/templates`       | `help.section.templates`     |
+| Construir  | Generar con IA       | `/ai`              | `help.section.ai-generate`   |
+| Datos      | Registros            | `/content`         | `help.section.records`       |
+| Datos      | Modelos              | `/models`          | `help.section.models`        |
+| Datos      | Fuentes de datos     | `/data-sources`    | `help.section.data-sources`  |
+| Datos      | Consultas            | `/queries`         | `help.section.queries`       |
+| Lógica     | Acciones y workflows | `/workflows`       | `help.section.workflows`     |
+| Lógica     | Estado y variables   | `/state`           | `help.section.state`         |
+| Lógica     | Formularios          | `/forms`           | `help.section.forms`         |
+| App        | Navegación           | `/navigation`      | `help.section.navigation`    |
+| App        | Usuarios y permisos  | `/users`           | `help.section.users`         |
+| App        | Administración       | `/admin`           | `help.section.admin`         |
+| Recursos   | Medios               | `/media`           | `help.section.media`         |
+| Recursos   | Extensiones          | `/extensions`      | `help.section.extensions`    |
+| Apariencia | Temas                | `/themes`          | `help.section.themes`        |
+| Apariencia | Sistema de diseño    | `/__design-system` | `help.section.design-system` |
+| Apariencia | Tokens               | `/tokens`          | `help.section.tokens`        |
+| Publicar   | Vista previa         | `/preview`         | `help.section.preview`       |
+| Publicar   | Compatibilidad       | `/compatibility`   | `help.section.compatibility` |
+| Publicar   | Exportar             | `/export`          | `help.section.export`        |
+| Publicar   | Desplegar            | `/deploy`          | `help.section.deploy`        |
 
-# Datos
+## Descriptores transversales
 
-## Registros — Database
-Gestiona datos internos de modelos.
+- `help.studio.shell` — AppShell, navegación, workspace y preferencias globales.
+- `help.studio.appearance` — apariencia del editor, separada del Theme/ExportIR del proyecto.
+- `help.studio.language` — infraestructura i18n español-primero.
 
-## Modelos — Boxes
-Define campos, relaciones, taxonomías, estados y validación.
+## Búsqueda
 
-## Fuentes de datos — PlugZap
-Conecta datos internos, REST/OpenAPI, GraphQL y connectors instalados.
+El Help Drawer indexa título, resumen, explicación larga, ejemplo, keywords y grupo/sección. La búsqueda es local y no envía telemetría ni contenido a un servicio externo.
 
-## Consultas — ListFilter
-Define cómo leer/filtrar/ordenar/paginar datos desde una fuente.
+## Accesibilidad
 
-# Lógica
-
-## Acciones y workflows — Workflow
-Define disparadores, condiciones y acciones.
-
-## Estado y variables — Variable
-Valores de Screen/App/Session/Persistent/Derived.
-
-## Formularios — ClipboardList
-Captura/edita datos con validación y ActionGraph submit.
-
-# App
-
-## Navegación — Route
-Stack/Tabs/Drawer/Modal, rutas, parámetros, deep links y guards.
-
-## Usuarios y permisos — ShieldCheck
-Roles/capabilities y enforcement.
-
-## Administración — Gauge
-CRUD/dashboards/tables/Kanban/calendar.
-
-# Recursos
-
-## Medios — Images
-Archivos, imágenes y assets.
-
-## Extensiones — Puzzle
-Añade conectores, componentes, plantillas, lógica y otras capacidades. Código generado requiere revisión.
-
-# Apariencia
-
-## Temas — Palette
-Diseño de la app exportada.
-
-## Sistema de diseño — SwatchBook
-Escalas/variantes/reglas.
-
-## Tokens — Braces
-Valores semánticos reutilizables.
-
-# Publicar
-
-## Vista previa — Eye
-Ejecuta runtime real sin chrome del editor.
-
-## Compatibilidad — BadgeCheck
-Analiza cada uno de los nueve targets y explica exact/adapted/warning/blocked.
-
-## Exportar — PackageOpen
-Genera cualquiera de los nueve destinos Core mediante el mismo pipeline de validación y evidencia.
-
-### Proyecto local
-Paquete portable y reimportable.
-
-### React Web
-Código fuente React desplegable.
-
-### Sitio estático
-Salida sin servidor para proyectos compatibles.
-
-### PWA
-Web App instalable/offline según configuración.
-
-### Android
-React Native/Expo para Android.
-
-### iOS
-React Native/Expo para iOS.
-
-### Capacitor
-Web Runtime empaquetado con Capacitor y plugins nativos.
-
-### LAMP
-Aplicación PHP/Slim + MySQL/MariaDB.
-
-### WordPress
-Block Theme + Companion Plugin usando APIs nativas WordPress.
-
-## Desplegar — Rocket
-Integraciones de publicación externas; no cambia el estatus de Exportar.
-
-# Global
-
-## Ayuda — CircleHelp
-Busca explicaciones del Studio.
-
-## Configuración — Settings
-Configura el Studio; siempre es el último control derecho.
+- icon-only: `aria-label="Más información"`;
+- acción de empty state: label visible `¿Qué puedo hacer aquí?`;
+- `Esc` cierra Popover/Sheet y Radix devuelve el foco al trigger;
+- búsqueda con label persistente `Buscar en la ayuda`;
+- desktop mantiene Popover de 360px dentro del rango contractual 320–380px;
+- móvil usa Sheet inferior y no comprime el contenido en un popover estrecho.
