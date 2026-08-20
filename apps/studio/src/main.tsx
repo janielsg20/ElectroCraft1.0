@@ -9,9 +9,9 @@ if (!rootElement) {
   throw new Error('ElectroCraft Studio no encontró el root de montaje.');
 }
 
-async function bootstrapStudio() {
+async function bootstrapStudio(root: HTMLElement) {
   await initializeElectroCraftI18n();
-  createRoot(rootElement).render(
+  createRoot(root).render(
     <StrictMode>
       <ElectroCraftI18nProvider>
         <App />
@@ -20,4 +20,4 @@ async function bootstrapStudio() {
   );
 }
 
-void bootstrapStudio();
+void bootstrapStudio(rootElement);
