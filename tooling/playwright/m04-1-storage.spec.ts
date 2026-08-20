@@ -77,7 +77,7 @@ test.describe('M04.1 almacenamiento local real', () => {
     );
     const repair = storage.getByRole('button', { name: 'Revisar' });
     const repairBox = await repair.boundingBox();
-    expect(repairBox?.height ?? 0).toBeGreaterThanOrEqual(36);
+    expect(repairBox?.height ?? 0).toBeGreaterThanOrEqual(44);
 
     const metrics = await page.evaluate(() => ({
       scrollWidth: document.documentElement.scrollWidth,
