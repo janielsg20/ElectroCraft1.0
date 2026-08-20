@@ -7,6 +7,7 @@ import type { JsonValue } from '@electrocraft/domain';
 import { drizzle } from 'drizzle-orm/pglite';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+  M04_1_MIGRATION_CHECKSUM,
   STUDIO_STORAGE_TABLES,
   applyStudioStorageMigrations,
   createDrizzleProjectRepository,
@@ -48,6 +49,27 @@ describe('M04.1 PGlite + Drizzle persistence', () => {
         .map(({ tablename }) => tablename)
         .filter((name) => (STUDIO_STORAGE_TABLES as readonly string[]).includes(name));
       expect(physical.sort()).toEqual([...STUDIO_STORAGE_TABLES].sort());
+    } finally {
+      await client.close();
+    }
+  });
+
+  it('re-applies the current physical migration idempotently and rejects a mismatched journal', async () => {
+    const client = await PGlite.create('memory://');
+    try {
+      await applyStudioStorageMigrations(client);
+      await applyStudioStorageMigrations(client);
+
+      const journal = await client.query<{ schema_version: number; checksum: string }>(
+        'SELECT schema_version, checksum FROM storage_migration_journal ORDER BY schema_version',
+      );
+      expect(journal.rows).toEqual([{ schema_version: 1, checksum: M04_1_MIGRATION_CHECKSUM }]);
+
+      await client.query('UPDATE storage_migration_journal SET checksum = $1 WHERE schema_version = $2', [
+        'm04.1:incompatible-schema',
+        1,
+      ]);
+      await expect(applyStudioStorageMigrations(client)).rejects.toThrow(/migration checksum mismatch/);
     } finally {
       await client.close();
     }
