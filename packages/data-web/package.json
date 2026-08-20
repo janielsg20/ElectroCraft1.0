@@ -1,0 +1,19 @@
+{
+  "name": "@electrocraft/data-web",
+  "version": "0.0.0-m04.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": ["src", "drizzle"],
+  "dependencies": {
+    "@electrocraft/application": "0.0.0-m01.3",
+    "@electrocraft/domain": "0.0.0-m01.3",
+    "@electric-sql/pglite": "0.5.4",
+    "drizzle-orm": "0.45.2"
+  },
+  "devDependencies": {
+    "drizzle-kit": "0.31.4"
+  }
+}

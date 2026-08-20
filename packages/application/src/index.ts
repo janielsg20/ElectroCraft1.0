@@ -1,20 +1,8 @@
-import { packageDescriptor as dep0 } from '@electrocraft/domain';
-
-export * from './app-behavior-service';
-export * from './blueprint-installer';
+export * from './project-repository';
 export * from './component-definition-service';
-export * from './connector-registry';
-export * from './engine-payload-compatibility';
-export * from './export-ir-service';
-export * from './model-ownership-service';
+export * from './data-query-form-service';
+export * from './action-state-navigation-permission-service';
 export * from './ownership-registry-service';
-export * from './project-document-service';
-export * from './project-import-service';
-
-export const packageDescriptor = Object.freeze({
-  name: '@electrocraft/application',
-  responsibility: 'casos de uso y ports de aplicación',
-  dependencies: [dep0.name] as const,
-});
-
-export type ApplicationPackageDescriptor = typeof packageDescriptor;
+export * from './serializer-migration-registry';
+export * from './engine-payload-service';
+export * from './projects';
