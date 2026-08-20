@@ -75,6 +75,7 @@ export function StorageSettings() {
           <p>Comprueba la base local y solicita persistencia reforzada cuando el navegador la permita.</p>
         </div>
         <Button
+          className="max-md:min-h-11"
           variant="outline"
           size="sm"
           disabled={repairing || !diagnostics.repairSupported}
