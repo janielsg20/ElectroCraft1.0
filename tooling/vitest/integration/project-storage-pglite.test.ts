@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { normalizeSaveProjectRequest } from '@electrocraft/application';
 import { PGlite } from '@electric-sql/pglite';
+import type { JsonValue } from '@electrocraft/domain';
 import { drizzle } from 'drizzle-orm/pglite';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
@@ -18,7 +19,7 @@ afterEach(async () => {
   await Promise.all(tempRoots.splice(0).map((root) => rm(root, { recursive: true, force: true })));
 });
 
-function request(name = 'Proyecto local', payload: unknown = { title: 'Inicio' }) {
+function request(name = 'Proyecto local', payload: JsonValue = { title: 'Inicio' }) {
   return normalizeSaveProjectRequest({
     project: { id: 'project-1', name, metadata: {} },
     objects: [{ objectId: 'screen-home', kind: 'screen', schemaVersion: 1, payload }],
