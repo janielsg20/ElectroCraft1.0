@@ -1,37 +1,26 @@
 # HANDOFF — ElectroCraft
 
 ## Current
-F03 / M03.12 — E2E AppShell completo, responsive, estados y accesibilidad — `ACTIVE`.
+F04 / M04.1 — Persistencia local real del Studio — `ACTIVE`.
 
-## Estado heredado
-- M03.11 cerró GREEN en `codex/m03-11-contextual-help`, head `afcb2c304332a4a3819ef878cb9d3e3c3e91ea9d`, PR `#25`.
-- Workflow propietario: run `32320190802`, job `96280687167`, artifact `9389415829`, digest `sha256:500c49b1ab6c73ceec1ba80324964cc9b5d64b72cb867ec0707ca33edbaec2a8`.
-- M03.11 dedicado `12/12`, browser `5/5`, full repository gate GREEN.
-- Base CI `32320190809` confirmó lint, typecheck, tests, build y Playwright GREEN.
-- M03.10 i18n y contratos M03.5/M03.6/M03.7 revalidados durante la migración de Help.
+## Heredado
+- F03/M03.12 cerró GREEN en head `af88c60264a243d97cd8e5ca708eedc8ded04028`.
+- M03.12 run `32320810295` success; artifact `9389767563`; digest `sha256:f810fda738509fca06660cc248ddbe576ebe68a885bb2d8ba026944668d4c015`.
+- Base CI `32320810328` success.
+- Monorepo actual: 18 owner packages, 20 aliases, 2 apps.
 
 ## Siguiente acción exacta
-1. Leer `.ai/microphases/M03_12.md`, `.ai/APP_SHELL_SPEC.md`, Playwright config y suites F03 existentes.
-2. Reutilizar locators semánticos y web-first assertions; prohibir `page.waitForTimeout`/sleeps fijos.
-3. Crear helpers de viewport/state/a11y solo si reducen duplicación sin ocultar intención del test.
-4. Construir matriz 1440/1280/1024/768/375/320 para AppShell, overflow, paneles/Sheets, touch targets y orden de acciones.
-5. Auditar rutas canónicas reales y fail-closed de rutas desconocidas; no añadir pantallas para satisfacer tests.
-6. Cubrir Settings, Help/Search, Editor, empty states, disabled/history, save/status seams y diagnostics existentes.
-7. Verificar keyboard/focus return y navegación completa; no confiar solo en click de ratón.
-8. Buscar labels inglesas conocidas en release UI.
-9. Revalidar que StudioAppearanceProfile no cambia ElectroCraftDocument, Theme o ExportIR.
-10. Configurar evidencia screenshot/trace para fallos y estados significativos usando APIs Playwright actuales.
-11. Crear `docs/qa/` y actualizar `.ai/SCREEN_SPECS` solo con comportamiento observado.
-12. Añadir gate M03.12; ejecutar lint/typecheck/tests/build/browser. Cerrar M03.12 y Gate F03; activar M04.1 automáticamente.
-
-## Decisiones vigentes
-- Navegación canónica = M03.3/APP_SHELL_SPEC.
-- Ayuda = registry único M03.11; no popovers ad hoc.
-- i18n = `@electrocraft/i18n`; español inicial/fallback.
-- Design System se consume solo por su root público.
-- Puck conserva ownership detrás de `@electrocraft/editor-puck`.
-- `/content` usa patrón List/Detail.
-- Empty states nunca inyectan demo data.
+1. Releer `.ai/microphases/M04_1.md` y evidencia M00.4 de PGlite/Drizzle.
+2. Revalidar versiones instalables actuales antes de fijar pins.
+3. Crear ports de proyectos en `packages/application/src/projects/` sin importar PGlite/Drizzle.
+4. Crear owner `packages/data-web/` para PGlite/Drizzle, Worker, schema, migrations y capability detection.
+5. Preferir OPFS cuando la plataforma lo soporte de forma segura y declarar fallback persistente compatible cuando no; no ocultar degradaciones.
+6. Añadir `project`, `project_object`, `project_revision`, `app_extension_state`, `capability_snapshot`, `user_preference`, migration journal y búsqueda.
+7. Implementar save/open transaccional, recovery y atomic rollback.
+8. Integrar `Configuración > Almacenamiento` y HelpDescriptor español sin simular estado.
+9. Actualizar boundaries a 19 owners/21 aliases, Studio dependency y lockfile.
+10. Añadir unit/contract/integration/browser gate M04.1; ejecutar lint/typecheck/tests/build/E2E.
+11. Cerrar M04.1 y activar la siguiente microfase F04 automáticamente.
 
 ## Read set
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M03_12.md → .ai/APP_SHELL_SPEC.md → playwright.config.ts → tooling/playwright → apps/studio/src/shell → apps/studio/src/help`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M04_1.md → experiments/m00-4-studio-db → packages/application → tooling/package-boundaries.json → apps/studio/src/shell`.
