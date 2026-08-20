@@ -1,0 +1,53 @@
+name: M03.11 Format Autofix
+
+on:
+  push:
+    branches:
+      - codex/m03-11-contextual-help
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Format M03.11 files
+        run: >-
+          npx prettier --write
+          packages/design-system/src/components/ui/popover.tsx
+          packages/design-system/src/components/ui/index.ts
+          locales/es/help.json
+          apps/studio/src/help/help-registry.ts
+          apps/studio/src/help/help-ui.tsx
+          apps/studio/src/shell/studio-topbar.tsx
+          apps/studio/src/shell/language-settings.tsx
+          apps/studio/src/shell/information-architecture-ui.tsx
+          apps/studio/src/App.tsx
+          tooling/scripts/verify-m03-10-i18n.mjs
+          tooling/scripts/verify-m03-11-help.mjs
+          tooling/vitest/unit/help-registry.test.ts
+          tooling/vitest/contract/help-system-boundary.test.ts
+          tooling/vitest/integration/help-runtime.test.ts
+          tooling/playwright/m03-11-help.spec.ts
+          .github/workflows/m03-11-help.yml
+          .ai/SECTION_HELP_CATALOG_ES.md
+      - name: Commit formatted sources
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add packages/design-system/src/components/ui/popover.tsx packages/design-system/src/components/ui/index.ts locales/es/help.json apps/studio/src/help apps/studio/src/shell/studio-topbar.tsx apps/studio/src/shell/language-settings.tsx apps/studio/src/shell/information-architecture-ui.tsx apps/studio/src/App.tsx tooling/scripts/verify-m03-10-i18n.mjs tooling/scripts/verify-m03-11-help.mjs tooling/vitest/unit/help-registry.test.ts tooling/vitest/contract/help-system-boundary.test.ts tooling/vitest/integration/help-runtime.test.ts tooling/playwright/m03-11-help.spec.ts .github/workflows/m03-11-help.yml .ai/SECTION_HELP_CATALOG_ES.md
+          if git diff --cached --quiet; then
+            echo 'No formatting changes required.'
+            exit 0
+          fi
+          git commit -m 'style(m03.11): apply reproducible formatting'
+          git push
