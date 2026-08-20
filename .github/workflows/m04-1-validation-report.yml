@@ -28,11 +28,27 @@ jobs:
           set +e
           mkdir -p .ai/evidence/F04/M04.1
 
+          surface=(
+            packages/application/src/projects
+            packages/data-web
+            apps/studio/src/features/projects
+            apps/studio/src/shell/studio-topbar.tsx
+            apps/studio/src/help/help-registry.ts
+            tooling/vitest/unit/project-storage-contract.test.ts
+            tooling/vitest/contract/project-storage-boundary.test.ts
+            tooling/vitest/integration/project-storage-pglite.test.ts
+          )
+
           npm ci > /tmp/npm-ci.log 2>&1
           npm_ci=$?
 
-          npx prettier --check packages/application/src/projects packages/data-web apps/studio/src/features/projects apps/studio/src/shell/studio-topbar.tsx apps/studio/src/help/help-registry.ts tooling/vitest/unit/project-storage-contract.test.ts tooling/vitest/contract/project-storage-boundary.test.ts tooling/vitest/integration/project-storage-pglite.test.ts > /tmp/format.log 2>&1
+          npx prettier --write "${surface[@]}" > /tmp/format-write.log 2>&1
+          format_write=$?
+          npx prettier --check "${surface[@]}" > /tmp/format.log 2>&1
           format=$?
+
+          npm run lint > /tmp/lint.log 2>&1
+          lint=$?
 
           npm run typecheck > /tmp/typecheck.log 2>&1
           typecheck=$?
@@ -47,7 +63,7 @@ jobs:
           build=$?
 
           overall=GREEN
-          if [ "$npm_ci" -ne 0 ] || [ "$format" -ne 0 ] || [ "$typecheck" -ne 0 ] || [ "$boundaries" -ne 0 ] || [ "$tests" -ne 0 ] || [ "$build" -ne 0 ]; then
+          if [ "$npm_ci" -ne 0 ] || [ "$format_write" -ne 0 ] || [ "$format" -ne 0 ] || [ "$lint" -ne 0 ] || [ "$typecheck" -ne 0 ] || [ "$boundaries" -ne 0 ] || [ "$tests" -ne 0 ] || [ "$build" -ne 0 ]; then
             overall=RED
           fi
 
@@ -55,21 +71,24 @@ jobs:
           {
             echo "# M04.1 validation report"
             echo
-            echo "- Tested commit: \`$GITHUB_SHA\`"
+            echo "- Source commit: \`$GITHUB_SHA\`"
             echo "- Runner: \`ubuntu-latest\` / Node \`22.13.0\`"
+            echo "- Formatting: Prettier --write applied before validation"
             echo "- Overall: \`$overall\`"
             echo
             echo "| Gate | Exit code |"
             echo "| --- | ---: |"
             echo "| npm ci | $npm_ci |"
-            echo "| Prettier M04.1 surface | $format |"
+            echo "| Prettier write M04.1 surface | $format_write |"
+            echo "| Prettier check M04.1 surface | $format |"
+            echo "| npm run lint | $lint |"
             echo "| npm run typecheck | $typecheck |"
             echo "| npm run test:boundaries | $boundaries |"
             echo "| targeted M04.1 Vitest | $tests |"
             echo "| npm run build:studio | $build |"
           } > "$report"
 
-          for pair in "npm-ci:/tmp/npm-ci.log:$npm_ci" "format:/tmp/format.log:$format" "typecheck:/tmp/typecheck.log:$typecheck" "boundaries:/tmp/boundaries.log:$boundaries" "tests:/tmp/tests.log:$tests" "build:/tmp/build.log:$build"; do
+          for pair in "npm-ci:/tmp/npm-ci.log:$npm_ci" "format-write:/tmp/format-write.log:$format_write" "format:/tmp/format.log:$format" "lint:/tmp/lint.log:$lint" "typecheck:/tmp/typecheck.log:$typecheck" "boundaries:/tmp/boundaries.log:$boundaries" "tests:/tmp/tests.log:$tests" "build:/tmp/build.log:$build"; do
             name=${pair%%:*}
             rest=${pair#*:}
             log=${rest%%:*}
@@ -87,23 +106,17 @@ jobs:
           done
 
           echo "overall=$overall" >> "$GITHUB_OUTPUT"
-          echo "npm_ci=$npm_ci" >> "$GITHUB_OUTPUT"
-          echo "format=$format" >> "$GITHUB_OUTPUT"
-          echo "typecheck=$typecheck" >> "$GITHUB_OUTPUT"
-          echo "boundaries=$boundaries" >> "$GITHUB_OUTPUT"
-          echo "tests=$tests" >> "$GITHUB_OUTPUT"
-          echo "build=$build" >> "$GITHUB_OUTPUT"
 
-      - name: Commit validation report
+      - name: Commit formatted surface and validation report
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .ai/evidence/F04/M04.1/VALIDATION_LATEST.md
+          git add packages/application/src/projects packages/data-web apps/studio/src/features/projects apps/studio/src/shell/studio-topbar.tsx apps/studio/src/help/help-registry.ts tooling/vitest/unit/project-storage-contract.test.ts tooling/vitest/contract/project-storage-boundary.test.ts tooling/vitest/integration/project-storage-pglite.test.ts .ai/evidence/F04/M04.1/VALIDATION_LATEST.md
           if git diff --cached --quiet; then
-            echo "Validation report unchanged."
+            echo "Validation surface unchanged."
           else
-            git commit -m "test: record M04.1 validation result"
+            git commit -m "test: format and record M04.1 validation result"
             git push origin HEAD:codex/m04-1-storage-foundation
           fi
 
