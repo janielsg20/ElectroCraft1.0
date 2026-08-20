@@ -1,6 +1,7 @@
 import { STUDIO_STORAGE_SCHEMA_VERSION } from './schema-contract';
 
 export const M04_1_MIGRATION_CHECKSUM = 'm04.1:storage-schema-v1' as const;
+export const M04_3_MIGRATION_CHECKSUM = 'm04.3:incremental-storage-v2' as const;
 
 export const M04_1_SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS projects (
@@ -121,22 +122,45 @@ CREATE TABLE IF NOT EXISTS storage_migration_journal (
 );
 `;
 
+export const M04_3_INCREMENTAL_SQL = `
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS current_revision_base text;
+UPDATE projects AS project
+SET current_revision_base = latest.id
+FROM (
+  SELECT DISTINCT ON (project_id) project_id, id
+  FROM project_revisions
+  ORDER BY project_id, created_at DESC, id DESC
+) AS latest
+WHERE project.id = latest.project_id
+  AND project.current_revision_base IS NULL;
+`;
+
 export interface PGliteMigrationClient {
   exec(query: string): Promise<unknown>;
   query<T extends Record<string, unknown>>(query: string, params?: unknown[]): Promise<{ rows: T[] }>;
 }
 
-export async function applyStudioStorageMigrations(client: PGliteMigrationClient) {
+async function applyMigration(
+  client: PGliteMigrationClient,
+  schemaVersion: number,
+  checksum: string,
+  sql: string,
+) {
   const existing = await client
     .query<{ checksum: string }>('SELECT checksum FROM storage_migration_journal WHERE schema_version = $1', [
-      STUDIO_STORAGE_SCHEMA_VERSION,
+      schemaVersion,
     ])
     .catch(() => ({ rows: [] }));
 
-  if (existing.rows[0]?.checksum === M04_1_MIGRATION_CHECKSUM) return;
+  if (existing.rows[0]?.checksum === checksum) return;
   if (existing.rows.length > 0) throw new Error('storage migration checksum mismatch');
 
   await client.exec(
-    `BEGIN;${M04_1_SCHEMA_SQL}\nINSERT INTO storage_migration_journal(schema_version, checksum) VALUES (${STUDIO_STORAGE_SCHEMA_VERSION}, '${M04_1_MIGRATION_CHECKSUM}') ON CONFLICT (schema_version) DO NOTHING;COMMIT;`,
+    `BEGIN;${sql}\nINSERT INTO storage_migration_journal(schema_version, checksum) VALUES (${schemaVersion}, '${checksum}') ON CONFLICT (schema_version) DO NOTHING;COMMIT;`,
   );
+}
+
+export async function applyStudioStorageMigrations(client: PGliteMigrationClient) {
+  await applyMigration(client, 1, M04_1_MIGRATION_CHECKSUM, M04_1_SCHEMA_SQL);
+  await applyMigration(client, STUDIO_STORAGE_SCHEMA_VERSION, M04_3_MIGRATION_CHECKSUM, M04_3_INCREMENTAL_SQL);
 }
