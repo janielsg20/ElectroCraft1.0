@@ -13,24 +13,26 @@
 - M03.6 — Adaptar laptop/tablet/mobile: `COMPLETADA`; Gate `GREEN`.
 - M03.7 — Aplicar Progressive Disclosure y arquitectura de información: `COMPLETADA`; Gate `GREEN`.
 - M03.8 — Diseñar Palette descubrible sin multiplicar componentes: `COMPLETADA`; Gate `GREEN`.
-- M03.9 — Apariencia del Studio Editor completo: `ACTIVE`.
+- M03.9 — Apariencia del Studio Editor completo: `COMPLETADA`; Gate `GREEN`.
+- M03.10 — Infraestructura español-primero e i18n tipado: `ACTIVE`.
 - Blockers P0/P1 funcionales conocidos: `0`.
 
-## Cierre M03.8
-M03.8 cerró funcionalmente sobre head `b3e66bf4d85518ea3f3102e8ffe0db472aea9947` con workflow propietario `M03.8 Discoverable Palette Gate`, run `32308655658` `success`, job `96246831243`, artifact `9385669357` y digest `sha256:1692ec47ef5cab4a30a480d8c3b7fb2763c9f2daf2faf5ad0e88b5aa1429434c`.
+## Cierre M03.9
+M03.9 cerró sobre head `457375512fcc3cc9da056720b86bad0c7233d920` con workflow propietario `M03.9 Editor Appearance Profile Gate`, run `32315742507` success, job `96267423764`, artifact `9388009972` y digest `sha256:d802096889a8ffed4a3806e5bb3bce8e11e570676cdee142afc9ba74a3a3cb5d`.
 
-Gate dedicado: structural `7/7`, revalidación M03.5 `1/1`, Vitest `27/27`, Playwright `11/11`. Full `npm run check`: Node `37/37`, Vitest `230/230` en 63 archivos, Playwright `45/45`, lint/format, TypeScript strict, boundaries y build GREEN.
+Suite dedicada: unit `8/8`, contract `4/4`, integration `2/2`, Playwright `7/7`. Full gate: Node `37/37`, Vitest `244/244` en 66 archivos, Playwright `52/52`, lint/format, TypeScript strict, boundaries y build GREEN. Base CI `32315742400` GREEN. M01.4 reparado y GREEN en run `32315742430`.
 
 ## Microfase activa
-`M03.9` — Apariencia del Studio Editor completo.
+`M03.10` — Infraestructura español-primero e i18n tipado.
 
-Objetivo: crear una preferencia real `StudioAppearanceProfile` separada del theme del proyecto, aplicada mediante Studio design tokens con Preview/Apply/Revert, presets personales, responsive/accesibilidad y aislamiento probado respecto a ElectroCraftDocument, frontend Theme y ExportIR.
+Objetivo: consolidar copy español, namespaces, fallback, tipado estricto, errores/Intl y selector `Configuración > General > Idioma` sobre `i18next + react-i18next`, preservando IDs internos estables y evitando fugas de labels inglesas desde engines OSS.
 
 ## Referencias
-- Spec M03.9: `.ai/microphases/M03_9.md`.
+- Spec M03.10: `.ai/microphases/M03_10.md`.
 - Fase: `.ai/phases/F03.md`.
-- Evidencia M03.8: `.ai/evidence/F03/M03.8/CLOSURE_2026-08-19.md`.
+- Evidencia M03.9: `.ai/evidence/F03/M03.9/CLOSURE_2026-08-19.md`.
+- I18N spec: `.ai/I18N_SPEC.md`.
 - Tracking: `.ai/TRACKING.md`.
 - Handoff: `.ai/HANDOFF.md`.
 
-No declarar M03.9 completada sin `StudioAppearanceProfile schema`, `StudioAppearanceSettingsPanel`, Studio token provider, appearance isolation E2E y su propia evidencia real GREEN.
+No declarar M03.10 completada sin `packages/i18n/`, `locales/es/`, catálogo tipado/fallback, ui-string lint/test, selector real de idioma, HelpDescriptor y evidencia GREEN de lint/typecheck/test/build/E2E.
