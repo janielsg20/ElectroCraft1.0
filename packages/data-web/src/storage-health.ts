@@ -1,4 +1,4 @@
-import { M04_1_MIGRATION_CHECKSUM } from './migration';
+import { M04_3_MIGRATION_CHECKSUM } from './migration';
 import { STUDIO_STORAGE_SCHEMA_VERSION } from './schema-contract';
 
 export interface StudioStorageHealthClient {
@@ -17,7 +17,7 @@ export async function verifyStudioStorageHealth(client: StudioStorageHealthClien
     [STUDIO_STORAGE_SCHEMA_VERSION],
   );
   const checksum = result.rows[0]?.checksum;
-  if (checksum !== M04_1_MIGRATION_CHECKSUM) {
+  if (checksum !== M04_3_MIGRATION_CHECKSUM) {
     throw new Error('storage migration health check failed');
   }
   return Object.freeze({
