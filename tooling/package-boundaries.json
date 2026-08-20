@@ -70,7 +70,11 @@
       "@electrocraft/testing"
     ]
   },
+  "ownedResourceRoots": {
+    "@electrocraft/i18n": ["locales/es"]
+  },
   "invariants": {
+    "expectedStablePackageCount": 18,
     "domainForbiddenImports": [
       "react",
       "@puckeditor/core",
