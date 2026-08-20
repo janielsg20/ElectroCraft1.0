@@ -16,6 +16,9 @@ import { verifyStudioStorageHealth } from './storage-health';
 export const DEFAULT_BROWSER_STORAGE_BACKEND = 'indexeddb' as const;
 export const DEFAULT_BROWSER_DATABASE_NAME = 'electrocraft-studio-storage' as const;
 
+const LEADER_REQUEST = 'electrocraft-storage-leader-request' as const;
+const LEADER_ACTIVE = 'electrocraft-storage-leader-active' as const;
+
 export interface BrowserProjectStorageOptions {
   readonly preferredBackend?: 'indexeddb' | 'opfs-ahp';
   readonly databaseName?: string;
@@ -41,13 +44,31 @@ function dataDirFor(backend: 'indexeddb' | 'opfs-ahp', databaseName: string) {
   return backend === 'indexeddb' ? `idb://${databaseName}` : `opfs-ahp://electrocraft/${databaseName}/`;
 }
 
-async function openWorkerClient(dataDir: string, databaseName: string) {
+function leaderSignalChannelName(databaseName: string) {
+  return `electrocraft-storage-leader:${databaseName}`;
+}
+
+function createStorageClientId() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+  return `electrocraft-storage-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+async function openWorkerClient(
+  dataDir: string,
+  databaseName: string,
+  clientId: string,
+  leaderSignalChannel: string,
+) {
   return PGliteWorker.create(
     new Worker(new URL('./pglite.worker.ts', import.meta.url), {
       type: 'module',
       name: 'electrocraft-storage',
     }),
-    { dataDir, id: databaseName },
+    {
+      dataDir,
+      id: databaseName,
+      meta: { clientId, leaderSignalChannel },
+    },
   );
 }
 
@@ -59,7 +80,11 @@ function createWorkerDrizzleDatabase(client: PGliteWorker) {
   return drizzle(client as unknown as PGlite, { schema });
 }
 
-async function createPersistentWorkerClient(options: BrowserProjectStorageOptions): Promise<BrowserStorageClient> {
+async function createPersistentWorkerClient(
+  options: BrowserProjectStorageOptions,
+  clientId: string,
+  leaderSignalChannel: string,
+): Promise<BrowserStorageClient> {
   const databaseName = normalizeDatabaseName(options.databaseName);
   const preferredBackend = options.preferredBackend ?? DEFAULT_BROWSER_STORAGE_BACKEND;
 
@@ -67,19 +92,19 @@ async function createPersistentWorkerClient(options: BrowserProjectStorageOption
     if (!canAttemptOpfs()) {
       return Object.freeze({
         backend: 'indexeddb',
-        client: await openWorkerClient(dataDirFor('indexeddb', databaseName), databaseName),
+        client: await openWorkerClient(dataDirFor('indexeddb', databaseName), databaseName, clientId, leaderSignalChannel),
         fallbackReason: 'OPFS AHP solicitado pero no disponible; se usa IndexedDB persistente.',
       });
     }
     try {
       return Object.freeze({
         backend: 'opfs-ahp',
-        client: await openWorkerClient(dataDirFor('opfs-ahp', databaseName), databaseName),
+        client: await openWorkerClient(dataDirFor('opfs-ahp', databaseName), databaseName, clientId, leaderSignalChannel),
       });
     } catch (error) {
       return Object.freeze({
         backend: 'indexeddb',
-        client: await openWorkerClient(dataDirFor('indexeddb', databaseName), databaseName),
+        client: await openWorkerClient(dataDirFor('indexeddb', databaseName), databaseName, clientId, leaderSignalChannel),
         fallbackReason:
           error instanceof Error ? error.message : 'OPFS AHP no disponible; se usa IndexedDB persistente.',
       });
@@ -88,7 +113,7 @@ async function createPersistentWorkerClient(options: BrowserProjectStorageOption
 
   return Object.freeze({
     backend: 'indexeddb',
-    client: await openWorkerClient(dataDirFor('indexeddb', databaseName), databaseName),
+    client: await openWorkerClient(dataDirFor('indexeddb', databaseName), databaseName, clientId, leaderSignalChannel),
   });
 }
 
@@ -108,16 +133,23 @@ async function storageEstimate() {
 }
 
 export function createBrowserProjectStoragePort(options: BrowserProjectStorageOptions = {}): ProjectStoragePort {
+  const clientId = createStorageClientId();
   let runtime: BrowserStorageClient | null = null;
   let repository: ReturnType<typeof createDrizzleProjectRepository> | null = null;
   let initializePromise: Promise<ProjectStorageDiagnostics> | null = null;
   let unsubscribeLeaderChange: (() => void) | null = null;
+  let leaderChannel: BroadcastChannel | null = null;
+  let announcedLeaderClientId: string | null = null;
   let leaderChanges = 0;
 
   function coordination(): ProjectStorageCoordinationDiagnostics {
+    let role: ProjectStorageCoordinationDiagnostics['role'] = 'unknown';
+    if (runtime && announcedLeaderClientId) {
+      role = announcedLeaderClientId === clientId ? 'leader' : 'follower';
+    }
     return Object.freeze({
       mode: 'multi-tab',
-      role: runtime ? (runtime.client.isLeader ? 'leader' : 'follower') : 'unknown',
+      role,
       leaderChanges,
     });
   }
@@ -136,7 +168,31 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
     message: 'Almacenamiento local pendiente de inicialización.',
   });
 
+  function closeLeaderSignalChannel() {
+    leaderChannel?.close();
+    leaderChannel = null;
+    announcedLeaderClientId = null;
+  }
+
+  function requestLeaderIdentity() {
+    leaderChannel?.postMessage({ type: LEADER_REQUEST });
+  }
+
+  function ensureLeaderSignalChannel(databaseName: string) {
+    if (leaderChannel) return;
+    leaderChannel = new BroadcastChannel(leaderSignalChannelName(databaseName));
+    leaderChannel.addEventListener('message', (event) => {
+      if (event.data?.type !== LEADER_ACTIVE || typeof event.data.clientId !== 'string') return;
+      const nextLeader = event.data.clientId;
+      if (announcedLeaderClientId && announcedLeaderClientId !== nextLeader) leaderChanges += 1;
+      announcedLeaderClientId = nextLeader;
+      diagnostics = Object.freeze({ ...diagnostics, coordination: coordination() });
+    });
+    requestLeaderIdentity();
+  }
+
   async function revalidateAfterLeaderChange(client: PGliteWorker) {
+    requestLeaderIdentity();
     diagnostics = Object.freeze({
       ...diagnostics,
       state: 'loading',
@@ -186,7 +242,11 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
         message: 'Inicializando almacenamiento local…',
       });
       try {
-        runtime = await createPersistentWorkerClient(options);
+        const databaseName = normalizeDatabaseName(options.databaseName);
+        const signalChannel = leaderSignalChannelName(databaseName);
+        ensureLeaderSignalChannel(databaseName);
+        runtime = await createPersistentWorkerClient(options, clientId, signalChannel);
+        requestLeaderIdentity();
         diagnostics = Object.freeze({
           ...diagnostics,
           backend: runtime.backend,
@@ -207,9 +267,9 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
         repository = createDrizzleProjectRepository(createWorkerDrizzleDatabase(runtime.client));
 
         unsubscribeLeaderChange = runtime.client.onLeaderChange(() => {
-          leaderChanges += 1;
           if (runtime) void revalidateAfterLeaderChange(runtime.client);
         });
+        requestLeaderIdentity();
 
         const estimate = await storageEstimate();
         diagnostics = Object.freeze({
@@ -237,6 +297,7 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
         runtime = null;
         repository = null;
         await failedRuntime?.client.close().catch(() => undefined);
+        closeLeaderSignalChannel();
         diagnostics = Object.freeze({
           ...diagnostics,
           state: 'blocked',
@@ -262,6 +323,7 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
 
   async function getDiagnostics() {
     if (!runtime) return diagnostics;
+    requestLeaderIdentity();
     const estimate = await storageEstimate();
     diagnostics = Object.freeze({
       ...diagnostics,
@@ -317,6 +379,7 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
           message: 'Comprobando almacenamiento local…',
         });
         await verifyStudioStorageHealth(runtime.client);
+        requestLeaderIdentity();
         diagnostics = Object.freeze({
           ...diagnostics,
           state: 'ready',
@@ -338,6 +401,7 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
       await runtime?.client.close();
       runtime = null;
       repository = null;
+      closeLeaderSignalChannel();
       diagnostics = Object.freeze({
         ...diagnostics,
         state: 'initial',
