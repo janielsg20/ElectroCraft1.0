@@ -123,17 +123,20 @@ CREATE TABLE IF NOT EXISTS storage_migration_journal (
 
 export interface PGliteMigrationClient {
   exec(query: string): Promise<unknown>;
-  query<T extends Record<string, unknown>>(query: string, params?: readonly unknown[]): Promise<{ rows: T[] }>;
+  query<T extends Record<string, unknown>>(query: string, params?: unknown[]): Promise<{ rows: T[] }>;
 }
 
 export async function applyStudioStorageMigrations(client: PGliteMigrationClient) {
-  const existing = await client.query<{ checksum: string }>(
-    'SELECT checksum FROM storage_migration_journal WHERE schema_version = $1',
-    [STUDIO_STORAGE_SCHEMA_VERSION],
-  ).catch(() => ({ rows: [] }));
+  const existing = await client
+    .query<{ checksum: string }>('SELECT checksum FROM storage_migration_journal WHERE schema_version = $1', [
+      STUDIO_STORAGE_SCHEMA_VERSION,
+    ])
+    .catch(() => ({ rows: [] }));
 
   if (existing.rows[0]?.checksum === M04_1_MIGRATION_CHECKSUM) return;
   if (existing.rows.length > 0) throw new Error('storage migration checksum mismatch');
 
-  await client.exec(`BEGIN;${M04_1_SCHEMA_SQL}\nINSERT INTO storage_migration_journal(schema_version, checksum) VALUES (${STUDIO_STORAGE_SCHEMA_VERSION}, '${M04_1_MIGRATION_CHECKSUM}') ON CONFLICT (schema_version) DO NOTHING;COMMIT;`);
+  await client.exec(
+    `BEGIN;${M04_1_SCHEMA_SQL}\nINSERT INTO storage_migration_journal(schema_version, checksum) VALUES (${STUDIO_STORAGE_SCHEMA_VERSION}, '${M04_1_MIGRATION_CHECKSUM}') ON CONFLICT (schema_version) DO NOTHING;COMMIT;`,
+  );
 }
