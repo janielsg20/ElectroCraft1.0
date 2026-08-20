@@ -71,6 +71,28 @@ describe('M04.1 PGlite + Drizzle persistence', () => {
     }
   });
 
+  it('reports checksum corruption while openProject stays fail-closed', async () => {
+    const client = await PGlite.create('memory://');
+    try {
+      await applyStudioStorageMigrations(client);
+      const repository = createDrizzleProjectRepository(drizzle(client, { schema: storageSchema }));
+      await repository.saveProject(request('Íntegro', { version: 1 }));
+
+      await client.query(
+        "UPDATE project_objects SET checksum = 'fnv1a64:0000000000000000' WHERE project_id = $1 AND object_id = $2",
+        ['project-1', 'screen-home'],
+      );
+
+      const report = await repository.verifyProject('project-1');
+      expect(report.coherent).toBe(false);
+      expect(report.invalidObjectIds).toEqual(['screen-home']);
+      expect(report.revisionChecksumValid).toBe(true);
+      await expect(repository.openProject('project-1')).rejects.toThrow(/checksum mismatch/);
+    } finally {
+      await client.close();
+    }
+  });
+
   it('persists through close/reopen on a real filesystem data directory', async () => {
     const root = await mkdtemp(join(tmpdir(), 'electrocraft-m04-1-'));
     tempRoots.push(root);
