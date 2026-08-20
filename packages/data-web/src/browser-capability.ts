@@ -39,7 +39,13 @@ export function resolveBrowserStorageCapability(environment: {
   return {
     backend: 'memory',
     dataDir: 'memory://',
-    status: { health: 'degraded', backend: 'memory', persistent: false, worker: false, reasonCode: 'PERSISTENCE_UNAVAILABLE' },
+    status: {
+      health: 'degraded',
+      backend: 'memory',
+      persistent: false,
+      worker: false,
+      reasonCode: 'PERSISTENCE_UNAVAILABLE',
+    },
   };
 }
 

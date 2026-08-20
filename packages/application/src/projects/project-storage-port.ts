@@ -38,7 +38,8 @@ export interface ProjectStoragePort {
 
 export class ProjectStorageError extends Error {
   constructor(
-    readonly code: 'PROJECT_STORAGE_INIT_FAILED' | 'PROJECT_SAVE_FAILED' | 'PROJECT_OPEN_FAILED' | 'PROJECT_RECOVERY_FAILED',
+    readonly code:
+      'PROJECT_STORAGE_INIT_FAILED' | 'PROJECT_SAVE_FAILED' | 'PROJECT_OPEN_FAILED' | 'PROJECT_RECOVERY_FAILED',
     message: string,
     readonly causeValue?: unknown,
   ) {

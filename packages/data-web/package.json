@@ -6,7 +6,10 @@
   "exports": {
     ".": "./src/index.ts"
   },
-  "files": ["src", "drizzle"],
+  "files": [
+    "src",
+    "drizzle"
+  ],
   "dependencies": {
     "@electrocraft/application": "0.0.0-m01.3",
     "@electrocraft/domain": "0.0.0-m01.3",

@@ -13,7 +13,9 @@ export const projectTable = pgTable('project', {
 export const projectObjectTable = pgTable(
   'project_object',
   {
-    projectId: text('project_id').notNull().references(() => projectTable.id, { onDelete: 'cascade' }),
+    projectId: text('project_id')
+      .notNull()
+      .references(() => projectTable.id, { onDelete: 'cascade' }),
     objectId: text('object_id').notNull(),
     kind: text('kind').notNull(),
     schemaVersion: integer('schema_version').notNull(),
@@ -30,7 +32,9 @@ export const projectRevisionTable = pgTable(
   'project_revision',
   {
     id: text('id').primaryKey(),
-    projectId: text('project_id').notNull().references(() => projectTable.id, { onDelete: 'cascade' }),
+    projectId: text('project_id')
+      .notNull()
+      .references(() => projectTable.id, { onDelete: 'cascade' }),
     snapshot: jsonb('snapshot_json').$type<JsonValue>().notNull(),
     checksum: text('checksum').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

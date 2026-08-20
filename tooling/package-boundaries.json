@@ -15,23 +15,94 @@
     "@electrocraft/auth-core": ["@electrocraft/domain", "@electrocraft/application"],
     "@electrocraft/workflow-rete": ["@electrocraft/domain", "@electrocraft/application"],
     "@electrocraft/forms": ["@electrocraft/domain", "@electrocraft/application"],
-    "@electrocraft/admin-refine": ["@electrocraft/domain", "@electrocraft/application", "@electrocraft/data-core", "@electrocraft/query-rqb", "@electrocraft/forms"],
-    "@electrocraft/runtime-web": ["@electrocraft/domain", "@electrocraft/application", "@electrocraft/data-core", "@electrocraft/query-rqb", "@electrocraft/media-tiptap", "@electrocraft/state-zustand", "@electrocraft/auth-core", "@electrocraft/forms"],
-    "@electrocraft/runtime-native": ["@electrocraft/domain", "@electrocraft/application", "@electrocraft/data-core", "@electrocraft/state-zustand", "@electrocraft/auth-core", "@electrocraft/forms"],
+    "@electrocraft/admin-refine": [
+      "@electrocraft/domain",
+      "@electrocraft/application",
+      "@electrocraft/data-core",
+      "@electrocraft/query-rqb",
+      "@electrocraft/forms"
+    ],
+    "@electrocraft/runtime-web": [
+      "@electrocraft/domain",
+      "@electrocraft/application",
+      "@electrocraft/data-core",
+      "@electrocraft/query-rqb",
+      "@electrocraft/media-tiptap",
+      "@electrocraft/state-zustand",
+      "@electrocraft/auth-core",
+      "@electrocraft/forms"
+    ],
+    "@electrocraft/runtime-native": [
+      "@electrocraft/domain",
+      "@electrocraft/application",
+      "@electrocraft/data-core",
+      "@electrocraft/state-zustand",
+      "@electrocraft/auth-core",
+      "@electrocraft/forms"
+    ],
     "@electrocraft/export-ir": ["@electrocraft/domain"],
     "@electrocraft/exporters": ["@electrocraft/domain", "@electrocraft/application", "@electrocraft/export-ir"],
     "@electrocraft/testing": ["@electrocraft/domain", "@electrocraft/export-ir"]
   },
   "apps": {
-    "@electrocraft/studio": ["@electrocraft/domain", "@electrocraft/application", "@electrocraft/design-system", "@electrocraft/i18n", "@electrocraft/editor-puck", "@electrocraft/data-core", "@electrocraft/data-web", "@electrocraft/query-rqb", "@electrocraft/media-tiptap", "@electrocraft/state-zustand", "@electrocraft/auth-core", "@electrocraft/workflow-rete", "@electrocraft/forms", "@electrocraft/admin-refine", "@electrocraft/runtime-web", "@electrocraft/export-ir", "@electrocraft/exporters"],
-    "@electrocraft/native-preview": ["@electrocraft/domain", "@electrocraft/application", "@electrocraft/runtime-native", "@electrocraft/export-ir", "@electrocraft/testing"]
+    "@electrocraft/studio": [
+      "@electrocraft/domain",
+      "@electrocraft/application",
+      "@electrocraft/design-system",
+      "@electrocraft/i18n",
+      "@electrocraft/editor-puck",
+      "@electrocraft/data-core",
+      "@electrocraft/data-web",
+      "@electrocraft/query-rqb",
+      "@electrocraft/media-tiptap",
+      "@electrocraft/state-zustand",
+      "@electrocraft/auth-core",
+      "@electrocraft/workflow-rete",
+      "@electrocraft/forms",
+      "@electrocraft/admin-refine",
+      "@electrocraft/runtime-web",
+      "@electrocraft/export-ir",
+      "@electrocraft/exporters"
+    ],
+    "@electrocraft/native-preview": [
+      "@electrocraft/domain",
+      "@electrocraft/application",
+      "@electrocraft/runtime-native",
+      "@electrocraft/export-ir",
+      "@electrocraft/testing"
+    ]
   },
   "ownedResourceRoots": { "@electrocraft/i18n": ["locales/es"] },
   "invariants": {
     "expectedStablePackageCount": 19,
-    "domainForbiddenImports": ["react", "@puckeditor/core", "drizzle-orm", "expo", "react-native", "node:fs", "fs", "node:path", "path", "window", "document"],
-    "nativeForbiddenPackages": ["@electrocraft/design-system", "@electrocraft/editor-puck", "@electrocraft/admin-refine", "@electrocraft/runtime-web", "@electrocraft/data-web"],
-    "exportersForbiddenPackages": ["@electrocraft/design-system", "@electrocraft/editor-puck", "@electrocraft/admin-refine", "@electrocraft/runtime-web", "@electrocraft/runtime-native", "@electrocraft/data-web"],
+    "domainForbiddenImports": [
+      "react",
+      "@puckeditor/core",
+      "drizzle-orm",
+      "expo",
+      "react-native",
+      "node:fs",
+      "fs",
+      "node:path",
+      "path",
+      "window",
+      "document"
+    ],
+    "nativeForbiddenPackages": [
+      "@electrocraft/design-system",
+      "@electrocraft/editor-puck",
+      "@electrocraft/admin-refine",
+      "@electrocraft/runtime-web",
+      "@electrocraft/data-web"
+    ],
+    "exportersForbiddenPackages": [
+      "@electrocraft/design-system",
+      "@electrocraft/editor-puck",
+      "@electrocraft/admin-refine",
+      "@electrocraft/runtime-web",
+      "@electrocraft/runtime-native",
+      "@electrocraft/data-web"
+    ],
     "forbidDeepPackageImports": true,
     "forbidCrossPackageRelativeImports": true,
     "applicationAllowedPackages": ["@electrocraft/domain"]

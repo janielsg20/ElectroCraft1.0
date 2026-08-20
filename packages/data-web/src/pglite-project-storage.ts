@@ -31,7 +31,9 @@ export class PGliteProjectStorage implements ProjectStoragePort {
 
   async initialize(): Promise<ProjectStorageStatus> {
     try {
-      await this.client.exec(`CREATE TABLE IF NOT EXISTS migration_journal (migration_id text PRIMARY KEY, checksum text NOT NULL, applied_at timestamptz NOT NULL DEFAULT now(), successful boolean NOT NULL DEFAULT true);`);
+      await this.client.exec(
+        `CREATE TABLE IF NOT EXISTS migration_journal (migration_id text PRIMARY KEY, checksum text NOT NULL, applied_at timestamptz NOT NULL DEFAULT now(), successful boolean NOT NULL DEFAULT true);`,
+      );
       for (const migration of studioDbMigrations) {
         const existing = await this.client.query<{ checksum: string }>(
           'SELECT checksum FROM migration_journal WHERE migration_id = $1',
@@ -51,7 +53,11 @@ export class PGliteProjectStorage implements ProjectStoragePort {
       return this.status;
     } catch (error) {
       this.status = { ...this.status, health: 'blocked', reasonCode: 'MIGRATION_FAILED' };
-      throw new ProjectStorageError('PROJECT_STORAGE_INIT_FAILED', 'No se pudo preparar el almacenamiento local.', error);
+      throw new ProjectStorageError(
+        'PROJECT_STORAGE_INIT_FAILED',
+        'No se pudo preparar el almacenamiento local.',
+        error,
+      );
     }
   }
 
@@ -60,7 +66,8 @@ export class PGliteProjectStorage implements ProjectStoragePort {
   }
 
   private assertInitialized() {
-    if (!this.initialized) throw new ProjectStorageError('PROJECT_STORAGE_INIT_FAILED', 'El almacenamiento no está inicializado.');
+    if (!this.initialized)
+      throw new ProjectStorageError('PROJECT_STORAGE_INIT_FAILED', 'El almacenamiento no está inicializado.');
   }
 
   async saveSnapshot(snapshot: ElectroCraftProjectSnapshot): Promise<void> {
