@@ -4,5 +4,10 @@
   "editor.screens": "Pantallas",
   "editor.canvas": "Lienzo",
   "editor.properties": "Propiedades",
-  "editor.layers": "Capas"
+  "editor.layers": "Capas",
+  "puck.component.HeadingBlock": "Encabezado",
+  "puck.field.HeadingBlock.title": "Título",
+  "puck.field.HeadingBlock.emphasis": "Énfasis",
+  "puck.boolean.yes": "Sí",
+  "puck.boolean.no": "No"
 }
