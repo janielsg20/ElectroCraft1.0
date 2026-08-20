@@ -1,38 +1,37 @@
 # HANDOFF — ElectroCraft
 
 ## Current
-F03 / M03.11 — Sistema de ayuda contextual y explicación de todas las secciones — `ACTIVE`.
+F03 / M03.12 — E2E AppShell completo, responsive, estados y accesibilidad — `ACTIVE`.
 
 ## Estado heredado
-- M03.10 cerró GREEN sobre `codex/m03-10-spanish-first-i18n`, head funcional `4731b1056bf8e75377e45f3ff1b438a4d9e9a101`, PR `#24` apilado sobre M03.9.
-- Workflow propietario M03.10: run `32318184912` success; job `96274840342`; artifact `9388906418`; digest `sha256:3f7573c3af3da92fd002097155d926505d1711feb6b09da336caf42511b0dba6`.
-- M03.10 dedicado: `12/12`; browser `4/4`; full gate Node `39/39`, Vitest `256/256`, Playwright `56/56`, lint/typecheck/boundaries/build GREEN.
-- Base CI run `32318184871` GREEN; artifact `9388919028`.
-- M03.2 AppShell full repository gate independiente GREEN sobre el mismo head.
-- Monorepo actual: 18 owner packages, 20 aliases públicos y 2 apps; `@electrocraft/i18n` es owner estable de locales españoles.
+- M03.11 cerró GREEN en `codex/m03-11-contextual-help`, head `afcb2c304332a4a3819ef878cb9d3e3c3e91ea9d`, PR `#25`.
+- Workflow propietario: run `32320190802`, job `96280687167`, artifact `9389415829`, digest `sha256:500c49b1ab6c73ceec1ba80324964cc9b5d64b72cb867ec0707ca33edbaec2a8`.
+- M03.11 dedicado `12/12`, browser `5/5`, full repository gate GREEN.
+- Base CI `32320190809` confirmó lint, typecheck, tests, build y Playwright GREEN.
+- M03.10 i18n y contratos M03.5/M03.6/M03.7 revalidados durante la migración de Help.
 
 ## Siguiente acción exacta
-1. Leer `.ai/microphases/M03_11.md`, `.ai/APP_SHELL_SPEC.md`, `apps/studio/src/help/help-registry.ts`, `locales/es/help.json`, empty states y primitives actuales del Design System.
-2. Mantener la navegación M03.3 como canónica; no reintroducir Taxonomías/Relaciones/Roles del wording antiguo.
-3. Evolucionar HelpDescriptor a keys i18n tipadas (`titleKey`, `shortKey`, `longKey`, examples, related IDs, learn-more ref) conservando compatibilidad donde sea útil durante la migración.
-4. Implementar un solo HelpRegistry para todos los destinos canónicos superiores realmente definidos.
-5. Añadir primitive Popover shadcn/Radix al Design System solo si falta, consumiéndolo exclusivamente desde el root público.
-6. Implementar `HelpTrigger` reutilizable: CircleHelp, tooltip corto, Popover desktop 320–380px y Sheet móvil, keyboard/focus return.
-7. Implementar Help Drawer global con `Buscar en la ayuda`, búsqueda por título/descripción/keyword/sección y navegación a conceptos relacionados.
-8. Conectar el botón global Ayuda antes de Settings y los triggers H1/empty states sin crear popovers específicos por módulo.
-9. Hacer que empty states reales enlacen `¿Qué puedo hacer aquí?` sin introducir datos demo ni pantallas ficticias.
-10. Crear `.ai/SECTION_HELP_CATALOG_ES.md` y completar `locales/es/help.json`.
-11. Añadir unit/contract/integration/E2E y gate M03.11; validar focus return, responsive Popover/Sheet, búsqueda y Topbar ordering.
-12. Ejecutar lint, typecheck, tests, build y browser audit; cerrar M03.11 y activar M03.12 automáticamente.
+1. Leer `.ai/microphases/M03_12.md`, `.ai/APP_SHELL_SPEC.md`, Playwright config y suites F03 existentes.
+2. Reutilizar locators semánticos y web-first assertions; prohibir `page.waitForTimeout`/sleeps fijos.
+3. Crear helpers de viewport/state/a11y solo si reducen duplicación sin ocultar intención del test.
+4. Construir matriz 1440/1280/1024/768/375/320 para AppShell, overflow, paneles/Sheets, touch targets y orden de acciones.
+5. Auditar rutas canónicas reales y fail-closed de rutas desconocidas; no añadir pantallas para satisfacer tests.
+6. Cubrir Settings, Help/Search, Editor, empty states, disabled/history, save/status seams y diagnostics existentes.
+7. Verificar keyboard/focus return y navegación completa; no confiar solo en click de ratón.
+8. Buscar labels inglesas conocidas en release UI.
+9. Revalidar que StudioAppearanceProfile no cambia ElectroCraftDocument, Theme o ExportIR.
+10. Configurar evidencia screenshot/trace para fallos y estados significativos usando APIs Playwright actuales.
+11. Crear `docs/qa/` y actualizar `.ai/SCREEN_SPECS` solo con comportamiento observado.
+12. Añadir gate M03.12; ejecutar lint/typecheck/tests/build/browser. Cerrar M03.12 y Gate F03; activar M04.1 automáticamente.
 
 ## Decisiones vigentes
-- i18n se consume desde `@electrocraft/i18n`; copy visible nuevo no se hardcodea.
-- El Design System se consume solo desde su root público.
-- Puck conserva ownership detrás de `@electrocraft/editor-puck`; ayuda no altera ComponentDefinitions.
-- La IA del Studio clasifica información como `primary | contextual | advanced | diagnostic`.
-- `/content` es la ruta canónica List/Detail; rutas desconocidas fallan cerradas.
-- Los empty states describen ausencia real y nunca inyectan demo data.
-- La navegación canónica es la cerrada por M03.3/APP_SHELL_SPEC, no listados obsoletos posteriores.
+- Navegación canónica = M03.3/APP_SHELL_SPEC.
+- Ayuda = registry único M03.11; no popovers ad hoc.
+- i18n = `@electrocraft/i18n`; español inicial/fallback.
+- Design System se consume solo por su root público.
+- Puck conserva ownership detrás de `@electrocraft/editor-puck`.
+- `/content` usa patrón List/Detail.
+- Empty states nunca inyectan demo data.
 
 ## Read set
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M03_11.md → .ai/APP_SHELL_SPEC.md → .ai/I18N_SPEC.md → apps/studio/src/help → locales/es/help.json → apps/studio/src/shell → packages/design-system`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M03_12.md → .ai/APP_SHELL_SPEC.md → playwright.config.ts → tooling/playwright → apps/studio/src/shell → apps/studio/src/help`.

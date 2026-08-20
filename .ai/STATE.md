@@ -15,28 +15,27 @@
 - M03.8 — Diseñar Palette descubrible sin multiplicar componentes: `COMPLETADA`; Gate `GREEN`.
 - M03.9 — Apariencia del Studio Editor completo: `COMPLETADA`; Gate `GREEN`.
 - M03.10 — Infraestructura español-primero e i18n tipado: `COMPLETADA`; Gate `GREEN`.
-- M03.11 — Sistema de ayuda contextual y explicación de todas las secciones: `ACTIVE`.
+- M03.11 — Sistema de ayuda contextual y explicación de todas las secciones: `COMPLETADA`; Gate `GREEN`.
+- M03.12 — E2E AppShell completo, responsive, estados y accesibilidad: `ACTIVE`.
 - Blockers P0/P1 funcionales conocidos: `0`.
 
-## Cierre M03.10
-M03.10 cerró sobre head `4731b1056bf8e75377e45f3ff1b438a4d9e9a101` con workflow propietario `M03.10 Spanish-first i18n Gate`, run `32318184912` success, job `96274840342`, artifact `9388906418` y digest `sha256:3f7573c3af3da92fd002097155d926505d1711feb6b09da336caf42511b0dba6`.
+## Cierre M03.11
+M03.11 cerró sobre head `afcb2c304332a4a3819ef878cb9d3e3c3e91ea9d` con workflow propietario `M03.11 Contextual Help Gate`, run `32320190802`, job `96280687167`, artifact `9389415829` y digest `sha256:500c49b1ab6c73ceec1ba80324964cc9b5d64b72cb867ec0707ca33edbaec2a8`.
 
-Suite dedicada `12/12`; Playwright dedicado `4/4`. Full gate: Node `39/39`, Vitest `256/256` en 69 archivos, Playwright `56/56`, lint/format, TypeScript strict, boundaries y build/PWA GREEN. Base CI `32318184871` GREEN sobre el mismo head.
+Suite dedicada `12/12`, browser `5/5` y full repository gate GREEN. Base CI `32320190809` confirmó lint, typecheck, tests, build y Playwright repository gate GREEN sobre el mismo head.
 
 ## Microfase activa
-`M03.11` — Sistema de ayuda contextual y explicación de todas las secciones.
+`M03.12` — E2E AppShell completo, responsive, estados y accesibilidad.
 
-Objetivo: construir un `HelpRegistry` único y tipado, un `HelpTrigger` reutilizable y un Help Drawer global con búsqueda, usando Lucide + primitives shadcn/ui Radix, copy español desde el namespace `help`, adaptación Popover desktop / Sheet móvil y enlaces de ayuda desde estados vacíos reales.
-
-La navegación canónica vigente es la cerrada por M03.3/APP_SHELL_SPEC. M03.11 no debe reintroducir destinos antiguos como Taxonomías/Relaciones/Roles ni inventar rutas/capacidades ausentes.
+Objetivo: cerrar F03 mediante una matriz Playwright semántica en 1440/1280/1024/768/375/320, sin esperas fijas, validando navegación, Settings, Help, Editor, estados, responsive, teclado/foco, ausencia de labels inglesas y aislamiento de StudioAppearanceProfile respecto al documento/Theme/ExportIR.
 
 ## Referencias
-- Spec M03.11: `.ai/microphases/M03_11.md`.
+- Spec M03.12: `.ai/microphases/M03_12.md`.
 - Fase: `.ai/phases/F03.md`.
 - AppShell canónico: `.ai/APP_SHELL_SPEC.md`.
-- Evidencia M03.10: `.ai/evidence/F03/M03.10/CLOSURE_2026-08-20.md`.
-- I18N spec: `.ai/I18N_SPEC.md`.
+- Evidencia M03.11: `.ai/evidence/F03/M03.11/CLOSURE_2026-08-20.md`.
+- Help catalog: `.ai/SECTION_HELP_CATALOG_ES.md`.
 - Tracking: `.ai/TRACKING.md`.
 - Handoff: `.ai/HANDOFF.md`.
 
-No declarar M03.11 completada sin HelpRegistry tipado, HelpTrigger reutilizable, Help Drawer con búsqueda, catálogo de ayuda español, adaptación responsive/keyboard/focus, enlaces desde empty states reales y evidencia GREEN de lint/typecheck/test/build/E2E.
+No declarar M03.12/F03 completada sin viewport matrix, estados, keyboard/focus, screenshot/trace de fallos, no-English audit, aislamiento de apariencia y gate completo GREEN.
