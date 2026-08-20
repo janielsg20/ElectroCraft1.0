@@ -1,77 +1,194 @@
+import { translateStrict, type ElectroCraftResourceKey } from '@electrocraft/i18n';
+import { studioSidebarNavigation, type SidebarNavigationItemId } from '../shell/sidebar-navigation';
+
+// M03.4 continuity: Configuración usa overlays Radix y restaura el foco al trigger al cerrar.
+// M03.10 continuity: ElectroCraft se entrega en español. La infraestructura de idiomas permite añadir traducciones futuras sin cambiar la lógica de la aplicación.
+
+type HelpMessageKey = ElectroCraftResourceKey<'help'>;
+
+export type StudioHelpId =
+  | 'help.studio.shell'
+  | 'help.studio.appearance'
+  | 'help.studio.language'
+  | `help.section.${SidebarNavigationItemId}`;
+
 export interface HelpDescriptor {
-  readonly id: `help.${string}`;
+  readonly id: StudioHelpId;
+  readonly sectionId: string;
+  readonly section: string;
+  readonly titleKey: HelpMessageKey;
+  readonly shortKey: HelpMessageKey;
+  readonly longKey: HelpMessageKey;
+  readonly exampleKeys: readonly HelpMessageKey[];
+  readonly relatedIds: readonly StudioHelpId[];
+  readonly keywords: readonly string[];
+  readonly learnMoreRef?: string;
   readonly title: string;
   readonly summary: string;
   readonly details: readonly string[];
 }
 
-export const studioShellHelpDescriptor = Object.freeze({
-  id: 'help.studio.shell',
-  title: 'AppShell del Studio',
-  summary:
-    'ElectroCraft usa un único AppShell compartido con Sidebar global, Topbar contextual, editor Puck estructurado y Statusbar sobre la foundation shadcn/ui con base Radix.',
-  details: Object.freeze([
-    'El layout raíz usa 100dvh y mantiene el scroll dentro del área de trabajo; el body global no se usa como superficie desplazable del editor.',
-    'El Sidebar usa los grupos Construir, Datos, Lógica, App, Recursos, Apariencia y Publicar. Cada destino conserva icono Lucide, label accesible y aria-current cuando está activo.',
-    'Desktop permite contraer 240px a 64px. Laptop conserva rail de 64px; cuando el lienzo útil se estrecha, Contexto e Inspector usan un único overlay en vez de comprimir el Canvas.',
-    'Tablet conserva un rail global de 56px con objetivos táctiles y mantiene la navegación completa disponible en un Sheet Radix. Las herramientas secundarias del editor también usan Sheets.',
-    'Móvil elimina el rail lateral, conserva una Topbar compacta y añade navegación inferior Componentes, Pantallas, Lienzo, Propiedades, Apariencia y Más sin ocultar capacidades primarias.',
-    'En móvil, Componentes, Propiedades y Apariencia usan Sheets inferiores; Más abre Capas/Outline en un Sheet de altura completa. Todos usan triggers Radix reales para restaurar el foco al cerrar.',
-    'La preferencia de colapso se consume mediante WorkspacePreferencesPort. Durante F03 el adapter es in-memory; F04 puede sustituir solo el adapter por PGlite sin cambiar el contrato de UI.',
-    'La Topbar de 52px separa breadcrumb/proyecto/guardado, herramientas contextuales y acciones de publicación. En tablet y móvil las herramientas secundarias se trasladan a Sheet.',
-    'Ayuda abre este descriptor persistente y Configuración abre un Sheet real. El gear es la última acción del extremo derecho y el cierre de Radix restaura el foco al trigger.',
-    'Configuración > Espacio de trabajo controla el mismo WorkspacePreferencesPort del Sidebar; no crea una segunda fuente de verdad ni persiste Project Objects.',
-    'El editor divide el workspace desktop en Contexto 288px redimensionable 240–380px, Lienzo flexible e Inspector 320px redimensionable 280–440px. El Statusbar existente permanece en 26px y solo informa estado.',
-    'Puck conserva el ownership de composición visual: Contexto usa sus superficies de componentes/esquema, el Lienzo usa Puck.Preview y el Inspector usa Puck.Fields. La adaptación responsive no crea un editor paralelo ni datos demo.',
-    'Los separadores desktop admiten puntero y teclado; tablet y móvil priorizan objetivos táctiles, foco visible y superficies que no comprimen el lienzo.',
-    'La arquitectura de información clasifica controles como primary, contextual, advanced o diagnostic. Los módulos principales permanecen en navegación y los detalles secundarios se anidan en su superficie propietaria.',
-    'Progressive Disclosure usa Collapsible Radix: Settings mantiene Espacio de trabajo visible y agrupa detalles técnicos en Avanzado; el Inspector mantiene propiedades principales visibles y agrupa detalles secundarios en Avanzado.',
-    'Los diagnósticos que explican error, bloqueo, guardado o estado local nunca se esconden dentro de Advanced; permanecen visibles cuando son relevantes para entender el estado del sistema.',
-    'Contenido usa un patrón List/Detail dentro de su ruta canónica: la lista permanece primaria y el detalle aparece de forma contextual sin crear una segunda ruta innecesaria.',
-    'Los empty states describen ausencia real de proyecto, contenido, selección o configuración y no inyectan tarjetas, registros, widgets ni resultados demo para aparentar funcionalidad.',
-    'La Palette usa PALETTE_CATALOG_MATRIX.md como catálogo funcional visible y no deriva su inventario directamente de ComponentDefinitions de Puck.',
-    'La Palette organiza Layout, Basic, Content, Navigation, Dynamic Data, Forms, Filters, Social / Contact, Admin y Commerce Pack; el search reconoce nombre, función, categoría, keywords y referencias conceptuales como posts, menu, login, JetEngine, social y commerce.',
-    'Favoritos y Recientes guardan solo paletteItemId como preferencias del workspace. No clonan ComponentDefinitions ni forman parte de ElectroCraftDocument o ExportIR.',
-    'Puck.Components permanece como fuente de drag para componentes registrados. El click-to-insert pasa por el adapter Puck y solo se habilita cuando existe el mapping real; un item aún no mapeado muestra código, ubicación, causa y acción sugerida en vez de fingir éxito.',
-    'La Palette es navegable por teclado: el buscador precede al catálogo, ArrowDown entra en los items y Escape devuelve el foco al lienzo. En móvil vive dentro del Sheet inferior de Componentes, no como una versión desktop comprimida.',
-    'Apariencia del Studio usa un preference schema separado del documento y aplica únicamente tokens del Design System; no reutiliza ni modifica el theme del proyecto.',
-  ]),
-} satisfies HelpDescriptor);
+interface HelpDefinition {
+  readonly id: StudioHelpId;
+  readonly sectionId: string;
+  readonly navigationItemId?: SidebarNavigationItemId;
+  readonly titleKey: HelpMessageKey;
+  readonly shortKey: HelpMessageKey;
+  readonly longKey: HelpMessageKey;
+  readonly exampleKeys: readonly HelpMessageKey[];
+  readonly relatedIds: readonly StudioHelpId[];
+  readonly keywords: readonly string[];
+  readonly learnMoreRef?: string;
+}
 
-export const studioAppearanceHelpDescriptor = Object.freeze({
-  id: 'help.studio.appearance',
-  title: 'Apariencia del Studio',
-  summary:
-    'Configura la presentación del propio editor de ElectroCraft sin modificar ElectroCraftDocument, el tema del frontend, el tema de Administración ni ExportIR.',
-  details: Object.freeze([
-    'Modo, colores, tipografía, iconos, forma, densidad y movimiento se previsualizan mediante tokens del Studio antes de Aplicar.',
-    'Aplicar persiste el perfil de la sesión; Revertir descarta la vista previa. Si intentas cerrar con cambios pendientes, ElectroCraft pide aplicar, descartar o seguir editando.',
-    'Los presets integrados y personales guardan solo preferencias de apariencia del Studio. Nunca se serializan dentro del proyecto ni de ExportIR.',
-    'prefers-reduced-motion del sistema limita la animación solicitada por el perfil. El usuario no puede forzar movimiento alto por encima de esa preferencia del sistema.',
-    'Las combinaciones de contraste o legibilidad marcadas como no accesibles muestran una advertencia visible y permiten Restaurar valores accesibles.',
-  ]),
-} satisfies HelpDescriptor);
+const helpT = (key: HelpMessageKey) => translateStrict('help', key);
+const helpKey = (value: string) => value as HelpMessageKey;
 
-export const studioLanguageHelpDescriptor = Object.freeze({
-  id: 'help.studio.language',
-  title: 'Idioma del Studio',
-  summary:
-    'ElectroCraft se entrega en español. La infraestructura de idiomas permite añadir traducciones futuras sin cambiar la lógica de la aplicación.',
-  details: Object.freeze([
-    'Español es el idioma inicial y fallback del Studio.',
-    'Los IDs de componentes, rutas, slugs y contratos canónicos permanecen estables aunque cambie el copy visible.',
-    'Las traducciones pertenecen al owner @electrocraft/i18n y a locales/es; no se duplican dentro del documento del proyecto.',
-  ]),
-} satisfies HelpDescriptor);
+function navigationSection(itemId: SidebarNavigationItemId): string {
+  for (const group of studioSidebarNavigation) {
+    if (group.items.some((item) => item.id === itemId)) return group.label;
+  }
+  return helpT('help.shell.title');
+}
 
-export const studioHelpRegistry = Object.freeze({
-  [studioShellHelpDescriptor.id]: studioShellHelpDescriptor,
-  [studioAppearanceHelpDescriptor.id]: studioAppearanceHelpDescriptor,
-  [studioLanguageHelpDescriptor.id]: studioLanguageHelpDescriptor,
+function resolveDefinition(definition: HelpDefinition): HelpDescriptor {
+  const exampleDetails = definition.exampleKeys.map((key) => helpT(key));
+  return Object.freeze({
+    ...definition,
+    section: definition.navigationItemId ? navigationSection(definition.navigationItemId) : helpT(definition.titleKey),
+    title: helpT(definition.titleKey),
+    summary: helpT(definition.shortKey),
+    details: Object.freeze([helpT(definition.longKey), ...exampleDetails]),
+  });
+}
+
+const studioDefinitions = Object.freeze([
+  {
+    id: 'help.studio.shell',
+    sectionId: 'studio',
+    titleKey: 'help.shell.title',
+    shortKey: 'help.shell.short',
+    longKey: 'help.shell.long',
+    exampleKeys: ['help.shell.example'],
+    relatedIds: ['help.section.editor', 'help.studio.appearance', 'help.studio.language'],
+    keywords: ['appshell', 'sidebar', 'topbar', 'statusbar', 'workspace', 'configuración', 'navegación'],
+    learnMoreRef: '.ai/APP_SHELL_SPEC.md',
+  },
+  {
+    id: 'help.studio.appearance',
+    sectionId: 'settings-appearance',
+    titleKey: 'help.appearance.title',
+    shortKey: 'help.appearance.short',
+    longKey: 'help.appearance.long',
+    exampleKeys: ['help.appearance.example'],
+    relatedIds: ['help.studio.shell', 'help.section.themes', 'help.section.tokens'],
+    keywords: ['apariencia', 'densidad', 'color', 'tipografía', 'movimiento', 'studio'],
+  },
+  {
+    id: 'help.studio.language',
+    sectionId: 'settings-language',
+    titleKey: 'help.language.title',
+    shortKey: 'help.language.summary',
+    longKey: 'help.language.detail',
+    exampleKeys: ['help.language.example'],
+    relatedIds: ['help.studio.shell'],
+    keywords: ['idioma', 'español', 'i18n', 'traducción', 'fallback'],
+    learnMoreRef: '.ai/I18N_SPEC.md',
+  },
+] as const satisfies readonly HelpDefinition[]);
+
+const navigationKeywords: Readonly<Record<SidebarNavigationItemId, readonly string[]>> = Object.freeze({
+  editor: ['editor', 'lienzo', 'canvas', 'inspector', 'puck'],
+  screens: ['pantallas', 'screens', 'rutas'],
+  components: ['componentes', 'palette', 'puck', 'widgets'],
+  templates: ['plantillas', 'templates', 'reutilizar'],
+  'ai-generate': ['ia', 'ai', 'generar', 'asistente'],
+  records: ['registros', 'contenido', 'content', 'list detail'],
+  models: ['modelos', 'campos', 'schema', 'contenido'],
+  'data-sources': ['fuentes', 'datos', 'conexiones', 'adapters'],
+  queries: ['consultas', 'queries', 'filtros', 'rqb'],
+  workflows: ['acciones', 'workflows', 'rete', 'lógica'],
+  state: ['estado', 'variables', 'zustand'],
+  forms: ['formularios', 'forms', 'validación', 'zod'],
+  navigation: ['navegación', 'rutas', 'destinos'],
+  users: ['usuarios', 'permisos', 'roles', 'auth'],
+  admin: ['administración', 'admin', 'refine'],
+  media: ['medios', 'media', 'assets', 'archivos'],
+  extensions: ['extensiones', 'plugins', 'capabilities'],
+  themes: ['temas', 'theme', 'frontend'],
+  'design-system': ['sistema de diseño', 'design system', 'radix', 'lucide'],
+  tokens: ['tokens', 'color', 'spacing', 'tipografía'],
+  preview: ['vista previa', 'preview', 'breakpoint'],
+  compatibility: ['compatibilidad', 'capabilities', 'targets'],
+  export: ['exportar', 'export', 'exportir', 'target'],
+  deploy: ['desplegar', 'deploy', 'publicar'],
 });
 
-export type StudioHelpId = keyof typeof studioHelpRegistry;
+const navigationRelated: Partial<Record<SidebarNavigationItemId, readonly StudioHelpId[]>> = Object.freeze({
+  editor: ['help.section.components', 'help.section.screens'],
+  components: ['help.section.editor', 'help.section.templates'],
+  records: ['help.section.models', 'help.section.queries', 'help.section.forms'],
+  models: ['help.section.records', 'help.section.forms'],
+  queries: ['help.section.records', 'help.section.data-sources'],
+  forms: ['help.section.models', 'help.section.workflows'],
+  themes: ['help.studio.appearance', 'help.section.tokens'],
+  preview: ['help.section.compatibility', 'help.section.export'],
+  compatibility: ['help.section.preview', 'help.section.export'],
+  export: ['help.section.compatibility', 'help.section.deploy'],
+  deploy: ['help.section.export'],
+});
+
+const navigationItemIds = Object.freeze(
+  studioSidebarNavigation.flatMap((group) => group.items.map((item) => item.id)) as SidebarNavigationItemId[],
+);
+
+const navigationDefinitions: readonly HelpDefinition[] = navigationItemIds.map((itemId) => ({
+  id: `help.section.${itemId}` as StudioHelpId,
+  sectionId: itemId,
+  navigationItemId: itemId,
+  titleKey: helpKey(`help.section.${itemId}.title`),
+  shortKey: helpKey(`help.section.${itemId}.short`),
+  longKey: helpKey(`help.section.${itemId}.long`),
+  exampleKeys: [helpKey(`help.section.${itemId}.example`)],
+  relatedIds: navigationRelated[itemId] ?? ['help.studio.shell'],
+  keywords: navigationKeywords[itemId],
+}));
+
+const helpDefinitions = Object.freeze([...studioDefinitions, ...navigationDefinitions]);
+const resolvedDescriptors = helpDefinitions.map(resolveDefinition);
+
+export const studioHelpRegistry = Object.freeze(
+  Object.fromEntries(resolvedDescriptors.map((descriptor) => [descriptor.id, descriptor])) as Readonly<
+    Record<StudioHelpId, HelpDescriptor>
+  >,
+);
+
+export const studioHelpDescriptors = Object.freeze(resolvedDescriptors);
 
 export function getStudioHelpDescriptor(helpId: StudioHelpId): HelpDescriptor {
-  return studioHelpRegistry[helpId];
+  const descriptor = studioHelpRegistry[helpId];
+  if (!descriptor) throw new Error(`Unknown Studio help descriptor: ${helpId}`);
+  return descriptor;
+}
+
+export function getHelpIdForNavigationItem(itemId: SidebarNavigationItemId): StudioHelpId {
+  return `help.section.${itemId}`;
+}
+
+export function searchStudioHelp(query: string): readonly HelpDescriptor[] {
+  const normalized = query.trim().toLocaleLowerCase('es');
+  if (!normalized) return studioHelpDescriptors;
+
+  return studioHelpDescriptors.filter((descriptor) => {
+    const searchable = [
+      descriptor.title,
+      descriptor.summary,
+      descriptor.section,
+      ...descriptor.details,
+      ...descriptor.keywords,
+    ]
+      .join(' ')
+      .toLocaleLowerCase('es');
+    return searchable.includes(normalized);
+  });
 }
