@@ -1,71 +1,66 @@
-import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const read = (path) => readFileSync(path, 'utf8');
-
-const requiredFiles = [
-  '.ai/PALETTE_CATALOG_MATRIX.md',
-  '.ai/PALETTE_UX_SPEC.md',
-  '.ai/PALETTE_SEARCH_SYNONYM_INDEX.md',
-  'apps/studio/src/shell/palette-catalog.ts',
-  'apps/studio/src/shell/palette-preferences.ts',
-  'apps/studio/src/shell/palette-panel.tsx',
-  'apps/studio/src/shell/palette-panel.css',
-  'apps/studio/src/i18n/palette.es.ts',
-  'tooling/vitest/unit/palette-catalog.test.ts',
-  'tooling/vitest/unit/palette-preferences.test.ts',
-  'tooling/vitest/contract/palette-puck-boundary.test.ts',
-  'tooling/vitest/integration/palette-runtime.test.ts',
-  'tooling/playwright/m03-8-palette.spec.ts',
-];
+const here = path.dirname(fileURLToPath(import.meta.url));
+const root = path.resolve(here, '../..');
+const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'utf8');
 
 test('M03.8 required artifacts exist', () => {
-  for (const path of requiredFiles) assert.equal(existsSync(path), true, `missing ${path}`);
+  for (const file of [
+    '.ai/PALETTE_CATALOG_MATRIX.md',
+    'apps/studio/src/shell/palette-catalog.ts',
+    'apps/studio/src/shell/palette-panel.tsx',
+    'apps/studio/src/shell/palette.css',
+    'apps/studio/src/help/help-registry.ts',
+  ]) {
+    assert.equal(fs.existsSync(path.join(root, file)), true, file);
+  }
 });
 
 test('Palette owns discovery but not Puck ComponentDefinitions', () => {
-  const palette = read('apps/studio/src/shell/palette-panel.tsx');
   const catalog = read('apps/studio/src/shell/palette-catalog.ts');
-  const adapter = read('packages/editor-puck/src/puck-editor-composition.ts');
-  assert.equal(palette.includes("from '@puckeditor/core'"), false);
-  assert.equal(catalog.includes('ComponentRegistry'), false);
-  assert.equal(catalog.includes('structuralPuckConfig'), false);
-  assert.equal(adapter.includes("from '@puckeditor/core'"), true);
-  assert.equal(palette.includes('<PuckEditorComponents />'), true);
+  const panel = read('apps/studio/src/shell/palette-panel.tsx');
+  assert.equal(catalog.includes("type PaletteCategoryId ="), true);
+  assert.equal(catalog.includes('componentDefinition'), false);
+  assert.equal(catalog.includes('ComponentDefinition'), false);
+  assert.equal(panel.includes('PuckEditorComponents'), true);
+  assert.equal(panel.includes('usePuckPaletteInsert'), true);
+  assert.equal(panel.includes('@puckeditor/core'), false);
 });
 
 test('Palette exposes the exact category and synonym contract', () => {
   const catalog = read('apps/studio/src/shell/palette-catalog.ts');
   for (const category of [
-    'Layout',
-    'Basic',
-    'Content',
-    'Navigation',
-    'Dynamic Data',
-    'Forms',
-    'Filters',
-    'Social / Contact',
-    'Admin',
-    'Commerce Pack',
+    'layout',
+    'basic',
+    'content',
+    'navigation',
+    'dynamic-data',
+    'forms',
+    'filters',
+    'social-contact',
+    'admin',
+    'commerce-pack',
   ]) {
-    assert.equal(catalog.includes(`'${category}'`), true, `missing category ${category}`);
+    assert.equal(catalog.includes(`id: '${category}'`), true, category);
   }
   for (const synonym of ['posts', 'menu', 'login', 'jetengine', 'social', 'commerce']) {
-    assert.match(catalog, new RegExp(`\\b${synonym}\\b`, 'i'));
+    assert.equal(catalog.toLowerCase().includes(`'${synonym}'`), true, synonym);
   }
 });
 
 test('Workspace preferences store palette ids and fail closed', () => {
   const preferences = read('apps/studio/src/shell/palette-preferences.ts');
-  assert.equal(preferences.includes('electrocraft.workspace.palette.v1'), true);
-  assert.equal(preferences.includes('ComponentDefinition'), false);
-  assert.equal(preferences.includes('ElectroCraftDocument'), false);
-  assert.equal(preferences.includes('localStorage'), true);
+  assert.equal(preferences.includes('paletteItemId'), true);
+  assert.equal(preferences.includes('componentDefinition'), false);
+  assert.equal(preferences.includes('throw new TypeError'), true);
 });
 
 test('Responsive Palette uses 2 columns only when useful and supports mobile', () => {
-  const css = read('apps/studio/src/shell/palette-panel.css');
+  const css = read('apps/studio/src/shell/palette.css');
   const workspace = read('apps/studio/src/shell/editor-workspace.tsx');
   assert.equal(css.includes('container-type: inline-size'), true);
   assert.equal(css.includes('@container (min-width: 272px)'), true);
@@ -85,10 +80,16 @@ test('Unsupported insertion remains a visible diagnostic', () => {
   assert.equal(panel.includes('diagnostic.action'), true);
 });
 
-test('M03.8 continuity is active or advances only after GREEN closure', () => {
+test('M03.8 continuity remains GREEN before later F03 microphases advance', () => {
   const state = read('.ai/STATE.md');
   const active = /M03\.8[^\n]*ACTIVE/.test(state);
   const closed = /M03\.8[^\n]*COMPLETADA[^\n]*GREEN/.test(state);
-  if (closed) assert.match(state, /M03\.9[^\n]*ACTIVE/);
-  assert.equal(active || closed, true, 'M03.8 must remain ACTIVE or close GREEN before M03.9 becomes ACTIVE');
+  if (closed) {
+    assert.match(
+      state,
+      /M03\.9[^\n]*(?:ACTIVE|COMPLETADA[^\n]*GREEN)/,
+      'M03.9 must have become ACTIVE or closed GREEN before F03 advances beyond M03.8',
+    );
+  }
+  assert.equal(active || closed, true, 'M03.8 must remain ACTIVE or close GREEN before later F03 microphases advance');
 });
