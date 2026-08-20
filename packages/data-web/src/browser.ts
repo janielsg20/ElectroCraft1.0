@@ -1,6 +1,7 @@
 import {
   PROJECT_STORAGE_SCHEMA_VERSION,
   type NormalizedSaveProjectRequest,
+  type ProjectStorageCoordinationDiagnostics,
   type ProjectStorageDiagnostics,
   type ProjectStoragePort,
 } from '@electrocraft/application';
@@ -10,9 +11,15 @@ import { drizzle } from 'drizzle-orm/pglite';
 import { applyStudioStorageMigrations } from './migration';
 import { createDrizzleProjectRepository } from './repository';
 import * as schema from './schema';
+import { verifyStudioStorageHealth } from './storage-health';
 
-const OPFS_DIR = 'opfs-ahp://electrocraft/studio-db/';
-const IDB_DIR = 'idb://electrocraft-studio-db';
+export const DEFAULT_BROWSER_STORAGE_BACKEND = 'indexeddb' as const;
+export const DEFAULT_BROWSER_DATABASE_NAME = 'electrocraft-studio-storage' as const;
+
+export interface BrowserProjectStorageOptions {
+  readonly preferredBackend?: 'indexeddb' | 'opfs-ahp';
+  readonly databaseName?: string;
+}
 
 interface BrowserStorageClient {
   readonly backend: 'opfs-ahp' | 'indexeddb';
@@ -24,13 +31,23 @@ function canAttemptOpfs() {
   return typeof navigator !== 'undefined' && typeof navigator.storage?.getDirectory === 'function';
 }
 
-async function openWorkerClient(dataDir: string) {
+function normalizeDatabaseName(value = DEFAULT_BROWSER_DATABASE_NAME) {
+  const normalized = value.trim();
+  if (!normalized) throw new TypeError('databaseName must not be empty');
+  return normalized;
+}
+
+function dataDirFor(backend: 'indexeddb' | 'opfs-ahp', databaseName: string) {
+  return backend === 'indexeddb' ? `idb://${databaseName}` : `opfs-ahp://electrocraft/${databaseName}/`;
+}
+
+async function openWorkerClient(dataDir: string, databaseName: string) {
   return PGliteWorker.create(
     new Worker(new URL('./pglite.worker.ts', import.meta.url), {
       type: 'module',
       name: 'electrocraft-storage',
     }),
-    { dataDir, id: 'electrocraft-studio-storage' },
+    { dataDir, id: databaseName },
   );
 }
 
@@ -42,23 +59,36 @@ function createWorkerDrizzleDatabase(client: PGliteWorker) {
   return drizzle(client as unknown as PGlite, { schema });
 }
 
-async function createPersistentWorkerClient(): Promise<BrowserStorageClient> {
-  if (canAttemptOpfs()) {
-    try {
-      return Object.freeze({ backend: 'opfs-ahp', client: await openWorkerClient(OPFS_DIR) });
-    } catch (error) {
-      const fallbackReason = error instanceof Error ? error.message : 'OPFS AHP no disponible en este navegador.';
+async function createPersistentWorkerClient(options: BrowserProjectStorageOptions): Promise<BrowserStorageClient> {
+  const databaseName = normalizeDatabaseName(options.databaseName);
+  const preferredBackend = options.preferredBackend ?? DEFAULT_BROWSER_STORAGE_BACKEND;
+
+  if (preferredBackend === 'opfs-ahp') {
+    if (!canAttemptOpfs()) {
       return Object.freeze({
         backend: 'indexeddb',
-        client: await openWorkerClient(IDB_DIR),
-        fallbackReason,
+        client: await openWorkerClient(dataDirFor('indexeddb', databaseName), databaseName),
+        fallbackReason: 'OPFS AHP solicitado pero no disponible; se usa IndexedDB persistente.',
+      });
+    }
+    try {
+      return Object.freeze({
+        backend: 'opfs-ahp',
+        client: await openWorkerClient(dataDirFor('opfs-ahp', databaseName), databaseName),
+      });
+    } catch (error) {
+      return Object.freeze({
+        backend: 'indexeddb',
+        client: await openWorkerClient(dataDirFor('indexeddb', databaseName), databaseName),
+        fallbackReason:
+          error instanceof Error ? error.message : 'OPFS AHP no disponible; se usa IndexedDB persistente.',
       });
     }
   }
+
   return Object.freeze({
     backend: 'indexeddb',
-    client: await openWorkerClient(IDB_DIR),
-    fallbackReason: 'OPFS AHP no está disponible; se usa IndexedDB persistente.',
+    client: await openWorkerClient(dataDirFor('indexeddb', databaseName), databaseName),
   });
 }
 
@@ -77,55 +107,145 @@ async function storageEstimate() {
   } as const;
 }
 
-export function createBrowserProjectStoragePort(): ProjectStoragePort {
+export function createBrowserProjectStoragePort(options: BrowserProjectStorageOptions = {}): ProjectStoragePort {
   let runtime: BrowserStorageClient | null = null;
   let repository: ReturnType<typeof createDrizzleProjectRepository> | null = null;
+  let initializePromise: Promise<ProjectStorageDiagnostics> | null = null;
+  let unsubscribeLeaderChange: (() => void) | null = null;
+  let leaderChanges = 0;
+
+  function coordination(): ProjectStorageCoordinationDiagnostics {
+    return Object.freeze({
+      mode: 'multi-tab',
+      role: runtime ? (runtime.client.isLeader ? 'leader' : 'follower') : 'unknown',
+      leaderChanges,
+    });
+  }
+
   let diagnostics: ProjectStorageDiagnostics = Object.freeze({
     state: 'initial',
-    backend: 'indexeddb',
+    backend: DEFAULT_BROWSER_STORAGE_BACKEND,
     persistent: false,
     durable: false,
     usageBytes: null,
     quotaBytes: null,
     migrationVersion: 0,
     repairSupported: true,
+    lifecyclePhase: 'idle',
+    coordination: coordination(),
     message: 'Almacenamiento local pendiente de inicialización.',
   });
 
-  async function initialize() {
-    if (runtime && repository) return getDiagnostics();
-    diagnostics = Object.freeze({ ...diagnostics, state: 'loading', message: 'Inicializando almacenamiento local…' });
+  async function revalidateAfterLeaderChange(client: PGliteWorker) {
+    diagnostics = Object.freeze({
+      ...diagnostics,
+      state: 'loading',
+      lifecyclePhase: 'leader-handoff',
+      coordination: coordination(),
+      message: 'Revalidando almacenamiento compartido…',
+    });
     try {
-      runtime = await createPersistentWorkerClient();
-      await applyStudioStorageMigrations(runtime.client);
-      repository = createDrizzleProjectRepository(createWorkerDrizzleDatabase(runtime.client));
+      await verifyStudioStorageHealth(client);
+      if (runtime?.client !== client) return;
       const estimate = await storageEstimate();
       diagnostics = Object.freeze({
+        ...diagnostics,
         state: 'ready',
-        backend: runtime.backend,
-        persistent: true,
+        lifecyclePhase: 'ready',
         durable: estimate.durable,
         usageBytes: estimate.usageBytes,
         quotaBytes: estimate.quotaBytes,
-        migrationVersion: PROJECT_STORAGE_SCHEMA_VERSION,
-        repairSupported: true,
+        coordination: coordination(),
         message:
           runtime.backend === 'opfs-ahp'
             ? 'Base local persistente lista mediante OPFS.'
             : 'Base local persistente lista mediante IndexedDB.',
-        ...(runtime.fallbackReason ? { fallbackReason: runtime.fallbackReason } : {}),
       });
-      return diagnostics;
     } catch (error) {
+      if (runtime?.client !== client) return;
       diagnostics = Object.freeze({
         ...diagnostics,
-        state: 'blocked',
-        persistent: false,
-        repairSupported: true,
-        message: error instanceof Error ? error.message : 'No se pudo inicializar el almacenamiento local.',
+        state: 'error',
+        lifecyclePhase: 'leader-handoff',
+        coordination: coordination(),
+        message: error instanceof Error ? error.message : 'No se pudo revalidar el almacenamiento compartido.',
       });
-      return diagnostics;
     }
+  }
+
+  async function initialize() {
+    if (runtime && repository) return getDiagnostics();
+    if (initializePromise) return initializePromise;
+
+    initializePromise = (async () => {
+      diagnostics = Object.freeze({
+        ...diagnostics,
+        state: 'loading',
+        lifecyclePhase: 'bootstrap',
+        coordination: coordination(),
+        message: 'Inicializando almacenamiento local…',
+      });
+      try {
+        runtime = await createPersistentWorkerClient(options);
+        diagnostics = Object.freeze({
+          ...diagnostics,
+          backend: runtime.backend,
+          lifecyclePhase: 'migrations',
+          coordination: coordination(),
+          message: 'Aplicando migraciones del almacenamiento…',
+          ...(runtime.fallbackReason ? { fallbackReason: runtime.fallbackReason } : {}),
+        });
+
+        await applyStudioStorageMigrations(runtime.client);
+        diagnostics = Object.freeze({
+          ...diagnostics,
+          lifecyclePhase: 'health-check',
+          coordination: coordination(),
+          message: 'Comprobando almacenamiento local…',
+        });
+        await verifyStudioStorageHealth(runtime.client);
+        repository = createDrizzleProjectRepository(createWorkerDrizzleDatabase(runtime.client));
+
+        unsubscribeLeaderChange = runtime.client.onLeaderChange(() => {
+          leaderChanges += 1;
+          if (runtime) void revalidateAfterLeaderChange(runtime.client);
+        });
+
+        const estimate = await storageEstimate();
+        diagnostics = Object.freeze({
+          state: 'ready',
+          backend: runtime.backend,
+          persistent: true,
+          durable: estimate.durable,
+          usageBytes: estimate.usageBytes,
+          quotaBytes: estimate.quotaBytes,
+          migrationVersion: PROJECT_STORAGE_SCHEMA_VERSION,
+          repairSupported: true,
+          lifecyclePhase: 'ready',
+          coordination: coordination(),
+          message:
+            runtime.backend === 'opfs-ahp'
+              ? 'Base local persistente lista mediante OPFS.'
+              : 'Base local persistente lista mediante IndexedDB.',
+          ...(runtime.fallbackReason ? { fallbackReason: runtime.fallbackReason } : {}),
+        });
+        return diagnostics;
+      } catch (error) {
+        diagnostics = Object.freeze({
+          ...diagnostics,
+          state: 'blocked',
+          persistent: false,
+          coordination: coordination(),
+          repairSupported: true,
+          message: error instanceof Error ? error.message : 'No se pudo inicializar el almacenamiento local.',
+        });
+        return diagnostics;
+      }
+    })().finally(() => {
+      initializePromise = null;
+    });
+
+    return initializePromise;
   }
 
   async function ensureRepository() {
@@ -142,6 +262,7 @@ export function createBrowserProjectStoragePort(): ProjectStoragePort {
       durable: estimate.durable,
       usageBytes: estimate.usageBytes,
       quotaBytes: estimate.quotaBytes,
+      coordination: coordination(),
     });
     return diagnostics;
   }
@@ -153,12 +274,19 @@ export function createBrowserProjectStoragePort(): ProjectStoragePort {
       diagnostics = Object.freeze({ ...diagnostics, state: 'saving', message: 'Guardando proyecto…' });
       try {
         const revision = await repo.saveProject(request);
-        diagnostics = Object.freeze({ ...diagnostics, state: 'saved', message: 'Proyecto guardado.' });
+        diagnostics = Object.freeze({
+          ...diagnostics,
+          state: 'saved',
+          lifecyclePhase: 'ready',
+          coordination: coordination(),
+          message: 'Proyecto guardado.',
+        });
         return revision;
       } catch (error) {
         diagnostics = Object.freeze({
           ...diagnostics,
           state: 'error',
+          coordination: coordination(),
           message: error instanceof Error ? error.message : 'No se pudo guardar el proyecto.',
         });
         throw error;
@@ -176,13 +304,31 @@ export function createBrowserProjectStoragePort(): ProjectStoragePort {
         await navigator.storage.persist().catch(() => false);
       }
       if (runtime) {
-        await runtime.client.query('SELECT 1');
+        diagnostics = Object.freeze({
+          ...diagnostics,
+          state: 'loading',
+          lifecyclePhase: 'health-check',
+          message: 'Comprobando almacenamiento local…',
+        });
+        await verifyStudioStorageHealth(runtime.client);
+        diagnostics = Object.freeze({
+          ...diagnostics,
+          state: 'ready',
+          lifecyclePhase: 'ready',
+          coordination: coordination(),
+          message:
+            runtime.backend === 'opfs-ahp'
+              ? 'Base local persistente lista mediante OPFS.'
+              : 'Base local persistente lista mediante IndexedDB.',
+        });
       } else {
         await initialize();
       }
       return getDiagnostics();
     },
     async close() {
+      unsubscribeLeaderChange?.();
+      unsubscribeLeaderChange = null;
       await runtime?.client.close();
       runtime = null;
       repository = null;
@@ -190,6 +336,8 @@ export function createBrowserProjectStoragePort(): ProjectStoragePort {
         ...diagnostics,
         state: 'initial',
         persistent: false,
+        lifecyclePhase: 'idle',
+        coordination: coordination(),
         message: 'Almacenamiento local cerrado.',
       });
     },
