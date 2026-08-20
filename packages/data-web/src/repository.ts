@@ -145,8 +145,8 @@ export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
   }
 
   async function verifyProject(projectId: string): Promise<ProjectIntegrityReport> {
-    const opened = await openProject(projectId);
-    if (!opened) {
+    const projectRows = await db.select({ id: schema.projects.id }).from(schema.projects).where(eq(schema.projects.id, projectId));
+    if (!projectRows[0]) {
       return Object.freeze({
         projectId,
         coherent: false,
@@ -156,21 +156,37 @@ export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
       });
     }
 
-    const invalidObjectIds: string[] = [];
-    for (const object of opened.objects) {
-      if (createElectroCraftCanonicalSnapshotChecksum(object.payload) !== object.checksum) invalidObjectIds.push(object.objectId);
+    const objectRows = await db.select().from(schema.projectObjects).where(eq(schema.projectObjects.projectId, projectId));
+    const invalidObjectIds = objectRows
+      .filter((object) => createElectroCraftCanonicalSnapshotChecksum(object.payload) !== object.checksum)
+      .map(({ objectId }) => objectId)
+      .sort();
+
+    const revisionRows = await db
+      .select()
+      .from(schema.projectRevisions)
+      .where(eq(schema.projectRevisions.projectId, projectId))
+      .orderBy(desc(schema.projectRevisions.createdAt))
+      .limit(1);
+
+    let revisionChecksumValid = true;
+    let manifestMatches = true;
+    if (revisionRows[0]) {
+      try {
+        const revision = toRevision(revisionRows[0]);
+        const manifestIds = revision.manifest.objects.map(({ objectId }) => objectId).sort();
+        const actualIds = objectRows.map(({ objectId }) => objectId).sort();
+        manifestMatches = JSON.stringify(manifestIds) === JSON.stringify(actualIds);
+      } catch {
+        revisionChecksumValid = false;
+        manifestMatches = false;
+      }
     }
-    const revisionChecksumValid = opened.revision
-      ? createElectroCraftCanonicalSnapshotChecksum(opened.revision.manifest) === opened.revision.checksum
-      : true;
-    const manifestIds = opened.revision?.manifest.objects.map(({ objectId }) => objectId).sort() ?? [];
-    const actualIds = opened.objects.map(({ objectId }) => objectId).sort();
-    const manifestMatches = opened.revision === null || JSON.stringify(manifestIds) === JSON.stringify(actualIds);
 
     return Object.freeze({
       projectId,
       coherent: invalidObjectIds.length === 0 && revisionChecksumValid && manifestMatches,
-      checkedObjects: opened.objects.length,
+      checkedObjects: objectRows.length,
       invalidObjectIds: Object.freeze(invalidObjectIds),
       revisionChecksumValid,
     });
