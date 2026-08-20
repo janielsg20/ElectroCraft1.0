@@ -6,6 +6,7 @@ export * from './migration';
 export * from './repository';
 export * from './schema-contract';
 export * from './schema';
+export * from './storage-health';
 
 export const packageDescriptor = Object.freeze({
   name: '@electrocraft/data-web',
