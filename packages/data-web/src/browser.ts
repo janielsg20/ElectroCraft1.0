@@ -53,12 +53,7 @@ function createStorageClientId() {
   return `electrocraft-storage-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-async function openWorkerClient(
-  dataDir: string,
-  databaseName: string,
-  clientId: string,
-  leaderSignalChannel: string,
-) {
+async function openWorkerClient(dataDir: string, databaseName: string, clientId: string, leaderSignalChannel: string) {
   return PGliteWorker.create(
     new Worker(new URL('./pglite.worker.ts', import.meta.url), {
       type: 'module',
@@ -92,19 +87,34 @@ async function createPersistentWorkerClient(
     if (!canAttemptOpfs()) {
       return Object.freeze({
         backend: 'indexeddb',
-        client: await openWorkerClient(dataDirFor('indexeddb', databaseName), databaseName, clientId, leaderSignalChannel),
+        client: await openWorkerClient(
+          dataDirFor('indexeddb', databaseName),
+          databaseName,
+          clientId,
+          leaderSignalChannel,
+        ),
         fallbackReason: 'OPFS AHP solicitado pero no disponible; se usa IndexedDB persistente.',
       });
     }
     try {
       return Object.freeze({
         backend: 'opfs-ahp',
-        client: await openWorkerClient(dataDirFor('opfs-ahp', databaseName), databaseName, clientId, leaderSignalChannel),
+        client: await openWorkerClient(
+          dataDirFor('opfs-ahp', databaseName),
+          databaseName,
+          clientId,
+          leaderSignalChannel,
+        ),
       });
     } catch (error) {
       return Object.freeze({
         backend: 'indexeddb',
-        client: await openWorkerClient(dataDirFor('indexeddb', databaseName), databaseName, clientId, leaderSignalChannel),
+        client: await openWorkerClient(
+          dataDirFor('indexeddb', databaseName),
+          databaseName,
+          clientId,
+          leaderSignalChannel,
+        ),
         fallbackReason:
           error instanceof Error ? error.message : 'OPFS AHP no disponible; se usa IndexedDB persistente.',
       });
