@@ -14,6 +14,7 @@ on:
       - 'locales/es/help.json'
       - 'tooling/package-boundaries.json'
       - 'tooling/vitest/**/project-storage-*.test.ts'
+      - 'tooling/playwright/m04-1-storage.spec.ts'
       - 'tsconfig.base.json'
       - 'package-lock.json'
       - '.github/workflows/m04-1-storage-foundation.yml'
@@ -24,7 +25,7 @@ on:
 jobs:
   storage-gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -48,6 +49,7 @@ jobs:
           tooling/vitest/unit/project-storage-contract.test.ts
           tooling/vitest/contract/project-storage-boundary.test.ts
           tooling/vitest/integration/project-storage-pglite.test.ts
+          tooling/playwright/m04-1-storage.spec.ts
           tsconfig.base.json
           .github/workflows/m04-1-storage-foundation.yml
       - run: npm run lint
@@ -60,3 +62,7 @@ jobs:
           tooling/vitest/contract/project-storage-boundary.test.ts
           tooling/vitest/integration/project-storage-pglite.test.ts
       - run: npm run build:studio
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: M04.1 browser storage smoke
+        run: npx playwright test tooling/playwright/m04-1-storage.spec.ts --config playwright.config.ts
