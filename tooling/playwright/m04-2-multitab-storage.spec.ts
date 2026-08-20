@@ -33,12 +33,21 @@ test.describe('M04.2 PGlite multi-tab worker', () => {
     expect(firstDiagnostics.coordination?.mode).toBe('multi-tab');
     expect(secondDiagnostics.coordination?.mode).toBe('multi-tab');
 
-    const roles = [firstDiagnostics.coordination?.role, secondDiagnostics.coordination?.role];
-    expect(roles).toContain('leader');
-    expect(roles).toContain('follower');
+    await expect
+      .poll(
+        async () => {
+          const [firstState, secondState] = await Promise.all([initializeStorage(first), initializeStorage(second)]);
+          return [firstState.coordination?.role, secondState.coordination?.role].sort().join(',');
+        },
+        { timeout: 30_000 },
+      )
+      .toBe('follower,leader');
 
-    const leaderPage = firstDiagnostics.coordination?.role === 'leader' ? first : second;
+    const [settledFirst, settledSecond] = await Promise.all([initializeStorage(first), initializeStorage(second)]);
+    const leaderPage = settledFirst.coordination?.role === 'leader' ? first : second;
     const followerPage = leaderPage === first ? second : first;
+    expect(settledSecond.coordination?.role).not.toBe(settledFirst.coordination?.role);
+
     const projectId = `m04-2-shared-${Date.now()}`;
 
     await leaderPage.evaluate(async (id) => {
