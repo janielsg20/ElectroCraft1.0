@@ -2,6 +2,9 @@ import { translateStrict, type ElectroCraftResourceKey } from '@electrocraft/i18
 import { studioSidebarNavigation, type SidebarNavigationItemId } from '../shell/sidebar-navigation';
 
 // M03.4 continuity: Configuración usa overlays Radix y restaura el foco al trigger al cerrar.
+// M03.5 continuity: el workspace desktop conserva Contexto 288px, Lienzo flexible e Inspector 320px.
+// M03.6 continuity: tablet conserva un rail global de 56px; móvil usa navegación inferior, Sheets inferiores y Más abre Capas/Outline a altura completa.
+// M03.7 continuity: Progressive Disclosure clasifica información como primary, contextual, advanced o diagnostic; los diagnósticos críticos permanecen fuera de Advanced.
 // M03.10 continuity: ElectroCraft se entrega en español. La infraestructura de idiomas permite añadir traducciones futuras sin cambiar la lógica de la aplicación.
 
 type HelpMessageKey = ElectroCraftResourceKey<'help'>;
