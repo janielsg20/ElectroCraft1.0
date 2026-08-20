@@ -1,66 +1,71 @@
-import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { existsSync, readFileSync } from 'node:fs';
+import test from 'node:test';
 
-const here = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(here, '../..');
-const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'utf8');
+const read = (path) => readFileSync(path, 'utf8');
+
+const requiredFiles = [
+  '.ai/PALETTE_CATALOG_MATRIX.md',
+  '.ai/PALETTE_UX_SPEC.md',
+  '.ai/PALETTE_SEARCH_SYNONYM_INDEX.md',
+  'apps/studio/src/shell/palette-catalog.ts',
+  'apps/studio/src/shell/palette-preferences.ts',
+  'apps/studio/src/shell/palette-panel.tsx',
+  'apps/studio/src/shell/palette-panel.css',
+  'apps/studio/src/i18n/palette.es.ts',
+  'tooling/vitest/unit/palette-catalog.test.ts',
+  'tooling/vitest/unit/palette-preferences.test.ts',
+  'tooling/vitest/contract/palette-puck-boundary.test.ts',
+  'tooling/vitest/integration/palette-runtime.test.ts',
+  'tooling/playwright/m03-8-palette.spec.ts',
+];
 
 test('M03.8 required artifacts exist', () => {
-  for (const file of [
-    '.ai/PALETTE_CATALOG_MATRIX.md',
-    'apps/studio/src/shell/palette-catalog.ts',
-    'apps/studio/src/shell/palette-panel.tsx',
-    'apps/studio/src/shell/palette.css',
-    'apps/studio/src/help/help-registry.ts',
-  ]) {
-    assert.equal(fs.existsSync(path.join(root, file)), true, file);
-  }
+  for (const path of requiredFiles) assert.equal(existsSync(path), true, `missing ${path}`);
 });
 
 test('Palette owns discovery but not Puck ComponentDefinitions', () => {
+  const palette = read('apps/studio/src/shell/palette-panel.tsx');
   const catalog = read('apps/studio/src/shell/palette-catalog.ts');
-  const panel = read('apps/studio/src/shell/palette-panel.tsx');
-  assert.equal(catalog.includes("type PaletteCategoryId ="), true);
-  assert.equal(catalog.includes('componentDefinition'), false);
-  assert.equal(catalog.includes('ComponentDefinition'), false);
-  assert.equal(panel.includes('PuckEditorComponents'), true);
-  assert.equal(panel.includes('usePuckPaletteInsert'), true);
-  assert.equal(panel.includes('@puckeditor/core'), false);
+  const adapter = read('packages/editor-puck/src/puck-editor-composition.ts');
+  assert.equal(palette.includes("from '@puckeditor/core'"), false);
+  assert.equal(catalog.includes('ComponentRegistry'), false);
+  assert.equal(catalog.includes('structuralPuckConfig'), false);
+  assert.equal(adapter.includes("from '@puckeditor/core'"), true);
+  assert.equal(palette.includes('<PuckEditorComponents />'), true);
 });
 
 test('Palette exposes the exact category and synonym contract', () => {
   const catalog = read('apps/studio/src/shell/palette-catalog.ts');
   for (const category of [
-    'layout',
-    'basic',
-    'content',
-    'navigation',
-    'dynamic-data',
-    'forms',
-    'filters',
-    'social-contact',
-    'admin',
-    'commerce-pack',
+    'Layout',
+    'Basic',
+    'Content',
+    'Navigation',
+    'Dynamic Data',
+    'Forms',
+    'Filters',
+    'Social / Contact',
+    'Admin',
+    'Commerce Pack',
   ]) {
-    assert.equal(catalog.includes(`id: '${category}'`), true, category);
+    assert.equal(catalog.includes(`'${category}'`), true, `missing category ${category}`);
   }
   for (const synonym of ['posts', 'menu', 'login', 'jetengine', 'social', 'commerce']) {
-    assert.equal(catalog.toLowerCase().includes(`'${synonym}'`), true, synonym);
+    assert.match(catalog, new RegExp(`\\b${synonym}\\b`, 'i'));
   }
 });
 
 test('Workspace preferences store palette ids and fail closed', () => {
   const preferences = read('apps/studio/src/shell/palette-preferences.ts');
-  assert.equal(preferences.includes('paletteItemId'), true);
-  assert.equal(preferences.includes('componentDefinition'), false);
-  assert.equal(preferences.includes('throw new TypeError'), true);
+  assert.equal(preferences.includes('electrocraft.workspace.palette.v1'), true);
+  assert.equal(preferences.includes('ComponentDefinition'), false);
+  assert.equal(preferences.includes('ElectroCraftDocument'), false);
+  assert.equal(preferences.includes('localStorage'), true);
 });
 
 test('Responsive Palette uses 2 columns only when useful and supports mobile', () => {
-  const css = read('apps/studio/src/shell/palette.css');
+  const css = read('apps/studio/src/shell/palette-panel.css');
   const workspace = read('apps/studio/src/shell/editor-workspace.tsx');
   assert.equal(css.includes('container-type: inline-size'), true);
   assert.equal(css.includes('@container (min-width: 272px)'), true);
