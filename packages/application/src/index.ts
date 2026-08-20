@@ -10,6 +10,7 @@ export * from './model-ownership-service';
 export * from './ownership-registry-service';
 export * from './project-document-service';
 export * from './project-import-service';
+export * from './projects';
 
 export const packageDescriptor = Object.freeze({
   name: '@electrocraft/application',

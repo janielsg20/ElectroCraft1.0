@@ -5,10 +5,10 @@ export const informationArchitectureMessagesEs = Object.freeze({
   'studio.ia.settings.primaryTitle': 'Espacio de trabajo',
   'studio.ia.settings.advancedTitle': 'Avanzado',
   'studio.ia.settings.advancedSummary': 'Detalles técnicos de la sesión y de las preferencias del Studio.',
-  'studio.ia.settings.persistenceLabel': 'Persistencia de preferencias',
-  'studio.ia.settings.persistenceValue': 'Sesión actual',
+  'studio.ia.settings.persistenceLabel': 'Preferencias del AppShell',
+  'studio.ia.settings.persistenceValue': 'Adapter de workspace',
   'studio.ia.settings.persistenceHelp':
-    'Durante F03 las preferencias usan un adapter en memoria. El modelo del proyecto no se modifica.',
+    'Las preferencias visuales del AppShell mantienen ownership separado. El estado real de la base de proyectos se muestra en Almacenamiento.',
   'studio.ia.settings.statusErrorTitle': 'El Studio necesita atención',
   'studio.ia.settings.statusErrorSummary':
     'El estado actual se mantiene visible y no se oculta dentro de las opciones avanzadas.',

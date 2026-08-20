@@ -1,0 +1,35 @@
+name: M04.1 Storage Foundation
+
+on:
+  pull_request:
+    paths:
+      - 'packages/application/src/projects/**'
+      - 'packages/data-web/**'
+      - 'apps/studio/src/features/projects/**'
+      - 'apps/studio/src/shell/studio-topbar.tsx'
+      - 'apps/studio/src/help/help-registry.ts'
+      - 'tooling/package-boundaries.json'
+      - 'tooling/vitest/**/project-storage-*.test.ts'
+      - '.github/workflows/m04-1-storage-foundation.yml'
+  push:
+    branches:
+      - 'codex/m04-1-storage-foundation'
+
+jobs:
+  storage-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.13.0'
+          cache: npm
+      - run: npm ci
+      - name: Format M04.1 surface
+        run: npx prettier --check packages/application/src/projects packages/data-web apps/studio/src/features/projects tooling/vitest/unit/project-storage-contract.test.ts tooling/vitest/contract/project-storage-boundary.test.ts tooling/vitest/integration/project-storage-pglite.test.ts .github/workflows/m04-1-storage-foundation.yml
+      - run: npm run typecheck
+      - run: npm run test:boundaries
+      - name: M04.1 tests
+        run: npx vitest run --config vitest.config.ts tooling/vitest/unit/project-storage-contract.test.ts tooling/vitest/contract/project-storage-boundary.test.ts tooling/vitest/integration/project-storage-pglite.test.ts
+      - run: npm run build:studio
