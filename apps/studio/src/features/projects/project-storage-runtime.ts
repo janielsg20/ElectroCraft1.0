@@ -99,6 +99,9 @@ export const projectStorageRuntime = Object.freeze({
   currentProjectId: () => currentProjectId,
   listProjects: service.listProjects,
   setProjectStatus: service.setProjectStatus,
+  renameProject: service.renameProject,
+  duplicateProject: service.duplicateProject,
+  deleteProjectPermanently: service.deleteProjectPermanently,
   async openProject(projectId: string) {
     const opened = await service.openProject(projectId);
     if (opened) currentProjectId = opened.project.id;
