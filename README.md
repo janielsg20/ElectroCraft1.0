@@ -76,3 +76,18 @@ Canonical prompt:
 
 Initial execution:
 `F00 / M00.1`.
+
+## Entorno de desarrollo
+
+Si el entorno define proxies, usa las variables estándar `HTTP_PROXY` y
+`HTTPS_PROXY`. No definas `npm_config_http_proxy` ni
+`npm_config_https_proxy`: npm 11 las considera aliases obsoletos y las
+rechazará en su próxima versión mayor.
+
+Los entornos que todavía inyecten esos aliases pueden limpiarlos antes de
+ejecutar npm cargando el helper del repositorio:
+
+```sh
+. tooling/shell/npm-proxy-env.sh
+npm --version
+```
