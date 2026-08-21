@@ -20,6 +20,8 @@ import {
   type ProjectLifecycleStatus,
   type ListProjectsRequest,
   type DuplicateProjectRequest,
+  DEFAULT_STUDIO_WORKSPACE_PREFERENCES,
+  type StudioWorkspacePreferences,
   type StoredProjectObject,
 } from '@electrocraft/application';
 import { and, asc, count, desc, eq, ilike } from 'drizzle-orm';
@@ -56,6 +58,42 @@ function toRevision(row: typeof schema.projectRevisions.$inferSelect): ProjectSt
 }
 
 export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
+  async function getWorkspacePreferences(workspaceId: string): Promise<StudioWorkspacePreferences> {
+    const row = (
+      await db
+        .select()
+        .from(schema.workspacePreferences)
+        .where(
+          and(
+            eq(schema.workspacePreferences.workspaceId, workspaceId),
+            eq(schema.workspacePreferences.key, 'studio-layout'),
+          ),
+        )
+        .limit(1)
+    )[0];
+    return (row?.value ?? DEFAULT_STUDIO_WORKSPACE_PREFERENCES) as unknown as StudioWorkspacePreferences;
+  }
+  async function saveWorkspacePreferences(workspaceId: string, preferences: StudioWorkspacePreferences) {
+    await db
+      .insert(schema.workspacePreferences)
+      .values({ workspaceId, key: 'studio-layout', value: preferences as unknown as JsonValue, updatedAt: new Date() })
+      .onConflictDoUpdate({
+        target: [schema.workspacePreferences.workspaceId, schema.workspacePreferences.key],
+        set: { value: preferences as unknown as JsonValue, updatedAt: new Date() },
+      });
+    return preferences;
+  }
+  async function resetWorkspacePreferences(workspaceId: string) {
+    await db
+      .delete(schema.workspacePreferences)
+      .where(
+        and(
+          eq(schema.workspacePreferences.workspaceId, workspaceId),
+          eq(schema.workspacePreferences.key, 'studio-layout'),
+        ),
+      );
+    return DEFAULT_STUDIO_WORKSPACE_PREFERENCES;
+  }
   async function listProjects(request: Required<ListProjectsRequest>): Promise<readonly ProjectSummary[]> {
     const filters = [];
     if (request.status !== 'all') filters.push(eq(schema.projects.status, request.status));
@@ -132,17 +170,15 @@ export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
         .from(schema.projectObjects)
         .where(eq(schema.projectObjects.projectId, request.sourceProjectId));
       const now = new Date();
-      await tx
-        .insert(schema.projects)
-        .values({
-          id: request.projectId,
-          name: request.name,
-          metadata: source.metadata,
-          status: 'active',
-          currentRevisionBase: null,
-          createdAt: now,
-          updatedAt: now,
-        });
+      await tx.insert(schema.projects).values({
+        id: request.projectId,
+        name: request.name,
+        metadata: source.metadata,
+        status: 'active',
+        currentRevisionBase: null,
+        createdAt: now,
+        updatedAt: now,
+      });
       for (const object of objects) {
         const objectId = globalThis.crypto.randomUUID();
         await tx
@@ -526,6 +562,9 @@ export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
     renameProject,
     duplicateProject,
     deleteProjectPermanently,
+    getWorkspacePreferences,
+    saveWorkspacePreferences,
+    resetWorkspacePreferences,
     saveProject,
     saveProjectIncremental,
     createCheckpoint,

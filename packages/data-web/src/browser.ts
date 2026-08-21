@@ -7,6 +7,7 @@ import {
   type ListProjectsRequest,
   type ProjectLifecycleStatus,
   type DuplicateProjectRequest,
+  type StudioWorkspacePreferences,
 } from '@electrocraft/application';
 import type { PGlite } from '@electric-sql/pglite';
 import { PGliteWorker } from '@electric-sql/pglite/worker';
@@ -395,6 +396,13 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
     duplicateProject: (request: DuplicateProjectRequest) => persistOperation((repo) => repo.duplicateProject(request)),
     deleteProjectPermanently: (projectId: string) =>
       persistOperation((repo) => repo.deleteProjectPermanently(projectId)),
+    async getWorkspacePreferences(workspaceId: string) {
+      return (await ensureRepository()).getWorkspacePreferences(workspaceId);
+    },
+    saveWorkspacePreferences: (workspaceId: string, preferences: StudioWorkspacePreferences) =>
+      persistOperation((repo) => repo.saveWorkspacePreferences(workspaceId, preferences)),
+    resetWorkspacePreferences: (workspaceId: string) =>
+      persistOperation((repo) => repo.resetWorkspacePreferences(workspaceId)),
     async verifyProject(projectId: string) {
       return (await ensureRepository()).verifyProject(projectId);
     },

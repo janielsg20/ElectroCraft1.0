@@ -2,6 +2,7 @@ import { Button } from '@electrocraft/design-system';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { HelpTrigger } from '../../help/help-ui';
 import { projectStorageRuntime } from './project-storage-runtime';
+import { DEFAULT_STUDIO_WORKSPACE_PREFERENCES, type StudioWorkspacePreferences } from '@electrocraft/application';
 
 type RecoveryState =
   | { readonly state: 'idle' }
@@ -35,10 +36,21 @@ export function StorageSettings() {
   );
   const [repairing, setRepairing] = useState(false);
   const [recovery, setRecovery] = useState<RecoveryState>({ state: 'idle' });
+  const [workspace, setWorkspace] = useState<StudioWorkspacePreferences>(DEFAULT_STUDIO_WORKSPACE_PREFERENCES);
 
   useEffect(() => {
-    void projectStorageRuntime.initialize();
+    void projectStorageRuntime
+      .initialize()
+      .then(() => projectStorageRuntime.getWorkspacePreferences('device-default'))
+      .then(setWorkspace);
   }, []);
+  useEffect(
+    () =>
+      projectStorageRuntime.subscribeWorkspacePreferences(() => {
+        void projectStorageRuntime.getWorkspacePreferences('device-default').then(setWorkspace);
+      }),
+    [],
+  );
 
   const used = formatBytes(diagnostics.usageBytes);
   const quota = formatBytes(diagnostics.quotaBytes);
@@ -63,6 +75,77 @@ export function StorageSettings() {
         </div>
         <span className="ec-ia-setting-detail-value">{backendLabel(diagnostics.backend)}</span>
       </div>
+      <section aria-labelledby="workspace-settings-heading">
+        <h2 id="workspace-settings-heading">Espacio de trabajo</h2>
+        <p>Sidebar, paneles y layouts guardados son preferencias Studio-only y no se exportan con el proyecto.</p>
+        <div className="ec-topbar-setting-row">
+          <label>
+            Lado del Sidebar
+            <select
+              value={workspace.sidebarSide}
+              onChange={(e) => setWorkspace({ ...workspace, sidebarSide: e.target.value as 'left' | 'right' })}
+            >
+              <option value="left">Izquierda</option>
+              <option value="right">Derecha</option>
+            </select>
+          </label>
+          <label>
+            Visualización
+            <select
+              value={workspace.sidebarDisplay}
+              onChange={(e) =>
+                setWorkspace({
+                  ...workspace,
+                  sidebarDisplay: e.target.value as StudioWorkspacePreferences['sidebarDisplay'],
+                })
+              }
+            >
+              <option value="icons">Iconos</option>
+              <option value="text">Texto</option>
+              <option value="icons+text">Iconos y texto</option>
+            </select>
+          </label>
+        </div>
+        <div className="ec-topbar-setting-row">
+          <label>
+            Contexto{' '}
+            <input
+              type="number"
+              min="240"
+              max="380"
+              value={workspace.contextWidth}
+              onChange={(e) => setWorkspace({ ...workspace, contextWidth: Number(e.target.value) })}
+            />
+          </label>
+          <label>
+            Inspector{' '}
+            <input
+              type="number"
+              min="280"
+              max="440"
+              value={workspace.inspectorWidth}
+              onChange={(e) => setWorkspace({ ...workspace, inspectorWidth: Number(e.target.value) })}
+            />
+          </label>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            onClick={() =>
+              void projectStorageRuntime
+                .saveWorkspacePreferences('device-default', workspace, window.innerWidth)
+                .then(setWorkspace)
+            }
+          >
+            Guardar layout
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => void projectStorageRuntime.resetWorkspacePreferences('device-default').then(setWorkspace)}
+          >
+            Restaurar predeterminado
+          </Button>
+        </div>
+      </section>
       <div className="ec-topbar-setting-row" data-storage-recovery={recovery.state}>
         <div>
           <strong>Historial y recuperación</strong>

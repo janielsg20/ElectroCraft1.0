@@ -25,7 +25,8 @@
 - M04.4 — Project Home real: `COMPLETADA`; Gate `GREEN`.
 - M04.5 — New Project Wizard y project actions: `COMPLETADA`; Gate `GREEN`.
 - M04.6 — Import/Backup/Restore: `COMPLETADA`; Gate `GREEN`.
-- M04.7 — Workspace preferences: `ACTIVE`.
+- M04.7 — Workspace preferences: `COMPLETADA`; Gate `GREEN`.
+- M04.8 — Project Revision Checkpoints y Restore: `ACTIVE`.
 - Blockers P0/P1 funcionales conocidos: `0`.
 
 ## Cierre F03/M03.12
@@ -46,6 +47,6 @@ M04.3 cerró localmente `GREEN` sobre source funcional `987f4c333f6e8b4c48d7ebad
 
 ## Microfase activa
 
-`M04.7` — Workspace preferences.
+`M04.8` — Construir Project Revision Checkpoints y Restore.
 
-Referencias: `.ai/microphases/M04_7.md`, `.ai/evidence/F04/M04.6/CLOSURE_2026-08-21.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
+Referencias: `.ai/microphases/M04_8.md`, `.ai/evidence/F04/M04.7/CLOSURE_2026-08-21.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.

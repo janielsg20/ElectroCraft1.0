@@ -10,6 +10,12 @@ import { createProjectAutosaveController } from './project-storage-autosave';
 const port = createBrowserProjectStoragePort();
 const service = createProjectStorageService(port);
 const listeners = new Set<() => void>();
+const preferenceListeners = new Set<() => void>();
+const preferenceChannel =
+  typeof BroadcastChannel === 'undefined' ? null : new BroadcastChannel('electrocraft-workspace-preferences');
+preferenceChannel?.addEventListener('message', () => {
+  for (const listener of preferenceListeners) listener();
+});
 
 let snapshot: ProjectStorageDiagnostics = Object.freeze({
   state: 'initial',
@@ -104,6 +110,23 @@ export const projectStorageRuntime = Object.freeze({
   deleteProjectPermanently: service.deleteProjectPermanently,
   createBackup: service.createBackup,
   importBackup: service.importBackup,
+  getWorkspacePreferences: service.getWorkspacePreferences,
+  subscribeWorkspacePreferences(listener: () => void) {
+    preferenceListeners.add(listener);
+    return () => preferenceListeners.delete(listener);
+  },
+  async saveWorkspacePreferences(...args: Parameters<typeof service.saveWorkspacePreferences>) {
+    const result = await service.saveWorkspacePreferences(...args);
+    preferenceChannel?.postMessage({ type: 'workspace-preferences-changed' });
+    for (const listener of preferenceListeners) listener();
+    return result;
+  },
+  async resetWorkspacePreferences(workspaceId: string) {
+    const result = await service.resetWorkspacePreferences(workspaceId);
+    preferenceChannel?.postMessage({ type: 'workspace-preferences-changed' });
+    for (const listener of preferenceListeners) listener();
+    return result;
+  },
   async openProject(projectId: string) {
     const opened = await service.openProject(projectId);
     if (opened) currentProjectId = opened.project.id;

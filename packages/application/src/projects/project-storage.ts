@@ -68,6 +68,55 @@ export interface ProjectBackupPackage {
   readonly checksum: ElectroCraftCanonicalSnapshotChecksum;
 }
 export type ProjectImportStrategy = 'copy' | 'replace';
+export interface StudioWorkspaceLayout {
+  readonly id: string;
+  readonly name: string;
+  readonly contextWidth: number;
+  readonly inspectorWidth: number;
+  readonly visiblePanels: readonly string[];
+}
+export interface StudioWorkspacePreferences {
+  readonly sidebarSide: 'left' | 'right';
+  readonly sidebarCollapsed: boolean;
+  readonly sidebarWidth: number;
+  readonly sidebarDisplay: 'icons' | 'text' | 'icons+text';
+  readonly groupOrder: readonly string[];
+  readonly contextWidth: number;
+  readonly inspectorWidth: number;
+  readonly lastTab: string | null;
+  readonly lastDocumentId: string | null;
+  readonly layouts: readonly StudioWorkspaceLayout[];
+}
+export const DEFAULT_STUDIO_WORKSPACE_PREFERENCES: StudioWorkspacePreferences = Object.freeze({
+  sidebarSide: 'left',
+  sidebarCollapsed: false,
+  sidebarWidth: 240,
+  sidebarDisplay: 'icons+text',
+  groupOrder: [],
+  contextWidth: 288,
+  inspectorWidth: 320,
+  lastTab: null,
+  lastDocumentId: null,
+  layouts: [],
+});
+export function normalizeStudioWorkspacePreferences(
+  input: Partial<StudioWorkspacePreferences>,
+  viewportWidth = 1440,
+): StudioWorkspacePreferences {
+  const mobile = viewportWidth < 768;
+  const tablet = viewportWidth < 1024;
+  const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
+  return Object.freeze({
+    ...DEFAULT_STUDIO_WORKSPACE_PREFERENCES,
+    ...input,
+    sidebarSide: input.sidebarSide === 'right' ? 'right' : 'left',
+    sidebarWidth: clamp(input.sidebarWidth ?? 240, 64, 320),
+    contextWidth: mobile ? 288 : clamp(input.contextWidth ?? 288, 240, 380),
+    inspectorWidth: mobile || tablet ? 320 : clamp(input.inspectorWidth ?? 320, 280, 440),
+    groupOrder: Object.freeze([...(input.groupOrder ?? [])]),
+    layouts: Object.freeze([...(input.layouts ?? [])]),
+  });
+}
 
 export interface StoredProjectObjectInput {
   readonly objectId: string;
@@ -174,6 +223,12 @@ export interface ProjectStoragePort {
   renameProject(projectId: string, name: string): Promise<ProjectSummary>;
   duplicateProject(request: DuplicateProjectRequest): Promise<ProjectSummary>;
   deleteProjectPermanently(projectId: string): Promise<void>;
+  getWorkspacePreferences(workspaceId: string): Promise<StudioWorkspacePreferences>;
+  saveWorkspacePreferences(
+    workspaceId: string,
+    preferences: StudioWorkspacePreferences,
+  ): Promise<StudioWorkspacePreferences>;
+  resetWorkspacePreferences(workspaceId: string): Promise<StudioWorkspacePreferences>;
   verifyProject(projectId: string): Promise<ProjectIntegrityReport>;
   getDiagnostics(): Promise<ProjectStorageDiagnostics>;
   repair(): Promise<ProjectStorageDiagnostics>;
@@ -409,6 +464,19 @@ export function createProjectStorageService(port: ProjectStoragePort) {
       port.deleteProjectPermanently(requireNonEmpty(projectId, 'projectId')),
     createBackup,
     importBackup,
+    getWorkspacePreferences: (workspaceId: string) =>
+      port.getWorkspacePreferences(requireNonEmpty(workspaceId, 'workspaceId')),
+    saveWorkspacePreferences: (
+      workspaceId: string,
+      input: Partial<StudioWorkspacePreferences>,
+      viewportWidth?: number,
+    ) =>
+      port.saveWorkspacePreferences(
+        requireNonEmpty(workspaceId, 'workspaceId'),
+        normalizeStudioWorkspacePreferences(input, viewportWidth),
+      ),
+    resetWorkspacePreferences: (workspaceId: string) =>
+      port.resetWorkspacePreferences(requireNonEmpty(workspaceId, 'workspaceId')),
     verifyProject: (projectId: string) => port.verifyProject(requireNonEmpty(projectId, 'projectId')),
     saveProject: (request: SaveProjectRequest) => port.saveProject(normalizeSaveProjectRequest(request)),
     saveProjectIncremental: (request: IncrementalSaveProjectRequest) =>
