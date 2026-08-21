@@ -145,6 +145,12 @@ export function createProjectAutosaveController(service: AutosaveStorageService,
         deletedObjectIds: Object.freeze([...deletedObjectIds].sort()),
       });
     },
+    discardPending() {
+      clearScheduledFlush();
+      dirtyObjects.clear();
+      deletedObjectIds.clear();
+      project = null;
+    },
     dispose() {
       clearScheduledFlush();
     },
