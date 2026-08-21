@@ -12,9 +12,10 @@ Date: 2026-08-20.
 | F04 / M04.2        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.2/CLOSURE_2026-08-20.md` |
 | F04 / M04.3        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.3/CLOSURE_2026-08-21.md` |
 | F04 / M04.4        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.4/CLOSURE_2026-08-21.md` |
-| F04 / M04.5        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.6/CLOSURE_2026-08-21.md` |
-| F04 / M04.6        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.6/CLOSURE_2026-08-21.md` |
-| F04 / M04.7        | ACTIVE             | `.ai/microphases/M04_7.md`                     |
+| F04 / M04.5        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.7/CLOSURE_2026-08-21.md` |
+| F04 / M04.6        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.7/CLOSURE_2026-08-21.md` |
+| F04 / M04.7        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.7/CLOSURE_2026-08-21.md` |
+| F04 / M04.8        | ACTIVE             | `.ai/microphases/M04_8.md`                     |
 
 ## Cierre M04.1
 
