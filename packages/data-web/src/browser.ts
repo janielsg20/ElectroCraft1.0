@@ -6,6 +6,7 @@ import {
   type ProjectStoragePort,
   type ListProjectsRequest,
   type ProjectLifecycleStatus,
+  type DuplicateProjectRequest,
 } from '@electrocraft/application';
 import type { PGlite } from '@electric-sql/pglite';
 import { PGliteWorker } from '@electric-sql/pglite/worker';
@@ -390,6 +391,10 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
     },
     setProjectStatus: (projectId: string, status: ProjectLifecycleStatus) =>
       persistOperation((repo) => repo.setProjectStatus(projectId, status)),
+    renameProject: (projectId: string, name: string) => persistOperation((repo) => repo.renameProject(projectId, name)),
+    duplicateProject: (request: DuplicateProjectRequest) => persistOperation((repo) => repo.duplicateProject(request)),
+    deleteProjectPermanently: (projectId: string) =>
+      persistOperation((repo) => repo.deleteProjectPermanently(projectId)),
     async verifyProject(projectId: string) {
       return (await ensureRepository()).verifyProject(projectId);
     },

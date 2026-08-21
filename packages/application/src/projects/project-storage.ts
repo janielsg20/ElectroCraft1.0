@@ -52,6 +52,11 @@ export interface ListProjectsRequest {
   readonly status?: ProjectLifecycleStatus | 'all';
   readonly sort?: ProjectListSort;
 }
+export interface DuplicateProjectRequest {
+  readonly sourceProjectId: string;
+  readonly projectId: string;
+  readonly name: string;
+}
 
 export interface StoredProjectObjectInput {
   readonly objectId: string;
@@ -155,6 +160,9 @@ export interface ProjectStoragePort {
   openProject(projectId: string): Promise<OpenProjectResult | null>;
   listProjects(request: Required<ListProjectsRequest>): Promise<readonly ProjectSummary[]>;
   setProjectStatus(projectId: string, status: ProjectLifecycleStatus): Promise<ProjectSummary>;
+  renameProject(projectId: string, name: string): Promise<ProjectSummary>;
+  duplicateProject(request: DuplicateProjectRequest): Promise<ProjectSummary>;
+  deleteProjectPermanently(projectId: string): Promise<void>;
   verifyProject(projectId: string): Promise<ProjectIntegrityReport>;
   getDiagnostics(): Promise<ProjectStorageDiagnostics>;
   repair(): Promise<ProjectStorageDiagnostics>;
@@ -329,6 +337,16 @@ export function createProjectStorageService(port: ProjectStoragePort) {
     listProjects: (request: ListProjectsRequest = {}) => port.listProjects(normalizeListProjectsRequest(request)),
     setProjectStatus: (projectId: string, status: ProjectLifecycleStatus) =>
       port.setProjectStatus(requireNonEmpty(projectId, 'projectId'), normalizeProjectLifecycleStatus(status)),
+    renameProject: (projectId: string, name: string) =>
+      port.renameProject(requireNonEmpty(projectId, 'projectId'), requireNonEmpty(name, 'name')),
+    duplicateProject: (sourceProjectId: string, name: string, projectId = globalThis.crypto.randomUUID()) =>
+      port.duplicateProject({
+        sourceProjectId: requireNonEmpty(sourceProjectId, 'sourceProjectId'),
+        projectId: requireNonEmpty(projectId, 'projectId'),
+        name: requireNonEmpty(name, 'name'),
+      }),
+    deleteProjectPermanently: (projectId: string) =>
+      port.deleteProjectPermanently(requireNonEmpty(projectId, 'projectId')),
     verifyProject: (projectId: string) => port.verifyProject(requireNonEmpty(projectId, 'projectId')),
     saveProject: (request: SaveProjectRequest) => port.saveProject(normalizeSaveProjectRequest(request)),
     saveProjectIncremental: (request: IncrementalSaveProjectRequest) =>

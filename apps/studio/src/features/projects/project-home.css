@@ -94,3 +94,75 @@
     grid-template-columns: 1fr;
   }
 }
+.ec-project-wizard-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  background: #0008;
+  padding: 16px;
+}
+.ec-project-wizard {
+  width: min(760px, 100%);
+  max-height: 90dvh;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--background);
+  padding: 20px;
+}
+.ec-project-wizard > header,
+.ec-project-wizard > footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.ec-project-wizard ol {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  padding: 0;
+  list-style: none;
+}
+.ec-project-wizard li {
+  padding: 8px;
+  text-align: center;
+  background: var(--muted);
+}
+.ec-project-wizard li[aria-current='step'] {
+  font-weight: 700;
+  outline: 2px solid var(--ring);
+}
+.ec-project-wizard-body {
+  min-height: 220px;
+  padding: 20px 0;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+.ec-project-wizard fieldset {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.ec-project-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+}
+@media (max-width: 767px) {
+  .ec-project-wizard-backdrop {
+    padding: 0;
+  }
+  .ec-project-wizard {
+    width: 100%;
+    height: 100dvh;
+    max-height: none;
+    border-radius: 0;
+  }
+  .ec-project-wizard ol {
+    font-size: 12px;
+  }
+}

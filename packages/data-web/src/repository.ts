@@ -19,6 +19,7 @@ import {
   type ProjectSummary,
   type ProjectLifecycleStatus,
   type ListProjectsRequest,
+  type DuplicateProjectRequest,
   type StoredProjectObject,
 } from '@electrocraft/application';
 import { and, asc, count, desc, eq, ilike } from 'drizzle-orm';
@@ -108,6 +109,62 @@ export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
     );
     if (!project) throw new Error(`project not found: ${projectId}`);
     return project;
+  }
+  async function renameProject(projectId: string, name: string): Promise<ProjectSummary> {
+    const changed = await db
+      .update(schema.projects)
+      .set({ name, updatedAt: new Date() })
+      .where(eq(schema.projects.id, projectId))
+      .returning({ id: schema.projects.id });
+    if (!changed[0]) throw new Error(`project not found: ${projectId}`);
+    return (await listProjects({ search: '', status: 'all', sort: 'updated-desc' })).find(
+      (item) => item.id === projectId,
+    )!;
+  }
+  async function duplicateProject(request: DuplicateProjectRequest): Promise<ProjectSummary> {
+    await db.transaction(async (tx) => {
+      const source = (
+        await tx.select().from(schema.projects).where(eq(schema.projects.id, request.sourceProjectId)).limit(1)
+      )[0];
+      if (!source) throw new Error(`project not found: ${request.sourceProjectId}`);
+      const objects = await tx
+        .select()
+        .from(schema.projectObjects)
+        .where(eq(schema.projectObjects.projectId, request.sourceProjectId));
+      const now = new Date();
+      await tx
+        .insert(schema.projects)
+        .values({
+          id: request.projectId,
+          name: request.name,
+          metadata: source.metadata,
+          status: 'active',
+          currentRevisionBase: null,
+          createdAt: now,
+          updatedAt: now,
+        });
+      for (const object of objects) {
+        const objectId = globalThis.crypto.randomUUID();
+        await tx
+          .insert(schema.projectObjects)
+          .values({ ...object, projectId: request.projectId, objectId, updatedAt: now });
+      }
+    });
+    return (await listProjects({ search: '', status: 'all', sort: 'updated-desc' })).find(
+      (item) => item.id === request.projectId,
+    )!;
+  }
+  async function deleteProjectPermanently(projectId: string): Promise<void> {
+    const project = (
+      await db
+        .select({ status: schema.projects.status })
+        .from(schema.projects)
+        .where(eq(schema.projects.id, projectId))
+        .limit(1)
+    )[0];
+    if (!project) throw new Error(`project not found: ${projectId}`);
+    if (project.status !== 'trashed') throw new Error('project must be trashed before permanent deletion');
+    await db.delete(schema.projects).where(eq(schema.projects.id, projectId));
   }
   async function saveProject(request: NormalizedSaveProjectRequest): Promise<ProjectStorageRevision> {
     validateProjectStorageRevision(request.revision);
@@ -466,6 +523,9 @@ export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
   return Object.freeze({
     listProjects,
     setProjectStatus,
+    renameProject,
+    duplicateProject,
+    deleteProjectPermanently,
     saveProject,
     saveProjectIncremental,
     createCheckpoint,
