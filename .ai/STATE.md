@@ -19,7 +19,8 @@
 - M03.12 — E2E AppShell completo: `COMPLETADA`; Gate `GREEN`.
 - F04 — Persistencia local real del Studio: `IN_PROGRESS`.
 - M04.1 — Schema físico estable con PGlite/Drizzle + storage browser: `COMPLETADA`; Gate `GREEN`.
-- M04.2 — Inicializar PGlite Multi-Tab Worker y migrations: `ACTIVE`.
+- M04.2 — Inicializar PGlite Multi-Tab Worker y migrations: `COMPLETADA`; Gate `GREEN`.
+- M04.3 — Persistencia incremental, autosave y recovery: `ACTIVE`.
 - Blockers P0/P1 funcionales conocidos: `0`.
 
 ## Cierre F03/M03.12
@@ -28,7 +29,10 @@ M03.12 cerró en head `af88c60264a243d97cd8e5ca708eedc8ded04028` con run `323208
 ## Cierre M04.1
 M04.1 validó la implementación funcional en source commit `8fd9460a43a4a3b5eaf91e62b83f4b3cb7edf10b`. El informe `.ai/evidence/F04/M04.1/VALIDATION_LATEST.md` quedó `GREEN`: npm ci, format, lint, typecheck, boundaries, Vitest dedicado, full test, build, Chromium y smoke browser con persistencia tras reload.
 
-## Microfase activa
-`M04.2` — Inicializar PGlite Multi-Tab Worker y migrations: lifecycle bootstrap → migrations → health → repositories ready, una única DB lógica, leader election/handoff y pruebas con dos clientes/tabs.
+## Cierre M04.2
+M04.2 validó el source funcional `6847a5fa410f0478c7e393b3d06800b6f89af072` en el workflow dedicado `M04.2 Multi-Tab Worker Gate`, run `32430992572`, job `96622322833`, conclusión `success`. Incluyó lint, typecheck, boundaries, tests completos, build y Playwright real de dos tabs con write/read compartido y leader handoff.
 
-Referencias: `.ai/microphases/M04_2.md`, `.ai/evidence/F04/M04.1/CLOSURE_2026-08-20.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
+## Microfase activa
+`M04.3` — Persistencia incremental, autosave y recovery: dirty-set por `project_object`, transacciones que escriben únicamente objetos afectados, checkpoints restaurables, recovery y estados Guardando…/Guardado posteriores al commit.
+
+Referencias: `.ai/microphases/M04_3.md`, `.ai/evidence/F04/M04.2/CLOSURE_2026-08-20.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
