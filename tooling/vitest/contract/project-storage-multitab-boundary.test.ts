@@ -25,6 +25,8 @@ describe('M04.2 multi-tab worker boundary', () => {
     expect(browser).toContain('verifyStudioStorageHealth');
     expect(browser).not.toContain('runtime.client.isLeader');
     expect(worker).toContain('createLeaderSignal(options.meta');
+    expect(worker).toContain('LEADER_REQUEST');
+    expect(worker).toContain('channel.addEventListener');
     expect(worker).toContain('leaderSignal?.announce()');
   });
 
