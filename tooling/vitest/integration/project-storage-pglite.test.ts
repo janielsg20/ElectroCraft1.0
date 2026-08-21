@@ -8,6 +8,7 @@ import { drizzle } from 'drizzle-orm/pglite';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   M04_1_MIGRATION_CHECKSUM,
+  M04_3_MIGRATION_CHECKSUM,
   STUDIO_STORAGE_TABLES,
   applyStudioStorageMigrations,
   createDrizzleProjectRepository,
@@ -63,7 +64,10 @@ describe('M04.1 PGlite + Drizzle persistence', () => {
       const journal = await client.query<{ schema_version: number; checksum: string }>(
         'SELECT schema_version, checksum FROM storage_migration_journal ORDER BY schema_version',
       );
-      expect(journal.rows).toEqual([{ schema_version: 1, checksum: M04_1_MIGRATION_CHECKSUM }]);
+      expect(journal.rows).toEqual([
+        { schema_version: 1, checksum: M04_1_MIGRATION_CHECKSUM },
+        { schema_version: 2, checksum: M04_3_MIGRATION_CHECKSUM },
+      ]);
 
       await client.query('UPDATE storage_migration_journal SET checksum = $1 WHERE schema_version = $2', [
         'm04.1:incompatible-schema',

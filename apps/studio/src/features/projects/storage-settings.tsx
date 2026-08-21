@@ -3,6 +3,16 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 import { HelpTrigger } from '../../help/help-ui';
 import { projectStorageRuntime } from './project-storage-runtime';
 
+type RecoveryState =
+  | { readonly state: 'idle' }
+  | { readonly state: 'checking' }
+  | { readonly state: 'coherent' }
+  | { readonly state: 'unavailable'; readonly message: string }
+  | { readonly state: 'available'; readonly revisionId: string; readonly message: string }
+  | { readonly state: 'restoring'; readonly revisionId: string; readonly message: string }
+  | { readonly state: 'restored'; readonly message: string }
+  | { readonly state: 'error'; readonly message: string };
+
 function formatBytes(value: number | null) {
   if (value === null) return 'No disponible';
   if (value < 1024) return `${value} B`;
@@ -24,6 +34,7 @@ export function StorageSettings() {
     projectStorageRuntime.getSnapshot,
   );
   const [repairing, setRepairing] = useState(false);
+  const [recovery, setRecovery] = useState<RecoveryState>({ state: 'idle' });
 
   useEffect(() => {
     void projectStorageRuntime.initialize();
@@ -51,6 +62,84 @@ export function StorageSettings() {
           </p>
         </div>
         <span className="ec-ia-setting-detail-value">{backendLabel(diagnostics.backend)}</span>
+      </div>
+      <div className="ec-topbar-setting-row" data-storage-recovery={recovery.state}>
+        <div>
+          <strong>Historial y recuperación</strong>
+          <p role="status" aria-live="polite">
+            {recovery.state === 'idle'
+              ? 'Comprueba la integridad del proyecto actual y localiza el último checkpoint restaurable.'
+              : recovery.state === 'checking'
+                ? 'Comprobando integridad…'
+                : recovery.state === 'coherent'
+                  ? 'El proyecto actual es coherente; no necesita restauración.'
+                  : recovery.message}
+          </p>
+        </div>
+        <div className="flex flex-wrap justify-end gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={
+              projectStorageRuntime.currentProjectId() === null ||
+              recovery.state === 'checking' ||
+              recovery.state === 'restoring'
+            }
+            onClick={() => {
+              const projectId = projectStorageRuntime.currentProjectId();
+              if (!projectId) return;
+              setRecovery({ state: 'checking' });
+              void projectStorageRuntime
+                .verifyWithRecovery(projectId)
+                .then(({ integrity, recovery: candidate }) => {
+                  if (integrity.coherent) return setRecovery({ state: 'coherent' });
+                  if (!candidate) {
+                    return setRecovery({
+                      state: 'unavailable',
+                      message: 'Se detectó una incoherencia, pero no existe un checkpoint válido para restaurar.',
+                    });
+                  }
+                  return setRecovery({
+                    state: 'available',
+                    revisionId: candidate.revisionId,
+                    message: `Checkpoint disponible del ${new Date(candidate.createdAt).toLocaleString('es')}.`,
+                  });
+                })
+                .catch((error: unknown) =>
+                  setRecovery({
+                    state: 'error',
+                    message: error instanceof Error ? error.message : 'No se pudo comprobar la integridad.',
+                  }),
+                );
+            }}
+          >
+            Comprobar integridad
+          </Button>
+          {recovery.state === 'available' || recovery.state === 'restoring' ? (
+            <Button
+              variant="default"
+              size="sm"
+              disabled={recovery.state === 'restoring'}
+              onClick={() => {
+                const projectId = projectStorageRuntime.currentProjectId();
+                if (!projectId) return;
+                const revisionId = recovery.revisionId;
+                setRecovery({ state: 'restoring', revisionId, message: 'Restaurando checkpoint…' });
+                void projectStorageRuntime
+                  .restoreRevision(projectId, revisionId)
+                  .then(() => setRecovery({ state: 'restored', message: 'Checkpoint restaurado correctamente.' }))
+                  .catch((error: unknown) =>
+                    setRecovery({
+                      state: 'error',
+                      message: error instanceof Error ? error.message : 'No se pudo restaurar el checkpoint.',
+                    }),
+                  );
+              }}
+            >
+              {recovery.state === 'restoring' ? 'Restaurando…' : 'Restaurar'}
+            </Button>
+          ) : null}
+        </div>
       </div>
       <div className="ec-topbar-setting-row">
         <div>

@@ -40,7 +40,7 @@ describe('M04.1 storage ownership boundary', () => {
   });
 
   it('pins one physical schema independent of user-defined model count', () => {
-    expect(STUDIO_STORAGE_SCHEMA_VERSION).toBe(1);
+    expect(STUDIO_STORAGE_SCHEMA_VERSION).toBe(2);
     expect(STUDIO_STORAGE_TABLES).toEqual(
       expect.arrayContaining([
         'projects',
@@ -57,8 +57,22 @@ describe('M04.1 storage ownership boundary', () => {
       ]),
     );
     const migration = read('packages/data-web/drizzle/0000_m04_1_storage.sql');
+    const incrementalMigration = read('packages/data-web/drizzle/0001_m04_3_incremental.sql');
     expect(migration).toContain('data jsonb NOT NULL');
     expect(migration).toContain('record_field_index_fts_idx');
     expect(migration).not.toMatch(/CREATE TABLE[^;]*(user_model|dynamic_model)/i);
+    expect(incrementalMigration).toContain('current_revision_base');
+  });
+
+  it('keeps autosave incremental and histories session-local', () => {
+    const application = read('packages/application/src/projects/project-storage.ts');
+    const repository = read('packages/data-web/src/repository.ts');
+    const autosave = read('apps/studio/src/features/projects/project-storage-autosave.ts');
+
+    expect(application).toContain('dirtyObjects');
+    expect(application).toContain('deletedObjectIds');
+    expect(repository).toContain('saveProjectIncremental');
+    expect(autosave).toContain('saveProjectIncremental');
+    expect([application, repository, autosave].join('\n')).not.toMatch(/PuckHistory|ReteHistory|historySnapshot/);
   });
 });

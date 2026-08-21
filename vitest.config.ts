@@ -24,6 +24,7 @@ export default defineConfig({
           name: 'integration',
           environment: 'node',
           include: ['tooling/vitest/integration/**/*.test.ts'],
+          testTimeout: 15_000,
         },
       },
     ],

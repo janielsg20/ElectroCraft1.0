@@ -23,6 +23,7 @@ let snapshot: ProjectStorageDiagnostics = Object.freeze({
   message: 'Almacenamiento local pendiente de inicialización.',
 });
 let initializePromise: Promise<ProjectStorageDiagnostics> | null = null;
+let currentProjectId: string | null = null;
 
 function publish(next: ProjectStorageDiagnostics) {
   snapshot = next;
@@ -80,10 +81,12 @@ export const projectStorageRuntime = Object.freeze({
   },
   async saveProject(request: SaveProjectRequest) {
     const revision = await runPersistence(() => service.saveProject(request));
+    currentProjectId = request.project.id;
     autosave.noteCheckpointCommitted();
     return revision;
   },
   queueAutosave(request: IncrementalSaveProjectRequest) {
+    currentProjectId = request.project.id;
     return autosave.queue(request);
   },
   flushAutosave: () => autosave.flush(),
@@ -93,6 +96,7 @@ export const projectStorageRuntime = Object.freeze({
   checkpointBeforePublish: (projectId: string) => autosave.checkpoint(projectId, 'pre-publish'),
   checkpointBeforeExport: (projectId: string) => autosave.checkpoint(projectId, 'pre-export'),
   pendingAutosaveObjectIds: () => autosave.pendingObjectIds(),
+  currentProjectId: () => currentProjectId,
   openProject: service.openProject,
   verifyProject: service.verifyProject,
   async verifyWithRecovery(projectId: string) {
@@ -105,7 +109,9 @@ export const projectStorageRuntime = Object.freeze({
   recoveryCandidate: service.recoveryCandidate,
   async restoreRevision(projectId: string, revisionId: string) {
     autosave.discardPending();
-    return runPersistence(() => service.restoreRevision(projectId, revisionId));
+    const revision = await runPersistence(() => service.restoreRevision(projectId, revisionId));
+    currentProjectId = projectId;
+    return revision;
   },
   async close() {
     await autosave.flush();

@@ -280,7 +280,8 @@ export function normalizeIncrementalSaveProjectRequest(
   const dirtyIds = new Set<string>();
   const dirtyObjects = request.dirtyObjects.map((object) => {
     const normalized = normalizeStoredProjectObject(project.id, object, now);
-    if (dirtyIds.has(normalized.objectId)) throw new TypeError(`duplicate dirty project object: ${normalized.objectId}`);
+    if (dirtyIds.has(normalized.objectId))
+      throw new TypeError(`duplicate dirty project object: ${normalized.objectId}`);
     dirtyIds.add(normalized.objectId);
     return normalized;
   });
@@ -291,6 +292,10 @@ export function normalizeIncrementalSaveProjectRequest(
     if (deletedIds.has(objectId)) throw new TypeError(`duplicate deleted project object: ${objectId}`);
     if (dirtyIds.has(objectId)) throw new TypeError(`project object cannot be dirty and deleted: ${objectId}`);
     deletedIds.add(objectId);
+  }
+
+  if (dirtyObjects.length === 0 && deletedIds.size === 0) {
+    throw new TypeError('incremental project save requires at least one dirty or deleted object');
   }
 
   return Object.freeze({
