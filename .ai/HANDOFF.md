@@ -14,17 +14,18 @@ F04 / M04.6 — Import/Backup/Restore — `ACTIVE`.
 - `@electrocraft/data-web` mantiene PGlite `0.5.5` + Drizzle `0.45.2`, IndexedDB baseline, OPFS AHP opt-in, multi-tab Worker oficial, migrations/health fail-closed y leader handoff validado en Chromium.
 - PGlite conserva ownership de la elección; ElectroCraft solo publica una identidad observable del Worker líder desde `worker.init(options)` para evitar una carrera detectada en `PGliteWorker.isLeader`.
 - Monorepo actual: 19 owner packages, 21 aliases, 2 apps.
-- Blockers P0/P1 conocidos: `0`.
+- Remediación local del audit registrada en `.ai/evidence/F04/M04.6/AUDIT_REMEDIATION_2026-08-21.md`.
+- Blocker P0/P1 pendiente: gate E2E completo + CI remoto de la remediación; no declarar M04.6 cerrada antes de esa evidencia y de implementar Import/Backup.
 
 ## Siguiente acción exacta
 
-1. Releer `.ai/microphases/M04_6.md` y mantener PGlite/Drizzle como único owner de persistencia.
-2. Cambiar primero repository/service contract para listar, buscar, ordenar, abrir y cambiar estado de proyectos.
-3. Añadir la migration mínima para Archive/Trash en `projects`, sin crear un modelo paralelo.
-4. Construir la pantalla raíz `Proyectos` cuando no existe proyecto abierto, con toolbar 44px y CTA `Nuevo proyecto`.
-5. Renderizar grid/list desde la DB real con empty/loading/error states honestos.
-6. Abrir un proyecto cargando sus objetos committed y conservar recovery M04.3.
-7. Añadir unit/contract/integration/negative/round-trip/E2E responsive y gates completos.
+1. Ejecutar el E2E completo y CI remoto de la remediación; mantener M04.6 `ACTIVE` hasta obtener evidencia real.
+2. Cambiar primero el contract repository/service para backup e import, sin acceso PGlite desde UI.
+3. Definir backup versionado: manifest + snapshot canónico + referencias/archivos media y checksum verificable.
+4. Validar manifest/version/checksum antes de cualquier escritura y resolver colisiones con `importar como copia` explícito.
+5. Implementar la transacción PGlite/Drizzle y conservar el snapshot `pre-restore-safety` antes de reemplazar.
+6. Conectar `Proyectos > menú del proyecto > Importar/Crear copia/Restaurar` y `Configuración > Almacenamiento` con wizard/confirmación, resumen de impacto y progreso en español.
+7. Añadir unit/contract/negative/round-trip/integration real/E2E responsive y registrar el gate completo.
 
 ## Read set
 

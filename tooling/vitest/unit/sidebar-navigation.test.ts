@@ -31,7 +31,8 @@ describe('M03.3 Sidebar navigation', () => {
   });
 
   it('resolves active destinations without creating a second routing system', () => {
-    expect(resolveSidebarActiveItem('/')).toBe('editor');
+    expect(resolveSidebarActiveItem('/')).toBeNull();
+    expect(resolveSidebarActiveItem('/editor')).toBe('editor');
     expect(resolveSidebarActiveItem('/screens')).toBe('screens');
     expect(resolveSidebarActiveItem('/screens/hero')).toBe('screens');
     expect(resolveSidebarActiveItem('/compatibility/wordpress')).toBe('compatibility');

@@ -12,7 +12,7 @@ const conceptualSearchCases = [
 test.describe('M03.8 discoverable Palette', () => {
   test('renders search and the exact high-density catalog on desktop', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     const palette = page.locator('[data-studio-palette]').first();
     await expect(palette).toBeVisible();
@@ -33,7 +33,7 @@ test.describe('M03.8 discoverable Palette', () => {
   for (const [query, expectedId] of conceptualSearchCases) {
     test(`discovers ${query} by conceptual search`, async ({ page }) => {
       await page.setViewportSize({ width: 1440, height: 900 });
-      await page.goto('/');
+      await page.goto('/editor');
       const palette = page.locator('[data-studio-palette]').first();
       const search = palette.getByRole('searchbox', { name: 'Buscar componentes' });
       await search.fill(query);
@@ -43,7 +43,7 @@ test.describe('M03.8 discoverable Palette', () => {
 
   test('persists favorites and recent by palette item id', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/');
+    await page.goto('/editor');
     const palette = page.locator('[data-studio-palette]').first();
     const text = palette.locator('[data-palette-item="palette.basic.text"]').first();
     await text.getByRole('button', { name: 'Añadir a favoritos' }).click();
@@ -65,7 +65,7 @@ test.describe('M03.8 discoverable Palette', () => {
 
   test('shows actionable diagnostics instead of silent success for a pending Block mapping', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/');
+    await page.goto('/editor');
     const palette = page.locator('[data-studio-palette]').first();
     const search = palette.getByRole('searchbox', { name: 'Buscar componentes' });
     await search.fill('Tarjeta de producto');
@@ -84,7 +84,7 @@ test.describe('M03.8 discoverable Palette', () => {
 
   test('moves focus from search into items and Escape back to canvas', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/');
+    await page.goto('/editor');
     const palette = page.locator('[data-studio-palette]').first();
     const search = palette.getByRole('searchbox', { name: 'Buscar componentes' });
     await search.focus();
@@ -96,7 +96,7 @@ test.describe('M03.8 discoverable Palette', () => {
 
   test('uses the mobile Componentes bottom sheet without desktop compression', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
-    await page.goto('/');
+    await page.goto('/editor');
     await page.locator('[data-mobile-destination="components"]').click();
 
     const sheet = page.locator('[data-editor-mobile-sheet="components"]');

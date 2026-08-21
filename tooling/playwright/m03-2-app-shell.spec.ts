@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test.describe('M03.2 AppShell', () => {
   test('reserves exact desktop geometry and keeps scrolling inside the workspace', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1000 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     const shell = page.locator('.ec-app-shell');
     const sidebar = page.locator('.ec-app-shell-sidebar');
@@ -41,7 +41,7 @@ test.describe('M03.2 AppShell', () => {
 
   test('keeps the reserved 64px rail on laptop without shrinking the workspace', async ({ page }) => {
     await page.setViewportSize({ width: 1100, height: 800 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     const sidebarBox = await page.locator('.ec-app-shell-sidebar').boundingBox();
     const workspaceBox = await page.locator('.ec-app-shell-workspace').boundingBox();
@@ -54,7 +54,7 @@ test.describe('M03.2 AppShell', () => {
 
   test('uses a tablet rail plus a keyboard-accessible full-navigation Radix Sheet', async ({ page }) => {
     await page.setViewportSize({ width: 900, height: 800 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     const sidebar = page.locator('.ec-app-shell-sidebar');
     await expect(sidebar).toBeVisible();
@@ -75,7 +75,7 @@ test.describe('M03.2 AppShell', () => {
 
   test('keeps mobile touch targets and avoids horizontal overflow', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     const menuButton = page.getByRole('button', { name: 'Abrir navegación' });
     const menuBox = await menuButton.boundingBox();

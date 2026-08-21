@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test.describe('M03.11 contextual Help system', () => {
   test('keeps Ayuda before Settings and opens a searchable drawer with focus restoration', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     const help = page.getByRole('button', { name: 'Ayuda' });
     const settings = page.getByRole('button', { name: 'Configuración' });

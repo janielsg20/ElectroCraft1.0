@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+  M04_1_MIGRATION_CHECKSUM,
+  M04_3_MIGRATION_CHECKSUM,
   M04_4_MIGRATION_CHECKSUM,
+  M04_6_REFERENTIAL_INTEGRITY_CHECKSUM,
   STUDIO_STORAGE_SCHEMA_VERSION,
   verifyStudioStorageHealth,
 } from '@electrocraft/data-web';
@@ -16,18 +19,22 @@ function createHealthClient(checksum: string) {
       if (query.startsWith('SELECT 1')) {
         return { rows: [{ healthy: 1 } as unknown as T] };
       }
-      return { rows: [{ checksum } as unknown as T] };
+      return {
+        rows: [M04_1_MIGRATION_CHECKSUM, M04_3_MIGRATION_CHECKSUM, M04_4_MIGRATION_CHECKSUM, checksum].map(
+          (migrationChecksum, index) => ({ schema_version: index + 1, checksum: migrationChecksum }) as unknown as T,
+        ),
+      };
     },
   };
 }
 
 describe('M04.2 storage lifecycle health', () => {
   it('accepts the current migration journal after the database responds', async () => {
-    const client = createHealthClient(M04_4_MIGRATION_CHECKSUM);
+    const client = createHealthClient(M04_6_REFERENTIAL_INTEGRITY_CHECKSUM);
 
     await expect(verifyStudioStorageHealth(client)).resolves.toEqual({
       schemaVersion: STUDIO_STORAGE_SCHEMA_VERSION,
-      migrationChecksum: M04_4_MIGRATION_CHECKSUM,
+      migrationChecksum: M04_6_REFERENTIAL_INTEGRITY_CHECKSUM,
     });
     expect(client.calls).toBe(2);
   });

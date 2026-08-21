@@ -88,7 +88,8 @@ const topbarCopy: StudioTopbarCopy = Object.freeze({
 
 const workspacePreferencesPort = createMemoryWorkspacePreferencesPort();
 
-function resolveActiveLabel(activeItemId: ReturnType<typeof resolveSidebarActiveItem>) {
+function resolveActiveLabel(activeItemId: ReturnType<typeof resolveSidebarActiveItem>, pathname: string) {
+  if (pathname === '/') return commonT('studio.topbar.projectsLabel');
   for (const group of studioSidebarNavigation) {
     for (const item of group.items) {
       if (item.id === activeItemId) return item.label;
@@ -106,7 +107,7 @@ export function StudioAppShellRoute({
 }) {
   const help = getStudioHelpDescriptor('help.studio.shell');
   const activeItemId = resolveSidebarActiveItem(window.location.pathname);
-  const activeLabel = resolveActiveLabel(activeItemId);
+  const activeLabel = resolveActiveLabel(activeItemId, window.location.pathname);
 
   return (
     <StudioAppearanceProvider>

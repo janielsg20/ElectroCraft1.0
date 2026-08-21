@@ -77,7 +77,18 @@ export const projectStorageRuntime = Object.freeze({
   },
   async repair() {
     publish(Object.freeze({ ...snapshot, state: 'loading', message: 'Revisando almacenamiento local…' }));
-    return publish(await service.repair());
+    try {
+      return publish(await service.repair());
+    } catch (error) {
+      publish(
+        Object.freeze({
+          ...snapshot,
+          state: 'error',
+          message: error instanceof Error ? error.message : 'No se pudo revisar el almacenamiento local.',
+        }),
+      );
+      throw error;
+    }
   },
   async saveProject(request: SaveProjectRequest) {
     const revision = await runPersistence(() => service.saveProject(request));
@@ -117,7 +128,7 @@ export const projectStorageRuntime = Object.freeze({
   },
   recoveryCandidate: service.recoveryCandidate,
   async restoreRevision(projectId: string, revisionId: string) {
-    autosave.discardPending();
+    await autosave.flush();
     const revision = await runPersistence(() => service.restoreRevision(projectId, revisionId));
     currentProjectId = projectId;
     return revision;

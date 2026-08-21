@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
 async function resetAppearance(page: Page) {
-  await page.goto('/');
+  await page.goto('/editor');
   await page.evaluate(() => {
     window.localStorage.removeItem('electrocraft.studio.appearance.v1');
     window.localStorage.removeItem('electrocraft.studio.appearance-presets.v1');

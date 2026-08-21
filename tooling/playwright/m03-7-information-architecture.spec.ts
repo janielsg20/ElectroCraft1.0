@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test.describe('M03.7 Progressive Disclosure and information architecture', () => {
   test('keeps Settings primary controls visible and Advanced collapsed by default', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     const settingsTrigger = page.locator('[data-topbar-settings-trigger]');
     await settingsTrigger.click();
@@ -29,7 +29,7 @@ test.describe('M03.7 Progressive Disclosure and information architecture', () =>
     page,
   }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     const inspector = page.locator('[data-editor-region="inspector"]');
     await expect(inspector).toBeVisible();
@@ -74,7 +74,7 @@ test.describe('M03.7 Progressive Disclosure and information architecture', () =>
 
   test('keeps mobile Properties reachable through the existing bottom Sheet', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     const properties = page.locator('[data-mobile-destination="properties"]');
     await properties.click();

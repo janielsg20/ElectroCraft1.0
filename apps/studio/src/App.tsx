@@ -1,4 +1,4 @@
-import { useState, useSyncExternalStore } from 'react';
+import { lazy, Suspense, useEffect, useState, useSyncExternalStore } from 'react';
 import { evaluateStudioBootstrapHealth } from './bootstrap-health';
 import { projectStorageRuntime } from './features/projects/project-storage-runtime';
 import { ProjectHome } from './features/projects/project-home';
@@ -8,7 +8,6 @@ import { studioWorkspaceDescriptor } from './index';
 import { studioT } from './i18n/studio-shell.es';
 import { StudioAppShellRoute } from './shell/app-shell-route';
 import { DesignSystemDevelopmentRoute } from './shell/design-system-route';
-import { StudioEditorWorkspace } from './shell/editor-workspace';
 import { StudioContentListDetailRoute, StudioModuleEmptyStateRoute } from './shell/information-architecture-ui';
 import { resolveSidebarActiveItem } from './shell/sidebar-navigation';
 import './styles.css';
@@ -26,8 +25,12 @@ const projectHomeRoute = Object.freeze({
 });
 
 const designSystemRoute = '/__design-system';
+const editorRoute = '/editor';
 const contentRoute = '/content';
 const canonicalEmptyModuleRoutes = new Set(['/queries', '/forms', '/admin', '/media', '/export']);
+const StudioEditorWorkspace = lazy(() =>
+  import('./shell/editor-workspace').then((module) => ({ default: module.StudioEditorWorkspace })),
+);
 
 function StudioWorkspaceBootstrap({
   pathname,
@@ -87,20 +90,36 @@ function StudioWorkspaceBootstrap({
 }
 
 function resolveStudioWorkspace(pathname: string, health: ReturnType<typeof evaluateStudioBootstrapHealth>) {
-  if (pathname === projectHomeRoute.pathname) return <StudioEditorWorkspace />;
+  if (pathname === editorRoute) {
+    return (
+      <Suspense fallback={<p role="status">Cargando editor…</p>}>
+        <StudioEditorWorkspace />
+      </Suspense>
+    );
+  }
   if (pathname === contentRoute) return <StudioContentListDetailRoute />;
   if (canonicalEmptyModuleRoutes.has(pathname)) return <StudioModuleEmptyStateRoute pathname={pathname} />;
   return <StudioWorkspaceBootstrap pathname={pathname} health={health} />;
 }
 
 export function App() {
-  const pathname = window.location.pathname;
-  const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
+  const [pathname, setPathname] = useState(() => window.location.pathname);
   const storage = useSyncExternalStore(
     projectStorageRuntime.subscribe,
     projectStorageRuntime.getSnapshot,
     projectStorageRuntime.getSnapshot,
   );
+
+  useEffect(() => {
+    const handlePopState = () => setPathname(window.location.pathname);
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  function openEditor() {
+    window.history.pushState({}, '', editorRoute);
+    setPathname(editorRoute);
+  }
 
   if (pathname === designSystemRoute) {
     return <DesignSystemDevelopmentRoute />;
@@ -117,11 +136,13 @@ export function App() {
           : 'ready';
 
   const workspace =
-    pathname === '/' && !activeProjectId ? (
+    pathname === '/' ? (
       <ProjectHome
         onOpen={(id) =>
           void projectStorageRuntime.openProject(id).then((opened) => {
-            if (opened) setActiveProjectId(id);
+            if (opened) {
+              openEditor();
+            }
           })
         }
       />

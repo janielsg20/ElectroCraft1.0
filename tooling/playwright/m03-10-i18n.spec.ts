@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test.describe('M03.10 Spanish-first typed i18n', () => {
   test('shows Configuración > General > Idioma and persists Español', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     await page.getByRole('button', { name: 'Configuración' }).click();
     const dialog = page.getByRole('dialog', { name: 'Configuración' });
@@ -28,7 +28,7 @@ test.describe('M03.10 Spanish-first typed i18n', () => {
 
   test('exposes persistent Spanish help for language infrastructure', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/');
+    await page.goto('/editor');
     await page.getByRole('button', { name: 'Configuración' }).click();
 
     const help = page.locator('[data-language-help-trigger]');
@@ -40,7 +40,7 @@ test.describe('M03.10 Spanish-first typed i18n', () => {
 
   test('does not leak known English shell controls from OSS engines', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/');
+    await page.goto('/editor');
     const body = page.locator('body');
     for (const forbidden of ['Save changes', 'Cancel changes', 'Open settings', 'Components panel', 'Export project']) {
       await expect(body).not.toContainText(forbidden);
@@ -51,7 +51,7 @@ test.describe('M03.10 Spanish-first typed i18n', () => {
 
   test('keeps language settings usable on mobile without horizontal overflow', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
-    await page.goto('/');
+    await page.goto('/editor');
     await page.getByRole('button', { name: 'Configuración' }).click();
     const dialog = page.getByRole('dialog', { name: 'Configuración' });
     await expect(dialog.getByRole('button', { name: 'Idioma' })).toBeVisible();

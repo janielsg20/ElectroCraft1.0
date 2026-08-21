@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test.describe('M03.4 Topbar global + Settings', () => {
   test('renders exact desktop regions and keeps Settings as the last right action', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1000 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     const topbar = page.locator('.ec-app-shell-topbar');
     expect((await topbar.boundingBox())?.height).toBe(52);
@@ -20,7 +20,7 @@ test.describe('M03.4 Topbar global + Settings', () => {
 
   test('opens Settings, updates the shared Sidebar preference and restores focus on close', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     const settings = page.getByRole('button', { name: 'Configuración' });
     await settings.click();
@@ -39,7 +39,7 @@ test.describe('M03.4 Topbar global + Settings', () => {
 
   test('opens persistent AppShell help instead of hiding critical help in a tooltip', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     await page.getByRole('button', { name: 'Ayuda' }).click();
     const dialog = page.getByRole('dialog', { name: 'AppShell del Studio' });
@@ -51,7 +51,7 @@ test.describe('M03.4 Topbar global + Settings', () => {
 
   test('moves contextual tools into a Sheet on tablet and avoids horizontal overflow on mobile', async ({ page }) => {
     await page.setViewportSize({ width: 900, height: 800 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     await expect(page.locator('.ec-topbar-center')).toBeHidden();
     const tools = page.getByRole('button', { name: 'Abrir herramientas contextuales' });

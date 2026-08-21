@@ -25,7 +25,7 @@
 - M04.4 — Project Home real: `COMPLETADA`; Gate `GREEN`.
 - M04.5 — New Project Wizard y project actions: `COMPLETADA`; Gate `GREEN`.
 - M04.6 — Import/Backup/Restore: `ACTIVE`.
-- Blockers P0/P1 funcionales conocidos: `0`.
+- Blockers P0/P1 funcionales conocidos: `1` pendiente de cierre: ejecutar el gate E2E completo y CI remoto sobre la remediación local del audit. Los defectos reproducidos quedaron corregidos localmente.
 
 ## Cierre F03/M03.12
 
@@ -47,4 +47,4 @@ M04.3 cerró localmente `GREEN` sobre source funcional `987f4c333f6e8b4c48d7ebad
 
 `M04.6` — Import/Backup/Restore.
 
-Referencias: `.ai/microphases/M04_6.md`, `.ai/evidence/F04/M04.5/CLOSURE_2026-08-21.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
+Referencias: `.ai/microphases/M04_6.md`, `.ai/evidence/F04/M04.6/AUDIT_REMEDIATION_2026-08-21.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.

@@ -5,7 +5,7 @@ const groupLabels = ['Construir', 'Datos', 'Lógica', 'App', 'Recursos', 'Aparie
 test.describe('M03.3 Sidebar global', () => {
   test('renders exact groups, active item and 240 to 64 collapse on desktop', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1000 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     const shell = page.locator('.ec-app-shell');
     const sidebar = page.locator('.ec-app-shell-sidebar');
@@ -40,7 +40,7 @@ test.describe('M03.3 Sidebar global', () => {
 
   test('keeps the grouped Sidebar accessible in the mobile Radix Sheet', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     await page.getByRole('button', { name: 'Abrir navegación' }).click();
     const dialog = page.getByRole('dialog', { name: 'Navegación' });

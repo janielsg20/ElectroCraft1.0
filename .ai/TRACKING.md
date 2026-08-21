@@ -1,6 +1,6 @@
 # TRACKING — ElectroCraft current position
 
-Date: 2026-08-20.
+Date: 2026-08-21.
 
 | Scope              | Estado             | Evidencia                                      |
 | ------------------ | ------------------ | ---------------------------------------------- |
@@ -13,7 +13,7 @@ Date: 2026-08-20.
 | F04 / M04.3        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.3/CLOSURE_2026-08-21.md` |
 | F04 / M04.4        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.4/CLOSURE_2026-08-21.md` |
 | F04 / M04.5        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.5/CLOSURE_2026-08-21.md` |
-| F04 / M04.6        | ACTIVE             | `.ai/microphases/M04_6.md`                     |
+| F04 / M04.6        | ACTIVE             | `.ai/microphases/M04_6.md` + `.ai/evidence/F04/M04.6/AUDIT_REMEDIATION_2026-08-21.md` |
 
 ## Cierre M04.1
 
@@ -52,3 +52,10 @@ Date: 2026-08-20.
 ## Próxima microfase exacta
 
 `M04.6 — Import/Backup/Restore`.
+
+## Remediación de audit 2026-08-21
+
+- Sincronizado `main` en `e849d0d`; cambios locales previos preservados en `stash@{0}`.
+- Corregidos build npm 10/Tiptap, FKs con cascade, remapeo de referencias al duplicar, snapshot pre-restore, rutas `/` y `/editor`, lazy loading del editor, dialogs Radix accesibles, errores async, timeouts Windows y normalización LF.
+- Validación local: npm 10.9.2 `ci`, árbol Tiptap único 3.29.2, build, lint, typecheck, boundaries, full Vitest 86 archivos/308 tests y matriz E2E efectiva 81/81 (79/81 en corrida completa; 2/2 timeouts históricos pasan aislados con presupuesto portable).
+- Pendiente para cerrar el blocker: CI remoto; M04.6 sigue `ACTIVE` porque Import/Backup aún no está implementado.

@@ -72,6 +72,7 @@ export const studioShellMessagesEs = Object.freeze({
   'studio.appShell.status.blocked': 'Bloqueado',
 
   'studio.topbar.breadcrumbRoot': 'Studio',
+  'studio.topbar.projectsLabel': 'Proyectos',
   'studio.topbar.projectLabel': 'Proyecto local',
   'studio.topbar.save.ready': 'Sin cambios',
   'studio.topbar.save.saving': 'Guardando',

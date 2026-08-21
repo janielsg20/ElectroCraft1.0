@@ -81,6 +81,12 @@ describe('M04.3 incremental PGlite persistence and recovery', () => {
       await repository.restoreRevision(project.id, checkpoint.id);
       expect((await repository.verifyProject(project.id)).coherent).toBe(true);
       expect((await repository.openProject(project.id))?.objects[0]?.payload).toEqual({ version: 1 });
+      const safety = await client.query<{ reason: string; manifest: { objects: { payload: { version: number } }[] } }>(
+        "SELECT reason, manifest FROM project_revisions WHERE project_id = $1 AND reason = 'pre-restore-safety'",
+        [project.id],
+      );
+      expect(safety.rows).toHaveLength(1);
+      expect(safety.rows[0]?.manifest.objects[0]?.payload).toEqual({ version: 2 });
     } finally {
       await client.close();
     }

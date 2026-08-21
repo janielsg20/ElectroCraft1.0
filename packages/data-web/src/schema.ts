@@ -95,7 +95,9 @@ export const taxonomyTerms = pgTable(
 export const recordTerms = pgTable(
   'record_terms',
   {
-    projectId: text('project_id').notNull(),
+    projectId: text('project_id')
+      .notNull()
+      .references(() => projects.id, { onDelete: 'cascade' }),
     recordId: text('record_id').notNull(),
     termId: text('term_id').notNull(),
   },
@@ -126,7 +128,9 @@ export const relationEdges = pgTable(
 export const recordFieldIndex = pgTable(
   'record_field_index',
   {
-    projectId: text('project_id').notNull(),
+    projectId: text('project_id')
+      .notNull()
+      .references(() => projects.id, { onDelete: 'cascade' }),
     modelId: text('model_id').notNull(),
     recordId: text('record_id').notNull(),
     fieldId: text('field_id').notNull(),

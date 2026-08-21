@@ -1,4 +1,12 @@
-import { Button, Input } from '@electrocraft/design-system';
+import {
+  Button,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  Input,
+} from '@electrocraft/design-system';
 import { useState } from 'react';
 import { projectStorageRuntime } from './project-storage-runtime';
 
@@ -19,7 +27,6 @@ export function NewProjectWizard({
   const [demo, setDemo] = useState(false);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
-  if (!open) return null;
   async function create() {
     setSaving(true);
     setError('');
@@ -37,18 +44,23 @@ export function NewProjectWizard({
     }
   }
   return (
-    <div className="ec-project-wizard-backdrop">
-      <section role="dialog" aria-modal="true" aria-labelledby="wizard-title" className="ec-project-wizard">
+    <Dialog open={open} onOpenChange={(nextOpen) => (nextOpen ? undefined : onClose())}>
+      <DialogContent className="ec-project-wizard" aria-describedby="wizard-description">
         <header>
           <div>
             <p>
               Paso {step + 1} de {steps.length}
             </p>
-            <h2 id="wizard-title">Nuevo proyecto · {steps[step]}</h2>
+            <DialogTitle id="wizard-title">Nuevo proyecto · {steps[step]}</DialogTitle>
+            <DialogDescription id="wizard-description" className="sr-only">
+              Asistente de cuatro pasos para configurar un proyecto local.
+            </DialogDescription>
           </div>
-          <Button variant="ghost" onClick={onClose} aria-label="Cerrar asistente">
-            Cerrar
-          </Button>
+          <DialogClose asChild>
+            <Button variant="ghost" aria-label="Cerrar asistente">
+              Cerrar
+            </Button>
+          </DialogClose>
         </header>
         <ol aria-label="Progreso">
           {steps.map((label, index) => (
@@ -65,10 +77,22 @@ export function NewProjectWizard({
               <fieldset>
                 <legend>Tipo</legend>
                 <label>
-                  <input type="radio" checked={type === 'blank'} onChange={() => setType('blank')} /> Básico en blanco
+                  <input
+                    name="project-type"
+                    type="radio"
+                    checked={type === 'blank'}
+                    onChange={() => setType('blank')}
+                  />{' '}
+                  Básico en blanco
                 </label>
                 <label>
-                  <input type="radio" checked={type === 'blueprint'} onChange={() => setType('blueprint')} /> Blueprint
+                  <input
+                    name="project-type"
+                    type="radio"
+                    checked={type === 'blueprint'}
+                    onChange={() => setType('blueprint')}
+                  />{' '}
+                  Blueprint
                 </label>
               </fieldset>
             </>
@@ -77,10 +101,22 @@ export function NewProjectWizard({
             <fieldset>
               <legend>Diseño inicial</legend>
               <label>
-                <input type="radio" checked={design === 'system'} onChange={() => setDesign('system')} /> Sistema
+                <input
+                  name="project-design"
+                  type="radio"
+                  checked={design === 'system'}
+                  onChange={() => setDesign('system')}
+                />{' '}
+                Sistema
               </label>
               <label>
-                <input type="radio" checked={design === 'minimal'} onChange={() => setDesign('minimal')} /> Minimalista
+                <input
+                  name="project-design"
+                  type="radio"
+                  checked={design === 'minimal'}
+                  onChange={() => setDesign('minimal')}
+                />{' '}
+                Minimalista
               </label>
             </fieldset>
           ) : null}
@@ -103,7 +139,7 @@ export function NewProjectWizard({
                 <dt>Tipo</dt>
                 <dd>{type === 'blank' ? 'Básico' : 'Blueprint'}</dd>
                 <dt>Diseño</dt>
-                <dd>{design}</dd>
+                <dd>{design === 'system' ? 'Sistema' : 'Minimalista'}</dd>
                 <dt>Demo</dt>
                 <dd>{demo ? 'Sí' : 'No'}</dd>
               </dl>
@@ -125,7 +161,7 @@ export function NewProjectWizard({
             </Button>
           )}
         </footer>
-      </section>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

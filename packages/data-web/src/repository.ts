@@ -55,6 +55,20 @@ function toRevision(row: typeof schema.projectRevisions.$inferSelect): ProjectSt
   });
 }
 
+function remapJsonReferences(value: JsonValue, idMap: ReadonlyMap<string, string>): JsonValue {
+  if (typeof value === 'string') return idMap.get(value) ?? value;
+  if (value === null || typeof value !== 'object') return value;
+  if (Array.isArray(value)) return value.map((item) => remapJsonReferences(item, idMap));
+
+  const remapped: Record<string, JsonValue> = {};
+  for (const [key, item] of Object.entries(value)) {
+    const nextKey = idMap.get(key) ?? key;
+    if (Object.hasOwn(remapped, nextKey)) throw new Error(`duplicate payload key after id remap: ${nextKey}`);
+    remapped[nextKey] = remapJsonReferences(item, idMap);
+  }
+  return remapped;
+}
+
 export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
   async function listProjects(request: Required<ListProjectsRequest>): Promise<readonly ProjectSummary[]> {
     const filters = [];
@@ -131,23 +145,28 @@ export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
         .select()
         .from(schema.projectObjects)
         .where(eq(schema.projectObjects.projectId, request.sourceProjectId));
+      const objectIdMap = new Map(objects.map(({ objectId }) => [objectId, globalThis.crypto.randomUUID()]));
       const now = new Date();
-      await tx
-        .insert(schema.projects)
-        .values({
-          id: request.projectId,
-          name: request.name,
-          metadata: source.metadata,
-          status: 'active',
-          currentRevisionBase: null,
-          createdAt: now,
+      await tx.insert(schema.projects).values({
+        id: request.projectId,
+        name: request.name,
+        metadata: source.metadata,
+        status: 'active',
+        currentRevisionBase: null,
+        createdAt: now,
+        updatedAt: now,
+      });
+      for (const object of objects) {
+        const objectId = objectIdMap.get(object.objectId)!;
+        const payload = remapJsonReferences(object.payload, objectIdMap);
+        await tx.insert(schema.projectObjects).values({
+          ...object,
+          projectId: request.projectId,
+          objectId,
+          payload,
+          checksum: createElectroCraftCanonicalSnapshotChecksum(payload),
           updatedAt: now,
         });
-      for (const object of objects) {
-        const objectId = globalThis.crypto.randomUUID();
-        await tx
-          .insert(schema.projectObjects)
-          .values({ ...object, projectId: request.projectId, objectId, updatedAt: now });
       }
     });
     return (await listProjects({ search: '', status: 'all', sort: 'updated-desc' })).find(
@@ -396,6 +415,31 @@ export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
       const snapshots = projectRevisionSnapshotObjects(revision);
       if (!snapshots) throw new Error(`project revision is not restorable: ${revisionId}`);
       const now = new Date();
+
+      const currentRows = await tx
+        .select()
+        .from(schema.projectObjects)
+        .where(eq(schema.projectObjects.projectId, projectId));
+      const safetyObjects = currentRows.map((row) =>
+        validateStoredProjectObject({
+          projectId,
+          objectId: row.objectId,
+          kind: row.kind,
+          schemaVersion: row.schemaVersion,
+          payload: row.payload,
+          checksum: createElectroCraftCanonicalSnapshotChecksum(row.payload),
+          updatedAt: row.updatedAt.toISOString(),
+        }),
+      );
+      const safetyRevision = createProjectStorageRevision(projectId, safetyObjects, 'pre-restore-safety');
+      await tx.insert(schema.projectRevisions).values({
+        id: safetyRevision.id,
+        projectId,
+        reason: safetyRevision.reason,
+        manifest: safetyRevision.manifest as unknown as JsonValue,
+        checksum: safetyRevision.checksum,
+        createdAt: new Date(safetyRevision.createdAt),
+      });
 
       await tx.delete(schema.projectObjects).where(eq(schema.projectObjects.projectId, projectId));
       for (const snapshot of snapshots) {

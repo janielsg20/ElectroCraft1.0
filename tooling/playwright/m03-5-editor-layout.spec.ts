@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test.describe('M03.5 Context / Canvas / Inspector / Status', () => {
   test('renders exact desktop pane sizes and a 26px informational statusbar', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1000 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     await expect(page.locator('[data-editor-layout="desktop"]')).toBeVisible();
     const context = page.locator('[data-editor-region="context"]');
@@ -19,7 +19,7 @@ test.describe('M03.5 Context / Canvas / Inspector / Status', () => {
 
   test('resizes Context with keyboard and respects its declared range', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     const context = page.locator('[data-editor-region="context"]');
     const separator = page.getByRole('separator', { name: 'Redimensionar panel Contexto' });
@@ -35,7 +35,7 @@ test.describe('M03.5 Context / Canvas / Inspector / Status', () => {
 
   test('moves secondary tools to Sheets on tablet and restores the trigger focus', async ({ page }) => {
     await page.setViewportSize({ width: 900, height: 800 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     await expect(page.locator('[data-editor-layout="tablet"]')).toBeVisible();
     await expect(page.locator('[data-editor-region="canvas"]')).toBeVisible();
@@ -56,7 +56,7 @@ test.describe('M03.5 Context / Canvas / Inspector / Status', () => {
 
   test('keeps mobile canvas-first without horizontal document overflow', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     await expect(page.locator('[data-editor-layout="mobile"]')).toBeVisible();
     await expect(page.locator('[data-editor-region="canvas"]')).toBeVisible();

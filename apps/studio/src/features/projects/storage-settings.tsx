@@ -1,4 +1,13 @@
-import { Button } from '@electrocraft/design-system';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+  Button,
+} from '@electrocraft/design-system';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { HelpTrigger } from '../../help/help-ui';
 import { projectStorageRuntime } from './project-storage-runtime';
@@ -116,28 +125,49 @@ export function StorageSettings() {
             Comprobar integridad
           </Button>
           {recovery.state === 'available' || recovery.state === 'restoring' ? (
-            <Button
-              variant="default"
-              size="sm"
-              disabled={recovery.state === 'restoring'}
-              onClick={() => {
-                const projectId = projectStorageRuntime.currentProjectId();
-                if (!projectId) return;
-                const revisionId = recovery.revisionId;
-                setRecovery({ state: 'restoring', revisionId, message: 'Restaurando checkpoint…' });
-                void projectStorageRuntime
-                  .restoreRevision(projectId, revisionId)
-                  .then(() => setRecovery({ state: 'restored', message: 'Checkpoint restaurado correctamente.' }))
-                  .catch((error: unknown) =>
-                    setRecovery({
-                      state: 'error',
-                      message: error instanceof Error ? error.message : 'No se pudo restaurar el checkpoint.',
-                    }),
-                  );
-              }}
-            >
-              {recovery.state === 'restoring' ? 'Restaurando…' : 'Restaurar'}
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="default" size="sm" disabled={recovery.state === 'restoring'}>
+                  {recovery.state === 'restoring' ? 'Restaurando…' : 'Restaurar'}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogTitle>¿Restaurar este checkpoint?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Se guardarán primero los cambios pendientes y una copia de seguridad del estado actual. Después, el
+                  contenido del proyecto se reemplazará por el checkpoint seleccionado.
+                </AlertDialogDescription>
+                <div className="flex justify-end gap-2">
+                  <AlertDialogCancel asChild>
+                    <Button variant="outline">Cancelar</Button>
+                  </AlertDialogCancel>
+                  <AlertDialogAction asChild>
+                    <Button
+                      variant="destructive"
+                      onClick={() => {
+                        const projectId = projectStorageRuntime.currentProjectId();
+                        if (!projectId) return;
+                        const revisionId = recovery.revisionId;
+                        setRecovery({ state: 'restoring', revisionId, message: 'Restaurando checkpoint…' });
+                        void projectStorageRuntime
+                          .restoreRevision(projectId, revisionId)
+                          .then(() =>
+                            setRecovery({ state: 'restored', message: 'Checkpoint restaurado correctamente.' }),
+                          )
+                          .catch((error: unknown) =>
+                            setRecovery({
+                              state: 'error',
+                              message: error instanceof Error ? error.message : 'No se pudo restaurar el checkpoint.',
+                            }),
+                          );
+                      }}
+                    >
+                      Restaurar y reemplazar
+                    </Button>
+                  </AlertDialogAction>
+                </div>
+              </AlertDialogContent>
+            </AlertDialog>
           ) : null}
         </div>
       </div>
@@ -170,7 +200,10 @@ export function StorageSettings() {
           disabled={repairing || !diagnostics.repairSupported}
           onClick={() => {
             setRepairing(true);
-            void projectStorageRuntime.repair().finally(() => setRepairing(false));
+            void projectStorageRuntime
+              .repair()
+              .catch(() => undefined)
+              .finally(() => setRepairing(false));
           }}
         >
           {repairing ? 'Revisando…' : 'Revisar'}

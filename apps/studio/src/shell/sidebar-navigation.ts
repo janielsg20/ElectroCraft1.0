@@ -22,7 +22,12 @@ const navigation = [
     id: 'build',
     label: navigationT('studio.sidebar.group.build'),
     items: [
-      { id: 'editor', label: navigationT('studio.sidebar.item.editor'), href: '/', iconId: 'studio.sidebar.editor' },
+      {
+        id: 'editor',
+        label: navigationT('studio.sidebar.item.editor'),
+        href: '/editor',
+        iconId: 'studio.sidebar.editor',
+      },
       {
         id: 'screens',
         label: navigationT('studio.sidebar.item.screens'),
@@ -217,10 +222,6 @@ export function resolveSidebarActiveItem(pathname: string): SidebarNavigationIte
   const normalized = pathname === '/' ? '/' : pathname.replace(/\/+$/, '');
   for (const group of navigation) {
     for (const item of group.items) {
-      if (item.href === '/') {
-        if (normalized === '/') return item.id;
-        continue;
-      }
       if (normalized === item.href || normalized.startsWith(`${item.href}/`)) return item.id;
     }
   }

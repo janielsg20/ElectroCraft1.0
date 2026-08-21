@@ -16,6 +16,7 @@
   "studio.appShell.status.error": "Error",
   "studio.appShell.status.blocked": "Bloqueado",
   "studio.topbar.breadcrumbRoot": "Studio",
+  "studio.topbar.projectsLabel": "Proyectos",
   "studio.topbar.projectLabel": "Proyecto local",
   "studio.topbar.save.ready": "Guardado",
   "studio.topbar.save.saving": "Guardando…",

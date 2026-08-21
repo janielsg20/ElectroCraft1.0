@@ -10,6 +10,18 @@ function fixture(name: string): unknown {
 }
 
 describe('M02.9 engine payload compatibility boundary', () => {
+  it('pins one Tiptap runtime version across Puck and the media adapter', () => {
+    const lock = JSON.parse(readFileSync('package-lock.json', 'utf8')) as {
+      packages: Record<string, { version?: string }>;
+    };
+    const versions = new Set(
+      Object.entries(lock.packages)
+        .filter(([path]) => /(?:^|\/)node_modules\/@tiptap\/[^/]+$/.test(path))
+        .map(([, descriptor]) => descriptor.version),
+    );
+    expect([...versions]).toEqual(['3.29.2']);
+  });
+
   it('resolves approved wrappers to their adapter owners', () => {
     expect(analyzeElectroCraftEnginePayloadCompatibility(fixture('engine-payload-rqb-v1'))).toMatchObject({
       status: 'supported',

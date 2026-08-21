@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test.describe('M03.6 responsive AppShell and editor', () => {
   test('keeps laptop split mode when the canvas has enough useful width', async ({ page }) => {
     await page.setViewportSize({ width: 1180, height: 850 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     const sidebar = page.locator('.ec-app-shell-sidebar');
     expect(Math.round((await sidebar.boundingBox())?.width ?? 0)).toBe(64);
@@ -22,7 +22,7 @@ test.describe('M03.6 responsive AppShell and editor', () => {
 
   test('moves both secondary panels to overlays on a narrow laptop', async ({ page }) => {
     await page.setViewportSize({ width: 1100, height: 800 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     const layout = page.locator('[data-editor-responsive-mode="laptop"]');
     await expect(layout).toHaveAttribute('data-laptop-panel-strategy', 'overlay');
@@ -45,7 +45,7 @@ test.describe('M03.6 responsive AppShell and editor', () => {
 
   test('uses a 56px tablet rail while keeping full navigation and editor tools in Sheets', async ({ page }) => {
     await page.setViewportSize({ width: 900, height: 800 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     const sidebar = page.locator('.ec-app-shell-sidebar');
     await expect(sidebar).toBeVisible();
@@ -70,7 +70,7 @@ test.describe('M03.6 responsive AppShell and editor', () => {
 
   test('renders the exact five-action mobile dock with bottom Properties and full-height Outline', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     const dock = page.getByRole('navigation', { name: 'Navegación inferior del editor' });
     await expect(dock).toBeVisible();

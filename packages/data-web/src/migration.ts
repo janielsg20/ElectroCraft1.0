@@ -3,6 +3,7 @@ import { STUDIO_STORAGE_SCHEMA_VERSION } from './schema-contract';
 export const M04_1_MIGRATION_CHECKSUM = 'm04.1:storage-schema-v1' as const;
 export const M04_3_MIGRATION_CHECKSUM = 'm04.3:incremental-storage-v2' as const;
 export const M04_4_MIGRATION_CHECKSUM = 'm04.4:project-home-v3' as const;
+export const M04_6_REFERENTIAL_INTEGRITY_CHECKSUM = 'm04.6:referential-integrity-v4' as const;
 
 export const M04_1_SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS projects (
@@ -141,6 +142,20 @@ ALTER TABLE projects DROP CONSTRAINT IF EXISTS projects_status_check;
 ALTER TABLE projects ADD CONSTRAINT projects_status_check CHECK (status IN ('active', 'archived', 'trashed'));
 CREATE INDEX IF NOT EXISTS projects_status_updated_idx ON projects(status, updated_at DESC);
 `;
+export const M04_6_REFERENTIAL_INTEGRITY_SQL = `
+DELETE FROM record_terms AS child
+WHERE NOT EXISTS (SELECT 1 FROM projects AS project WHERE project.id = child.project_id);
+DELETE FROM record_field_index AS child
+WHERE NOT EXISTS (SELECT 1 FROM projects AS project WHERE project.id = child.project_id);
+ALTER TABLE record_terms DROP CONSTRAINT IF EXISTS record_terms_project_id_projects_id_fk;
+ALTER TABLE record_terms
+  ADD CONSTRAINT record_terms_project_id_projects_id_fk
+  FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
+ALTER TABLE record_field_index DROP CONSTRAINT IF EXISTS record_field_index_project_id_projects_id_fk;
+ALTER TABLE record_field_index
+  ADD CONSTRAINT record_field_index_project_id_projects_id_fk
+  FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
+`;
 
 export interface PGliteMigrationClient {
   exec(query: string): Promise<unknown>;
@@ -163,7 +178,18 @@ async function applyMigration(client: PGliteMigrationClient, schemaVersion: numb
 }
 
 export async function applyStudioStorageMigrations(client: PGliteMigrationClient) {
+  await client.exec(`CREATE TABLE IF NOT EXISTS storage_migration_journal (
+    schema_version integer PRIMARY KEY,
+    checksum text NOT NULL,
+    applied_at timestamptz NOT NULL DEFAULT now()
+  );`);
   await applyMigration(client, 1, M04_1_MIGRATION_CHECKSUM, M04_1_SCHEMA_SQL);
   await applyMigration(client, 2, M04_3_MIGRATION_CHECKSUM, M04_3_INCREMENTAL_SQL);
-  await applyMigration(client, STUDIO_STORAGE_SCHEMA_VERSION, M04_4_MIGRATION_CHECKSUM, M04_4_PROJECT_HOME_SQL);
+  await applyMigration(client, 3, M04_4_MIGRATION_CHECKSUM, M04_4_PROJECT_HOME_SQL);
+  await applyMigration(
+    client,
+    STUDIO_STORAGE_SCHEMA_VERSION,
+    M04_6_REFERENTIAL_INTEGRITY_CHECKSUM,
+    M04_6_REFERENTIAL_INTEGRITY_SQL,
+  );
 }

@@ -5,8 +5,12 @@ test('Project Home crea, reabre y archiva', async ({ page }) => {
   const create = page.getByRole('button', { name: 'Nuevo proyecto' }).first();
   await expect(create).toBeEnabled({ timeout: 60_000 });
   await create.click();
+  await page.getByRole('button', { name: 'Siguiente' }).click();
+  await page.getByRole('button', { name: 'Siguiente' }).click();
+  await page.getByRole('button', { name: 'Siguiente' }).click();
+  await page.getByRole('button', { name: 'Crear proyecto' }).click();
   await expect(page.locator('[data-editor-canvas-stage]')).toBeVisible({ timeout: 60_000 });
-  await page.reload();
+  await page.goto('/');
   await expect(page.getByRole('button', { name: /Proyecto sin título/ }).first()).toBeVisible({ timeout: 60_000 });
   await page.getByRole('button', { name: 'Archivar' }).first().click();
   await page.getByLabel('Estado de proyectos').selectOption('archived');

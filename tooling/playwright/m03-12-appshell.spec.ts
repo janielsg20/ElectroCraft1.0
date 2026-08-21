@@ -52,7 +52,7 @@ test.describe('M03.12 AppShell E2E closure matrix', () => {
   for (const viewport of viewportMatrix) {
     test(`${viewport.name} preserves the responsive AppShell contract`, async ({ page }, testInfo) => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
-      await page.goto('/');
+      await page.goto('/editor');
 
       await expect(page.locator('.ec-app-shell-topbar')).toBeVisible();
       await expect(page.locator('.ec-app-shell-statusbar')).toBeVisible();
@@ -96,7 +96,7 @@ test.describe('M03.12 AppShell E2E closure matrix', () => {
     page,
   }) => {
     await page.setViewportSize({ width: 1440, height: 1000 });
-    await page.goto('/');
+    await page.goto('/editor');
     const sidebar = page.locator('.ec-app-shell-sidebar');
 
     for (const label of canonicalNavigationLabels) {
@@ -112,7 +112,7 @@ test.describe('M03.12 AppShell E2E closure matrix', () => {
     page,
   }, testInfo) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/');
+    await page.goto('/editor');
 
     const help = page.getByRole('button', { name: 'Ayuda' });
     const settings = page.getByRole('button', { name: 'Configuración' });
@@ -155,7 +155,7 @@ test.describe('M03.12 AppShell E2E closure matrix', () => {
 
   test('keeps Studio appearance persistence isolated from project/theme/export storage', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/');
+    await page.goto('/editor');
     await page.evaluate(() => {
       window.localStorage.removeItem('electrocraft.studio.appearance.v1');
       window.localStorage.removeItem('electrocraft.studio.appearance-presets.v1');
@@ -181,7 +181,7 @@ test.describe('M03.12 AppShell E2E closure matrix', () => {
     page,
   }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/');
+    await page.goto('/editor');
     const body = page.locator('body');
     for (const forbidden of [
       'Save changes',
