@@ -2,6 +2,7 @@ import { STUDIO_STORAGE_SCHEMA_VERSION } from './schema-contract';
 
 export const M04_1_MIGRATION_CHECKSUM = 'm04.1:storage-schema-v1' as const;
 export const M04_3_MIGRATION_CHECKSUM = 'm04.3:incremental-storage-v2' as const;
+export const M04_4_MIGRATION_CHECKSUM = 'm04.4:project-home-v3' as const;
 
 export const M04_1_SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS projects (
@@ -134,18 +135,19 @@ FROM (
 WHERE project.id = latest.project_id
   AND project.current_revision_base IS NULL;
 `;
+export const M04_4_PROJECT_HOME_SQL = `
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS status text NOT NULL DEFAULT 'active';
+ALTER TABLE projects DROP CONSTRAINT IF EXISTS projects_status_check;
+ALTER TABLE projects ADD CONSTRAINT projects_status_check CHECK (status IN ('active', 'archived', 'trashed'));
+CREATE INDEX IF NOT EXISTS projects_status_updated_idx ON projects(status, updated_at DESC);
+`;
 
 export interface PGliteMigrationClient {
   exec(query: string): Promise<unknown>;
   query<T extends Record<string, unknown>>(query: string, params?: unknown[]): Promise<{ rows: T[] }>;
 }
 
-async function applyMigration(
-  client: PGliteMigrationClient,
-  schemaVersion: number,
-  checksum: string,
-  sql: string,
-) {
+async function applyMigration(client: PGliteMigrationClient, schemaVersion: number, checksum: string, sql: string) {
   const existing = await client
     .query<{ checksum: string }>('SELECT checksum FROM storage_migration_journal WHERE schema_version = $1', [
       schemaVersion,
@@ -162,5 +164,6 @@ async function applyMigration(
 
 export async function applyStudioStorageMigrations(client: PGliteMigrationClient) {
   await applyMigration(client, 1, M04_1_MIGRATION_CHECKSUM, M04_1_SCHEMA_SQL);
-  await applyMigration(client, STUDIO_STORAGE_SCHEMA_VERSION, M04_3_MIGRATION_CHECKSUM, M04_3_INCREMENTAL_SQL);
+  await applyMigration(client, 2, M04_3_MIGRATION_CHECKSUM, M04_3_INCREMENTAL_SQL);
+  await applyMigration(client, STUDIO_STORAGE_SCHEMA_VERSION, M04_4_MIGRATION_CHECKSUM, M04_4_PROJECT_HOME_SQL);
 }

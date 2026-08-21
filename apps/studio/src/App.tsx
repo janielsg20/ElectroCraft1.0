@@ -1,6 +1,7 @@
-import { useSyncExternalStore } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { evaluateStudioBootstrapHealth } from './bootstrap-health';
 import { projectStorageRuntime } from './features/projects/project-storage-runtime';
+import { ProjectHome } from './features/projects/project-home';
 import { HelpTrigger } from './help/help-ui';
 import { getHelpIdForNavigationItem } from './help/help-registry';
 import { studioWorkspaceDescriptor } from './index';
@@ -16,6 +17,7 @@ import './shell/topbar.css';
 import './shell/editor-workspace.css';
 import './shell/responsive-shell.css';
 import './shell/information-architecture.css';
+import './features/projects/project-home.css';
 
 const projectHomeRoute = Object.freeze({
   id: 'project-home-development',
@@ -93,6 +95,7 @@ function resolveStudioWorkspace(pathname: string, health: ReturnType<typeof eval
 
 export function App() {
   const pathname = window.location.pathname;
+  const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const storage = useSyncExternalStore(
     projectStorageRuntime.subscribe,
     projectStorageRuntime.getSnapshot,
@@ -113,5 +116,17 @@ export function App() {
           ? 'saving'
           : 'ready';
 
-  return <StudioAppShellRoute status={shellStatus}>{resolveStudioWorkspace(pathname, health)}</StudioAppShellRoute>;
+  const workspace =
+    pathname === '/' && !activeProjectId ? (
+      <ProjectHome
+        onOpen={(id) =>
+          void projectStorageRuntime.openProject(id).then((opened) => {
+            if (opened) setActiveProjectId(id);
+          })
+        }
+      />
+    ) : (
+      resolveStudioWorkspace(pathname, health)
+    );
+  return <StudioAppShellRoute status={shellStatus}>{workspace}</StudioAppShellRoute>;
 }

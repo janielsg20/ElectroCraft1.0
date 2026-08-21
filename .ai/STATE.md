@@ -22,7 +22,8 @@
 - M04.1 — Schema físico estable con PGlite/Drizzle + storage browser: `COMPLETADA`; Gate `GREEN`.
 - M04.2 — Inicializar PGlite Multi-Tab Worker y migrations: `COMPLETADA`; Gate `GREEN`.
 - M04.3 — Persistencia incremental, autosave y recovery: `COMPLETADA`; Gate `GREEN`.
-- M04.4 — Project Home real: `ACTIVE`.
+- M04.4 — Project Home real: `COMPLETADA`; Gate `GREEN`.
+- M04.5 — New Project Wizard y project actions: `ACTIVE`.
 - Blockers P0/P1 funcionales conocidos: `0`.
 
 ## Cierre F03/M03.12
@@ -43,6 +44,6 @@ M04.3 cerró localmente `GREEN` sobre source funcional `987f4c333f6e8b4c48d7ebad
 
 ## Microfase activa
 
-`M04.4` — Project Home real: toolbar Search/Status/Sort/View/New, cards desde la DB, empty state, apertura real y estados Archive/Trash persistidos.
+`M04.5` — New Project Wizard y project actions.
 
-Referencias: `.ai/microphases/M04_4.md`, `.ai/evidence/F04/M04.3/CLOSURE_2026-08-21.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
+Referencias: `.ai/microphases/M04_5.md`, `.ai/evidence/F04/M04.4/CLOSURE_2026-08-21.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.

@@ -4,6 +4,8 @@ import {
   type ProjectStorageCoordinationDiagnostics,
   type ProjectStorageDiagnostics,
   type ProjectStoragePort,
+  type ListProjectsRequest,
+  type ProjectLifecycleStatus,
 } from '@electrocraft/application';
 import type { PGlite } from '@electric-sql/pglite';
 import { PGliteWorker } from '@electric-sql/pglite/worker';
@@ -383,6 +385,11 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
     async openProject(projectId: string) {
       return (await ensureRepository()).openProject(projectId);
     },
+    async listProjects(request: Required<ListProjectsRequest>) {
+      return (await ensureRepository()).listProjects(request);
+    },
+    setProjectStatus: (projectId: string, status: ProjectLifecycleStatus) =>
+      persistOperation((repo) => repo.setProjectStatus(projectId, status)),
     async verifyProject(projectId: string) {
       return (await ensureRepository()).verifyProject(projectId);
     },

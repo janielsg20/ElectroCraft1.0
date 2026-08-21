@@ -39,6 +39,19 @@ export interface StoredProjectDefinition {
   readonly name: string;
   readonly metadata: ElectroCraftMetadata;
 }
+export type ProjectLifecycleStatus = 'active' | 'archived' | 'trashed';
+export type ProjectListSort = 'updated-desc' | 'updated-asc' | 'name-asc' | 'name-desc';
+export interface ProjectSummary extends StoredProjectDefinition {
+  readonly status: ProjectLifecycleStatus;
+  readonly objectCount: number;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+}
+export interface ListProjectsRequest {
+  readonly search?: string;
+  readonly status?: ProjectLifecycleStatus | 'all';
+  readonly sort?: ProjectListSort;
+}
 
 export interface StoredProjectObjectInput {
   readonly objectId: string;
@@ -140,6 +153,8 @@ export interface ProjectStoragePort {
   findRecoveryCandidate(projectId: string): Promise<ProjectRecoveryCandidate | null>;
   restoreRevision(projectId: string, revisionId: string): Promise<ProjectStorageRevision>;
   openProject(projectId: string): Promise<OpenProjectResult | null>;
+  listProjects(request: Required<ListProjectsRequest>): Promise<readonly ProjectSummary[]>;
+  setProjectStatus(projectId: string, status: ProjectLifecycleStatus): Promise<ProjectSummary>;
   verifyProject(projectId: string): Promise<ProjectIntegrityReport>;
   getDiagnostics(): Promise<ProjectStorageDiagnostics>;
   repair(): Promise<ProjectStorageDiagnostics>;
@@ -311,6 +326,9 @@ export function createProjectStorageService(port: ProjectStoragePort) {
     initialize: () => port.initialize(),
     diagnostics: () => port.getDiagnostics(),
     openProject: (projectId: string) => port.openProject(requireNonEmpty(projectId, 'projectId')),
+    listProjects: (request: ListProjectsRequest = {}) => port.listProjects(normalizeListProjectsRequest(request)),
+    setProjectStatus: (projectId: string, status: ProjectLifecycleStatus) =>
+      port.setProjectStatus(requireNonEmpty(projectId, 'projectId'), normalizeProjectLifecycleStatus(status)),
     verifyProject: (projectId: string) => port.verifyProject(requireNonEmpty(projectId, 'projectId')),
     saveProject: (request: SaveProjectRequest) => port.saveProject(normalizeSaveProjectRequest(request)),
     saveProjectIncremental: (request: IncrementalSaveProjectRequest) =>
@@ -323,6 +341,19 @@ export function createProjectStorageService(port: ProjectStoragePort) {
     repair: () => port.repair(),
     close: () => port.close(),
   });
+}
+
+export function normalizeProjectLifecycleStatus(value: string): ProjectLifecycleStatus {
+  if (value === 'active' || value === 'archived' || value === 'trashed') return value;
+  throw new TypeError(`unsupported project status: ${value}`);
+}
+export function normalizeListProjectsRequest(request: ListProjectsRequest): Required<ListProjectsRequest> {
+  const status = request.status ?? 'active';
+  if (status !== 'all') normalizeProjectLifecycleStatus(status);
+  const sort = request.sort ?? 'updated-desc';
+  if (!['updated-desc', 'updated-asc', 'name-asc', 'name-desc'].includes(sort))
+    throw new TypeError(`unsupported project sort: ${sort}`);
+  return Object.freeze({ search: request.search?.trim() ?? '', status, sort });
 }
 
 export type ProjectStorageService = ReturnType<typeof createProjectStorageService>;
