@@ -2,27 +2,51 @@
 
 Date: 2026-08-20.
 
-| Scope | Estado | Evidencia |
-|---|---|---|
-| F00 | COMPLETADA / GREEN | `.ai/evidence/F00/` |
-| F01 | COMPLETADA / GREEN | `.ai/evidence/F01/` |
-| F02 | COMPLETADA / GREEN | `.ai/evidence/F02/` |
-| F03 / M03.1–M03.12 | COMPLETADA / GREEN | `.ai/evidence/F03/CLOSURE_2026-08-20.md` |
-| F04 / M04.1 | ACTIVE | `.ai/microphases/M04_1.md` |
+| Scope              | Estado             | Evidencia                                      |
+| ------------------ | ------------------ | ---------------------------------------------- |
+| F00                | COMPLETADA / GREEN | `.ai/evidence/F00/`                            |
+| F01                | COMPLETADA / GREEN | `.ai/evidence/F01/`                            |
+| F02                | COMPLETADA / GREEN | `.ai/evidence/F02/`                            |
+| F03 / M03.1–M03.12 | COMPLETADA / GREEN | `.ai/evidence/F03/CLOSURE_2026-08-20.md`       |
+| F04 / M04.1        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.1/CLOSURE_2026-08-20.md` |
+| F04 / M04.2        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.2/CLOSURE_2026-08-20.md` |
+| F04 / M04.3        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.3/CLOSURE_2026-08-21.md` |
+| F04 / M04.4        | ACTIVE             | `.ai/microphases/M04_4.md`                     |
 
-## Cierre M03.12 / F03
-- Rama `codex/m03-12-appshell-e2e`; PR `#26`.
-- Head funcional `af88c60264a243d97cd8e5ca708eedc8ded04028`.
-- Gate M03.12 run `32320810295` success; job `96282469768`.
-- Artifact `9389767563`; digest `sha256:f810fda738509fca06660cc248ddbe576ebe68a885bb2d8ba026944668d4c015`.
-- Dedicado `7/7`; matriz E2E 6 viewports GREEN; full `npm run check` GREEN.
-- Base CI `32320810328` success; artifact `9389760505`.
-- F03 queda COMPLETADA/GREEN; blockers P0/P1 `0`.
+## Cierre M04.1
 
-## Entrada M04.1
-- Owner nuevo previsto: `@electrocraft/data-web` detrás de ports en `@electrocraft/application`.
-- PGlite + Drizzle deben quedar versionados exactamente tras revalidación de paquetes disponibles.
-- Persistencia browser debe ejecutarse detrás de Worker y seleccionar backend persistente según capacidad: OPFS cuando sea seguro/soportado, fallback compatible documentado cuando no.
-- Schema obligatorio: project, project_object, project_revision, app_extension_state, capability_snapshot, user_preference + búsqueda FTS/migration journal.
-- Deben existir transacciones save/open, recovery, rollback/atomicidad, Settings > Almacenamiento, ayuda española y tests browser capability.
-- Añadir owner cambia el invariant del monorepo de 18 a 19 paquetes; aliases públicos de 20 a 21.
+- Rama `codex/m04-1-storage-foundation`; PR `#27`.
+- Source funcional validado `8fd9460a43a4a3b5eaf91e62b83f4b3cb7edf10b`.
+- Informe `.ai/evidence/F04/M04.1/VALIDATION_LATEST.md`: `GREEN`.
+- Browser E2E: inicialización real de storage; save mediante runtime; reload; reopen del mismo proyecto; Settings > Almacenamiento usable en móvil sin overflow.
+- Owner `@electrocraft/data-web` con PGlite `0.5.5` + Drizzle `0.45.2`, Worker, schema físico versionado y migration journal.
+- Schema estable: projects, project_objects, project_revisions, content_records, taxonomy_terms, record_terms, relation_edges, record_field_index, workspace_preferences, media_metadata, audit_events, storage_migration_journal.
+
+## Cierre M04.2
+
+- Rama `codex/m04-2-multitab-worker`; PR `#28`.
+- Source funcional validado `6847a5fa410f0478c7e393b3d06800b6f89af072`.
+- Workflow `M04.2 Multi-Tab Worker Gate`: run `32430992572`, job `96622322833`, `success`.
+- `npm ci`, Prettier, lint, typecheck, boundaries, Vitest dedicado, full `npm run test`, full `npm run build`, Chromium y Playwright multi-tab: GREEN.
+- IndexedDB es baseline persistente; OPFS AHP queda como optimización capability-aware.
+- Lifecycle real: bootstrap → migrations → health-check → repositories ready.
+- Dos tabs comparten una única DB lógica mediante `PGliteWorker` con el mismo `id`.
+- `onLeaderChange` revalida health; el E2E cierra el líder, verifica el handoff y guarda nuevamente desde el nuevo líder.
+- La identidad observable del líder se anuncia desde `worker.init(options)`, ejecutado por PGlite únicamente en el Worker elegido como líder; PGlite/Web Locks conserva ownership de la elección.
+- UI/application no importan PGlite/Drizzle raw.
+- Blockers P0/P1 al cierre: `0`.
+
+## Cierre M04.3
+
+- Source funcional `987f4c333f6e8b4c48d7ebad9c284e3925e9cf02`.
+- Dirty-set con debounce configurable, checksum canónico y reintento sin pérdida tras commit fallido.
+- PGlite/Drizzle upsert/delete únicamente objetos afectados; no crea revisión por autosave.
+- Checkpoints manual/pre-import/pre-migration/pre-publish/pre-export/interval y restauración explícita de la última revisión válida.
+- Configuración > Almacenamiento expone integridad y recovery en español; screenshot browser versionado.
+- Dedicado: 17/17; full Vitest: 82 archivos/300 tests; lint/typecheck/boundaries/test/build y Playwright Chromium 1/1 `GREEN`.
+- Evidencia: `.ai/evidence/F04/M04.3/VALIDATION_LATEST.md` y `.ai/evidence/F04/M04.3/CLOSURE_2026-08-21.md`.
+- Blockers P0/P1: `0`.
+
+## Próxima microfase exacta
+
+`M04.4 — Construir Project Home`.

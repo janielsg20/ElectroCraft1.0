@@ -1,26 +1,31 @@
 # HANDOFF — ElectroCraft
 
 ## Current
-F04 / M04.1 — Persistencia local real del Studio — `ACTIVE`.
+
+F04 / M04.4 — Construir Project Home — `ACTIVE`.
 
 ## Heredado
+
 - F03/M03.12 cerró GREEN en head `af88c60264a243d97cd8e5ca708eedc8ded04028`.
-- M03.12 run `32320810295` success; artifact `9389767563`; digest `sha256:f810fda738509fca06660cc248ddbe576ebe68a885bb2d8ba026944668d4c015`.
-- Base CI `32320810328` success.
-- Monorepo actual: 18 owner packages, 20 aliases, 2 apps.
+- M04.1 cerró `COMPLETADA / GREEN` con source funcional validado `8fd9460a43a4a3b5eaf91e62b83f4b3cb7edf10b`.
+- M04.2 cerró `COMPLETADA / GREEN` con source funcional `6847a5fa410f0478c7e393b3d06800b6f89af072`; workflow run `32430992572`, job `96622322833`, `success`.
+- M04.3 cerró `COMPLETADA / GREEN` con source funcional `987f4c333f6e8b4c48d7ebad9c284e3925e9cf02` y evidencia `.ai/evidence/F04/M04.3/`.
+- Evidencia M04.2: `.ai/evidence/F04/M04.2/VALIDATION_LATEST.md` + `.ai/evidence/F04/M04.2/CLOSURE_2026-08-20.md`.
+- `@electrocraft/data-web` mantiene PGlite `0.5.5` + Drizzle `0.45.2`, IndexedDB baseline, OPFS AHP opt-in, multi-tab Worker oficial, migrations/health fail-closed y leader handoff validado en Chromium.
+- PGlite conserva ownership de la elección; ElectroCraft solo publica una identidad observable del Worker líder desde `worker.init(options)` para evitar una carrera detectada en `PGliteWorker.isLeader`.
+- Monorepo actual: 19 owner packages, 21 aliases, 2 apps.
+- Blockers P0/P1 conocidos: `0`.
 
 ## Siguiente acción exacta
-1. Releer `.ai/microphases/M04_1.md` y evidencia M00.4 de PGlite/Drizzle.
-2. Revalidar versiones instalables actuales antes de fijar pins.
-3. Crear ports de proyectos en `packages/application/src/projects/` sin importar PGlite/Drizzle.
-4. Crear owner `packages/data-web/` para PGlite/Drizzle, Worker, schema, migrations y capability detection.
-5. Preferir OPFS cuando la plataforma lo soporte de forma segura y declarar fallback persistente compatible cuando no; no ocultar degradaciones.
-6. Añadir `project`, `project_object`, `project_revision`, `app_extension_state`, `capability_snapshot`, `user_preference`, migration journal y búsqueda.
-7. Implementar save/open transaccional, recovery y atomic rollback.
-8. Integrar `Configuración > Almacenamiento` y HelpDescriptor español sin simular estado.
-9. Actualizar boundaries a 19 owners/21 aliases, Studio dependency y lockfile.
-10. Añadir unit/contract/integration/browser gate M04.1; ejecutar lint/typecheck/tests/build/E2E.
-11. Cerrar M04.1 y activar la siguiente microfase F04 automáticamente.
+
+1. Releer `.ai/microphases/M04_4.md` y mantener PGlite/Drizzle como único owner de persistencia.
+2. Cambiar primero repository/service contract para listar, buscar, ordenar, abrir y cambiar estado de proyectos.
+3. Añadir la migration mínima para Archive/Trash en `projects`, sin crear un modelo paralelo.
+4. Construir la pantalla raíz `Proyectos` cuando no existe proyecto abierto, con toolbar 44px y CTA `Nuevo proyecto`.
+5. Renderizar grid/list desde la DB real con empty/loading/error states honestos.
+6. Abrir un proyecto cargando sus objetos committed y conservar recovery M04.3.
+7. Añadir unit/contract/integration/negative/round-trip/E2E responsive y gates completos.
 
 ## Read set
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M04_1.md → experiments/m00-4-studio-db → packages/application → tooling/package-boundaries.json → apps/studio/src/shell`.
+
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M04_4.md → packages/data-web → packages/application/src/projects → apps/studio/src/features/projects → tooling/package-boundaries.json`.

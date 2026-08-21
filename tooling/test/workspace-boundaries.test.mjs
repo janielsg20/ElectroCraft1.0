@@ -12,9 +12,12 @@ function clone(value) {
   return structuredClone(value);
 }
 
-test('workspace owns exactly 18 stable packages and two apps', () => {
+test('workspace owns the declared stable package count and two apps', () => {
   const snapshot = collectWorkspace(root);
-  assert.equal(Object.keys(snapshot.boundaries.packages).length, 18);
+  assert.equal(
+    Object.keys(snapshot.boundaries.packages).length,
+    snapshot.boundaries.invariants.expectedStablePackageCount,
+  );
   assert.deepEqual(Object.keys(snapshot.boundaries.apps).sort(), [
     '@electrocraft/native-preview',
     '@electrocraft/studio',

@@ -1,0 +1,143 @@
+name: M04.2 Validation Report
+
+on:
+  push:
+    branches:
+      - 'codex/m04-2-multitab-worker'
+    paths-ignore:
+      - '.ai/evidence/F04/M04.2/VALIDATION_LATEST.md'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: m04-2-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-and-report:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.13.0'
+          cache: npm
+      - name: Format, validate and record M04.2
+        id: gates
+        shell: bash
+        run: |
+          set +e
+          mkdir -p .ai/evidence/F04/M04.2
+          surface=(
+            packages/application/src/projects/project-storage.ts
+            packages/data-web/src/browser.ts
+            packages/data-web/src/index.ts
+            packages/data-web/src/storage-health.ts
+            tooling/vitest/unit/project-storage-multitab-lifecycle.test.ts
+            tooling/vitest/contract/project-storage-multitab-boundary.test.ts
+            tooling/vitest/integration/project-storage-multitab-migrations.test.ts
+            tooling/playwright/m04-2-multitab-storage.spec.ts
+            .github/workflows/m04-2-multitab-worker.yml
+            .github/workflows/m04-2-validation-report.yml
+          )
+
+          npm ci > /tmp/npm-ci.log 2>&1
+          npm_ci=$?
+
+          npx prettier --write "${surface[@]}" > /tmp/format-write.log 2>&1
+          format_write=$?
+          npx prettier --check "${surface[@]}" > /tmp/format.log 2>&1
+          format=$?
+
+          npm run lint > /tmp/lint.log 2>&1
+          lint=$?
+          npm run typecheck > /tmp/typecheck.log 2>&1
+          typecheck=$?
+          npm run test:boundaries > /tmp/boundaries.log 2>&1
+          boundaries=$?
+
+          npx vitest run --config vitest.config.ts tooling/vitest/unit/project-storage-multitab-lifecycle.test.ts tooling/vitest/contract/project-storage-multitab-boundary.test.ts tooling/vitest/integration/project-storage-multitab-migrations.test.ts > /tmp/tests.log 2>&1
+          tests=$?
+
+          npm run test > /tmp/full-test.log 2>&1
+          full_test=$?
+          npm run build > /tmp/full-build.log 2>&1
+          full_build=$?
+
+          npx playwright install --with-deps chromium > /tmp/playwright-install.log 2>&1
+          playwright_install=$?
+          if [ "$playwright_install" -eq 0 ]; then
+            npx playwright test tooling/playwright/m04-2-multitab-storage.spec.ts --config playwright.config.ts > /tmp/browser.log 2>&1
+            browser=$?
+          else
+            browser=1
+            echo "Chromium installation failed; browser test not executed." > /tmp/browser.log
+          fi
+
+          overall=GREEN
+          if [ "$npm_ci" -ne 0 ] || [ "$format_write" -ne 0 ] || [ "$format" -ne 0 ] || [ "$lint" -ne 0 ] || [ "$typecheck" -ne 0 ] || [ "$boundaries" -ne 0 ] || [ "$tests" -ne 0 ] || [ "$full_test" -ne 0 ] || [ "$full_build" -ne 0 ] || [ "$playwright_install" -ne 0 ] || [ "$browser" -ne 0 ]; then
+            overall=RED
+          fi
+
+          report=.ai/evidence/F04/M04.2/VALIDATION_LATEST.md
+          {
+            echo "# M04.2 validation report"
+            echo
+            echo "- Source commit: \`$GITHUB_SHA\`"
+            echo "- Runner: \`ubuntu-latest\` / Node \`22.13.0\`"
+            echo "- Overall: \`$overall\`"
+            echo
+            echo "| Gate | Exit code |"
+            echo "| --- | ---: |"
+            echo "| npm ci | $npm_ci |"
+            echo "| Prettier write M04.2 surface | $format_write |"
+            echo "| Prettier check M04.2 surface | $format |"
+            echo "| npm run lint | $lint |"
+            echo "| npm run typecheck | $typecheck |"
+            echo "| npm run test:boundaries | $boundaries |"
+            echo "| targeted M04.2 Vitest | $tests |"
+            echo "| npm run test | $full_test |"
+            echo "| npm run build | $full_build |"
+            echo "| Playwright Chromium install | $playwright_install |"
+            echo "| M04.2 two-tab leader handoff | $browser |"
+          } > "$report"
+
+          for pair in "npm-ci:/tmp/npm-ci.log:$npm_ci" "format:/tmp/format.log:$format" "lint:/tmp/lint.log:$lint" "typecheck:/tmp/typecheck.log:$typecheck" "boundaries:/tmp/boundaries.log:$boundaries" "tests:/tmp/tests.log:$tests" "full-test:/tmp/full-test.log:$full_test" "full-build:/tmp/full-build.log:$full_build" "playwright-install:/tmp/playwright-install.log:$playwright_install" "browser:/tmp/browser.log:$browser"; do
+            name=${pair%%:*}
+            rest=${pair#*:}
+            log=${rest%%:*}
+            code=${rest##*:}
+            if [ "$code" -ne 0 ]; then
+              {
+                echo
+                echo "## Failure tail: $name"
+                echo
+                echo '```text'
+                tail -n 180 "$log"
+                echo '```'
+              } >> "$report"
+            fi
+          done
+          echo "overall=$overall" >> "$GITHUB_OUTPUT"
+
+      - name: Commit formatted surface and report
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add packages/application/src/projects/project-storage.ts packages/data-web/src/browser.ts packages/data-web/src/index.ts packages/data-web/src/storage-health.ts tooling/vitest/unit/project-storage-multitab-lifecycle.test.ts tooling/vitest/contract/project-storage-multitab-boundary.test.ts tooling/vitest/integration/project-storage-multitab-migrations.test.ts tooling/playwright/m04-2-multitab-storage.spec.ts .github/workflows/m04-2-multitab-worker.yml .github/workflows/m04-2-validation-report.yml .ai/evidence/F04/M04.2/VALIDATION_LATEST.md
+          if git diff --cached --quiet; then
+            echo "M04.2 validation surface unchanged."
+          else
+            git commit -m "test(m04.2): format and record validation result"
+            git push origin HEAD:codex/m04-2-multitab-worker
+          fi
+
+      - name: Fail workflow when a gate failed
+        if: steps.gates.outputs.overall != 'GREEN'
+        run: exit 1

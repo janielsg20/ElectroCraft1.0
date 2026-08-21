@@ -6,11 +6,16 @@ import { studioSidebarNavigation, type SidebarNavigationItemId } from '../shell/
 // M03.6 continuity: tablet conserva un rail global de 56px; móvil usa navegación inferior, Sheets inferiores y Más abre Capas/Outline a altura completa.
 // M03.7 continuity: Progressive Disclosure clasifica información como primary, contextual, advanced o diagnostic; los diagnósticos críticos permanecen fuera de Advanced.
 // M03.10 continuity: ElectroCraft se entrega en español. La infraestructura de idiomas permite añadir traducciones futuras sin cambiar la lógica de la aplicación.
+// F04 continuity: almacenamiento, autosave, checkpoints y recovery comparten help.projects.
 
 type HelpMessageKey = ElectroCraftResourceKey<'help'>;
 
 export type StudioHelpId =
-  'help.studio.shell' | 'help.studio.appearance' | 'help.studio.language' | `help.section.${SidebarNavigationItemId}`;
+  | 'help.studio.shell'
+  | 'help.studio.appearance'
+  | 'help.studio.language'
+  | 'help.projects'
+  | `help.section.${SidebarNavigationItemId}`;
 
 export interface HelpDescriptor {
   readonly id: StudioHelpId;
@@ -70,7 +75,7 @@ const studioDefinitions = Object.freeze([
     shortKey: 'help.shell.short',
     longKey: 'help.shell.long',
     exampleKeys: ['help.shell.behavior', 'help.shell.example'],
-    relatedIds: ['help.section.editor', 'help.studio.appearance', 'help.studio.language'],
+    relatedIds: ['help.section.editor', 'help.studio.appearance', 'help.studio.language', 'help.projects'],
     keywords: ['appshell', 'sidebar', 'topbar', 'statusbar', 'workspace', 'configuración', 'navegación'],
     learnMoreRef: '.ai/APP_SHELL_SPEC.md',
   },
@@ -94,6 +99,29 @@ const studioDefinitions = Object.freeze([
     relatedIds: ['help.studio.shell'],
     keywords: ['idioma', 'español', 'i18n', 'traducción', 'fallback'],
     learnMoreRef: '.ai/I18N_SPEC.md',
+  },
+  {
+    id: 'help.projects',
+    sectionId: 'settings-storage',
+    titleKey: 'help.projects.title',
+    shortKey: 'help.projects.short',
+    longKey: 'help.projects.long',
+    exampleKeys: ['help.projects.example'],
+    relatedIds: ['help.studio.shell', 'help.section.records', 'help.section.media'],
+    keywords: [
+      'proyectos',
+      'almacenamiento',
+      'pglite',
+      'drizzle',
+      'opfs',
+      'indexeddb',
+      'persistencia',
+      'autosave',
+      'checkpoint',
+      'restaurar',
+      'reparar',
+    ],
+    learnMoreRef: '.ai/microphases/M04_3.md',
   },
 ] as const satisfies readonly HelpDefinition[]);
 

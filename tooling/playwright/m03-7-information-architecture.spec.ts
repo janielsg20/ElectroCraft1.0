@@ -11,14 +11,15 @@ test.describe('M03.7 Progressive Disclosure and information architecture', () =>
     const dialog = page.locator('[data-topbar-settings-sheet]');
     await expect(dialog).toBeVisible();
     await expect(dialog.getByText('Espacio de trabajo', { exact: true })).toBeVisible();
-    await expect(dialog.getByText('Persistencia de preferencias', { exact: true })).toHaveCount(0);
+    await expect(dialog.getByText('Preferencias del AppShell', { exact: true })).toHaveCount(0);
 
     const advanced = dialog.locator('[data-progressive-disclosure="settings-advanced"]');
     const advancedTrigger = advanced.getByRole('button', { name: 'Avanzado' });
     await expect(advancedTrigger).toHaveAttribute('data-state', 'closed');
     await advancedTrigger.click();
     await expect(advancedTrigger).toHaveAttribute('data-state', 'open');
-    await expect(dialog.getByText('Persistencia de preferencias', { exact: true })).toBeVisible();
+    await expect(advanced.getByText('Preferencias del AppShell', { exact: true })).toBeVisible();
+    await expect(advanced.getByText('Adapter de workspace', { exact: true })).toBeVisible();
 
     await page.keyboard.press('Escape');
     await expect(settingsTrigger).toBeFocused();

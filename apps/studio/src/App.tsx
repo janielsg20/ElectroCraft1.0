@@ -1,4 +1,6 @@
+import { useSyncExternalStore } from 'react';
 import { evaluateStudioBootstrapHealth } from './bootstrap-health';
+import { projectStorageRuntime } from './features/projects/project-storage-runtime';
 import { HelpTrigger } from './help/help-ui';
 import { getHelpIdForNavigationItem } from './help/help-registry';
 import { studioWorkspaceDescriptor } from './index';
@@ -91,13 +93,25 @@ function resolveStudioWorkspace(pathname: string, health: ReturnType<typeof eval
 
 export function App() {
   const pathname = window.location.pathname;
+  const storage = useSyncExternalStore(
+    projectStorageRuntime.subscribe,
+    projectStorageRuntime.getSnapshot,
+    projectStorageRuntime.getSnapshot,
+  );
 
   if (pathname === designSystemRoute) {
     return <DesignSystemDevelopmentRoute />;
   }
 
   const health = evaluateStudioBootstrapHealth(studioWorkspaceDescriptor.dependencies);
-  const shellStatus = health.state === 'blocked' ? 'blocked' : 'ready';
+  const shellStatus =
+    health.state === 'blocked' || storage.state === 'blocked'
+      ? 'blocked'
+      : storage.state === 'error'
+        ? 'error'
+        : storage.state === 'saving'
+          ? 'saving'
+          : 'ready';
 
   return <StudioAppShellRoute status={shellStatus}>{resolveStudioWorkspace(pathname, health)}</StudioAppShellRoute>;
 }

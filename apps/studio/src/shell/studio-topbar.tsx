@@ -9,7 +9,9 @@ import {
   SheetTrigger,
   getStudioIcon,
 } from '@electrocraft/design-system';
-import { useSyncExternalStore } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
+import { StorageSettings } from '../features/projects/storage-settings';
+import { projectStorageRuntime } from '../features/projects/project-storage-runtime';
 import { HelpDrawerTrigger } from '../help/help-ui';
 import type { HelpDescriptor } from '../help/help-registry';
 import { appearanceT } from '../i18n/appearance.es';
@@ -145,10 +147,28 @@ export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help 
     preferencesPort.getSnapshot,
     preferencesPort.getSnapshot,
   );
+  const storage = useSyncExternalStore(
+    projectStorageRuntime.subscribe,
+    projectStorageRuntime.getSnapshot,
+    projectStorageRuntime.getSnapshot,
+  );
+
+  useEffect(() => {
+    void projectStorageRuntime.initialize();
+  }, []);
+
   const breakpoint = resolveStudioViewportBreakpoint(width);
   const sidebarCollapsed = preferences.sidebarCollapsed;
   const sidebarAction = sidebarCollapsed ? copy.expandSidebarAction : copy.collapseSidebarAction;
-  const hasVisibleDiagnostic = status === 'error' || status === 'blocked';
+  const storageStatus: AppShellStatus =
+    storage.state === 'saving'
+      ? 'saving'
+      : storage.state === 'error'
+        ? 'error'
+        : storage.state === 'blocked'
+          ? 'blocked'
+          : status;
+  const hasVisibleDiagnostic = storageStatus === 'error' || storageStatus === 'blocked';
 
   return (
     <div className="ec-topbar" data-breakpoint={breakpoint}>
@@ -159,8 +179,8 @@ export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help 
           <strong>{activeLabel}</strong>
         </div>
         <span className="ec-topbar-project">{copy.projectLabel}</span>
-        <span className="ec-topbar-save" data-save-state={status} role="status" aria-live="polite">
-          {copy.saveLabels[status]}
+        <span className="ec-topbar-save" data-save-state={storageStatus} role="status" aria-live="polite">
+          {copy.saveLabels[storageStatus]}
         </span>
       </div>
 
@@ -234,7 +254,11 @@ export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help 
               {hasVisibleDiagnostic ? (
                 <div className="ec-ia-diagnostic-alert" role="alert" data-information-level="diagnostic">
                   <strong>{copy.settingsStatusErrorTitle}</strong>
-                  <p>{copy.settingsStatusErrorSummary}</p>
+                  <p>
+                    {storage.state === 'error' || storage.state === 'blocked'
+                      ? storage.message
+                      : copy.settingsStatusErrorSummary}
+                  </p>
                 </div>
               ) : null}
 
@@ -256,6 +280,8 @@ export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help 
                   </Button>
                 </div>
               </section>
+
+              <StorageSettings />
 
               <section
                 className="ec-topbar-settings-section"

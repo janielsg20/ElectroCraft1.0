@@ -18,6 +18,7 @@
     "@electrocraft/i18n": "0.0.0-m03.10",
     "@electrocraft/editor-puck": "0.0.0-m01.3",
     "@electrocraft/data-core": "0.0.0-m01.3",
+    "@electrocraft/data-web": "0.0.0-m04.1",
     "@electrocraft/query-rqb": "0.0.0-m01.3",
     "@electrocraft/media-tiptap": "0.0.0-m01.3",
     "@electrocraft/state-zustand": "0.0.0-m01.3",

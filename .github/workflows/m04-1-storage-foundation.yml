@@ -1,0 +1,75 @@
+name: M04.1 Storage Foundation
+
+on:
+  pull_request:
+    paths:
+      - 'packages/application/src/projects/**'
+      - 'packages/data-web/**'
+      - 'apps/studio/package.json'
+      - 'apps/studio/vite.config.ts'
+      - 'apps/studio/src/App.tsx'
+      - 'apps/studio/src/features/projects/**'
+      - 'apps/studio/src/shell/studio-topbar.tsx'
+      - 'apps/studio/src/help/help-registry.ts'
+      - 'apps/studio/src/i18n/information-architecture.es.ts'
+      - 'locales/es/common.json'
+      - 'locales/es/help.json'
+      - 'tooling/package-boundaries.json'
+      - 'tooling/vitest/**/project-storage-*.test.ts'
+      - 'tooling/playwright/m04-1-storage.spec.ts'
+      - 'tsconfig.base.json'
+      - 'package-lock.json'
+      - '.github/workflows/m04-1-storage-foundation.yml'
+  push:
+    branches:
+      - 'codex/m04-1-storage-foundation'
+
+jobs:
+  storage-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.13.0'
+          cache: npm
+      - run: npm ci
+      - name: Format M04.1 surface
+        run: >-
+          npx prettier --check
+          packages/application/src/projects
+          packages/data-web
+          apps/studio/package.json
+          apps/studio/vite.config.ts
+          apps/studio/src/App.tsx
+          apps/studio/src/features/projects
+          apps/studio/src/shell/studio-topbar.tsx
+          apps/studio/src/help/help-registry.ts
+          apps/studio/src/i18n/information-architecture.es.ts
+          locales/es/common.json
+          locales/es/help.json
+          tooling/package-boundaries.json
+          tooling/vitest/unit/project-storage-contract.test.ts
+          tooling/vitest/contract/project-storage-boundary.test.ts
+          tooling/vitest/integration/project-storage-pglite.test.ts
+          tooling/playwright/m04-1-storage.spec.ts
+          tsconfig.base.json
+          .github/workflows/m04-1-storage-foundation.yml
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test:boundaries
+      - name: M04.1 tests
+        run: >-
+          npx vitest run --config vitest.config.ts
+          tooling/vitest/unit/project-storage-contract.test.ts
+          tooling/vitest/contract/project-storage-boundary.test.ts
+          tooling/vitest/integration/project-storage-pglite.test.ts
+      - name: Full repository test gate
+        run: npm run test
+      - name: Full repository build gate
+        run: npm run build
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: M04.1 browser storage smoke
+        run: npx playwright test tooling/playwright/m04-1-storage.spec.ts --config playwright.config.ts

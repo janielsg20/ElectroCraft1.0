@@ -15,16 +15,19 @@ const matrix = [
   [320, 'mobile'],
 ] as const;
 
+const studioScopedHelpCount = 4;
+
 describe('M03.12 observable AppShell matrix', () => {
   it('maps every required width to the canonical responsive mode', () => {
     for (const [width, mode] of matrix) expect(resolveEditorLayoutMode(width)).toBe(mode);
     expect(resolveLaptopPanelStrategy(1024)).toBe('overlay');
   });
 
-  it('keeps 24 canonical top-level destinations and one contextual Help descriptor each', () => {
+  it('keeps 24 canonical top-level destinations and contextual Help descriptors', () => {
     const items = studioSidebarNavigation.flatMap((group) => group.items);
     expect(items).toHaveLength(24);
-    expect(studioHelpDescriptors).toHaveLength(27);
+    expect(studioHelpDescriptors).toHaveLength(items.length + studioScopedHelpCount);
+    expect(studioHelpDescriptors.some((descriptor) => descriptor.id === 'help.projects')).toBe(true);
     for (const item of items) {
       expect(resolveSidebarActiveItem(item.href)).toBe(item.id);
       expect(studioHelpDescriptors.some((descriptor) => descriptor.id === `help.section.${item.id}`)).toBe(true);

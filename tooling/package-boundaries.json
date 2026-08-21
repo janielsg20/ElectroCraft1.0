@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "packageVersion": "0.0.0-m01.3",
+  "packageVersion": "0.0.0-m04.1",
   "packages": {
     "@electrocraft/domain": [],
     "@electrocraft/application": ["@electrocraft/domain"],
@@ -8,12 +8,13 @@
     "@electrocraft/i18n": [],
     "@electrocraft/editor-puck": ["@electrocraft/domain", "@electrocraft/application"],
     "@electrocraft/data-core": ["@electrocraft/domain", "@electrocraft/application"],
+    "@electrocraft/data-web": ["@electrocraft/domain", "@electrocraft/application"],
     "@electrocraft/query-rqb": ["@electrocraft/domain", "@electrocraft/application", "@electrocraft/data-core"],
-    "@electrocraft/media-tiptap": ["@electrocraft/domain"],
-    "@electrocraft/state-zustand": ["@electrocraft/domain"],
-    "@electrocraft/auth-core": ["@electrocraft/domain", "@electrocraft/application"],
-    "@electrocraft/workflow-rete": ["@electrocraft/domain", "@electrocraft/application"],
     "@electrocraft/forms": ["@electrocraft/domain", "@electrocraft/application"],
+    "@electrocraft/auth-core": ["@electrocraft/domain", "@electrocraft/application"],
+    "@electrocraft/state-zustand": ["@electrocraft/domain"],
+    "@electrocraft/workflow-rete": ["@electrocraft/domain", "@electrocraft/application"],
+    "@electrocraft/export-ir": ["@electrocraft/domain"],
     "@electrocraft/admin-refine": [
       "@electrocraft/domain",
       "@electrocraft/application",
@@ -21,6 +22,7 @@
       "@electrocraft/query-rqb",
       "@electrocraft/forms"
     ],
+    "@electrocraft/media-tiptap": ["@electrocraft/domain"],
     "@electrocraft/runtime-web": [
       "@electrocraft/domain",
       "@electrocraft/application",
@@ -39,7 +41,6 @@
       "@electrocraft/auth-core",
       "@electrocraft/forms"
     ],
-    "@electrocraft/export-ir": ["@electrocraft/domain"],
     "@electrocraft/exporters": ["@electrocraft/domain", "@electrocraft/application", "@electrocraft/export-ir"],
     "@electrocraft/testing": ["@electrocraft/domain", "@electrocraft/export-ir"]
   },
@@ -51,6 +52,7 @@
       "@electrocraft/i18n",
       "@electrocraft/editor-puck",
       "@electrocraft/data-core",
+      "@electrocraft/data-web",
       "@electrocraft/query-rqb",
       "@electrocraft/media-tiptap",
       "@electrocraft/state-zustand",
@@ -74,7 +76,7 @@
     "@electrocraft/i18n": ["locales/es"]
   },
   "invariants": {
-    "expectedStablePackageCount": 18,
+    "expectedStablePackageCount": 19,
     "domainForbiddenImports": [
       "react",
       "@puckeditor/core",
@@ -112,6 +114,7 @@
     "@electrocraft/i18n": "packages/i18n/src/index.ts",
     "@electrocraft/editor-puck": "packages/editor-puck/src/index.ts",
     "@electrocraft/data-core": "packages/data-core/src/index.ts",
+    "@electrocraft/data-web": "packages/data-web/src/index.ts",
     "@electrocraft/query-rqb": "packages/query-rqb/src/index.ts",
     "@electrocraft/media-tiptap": "packages/media-tiptap/src/index.ts",
     "@electrocraft/state-zustand": "packages/state-zustand/src/index.ts",

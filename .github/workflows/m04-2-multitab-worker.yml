@@ -1,0 +1,56 @@
+name: M04.2 Multi-Tab Worker Gate
+
+on:
+  pull_request:
+    paths:
+      - 'packages/application/src/projects/**'
+      - 'packages/data-web/**'
+      - 'apps/studio/src/features/projects/**'
+      - 'apps/studio/vite.config.ts'
+      - 'tooling/vitest/**/project-storage-multitab-*.test.ts'
+      - 'tooling/playwright/m04-2-multitab-storage.spec.ts'
+      - '.github/workflows/m04-2-multitab-worker.yml'
+  push:
+    branches:
+      - 'codex/m04-2-multitab-worker'
+
+jobs:
+  multitab-storage-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.13.0'
+          cache: npm
+      - run: npm ci
+      - name: Format M04.2 surface
+        run: >-
+          npx prettier --check
+          packages/application/src/projects/project-storage.ts
+          packages/data-web/src/browser.ts
+          packages/data-web/src/index.ts
+          packages/data-web/src/storage-health.ts
+          tooling/vitest/unit/project-storage-multitab-lifecycle.test.ts
+          tooling/vitest/contract/project-storage-multitab-boundary.test.ts
+          tooling/vitest/integration/project-storage-multitab-migrations.test.ts
+          tooling/playwright/m04-2-multitab-storage.spec.ts
+          .github/workflows/m04-2-multitab-worker.yml
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test:boundaries
+      - name: M04.2 unit contract integration
+        run: >-
+          npx vitest run --config vitest.config.ts
+          tooling/vitest/unit/project-storage-multitab-lifecycle.test.ts
+          tooling/vitest/contract/project-storage-multitab-boundary.test.ts
+          tooling/vitest/integration/project-storage-multitab-migrations.test.ts
+      - name: Full repository tests
+        run: npm run test
+      - name: Full repository build
+        run: npm run build
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: M04.2 two-tab leader handoff
+        run: npx playwright test tooling/playwright/m04-2-multitab-storage.spec.ts --config playwright.config.ts
