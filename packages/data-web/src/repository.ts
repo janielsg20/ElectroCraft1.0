@@ -5,11 +5,16 @@ import {
   type JsonValue,
 } from '@electrocraft/domain';
 import {
+  createProjectStorageRevision,
+  projectRevisionSnapshotObjects,
   validateProjectStorageRevision,
   validateStoredProjectObject,
+  type NormalizedIncrementalSaveProjectRequest,
   type NormalizedSaveProjectRequest,
   type OpenProjectResult,
+  type ProjectIncrementalSaveResult,
   type ProjectIntegrityReport,
+  type ProjectRecoveryCandidate,
   type ProjectStorageRevision,
   type StoredProjectObject,
 } from '@electrocraft/application';
@@ -59,11 +64,17 @@ export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
           id: request.project.id,
           name: request.project.name,
           metadata: request.project.metadata,
+          currentRevisionBase: request.revision.id,
           updatedAt: now,
         })
         .onConflictDoUpdate({
           target: schema.projects.id,
-          set: { name: request.project.name, metadata: request.project.metadata, updatedAt: now },
+          set: {
+            name: request.project.name,
+            metadata: request.project.metadata,
+            currentRevisionBase: request.revision.id,
+            updatedAt: now,
+          },
         });
 
       const expectedIds = request.objects.map(({ objectId }) => objectId);
@@ -124,6 +135,181 @@ export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
     return request.revision;
   }
 
+  async function saveProjectIncremental(
+    request: NormalizedIncrementalSaveProjectRequest,
+  ): Promise<ProjectIncrementalSaveResult> {
+    for (const object of request.dirtyObjects) validateStoredProjectObject(object);
+    const now = new Date(request.updatedAt);
+    let currentRevisionBase: string | null = null;
+
+    await db.transaction(async (tx) => {
+      const existingProjects = await tx
+        .select({ currentRevisionBase: schema.projects.currentRevisionBase })
+        .from(schema.projects)
+        .where(eq(schema.projects.id, request.project.id));
+      currentRevisionBase = existingProjects[0]?.currentRevisionBase ?? null;
+
+      await tx
+        .insert(schema.projects)
+        .values({
+          id: request.project.id,
+          name: request.project.name,
+          metadata: request.project.metadata,
+          currentRevisionBase,
+          updatedAt: now,
+        })
+        .onConflictDoUpdate({
+          target: schema.projects.id,
+          set: {
+            name: request.project.name,
+            metadata: request.project.metadata,
+            currentRevisionBase,
+            updatedAt: now,
+          },
+        });
+
+      for (const objectId of request.deletedObjectIds) {
+        await tx
+          .delete(schema.projectObjects)
+          .where(
+            and(
+              eq(schema.projectObjects.projectId, request.project.id),
+              eq(schema.projectObjects.objectId, objectId),
+            ),
+          );
+      }
+
+      for (const object of request.dirtyObjects) {
+        await tx
+          .insert(schema.projectObjects)
+          .values({
+            projectId: object.projectId,
+            objectId: object.objectId,
+            kind: object.kind,
+            schemaVersion: object.schemaVersion,
+            payload: object.payload,
+            checksum: object.checksum,
+            updatedAt: new Date(object.updatedAt),
+          })
+          .onConflictDoUpdate({
+            target: [schema.projectObjects.projectId, schema.projectObjects.objectId],
+            set: {
+              kind: object.kind,
+              schemaVersion: object.schemaVersion,
+              payload: object.payload,
+              checksum: object.checksum,
+              updatedAt: new Date(object.updatedAt),
+            },
+          });
+      }
+    });
+
+    return Object.freeze({
+      projectId: request.project.id,
+      updatedAt: request.updatedAt,
+      upsertedObjectIds: Object.freeze(request.dirtyObjects.map(({ objectId }) => objectId)),
+      deletedObjectIds: Object.freeze([...request.deletedObjectIds]),
+      currentRevisionBase,
+    });
+  }
+
+  async function createCheckpoint(projectId: string, reason: string): Promise<ProjectStorageRevision> {
+    return db.transaction(async (tx) => {
+      const projectRows = await tx.select({ id: schema.projects.id }).from(schema.projects).where(eq(schema.projects.id, projectId));
+      if (!projectRows[0]) throw new Error(`project not found: ${projectId}`);
+
+      const objectRows = await tx
+        .select()
+        .from(schema.projectObjects)
+        .where(eq(schema.projectObjects.projectId, projectId));
+      const objects = objectRows.map(toStoredObject);
+      const revision = createProjectStorageRevision(projectId, objects, reason);
+      const now = new Date(revision.createdAt);
+
+      await tx.insert(schema.projectRevisions).values({
+        id: revision.id,
+        projectId: revision.projectId,
+        reason: revision.reason,
+        manifest: revision.manifest as unknown as JsonValue,
+        checksum: revision.checksum,
+        createdAt: now,
+      });
+      await tx
+        .update(schema.projects)
+        .set({ currentRevisionBase: revision.id, updatedAt: now })
+        .where(eq(schema.projects.id, projectId));
+
+      return revision;
+    });
+  }
+
+  async function findRecoveryCandidate(projectId: string): Promise<ProjectRecoveryCandidate | null> {
+    const rows = await db
+      .select()
+      .from(schema.projectRevisions)
+      .where(eq(schema.projectRevisions.projectId, projectId))
+      .orderBy(desc(schema.projectRevisions.createdAt));
+
+    for (const row of rows) {
+      try {
+        const revision = toRevision(row);
+        const snapshots = projectRevisionSnapshotObjects(revision);
+        if (!snapshots) continue;
+        return Object.freeze({
+          projectId,
+          revisionId: revision.id,
+          reason: revision.reason,
+          createdAt: revision.createdAt,
+          objectCount: snapshots.length,
+        });
+      } catch {
+        // Corrupted/non-restorable revisions are skipped until the newest valid checkpoint is found.
+      }
+    }
+    return null;
+  }
+
+  async function restoreRevision(projectId: string, revisionId: string): Promise<ProjectStorageRevision> {
+    return db.transaction(async (tx) => {
+      const rows = await tx
+        .select()
+        .from(schema.projectRevisions)
+        .where(and(eq(schema.projectRevisions.projectId, projectId), eq(schema.projectRevisions.id, revisionId)))
+        .limit(1);
+      if (!rows[0]) throw new Error(`project revision not found: ${revisionId}`);
+
+      const revision = toRevision(rows[0]);
+      const snapshots = projectRevisionSnapshotObjects(revision);
+      if (!snapshots) throw new Error(`project revision is not restorable: ${revisionId}`);
+      const now = new Date();
+
+      await tx.delete(schema.projectObjects).where(eq(schema.projectObjects.projectId, projectId));
+      for (const snapshot of snapshots) {
+        const object = validateStoredProjectObject({
+          ...snapshot,
+          projectId,
+          checksum: snapshot.checksum as ElectroCraftCanonicalSnapshotChecksum,
+          updatedAt: now.toISOString(),
+        });
+        await tx.insert(schema.projectObjects).values({
+          projectId: object.projectId,
+          objectId: object.objectId,
+          kind: object.kind,
+          schemaVersion: object.schemaVersion,
+          payload: object.payload,
+          checksum: object.checksum,
+          updatedAt: now,
+        });
+      }
+      await tx
+        .update(schema.projects)
+        .set({ currentRevisionBase: revision.id, updatedAt: now })
+        .where(eq(schema.projects.id, projectId));
+
+      return revision;
+    });
+  }
+
   async function openProject(projectId: string): Promise<OpenProjectResult | null> {
     const projectRows = await db.select().from(schema.projects).where(eq(schema.projects.id, projectId));
     const project = projectRows[0];
@@ -132,12 +318,23 @@ export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
       .select()
       .from(schema.projectObjects)
       .where(eq(schema.projectObjects.projectId, projectId));
-    const revisionRows = await db
-      .select()
-      .from(schema.projectRevisions)
-      .where(eq(schema.projectRevisions.projectId, projectId))
-      .orderBy(desc(schema.projectRevisions.createdAt))
-      .limit(1);
+    const revisionRows = project.currentRevisionBase
+      ? await db
+          .select()
+          .from(schema.projectRevisions)
+          .where(
+            and(
+              eq(schema.projectRevisions.projectId, projectId),
+              eq(schema.projectRevisions.id, project.currentRevisionBase),
+            ),
+          )
+          .limit(1)
+      : await db
+          .select()
+          .from(schema.projectRevisions)
+          .where(eq(schema.projectRevisions.projectId, projectId))
+          .orderBy(desc(schema.projectRevisions.createdAt))
+          .limit(1);
 
     return Object.freeze({
       project: Object.freeze({
@@ -154,10 +351,11 @@ export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
 
   async function verifyProject(projectId: string): Promise<ProjectIntegrityReport> {
     const projectRows = await db
-      .select({ id: schema.projects.id })
+      .select({ id: schema.projects.id, currentRevisionBase: schema.projects.currentRevisionBase })
       .from(schema.projects)
       .where(eq(schema.projects.id, projectId));
-    if (!projectRows[0]) {
+    const project = projectRows[0];
+    if (!project) {
       return Object.freeze({
         projectId,
         coherent: false,
@@ -176,37 +374,47 @@ export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
       .map(({ objectId }) => objectId)
       .sort();
 
-    const revisionRows = await db
-      .select()
-      .from(schema.projectRevisions)
-      .where(eq(schema.projectRevisions.projectId, projectId))
-      .orderBy(desc(schema.projectRevisions.createdAt))
-      .limit(1);
-
     let revisionChecksumValid = true;
-    let manifestMatches = true;
-    if (revisionRows[0]) {
-      try {
-        const revision = toRevision(revisionRows[0]);
-        const manifestIds = revision.manifest.objects.map(({ objectId }) => objectId).sort();
-        const actualIds = objectRows.map(({ objectId }) => objectId).sort();
-        manifestMatches = JSON.stringify(manifestIds) === JSON.stringify(actualIds);
-      } catch {
+    if (project.currentRevisionBase) {
+      const revisionRows = await db
+        .select()
+        .from(schema.projectRevisions)
+        .where(
+          and(
+            eq(schema.projectRevisions.projectId, projectId),
+            eq(schema.projectRevisions.id, project.currentRevisionBase),
+          ),
+        )
+        .limit(1);
+      if (!revisionRows[0]) {
         revisionChecksumValid = false;
-        manifestMatches = false;
+      } else {
+        try {
+          toRevision(revisionRows[0]);
+        } catch {
+          revisionChecksumValid = false;
+        }
       }
     }
 
     return Object.freeze({
       projectId,
-      coherent: invalidObjectIds.length === 0 && revisionChecksumValid && manifestMatches,
+      coherent: invalidObjectIds.length === 0 && revisionChecksumValid,
       checkedObjects: objectRows.length,
       invalidObjectIds: Object.freeze(invalidObjectIds),
       revisionChecksumValid,
     });
   }
 
-  return Object.freeze({ saveProject, openProject, verifyProject });
+  return Object.freeze({
+    saveProject,
+    saveProjectIncremental,
+    createCheckpoint,
+    findRecoveryCandidate,
+    restoreRevision,
+    openProject,
+    verifyProject,
+  });
 }
 
 export type DrizzleProjectRepository = ReturnType<typeof createDrizzleProjectRepository>;
