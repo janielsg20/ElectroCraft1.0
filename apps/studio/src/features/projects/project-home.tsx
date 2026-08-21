@@ -1,4 +1,10 @@
-import type { ProjectLifecycleStatus, ProjectListSort, ProjectSummary } from '@electrocraft/application';
+import type {
+  ProjectBackupPackage,
+  ProjectImportStrategy,
+  ProjectLifecycleStatus,
+  ProjectListSort,
+  ProjectSummary,
+} from '@electrocraft/application';
 import { Button, Input } from '@electrocraft/design-system';
 import { useCallback, useEffect, useState } from 'react';
 import { HelpTrigger } from '../../help/help-ui';
@@ -14,6 +20,7 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
   const [error, setError] = useState('');
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [importStrategy, setImportStrategy] = useState<ProjectImportStrategy>('copy');
   const reload = useCallback(async () => {
     setState('loading');
     try {
@@ -29,6 +36,24 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
   async function change(id: string, next: ProjectLifecycleStatus) {
     await projectStorageRuntime.setProjectStatus(id, next);
     await reload();
+  }
+  async function backup(project: ProjectSummary) {
+    const data = await projectStorageRuntime.createBackup(project.id);
+    const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${project.name}.electrocraft.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+  async function importFile(file: File) {
+    try {
+      await projectStorageRuntime.importBackup(JSON.parse(await file.text()) as ProjectBackupPackage, importStrategy);
+      await reload();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo importar la copia.');
+      setState('error');
+    }
   }
   return (
     <>
@@ -78,6 +103,26 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
           <Button className="ec-project-new" disabled={state === 'loading'} onClick={() => setWizardOpen(true)}>
             Nuevo proyecto
           </Button>
+          <select
+            aria-label="Estrategia de importación"
+            value={importStrategy}
+            onChange={(e) => setImportStrategy(e.target.value as ProjectImportStrategy)}
+          >
+            <option value="copy">Importar como copia</option>
+            <option value="replace">Restaurar y reemplazar</option>
+          </select>
+          <label className="ec-project-import">
+            Importar copia
+            <input
+              aria-label="Archivo de copia"
+              type="file"
+              accept="application/json,.json"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) void importFile(file);
+              }}
+            />
+          </label>
         </div>
         {state === 'loading' ? <p role="status">Cargando proyectos…</p> : null}
         {state === 'error' ? (
@@ -120,6 +165,9 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
                     onClick={() => void projectStorageRuntime.duplicateProject(p.id, `${p.name} copia`).then(reload)}
                   >
                     Duplicar
+                  </Button>
+                  <Button variant="ghost" onClick={() => void backup(p)}>
+                    Crear copia
                   </Button>
                   {p.status === 'active' ? (
                     <Button variant="ghost" onClick={() => void change(p.id, 'archived')}>
