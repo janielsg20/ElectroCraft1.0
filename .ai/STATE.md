@@ -18,7 +18,7 @@
 - M03.10 — Infraestructura español-primero e i18n tipado: `COMPLETADA`; Gate `GREEN`.
 - M03.11 — Sistema de ayuda contextual: `COMPLETADA`; Gate `GREEN`.
 - M03.12 — E2E AppShell completo: `COMPLETADA`; Gate `GREEN`.
-- F04 — Persistencia local real del Studio: `IN_PROGRESS`.
+- F04 — Persistencia local real del Studio: `COMPLETADA`; Gate `GREEN`.
 - M04.1 — Schema físico estable con PGlite/Drizzle + storage browser: `COMPLETADA`; Gate `GREEN`.
 - M04.2 — Inicializar PGlite Multi-Tab Worker y migrations: `COMPLETADA`; Gate `GREEN`.
 - M04.3 — Persistencia incremental, autosave y recovery: `COMPLETADA`; Gate `GREEN`.
@@ -26,7 +26,9 @@
 - M04.5 — New Project Wizard y project actions: `COMPLETADA`; Gate `GREEN`.
 - M04.6 — Import/Backup/Restore: `COMPLETADA`; Gate `GREEN`.
 - M04.7 — Workspace preferences: `COMPLETADA`; Gate `GREEN`.
-- M04.8 — Project Revision Checkpoints y Restore: `ACTIVE`.
+- M04.8 — Project Revision Checkpoints y Restore: `COMPLETADA`; Gate `GREEN`.
+- F05 — Screen Composer con Puck: `IN_PROGRESS`.
+- M05.1 — Crear PuckAdapter y component mapping: `ACTIVE`.
 - Blockers P0/P1 funcionales conocidos: `0`.
 
 ## Cierre F03/M03.12
@@ -47,6 +49,6 @@ M04.3 cerró localmente `GREEN` sobre source funcional `987f4c333f6e8b4c48d7ebad
 
 ## Microfase activa
 
-`M04.8` — Construir Project Revision Checkpoints y Restore.
+`M05.1` — Crear PuckAdapter y component mapping.
 
-Referencias: `.ai/microphases/M04_8.md`, `.ai/evidence/F04/M04.7/CLOSURE_2026-08-21.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
+Referencias: `.ai/microphases/M05_1.md`, `.ai/evidence/F04/M04.8/CLOSURE_2026-08-21.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.

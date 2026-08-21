@@ -384,6 +384,9 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
     findRecoveryCandidate: async (projectId: string) => (await ensureRepository()).findRecoveryCandidate(projectId),
     restoreRevision: (projectId: string, revisionId: string) =>
       persistOperation((repo) => repo.restoreRevision(projectId, revisionId)),
+    async listRevisions(projectId: string) {
+      return (await ensureRepository()).listRevisions(projectId);
+    },
     async openProject(projectId: string) {
       return (await ensureRepository()).openProject(projectId);
     },

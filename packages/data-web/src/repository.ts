@@ -16,6 +16,7 @@ import {
   type ProjectIntegrityReport,
   type ProjectRecoveryCandidate,
   type ProjectStorageRevision,
+  type ProjectRevisionSummary,
   type ProjectSummary,
   type ProjectLifecycleStatus,
   type ListProjectsRequest,
@@ -58,6 +59,29 @@ function toRevision(row: typeof schema.projectRevisions.$inferSelect): ProjectSt
 }
 
 export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
+  async function listRevisions(projectId: string): Promise<readonly ProjectRevisionSummary[]> {
+    const rows = await db
+      .select()
+      .from(schema.projectRevisions)
+      .where(eq(schema.projectRevisions.projectId, projectId))
+      .orderBy(desc(schema.projectRevisions.createdAt));
+    return Object.freeze(
+      rows.map((row) => {
+        const revision = toRevision(row);
+        const objectsByKind: Record<string, number> = {};
+        for (const object of revision.manifest.objects)
+          objectsByKind[object.kind] = (objectsByKind[object.kind] ?? 0) + 1;
+        return Object.freeze({
+          id: revision.id,
+          projectId,
+          reason: revision.reason,
+          createdAt: revision.createdAt,
+          objectCount: revision.manifest.objects.length,
+          objectsByKind: Object.freeze(objectsByKind),
+        });
+      }),
+    );
+  }
   async function getWorkspacePreferences(workspaceId: string): Promise<StudioWorkspacePreferences> {
     const row = (
       await db
@@ -570,6 +594,7 @@ export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
     createCheckpoint,
     findRecoveryCandidate,
     restoreRevision,
+    listRevisions,
     openProject,
     verifyProject,
   });

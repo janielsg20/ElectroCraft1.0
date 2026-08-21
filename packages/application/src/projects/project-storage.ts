@@ -154,6 +154,14 @@ export interface ProjectStorageRevision {
   readonly checksum: ElectroCraftCanonicalSnapshotChecksum;
   readonly createdAt: string;
 }
+export interface ProjectRevisionSummary {
+  readonly id: string;
+  readonly projectId: string;
+  readonly reason: string;
+  readonly createdAt: string;
+  readonly objectCount: number;
+  readonly objectsByKind: Readonly<Record<string, number>>;
+}
 
 export interface SaveProjectRequest {
   readonly project: StoredProjectDefinition;
@@ -217,6 +225,7 @@ export interface ProjectStoragePort {
   createCheckpoint(projectId: string, reason: string): Promise<ProjectStorageRevision>;
   findRecoveryCandidate(projectId: string): Promise<ProjectRecoveryCandidate | null>;
   restoreRevision(projectId: string, revisionId: string): Promise<ProjectStorageRevision>;
+  listRevisions(projectId: string): Promise<readonly ProjectRevisionSummary[]>;
   openProject(projectId: string): Promise<OpenProjectResult | null>;
   listProjects(request: Required<ListProjectsRequest>): Promise<readonly ProjectSummary[]>;
   setProjectStatus(projectId: string, status: ProjectLifecycleStatus): Promise<ProjectSummary>;
@@ -486,6 +495,12 @@ export function createProjectStorageService(port: ProjectStoragePort) {
     recoveryCandidate: (projectId: string) => port.findRecoveryCandidate(requireNonEmpty(projectId, 'projectId')),
     restoreRevision: (projectId: string, revisionId: string) =>
       port.restoreRevision(requireNonEmpty(projectId, 'projectId'), requireNonEmpty(revisionId, 'revisionId')),
+    listRevisions: (projectId: string) => port.listRevisions(requireNonEmpty(projectId, 'projectId')),
+    async restoreRevisionAsCheckpoint(projectId: string, revisionId: string) {
+      const id = requireNonEmpty(projectId, 'projectId');
+      await port.restoreRevision(id, requireNonEmpty(revisionId, 'revisionId'));
+      return port.createCheckpoint(id, 'restored-revision');
+    },
     repair: () => port.repair(),
     close: () => port.close(),
   });

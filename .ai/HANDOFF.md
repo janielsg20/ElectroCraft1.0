@@ -2,7 +2,7 @@
 
 ## Current
 
-F04 / M04.8 — Construir Project Revision Checkpoints y Restore — `ACTIVE`.
+F05 / M05.1 — Crear PuckAdapter y component mapping — `ACTIVE`.
 
 ## Heredado
 
@@ -18,7 +18,7 @@ F04 / M04.8 — Construir Project Revision Checkpoints y Restore — `ACTIVE`.
 
 ## Siguiente acción exacta
 
-1. Releer `.ai/microphases/M04_8.md` y mantener PGlite/Drizzle como único owner de persistencia.
+1. Releer `.ai/microphases/M05_1.md` y mantener PGlite/Drizzle como único owner de persistencia.
 2. Cambiar primero repository/service contract para listar, buscar, ordenar, abrir y cambiar estado de proyectos.
 3. Añadir la migration mínima para Archive/Trash en `projects`, sin crear un modelo paralelo.
 4. Construir la pantalla raíz `Proyectos` cuando no existe proyecto abierto, con toolbar 44px y CTA `Nuevo proyecto`.
@@ -28,4 +28,4 @@ F04 / M04.8 — Construir Project Revision Checkpoints y Restore — `ACTIVE`.
 
 ## Read set
 
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M04_8.md → packages/data-web → packages/application/src/projects → apps/studio/src/features/projects → tooling/package-boundaries.json`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M05_1.md → packages/data-web → packages/application/src/projects → apps/studio/src/features/projects → tooling/package-boundaries.json`.

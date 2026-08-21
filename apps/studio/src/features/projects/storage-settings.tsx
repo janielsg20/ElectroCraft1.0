@@ -2,6 +2,7 @@ import { Button } from '@electrocraft/design-system';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { HelpTrigger } from '../../help/help-ui';
 import { projectStorageRuntime } from './project-storage-runtime';
+import { RevisionHistoryPanel } from './revision-history-panel';
 import { DEFAULT_STUDIO_WORKSPACE_PREFERENCES, type StudioWorkspacePreferences } from '@electrocraft/application';
 
 type RecoveryState =
@@ -259,6 +260,7 @@ export function StorageSettings() {
           {repairing ? 'Revisando…' : 'Revisar'}
         </Button>
       </div>
+      <RevisionHistoryPanel />
     </section>
   );
 }
