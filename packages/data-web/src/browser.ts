@@ -1,5 +1,5 @@
 import {
-  PROJECT_STORAGE_SCHEMA_VERSION,
+  type NormalizedIncrementalSaveProjectRequest,
   type NormalizedSaveProjectRequest,
   type ProjectStorageCoordinationDiagnostics,
   type ProjectStorageDiagnostics,
@@ -11,6 +11,7 @@ import { drizzle } from 'drizzle-orm/pglite';
 import { applyStudioStorageMigrations } from './migration';
 import { createDrizzleProjectRepository } from './repository';
 import * as schema from './schema';
+import { STUDIO_STORAGE_SCHEMA_VERSION } from './schema-contract';
 import { verifyStudioStorageHealth } from './storage-health';
 
 export const DEFAULT_BROWSER_STORAGE_BACKEND = 'indexeddb' as const;
@@ -53,12 +54,7 @@ function createStorageClientId() {
   return `electrocraft-storage-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-async function openWorkerClient(
-  dataDir: string,
-  databaseName: string,
-  clientId: string,
-  leaderSignalChannel: string,
-) {
+async function openWorkerClient(dataDir: string, databaseName: string, clientId: string, leaderSignalChannel: string) {
   return PGliteWorker.create(
     new Worker(new URL('./pglite.worker.ts', import.meta.url), {
       type: 'module',
@@ -92,19 +88,34 @@ async function createPersistentWorkerClient(
     if (!canAttemptOpfs()) {
       return Object.freeze({
         backend: 'indexeddb',
-        client: await openWorkerClient(dataDirFor('indexeddb', databaseName), databaseName, clientId, leaderSignalChannel),
+        client: await openWorkerClient(
+          dataDirFor('indexeddb', databaseName),
+          databaseName,
+          clientId,
+          leaderSignalChannel,
+        ),
         fallbackReason: 'OPFS AHP solicitado pero no disponible; se usa IndexedDB persistente.',
       });
     }
     try {
       return Object.freeze({
         backend: 'opfs-ahp',
-        client: await openWorkerClient(dataDirFor('opfs-ahp', databaseName), databaseName, clientId, leaderSignalChannel),
+        client: await openWorkerClient(
+          dataDirFor('opfs-ahp', databaseName),
+          databaseName,
+          clientId,
+          leaderSignalChannel,
+        ),
       });
     } catch (error) {
       return Object.freeze({
         backend: 'indexeddb',
-        client: await openWorkerClient(dataDirFor('indexeddb', databaseName), databaseName, clientId, leaderSignalChannel),
+        client: await openWorkerClient(
+          dataDirFor('indexeddb', databaseName),
+          databaseName,
+          clientId,
+          leaderSignalChannel,
+        ),
         fallbackReason:
           error instanceof Error ? error.message : 'OPFS AHP no disponible; se usa IndexedDB persistente.',
       });
@@ -279,7 +290,7 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
           durable: estimate.durable,
           usageBytes: estimate.usageBytes,
           quotaBytes: estimate.quotaBytes,
-          migrationVersion: PROJECT_STORAGE_SCHEMA_VERSION,
+          migrationVersion: STUDIO_STORAGE_SCHEMA_VERSION,
           repairSupported: true,
           lifecyclePhase: 'ready',
           coordination: coordination(),
@@ -335,31 +346,40 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
     return diagnostics;
   }
 
+  async function persistOperation<T>(operation: (repo: NonNullable<typeof repository>) => Promise<T>): Promise<T> {
+    const repo = await ensureRepository();
+    diagnostics = Object.freeze({ ...diagnostics, state: 'saving', message: 'Guardando proyecto…' });
+    try {
+      const result = await operation(repo);
+      diagnostics = Object.freeze({
+        ...diagnostics,
+        state: 'saved',
+        lifecyclePhase: 'ready',
+        coordination: coordination(),
+        message: 'Proyecto guardado.',
+      });
+      return result;
+    } catch (error) {
+      diagnostics = Object.freeze({
+        ...diagnostics,
+        state: 'error',
+        coordination: coordination(),
+        message: error instanceof Error ? error.message : 'No se pudo guardar el proyecto.',
+      });
+      throw error;
+    }
+  }
+
   return Object.freeze({
     initialize,
-    async saveProject(request: NormalizedSaveProjectRequest) {
-      const repo = await ensureRepository();
-      diagnostics = Object.freeze({ ...diagnostics, state: 'saving', message: 'Guardando proyecto…' });
-      try {
-        const revision = await repo.saveProject(request);
-        diagnostics = Object.freeze({
-          ...diagnostics,
-          state: 'saved',
-          lifecyclePhase: 'ready',
-          coordination: coordination(),
-          message: 'Proyecto guardado.',
-        });
-        return revision;
-      } catch (error) {
-        diagnostics = Object.freeze({
-          ...diagnostics,
-          state: 'error',
-          coordination: coordination(),
-          message: error instanceof Error ? error.message : 'No se pudo guardar el proyecto.',
-        });
-        throw error;
-      }
-    },
+    saveProject: (request: NormalizedSaveProjectRequest) => persistOperation((repo) => repo.saveProject(request)),
+    saveProjectIncremental: (request: NormalizedIncrementalSaveProjectRequest) =>
+      persistOperation((repo) => repo.saveProjectIncremental(request)),
+    createCheckpoint: (projectId: string, reason: string) =>
+      persistOperation((repo) => repo.createCheckpoint(projectId, reason)),
+    findRecoveryCandidate: async (projectId: string) => (await ensureRepository()).findRecoveryCandidate(projectId),
+    restoreRevision: (projectId: string, revisionId: string) =>
+      persistOperation((repo) => repo.restoreRevision(projectId, revisionId)),
     async openProject(projectId: string) {
       return (await ensureRepository()).openProject(projectId);
     },
