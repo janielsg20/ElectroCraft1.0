@@ -24,7 +24,8 @@
 - M04.3 — Persistencia incremental, autosave y recovery: `COMPLETADA`; Gate `GREEN`.
 - M04.4 — Project Home real: `COMPLETADA`; Gate `GREEN`.
 - M04.5 — New Project Wizard y project actions: `COMPLETADA`; Gate `GREEN`.
-- M04.6 — Import/Backup/Restore: `ACTIVE`.
+- M04.6 — Import/Backup/Restore: `COMPLETADA`; Gate `GREEN`.
+- M04.7 — Workspace preferences: `ACTIVE`.
 - Blockers P0/P1 funcionales conocidos: `0`.
 
 ## Cierre F03/M03.12
@@ -45,6 +46,6 @@ M04.3 cerró localmente `GREEN` sobre source funcional `987f4c333f6e8b4c48d7ebad
 
 ## Microfase activa
 
-`M04.6` — Import/Backup/Restore.
+`M04.7` — Workspace preferences.
 
-Referencias: `.ai/microphases/M04_6.md`, `.ai/evidence/F04/M04.5/CLOSURE_2026-08-21.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
+Referencias: `.ai/microphases/M04_7.md`, `.ai/evidence/F04/M04.6/CLOSURE_2026-08-21.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
