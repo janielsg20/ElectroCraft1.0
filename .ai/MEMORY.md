@@ -12,6 +12,8 @@ Solo contiene hechos estables y decisiones vigentes. Progreso y siguiente paso p
 - Existe un único modelo canónico portable; internals de engines OSS nunca se persisten como proyecto canónico.
 - `Puck` posee composición visual; ElectroCraft mapea `ElectroCraftDocument` y Slots sin crear un editor paralelo.
 - `PGlite` + `Drizzle` poseen persistencia Studio/internal data; modelos lógicos no crean tablas por modelo.
+- Persistencia browser usa una única DB lógica PGlite multi-tab por workspace/database id. IndexedDB es el baseline persistente compatible; OPFS AHP es una optimización explícita/capability-aware, no el default universal.
+- PGlite/Web Locks conserva ownership de la elección multi-tab. ElectroCraft puede observar la identidad del Worker líder desde `worker.init(options)` y `meta`, pero no implementa un segundo algoritmo de elección ni expone clients raw fuera de `data-web`.
 - `React Query Builder` posee condición/formatting; ElectroCraft valida bindings/capabilities fail-closed.
 - `Rete` posee graph/processing/history de workflows; `ElectroCraftActionGraph` es la definición persistida.
 - `TanStack Query` posee async cache; `Refine` solo Administración; `RHF/Zod` Forms; `Tiptap` RichText; `Zustand` runtime state.
