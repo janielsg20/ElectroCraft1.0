@@ -2,17 +2,19 @@
 
 Date: 2026-08-20.
 
-| Scope | Estado | Evidencia |
-|---|---|---|
-| F00 | COMPLETADA / GREEN | `.ai/evidence/F00/` |
-| F01 | COMPLETADA / GREEN | `.ai/evidence/F01/` |
-| F02 | COMPLETADA / GREEN | `.ai/evidence/F02/` |
-| F03 / M03.1–M03.12 | COMPLETADA / GREEN | `.ai/evidence/F03/CLOSURE_2026-08-20.md` |
-| F04 / M04.1 | COMPLETADA / GREEN | `.ai/evidence/F04/M04.1/CLOSURE_2026-08-20.md` |
-| F04 / M04.2 | COMPLETADA / GREEN | `.ai/evidence/F04/M04.2/CLOSURE_2026-08-20.md` |
-| F04 / M04.3 | ACTIVE | `.ai/microphases/M04_3.md` |
+| Scope              | Estado             | Evidencia                                      |
+| ------------------ | ------------------ | ---------------------------------------------- |
+| F00                | COMPLETADA / GREEN | `.ai/evidence/F00/`                            |
+| F01                | COMPLETADA / GREEN | `.ai/evidence/F01/`                            |
+| F02                | COMPLETADA / GREEN | `.ai/evidence/F02/`                            |
+| F03 / M03.1–M03.12 | COMPLETADA / GREEN | `.ai/evidence/F03/CLOSURE_2026-08-20.md`       |
+| F04 / M04.1        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.1/CLOSURE_2026-08-20.md` |
+| F04 / M04.2        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.2/CLOSURE_2026-08-20.md` |
+| F04 / M04.3        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.3/CLOSURE_2026-08-21.md` |
+| F04 / M04.4        | ACTIVE             | `.ai/microphases/M04_4.md`                     |
 
 ## Cierre M04.1
+
 - Rama `codex/m04-1-storage-foundation`; PR `#27`.
 - Source funcional validado `8fd9460a43a4a3b5eaf91e62b83f4b3cb7edf10b`.
 - Informe `.ai/evidence/F04/M04.1/VALIDATION_LATEST.md`: `GREEN`.
@@ -21,6 +23,7 @@ Date: 2026-08-20.
 - Schema estable: projects, project_objects, project_revisions, content_records, taxonomy_terms, record_terms, relation_edges, record_field_index, workspace_preferences, media_metadata, audit_events, storage_migration_journal.
 
 ## Cierre M04.2
+
 - Rama `codex/m04-2-multitab-worker`; PR `#28`.
 - Source funcional validado `6847a5fa410f0478c7e393b3d06800b6f89af072`.
 - Workflow `M04.2 Multi-Tab Worker Gate`: run `32430992572`, job `96622322833`, `success`.
@@ -33,16 +36,17 @@ Date: 2026-08-20.
 - UI/application no importan PGlite/Drizzle raw.
 - Blockers P0/P1 al cierre: `0`.
 
-## Entrada M04.3
-- Persistir incrementalmente por `project_object`; no crear una revisión/snapshot completo por cada acción.
-- Mantener dirty-set de object IDs canónicos; debounce/idle configurable y checksum antes de persistir.
-- Una transacción debe upsert/delete únicamente objetos afectados y actualizar `projects.updatedAt/currentRevisionBase` sin reescribir objetos no modificados.
-- `Guardado` solo después del commit.
-- Crear checkpoints restaurables antes de import/migration destructiva, publish/export, manualmente y por intervalo grueso configurable.
-- Recovery normal abre los últimos `project_objects` committed; si integrity falla debe exponer la última revisión válida restaurable.
-- Histories Puck/Rete permanecen session-local; no se serializan como history persistente.
-- Reutilizar PGlite/Drizzle + migration journal existente; no crear un segundo storage engine.
-- Añadir unit/contract/integration/round-trip/negative/E2E y gates completos.
+## Cierre M04.3
+
+- Source funcional `987f4c333f6e8b4c48d7ebad9c284e3925e9cf02`.
+- Dirty-set con debounce configurable, checksum canónico y reintento sin pérdida tras commit fallido.
+- PGlite/Drizzle upsert/delete únicamente objetos afectados; no crea revisión por autosave.
+- Checkpoints manual/pre-import/pre-migration/pre-publish/pre-export/interval y restauración explícita de la última revisión válida.
+- Configuración > Almacenamiento expone integridad y recovery en español; screenshot browser versionado.
+- Dedicado: 17/17; full Vitest: 82 archivos/300 tests; lint/typecheck/boundaries/test/build y Playwright Chromium 1/1 `GREEN`.
+- Evidencia: `.ai/evidence/F04/M04.3/VALIDATION_LATEST.md` y `.ai/evidence/F04/M04.3/CLOSURE_2026-08-21.md`.
+- Blockers P0/P1: `0`.
 
 ## Próxima microfase exacta
-`M04.3 — Persistencia incremental, autosave y recovery`.
+
+`M04.4 — Construir Project Home`.
