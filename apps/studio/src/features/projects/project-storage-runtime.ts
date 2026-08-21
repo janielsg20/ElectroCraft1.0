@@ -113,7 +113,9 @@ export const projectStorageRuntime = Object.freeze({
   getWorkspacePreferences: service.getWorkspacePreferences,
   subscribeWorkspacePreferences(listener: () => void) {
     preferenceListeners.add(listener);
-    return () => preferenceListeners.delete(listener);
+    return () => {
+      preferenceListeners.delete(listener);
+    };
   },
   async saveWorkspacePreferences(...args: Parameters<typeof service.saveWorkspacePreferences>) {
     const result = await service.saveWorkspacePreferences(...args);
@@ -141,6 +143,8 @@ export const projectStorageRuntime = Object.freeze({
     });
   },
   recoveryCandidate: service.recoveryCandidate,
+  listRevisions: service.listRevisions,
+  restoreRevisionAsCheckpoint: service.restoreRevisionAsCheckpoint,
   async restoreRevision(projectId: string, revisionId: string) {
     autosave.discardPending();
     const revision = await runPersistence(() => service.restoreRevision(projectId, revisionId));
