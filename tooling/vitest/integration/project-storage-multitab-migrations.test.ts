@@ -3,6 +3,7 @@ import { PGlite } from '@electric-sql/pglite';
 import {
   M04_1_MIGRATION_CHECKSUM,
   M04_3_MIGRATION_CHECKSUM,
+  M04_4_MIGRATION_CHECKSUM,
   STUDIO_STORAGE_SCHEMA_VERSION,
   applyStudioStorageMigrations,
   verifyStudioStorageHealth,
@@ -24,7 +25,7 @@ describe('M04.2 migration lifecycle with real PGlite', () => {
 
     await expect(verifyStudioStorageHealth(client)).resolves.toEqual({
       schemaVersion: STUDIO_STORAGE_SCHEMA_VERSION,
-      migrationChecksum: M04_3_MIGRATION_CHECKSUM,
+      migrationChecksum: M04_4_MIGRATION_CHECKSUM,
     });
 
     const journal = await client.query<{ schema_version: number; checksum: string }>(
@@ -32,10 +33,8 @@ describe('M04.2 migration lifecycle with real PGlite', () => {
     );
     expect(journal.rows).toEqual([
       { schema_version: 1, checksum: M04_1_MIGRATION_CHECKSUM },
-      {
-        schema_version: STUDIO_STORAGE_SCHEMA_VERSION,
-        checksum: M04_3_MIGRATION_CHECKSUM,
-      },
+      { schema_version: 2, checksum: M04_3_MIGRATION_CHECKSUM },
+      { schema_version: STUDIO_STORAGE_SCHEMA_VERSION, checksum: M04_4_MIGRATION_CHECKSUM },
     ]);
   });
 

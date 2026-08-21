@@ -11,7 +11,8 @@ Date: 2026-08-20.
 | F04 / M04.1        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.1/CLOSURE_2026-08-20.md` |
 | F04 / M04.2        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.2/CLOSURE_2026-08-20.md` |
 | F04 / M04.3        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.3/CLOSURE_2026-08-21.md` |
-| F04 / M04.4        | ACTIVE             | `.ai/microphases/M04_4.md`                     |
+| F04 / M04.4        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.4/CLOSURE_2026-08-21.md` |
+| F04 / M04.5        | ACTIVE             | `.ai/microphases/M04_5.md`                     |
 
 ## Cierre M04.1
 
@@ -49,4 +50,4 @@ Date: 2026-08-20.
 
 ## Próxima microfase exacta
 
-`M04.4 — Construir Project Home`.
+`M04.5 — New Project Wizard y project actions`.

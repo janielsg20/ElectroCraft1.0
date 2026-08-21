@@ -16,9 +16,12 @@ import {
   type ProjectIntegrityReport,
   type ProjectRecoveryCandidate,
   type ProjectStorageRevision,
+  type ProjectSummary,
+  type ProjectLifecycleStatus,
+  type ListProjectsRequest,
   type StoredProjectObject,
 } from '@electrocraft/application';
-import { and, desc, eq } from 'drizzle-orm';
+import { and, asc, count, desc, eq, ilike } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 import * as schema from './schema';
 
@@ -52,6 +55,60 @@ function toRevision(row: typeof schema.projectRevisions.$inferSelect): ProjectSt
 }
 
 export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
+  async function listProjects(request: Required<ListProjectsRequest>): Promise<readonly ProjectSummary[]> {
+    const filters = [];
+    if (request.status !== 'all') filters.push(eq(schema.projects.status, request.status));
+    if (request.search) filters.push(ilike(schema.projects.name, `%${request.search}%`));
+    const order =
+      request.sort === 'name-asc'
+        ? asc(schema.projects.name)
+        : request.sort === 'name-desc'
+          ? desc(schema.projects.name)
+          : request.sort === 'updated-asc'
+            ? asc(schema.projects.updatedAt)
+            : desc(schema.projects.updatedAt);
+    const rows = await db
+      .select({
+        id: schema.projects.id,
+        name: schema.projects.name,
+        metadata: schema.projects.metadata,
+        status: schema.projects.status,
+        createdAt: schema.projects.createdAt,
+        updatedAt: schema.projects.updatedAt,
+        objectCount: count(schema.projectObjects.objectId),
+      })
+      .from(schema.projects)
+      .leftJoin(schema.projectObjects, eq(schema.projects.id, schema.projectObjects.projectId))
+      .where(filters.length ? and(...filters) : undefined)
+      .groupBy(schema.projects.id)
+      .orderBy(order, asc(schema.projects.id));
+    return Object.freeze(
+      rows.map((row) =>
+        Object.freeze({
+          id: row.id,
+          name: row.name,
+          metadata: row.metadata as ElectroCraftMetadata,
+          status: row.status as ProjectLifecycleStatus,
+          objectCount: row.objectCount,
+          createdAt: row.createdAt.toISOString(),
+          updatedAt: row.updatedAt.toISOString(),
+        }),
+      ),
+    );
+  }
+  async function setProjectStatus(projectId: string, status: ProjectLifecycleStatus): Promise<ProjectSummary> {
+    const changed = await db
+      .update(schema.projects)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(schema.projects.id, projectId))
+      .returning({ id: schema.projects.id });
+    if (!changed[0]) throw new Error(`project not found: ${projectId}`);
+    const project = (await listProjects({ search: '', status: 'all', sort: 'updated-desc' })).find(
+      (item) => item.id === projectId,
+    );
+    if (!project) throw new Error(`project not found: ${projectId}`);
+    return project;
+  }
   async function saveProject(request: NormalizedSaveProjectRequest): Promise<ProjectStorageRevision> {
     validateProjectStorageRevision(request.revision);
     for (const object of request.objects) validateStoredProjectObject(object);
@@ -172,10 +229,7 @@ export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
         await tx
           .delete(schema.projectObjects)
           .where(
-            and(
-              eq(schema.projectObjects.projectId, request.project.id),
-              eq(schema.projectObjects.objectId, objectId),
-            ),
+            and(eq(schema.projectObjects.projectId, request.project.id), eq(schema.projectObjects.objectId, objectId)),
           );
       }
 
@@ -215,7 +269,10 @@ export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
 
   async function createCheckpoint(projectId: string, reason: string): Promise<ProjectStorageRevision> {
     return db.transaction(async (tx) => {
-      const projectRows = await tx.select({ id: schema.projects.id }).from(schema.projects).where(eq(schema.projects.id, projectId));
+      const projectRows = await tx
+        .select({ id: schema.projects.id })
+        .from(schema.projects)
+        .where(eq(schema.projects.id, projectId));
       if (!projectRows[0]) throw new Error(`project not found: ${projectId}`);
 
       const objectRows = await tx
@@ -407,6 +464,8 @@ export function createDrizzleProjectRepository(db: StudioProjectDatabase) {
   }
 
   return Object.freeze({
+    listProjects,
+    setProjectStatus,
     saveProject,
     saveProjectIncremental,
     createCheckpoint,

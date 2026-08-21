@@ -1,0 +1,96 @@
+.ec-project-home {
+  padding: 24px;
+  min-width: 0;
+  overflow: auto;
+}
+.ec-project-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ec-project-title h1 {
+  margin: 0;
+}
+.ec-project-toolbar {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-block: 1px solid var(--border);
+  padding: 6px 0;
+}
+.ec-project-toolbar input {
+  max-width: 280px;
+}
+.ec-project-toolbar select {
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--background);
+  padding: 0 10px;
+}
+.ec-project-view {
+  display: flex;
+}
+.ec-project-new {
+  margin-left: auto;
+}
+.ec-project-collection {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+.ec-project-collection--grid {
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+}
+.ec-project-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.ec-project-open {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+}
+.ec-project-open > span {
+  min-height: 92px;
+  display: grid;
+  place-items: center;
+  background: var(--muted);
+  border-radius: 6px;
+}
+.ec-project-card > div {
+  border-top: 1px solid var(--border);
+  padding: 4px;
+}
+.ec-project-empty {
+  text-align: center;
+  margin: 48px auto;
+}
+@media (max-width: 767px) {
+  .ec-project-home {
+    padding: 12px;
+  }
+  .ec-project-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .ec-project-toolbar input {
+    max-width: none;
+  }
+  .ec-project-view {
+    display: none;
+  }
+  .ec-project-new {
+    margin-left: 0;
+  }
+  .ec-project-collection--grid {
+    grid-template-columns: 1fr;
+  }
+}

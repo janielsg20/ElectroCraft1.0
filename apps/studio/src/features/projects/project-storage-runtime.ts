@@ -97,7 +97,13 @@ export const projectStorageRuntime = Object.freeze({
   checkpointBeforeExport: (projectId: string) => autosave.checkpoint(projectId, 'pre-export'),
   pendingAutosaveObjectIds: () => autosave.pendingObjectIds(),
   currentProjectId: () => currentProjectId,
-  openProject: service.openProject,
+  listProjects: service.listProjects,
+  setProjectStatus: service.setProjectStatus,
+  async openProject(projectId: string) {
+    const opened = await service.openProject(projectId);
+    if (opened) currentProjectId = opened.project.id;
+    return opened;
+  },
   verifyProject: service.verifyProject,
   async verifyWithRecovery(projectId: string) {
     const integrity = await service.verifyProject(projectId);
