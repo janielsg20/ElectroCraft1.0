@@ -16,6 +16,7 @@ on:
       - 'packages/design-system/src/components/ui/**'
       - 'packages/design-system/src/foundation/**'
       - 'packages/design-system/src/styles/**'
+      - 'tooling/package-boundaries.json'
       - 'tooling/vitest/unit/editor-appearance-profile.test.ts'
       - 'tooling/vitest/contract/editor-appearance-isolation.test.ts'
       - 'tooling/vitest/contract/single-studio-theme-boundary.test.ts'
@@ -46,6 +47,7 @@ on:
       - 'packages/design-system/src/components/ui/**'
       - 'packages/design-system/src/foundation/**'
       - 'packages/design-system/src/styles/**'
+      - 'tooling/package-boundaries.json'
       - 'tooling/vitest/unit/editor-appearance-profile.test.ts'
       - 'tooling/vitest/contract/editor-appearance-isolation.test.ts'
       - 'tooling/vitest/contract/single-studio-theme-boundary.test.ts'
@@ -118,6 +120,7 @@ jobs:
           packages/design-system/src/styles/globals.css
           packages/design-system/src/styles/tokens.css
           packages/design-system/src/styles/studio-appearance-tokens.css
+          tooling/package-boundaries.json
           tooling/vitest/unit/editor-appearance-profile.test.ts
           tooling/vitest/contract/editor-appearance-isolation.test.ts
           tooling/vitest/contract/single-studio-theme-boundary.test.ts
