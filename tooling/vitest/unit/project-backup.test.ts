@@ -7,33 +7,29 @@ import {
 } from '@electrocraft/application';
 import { describe, expect, it } from 'vitest';
 
-const source: OpenProjectResult = Object.freeze({
-  project: Object.freeze({ id: 'project-source', name: 'Proyecto fuente', metadata: {} }),
-  objects: Object.freeze([
-    Object.freeze({
-      projectId: 'project-source',
-      objectId: 'screen-home',
-      kind: 'screen',
-      schemaVersion: 1,
-      payload: { title: 'Inicio' },
-      checksum: 'fnv1a64:2fc91f05b315d313',
-      updatedAt: '2026-08-22T00:00:00.000Z',
-    }),
-  ]),
-  revision: null,
-});
+const project = Object.freeze({ id: 'project-source', name: 'Proyecto fuente', metadata: {} });
 
-function validSource() {
-  const request = normalizeSaveProjectRequest({
-    project: source.project,
-    objects: source.objects,
-    reason: 'fixture',
-  });
-  return Object.freeze({ ...source, objects: request.objects });
+function validSource(): OpenProjectResult {
+  const request = normalizeSaveProjectRequest(
+    {
+      project,
+      objects: [
+        {
+          objectId: 'screen-home',
+          kind: 'screen',
+          schemaVersion: 1,
+          payload: { title: 'Inicio' },
+        },
+      ],
+      reason: 'fixture',
+    },
+    '2026-08-22T00:00:00.000Z',
+  );
+  return Object.freeze({ project, objects: request.objects, revision: request.revision });
 }
 
 function createMemoryPort(initial: readonly OpenProjectResult[] = []) {
-  const projects = new Map(initial.map((project) => [project.project.id, project]));
+  const projects = new Map(initial.map((item) => [item.project.id, item]));
   const operations: string[] = [];
 
   const port: ProjectStoragePort = {
