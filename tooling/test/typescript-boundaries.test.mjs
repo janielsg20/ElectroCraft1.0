@@ -43,21 +43,22 @@ test('negative: domain cannot import React, Puck, Drizzle, Expo, DOM or filesyst
   }
 });
 
-test('declared public workspace subpaths are allowed while undeclared deep imports remain rejected', () => {
+test('design-system root is public while removed theme subpaths and deep imports remain rejected', () => {
   const snapshot = collectWorkspace(root);
   const allowed = validateImportRecords(
     '@electrocraft/studio',
-    record('apps/studio/src/probe.ts', '@electrocraft/design-system/framework-themes'),
+    record('apps/studio/src/probe.ts', '@electrocraft/design-system'),
     snapshot,
   );
   assert.deepEqual(allowed, []);
 
-  const rejected = validateImportRecords(
-    '@electrocraft/studio',
-    record('apps/studio/src/bad.ts', '@electrocraft/design-system/src/components/ui/button'),
-    snapshot,
-  );
-  assert.ok(rejected.some((error) => error.includes('deep/unknown workspace import')));
+  for (const specifier of [
+    '@electrocraft/design-system/framework-themes',
+    '@electrocraft/design-system/src/components/ui/button',
+  ]) {
+    const rejected = validateImportRecords('@electrocraft/studio', record('apps/studio/src/bad.ts', specifier), snapshot);
+    assert.ok(rejected.some((error) => error.includes('deep/unknown workspace import')), specifier);
+  }
 });
 
 test('negative: deep workspace imports are rejected even when the package root is allowed', () => {
