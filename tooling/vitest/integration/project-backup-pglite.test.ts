@@ -4,7 +4,12 @@ import {
   normalizeSaveProjectRequest,
   type ProjectStoragePort,
 } from '@electrocraft/application';
-import { applyStudioStorageMigrations, createDrizzleProjectRepository } from '@electrocraft/data-web';
+import {
+  applyStudioStorageMigrations,
+  createDrizzleProjectBackupRepository,
+  createDrizzleProjectRepository,
+} from '@electrocraft/data-web';
+import { createElectroCraftCanonicalSnapshotChecksum } from '@electrocraft/domain';
 import { PGlite } from '@electric-sql/pglite';
 import { drizzle } from 'drizzle-orm/pglite';
 import { describe, expect, it } from 'vitest';
@@ -19,7 +24,7 @@ function asStoragePort(repository: ReturnType<typeof createDrizzleProjectReposit
       durable: false,
       usageBytes: null,
       quotaBytes: null,
-      migrationVersion: 1,
+      migrationVersion: 5,
       repairSupported: false,
       message: 'ready',
     }),
@@ -42,7 +47,7 @@ function asStoragePort(repository: ReturnType<typeof createDrizzleProjectReposit
       durable: false,
       usageBytes: null,
       quotaBytes: null,
-      migrationVersion: 1,
+      migrationVersion: 5,
       repairSupported: false,
       message: 'ready',
     }),
@@ -53,7 +58,7 @@ function asStoragePort(repository: ReturnType<typeof createDrizzleProjectReposit
       durable: false,
       usageBytes: null,
       quotaBytes: null,
-      migrationVersion: 1,
+      migrationVersion: 5,
       repairSupported: false,
       message: 'ready',
     }),
@@ -62,13 +67,14 @@ function asStoragePort(repository: ReturnType<typeof createDrizzleProjectReposit
 }
 
 describe('M04.6 backup/import PGlite round-trip', () => {
-  it('exports, validates, imports as copy and reopens the same canonical objects', async () => {
+  it('exports and imports canonical objects plus embedded media as a copy', async () => {
     const client = await PGlite.create('memory://');
     try {
       await applyStudioStorageMigrations(client);
-      const repository = createDrizzleProjectRepository(drizzle(client, { schema: storageSchema }));
-      const port = asStoragePort(repository);
-      const service = createProjectBackupService(port);
+      const database = drizzle(client, { schema: storageSchema });
+      const repository = createDrizzleProjectRepository(database);
+      const backupRepository = createDrizzleProjectBackupRepository(database);
+      const service = createProjectBackupService(asStoragePort(repository), backupRepository);
       const project = { id: 'backup-source', name: 'Backup source', metadata: { locale: 'es' } };
       await repository.saveProject(
         normalizeSaveProjectRequest({
@@ -80,14 +86,33 @@ describe('M04.6 backup/import PGlite round-trip', () => {
           reason: 'fixture',
         }),
       );
+      const contentBase64 = 'SG9sYSBFbGVjdHJvQ3JhZnQ=';
+      await database.insert(storageSchema.mediaMetadata).values({
+        projectId: project.id,
+        mediaId: 'hero-copy',
+        metadata: { alt: 'Hero' },
+        fileName: 'hero.txt',
+        mimeType: 'text/plain',
+        contentBase64,
+        checksum: createElectroCraftCanonicalSnapshotChecksum(contentBase64),
+      });
 
       const backup = await service.exportProject(project.id);
+      expect(backup.manifest.mediaCount).toBe(1);
+      expect(backup.media[0]).toMatchObject({
+        mediaId: 'hero-copy',
+        fileName: 'hero.txt',
+        mimeType: 'text/plain',
+        contentBase64,
+      });
+
       const imported = await service.importProject(backup, {
         mode: 'import-as-copy',
         targetProjectId: 'backup-copy',
         name: 'Backup copy',
       });
       const reopened = await repository.openProject(imported.projectId);
+      const copiedMedia = await backupRepository.listProjectBackupMedia(imported.projectId);
 
       expect(imported).toMatchObject({
         sourceProjectId: 'backup-source',
@@ -101,6 +126,7 @@ describe('M04.6 backup/import PGlite round-trip', () => {
       ).toEqual(
         backup.snapshot.objects.map(({ objectId, kind, schemaVersion, payload }) => ({ objectId, kind, schemaVersion, payload })),
       );
+      expect(copiedMedia).toEqual(backup.media);
       expect((await repository.verifyProject('backup-copy')).coherent).toBe(true);
     } finally {
       await client.close();
@@ -111,8 +137,12 @@ describe('M04.6 backup/import PGlite round-trip', () => {
     const client = await PGlite.create('memory://');
     try {
       await applyStudioStorageMigrations(client);
-      const repository = createDrizzleProjectRepository(drizzle(client, { schema: storageSchema }));
-      const service = createProjectBackupService(asStoragePort(repository));
+      const database = drizzle(client, { schema: storageSchema });
+      const repository = createDrizzleProjectRepository(database);
+      const service = createProjectBackupService(
+        asStoragePort(repository),
+        createDrizzleProjectBackupRepository(database),
+      );
       await repository.saveProject(
         normalizeSaveProjectRequest({
           project: { id: 'tamper-source', name: 'Fuente', metadata: {} },
@@ -137,12 +167,16 @@ describe('M04.6 backup/import PGlite round-trip', () => {
     }
   });
 
-  it('persists a pre-restore safety revision before replacing an existing project', async () => {
+  it('persists a pre-restore safety revision in the same transaction before replacing', async () => {
     const client = await PGlite.create('memory://');
     try {
       await applyStudioStorageMigrations(client);
-      const repository = createDrizzleProjectRepository(drizzle(client, { schema: storageSchema }));
-      const service = createProjectBackupService(asStoragePort(repository));
+      const database = drizzle(client, { schema: storageSchema });
+      const repository = createDrizzleProjectRepository(database);
+      const service = createProjectBackupService(
+        asStoragePort(repository),
+        createDrizzleProjectBackupRepository(database),
+      );
 
       await repository.saveProject(
         normalizeSaveProjectRequest({
