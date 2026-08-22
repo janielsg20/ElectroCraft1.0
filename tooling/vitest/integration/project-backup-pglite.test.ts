@@ -1,4 +1,5 @@
 import {
+  createProjectBackupPackage,
   createProjectBackupService,
   normalizeSaveProjectRequest,
   type ProjectStoragePort,
@@ -95,7 +96,9 @@ describe('M04.6 backup/import PGlite round-trip', () => {
         safetyRevisionId: null,
       });
       expect(reopened?.project).toMatchObject({ id: 'backup-copy', name: 'Backup copy', metadata: { locale: 'es' } });
-      expect(reopened?.objects.map(({ objectId, kind, schemaVersion, payload }) => ({ objectId, kind, schemaVersion, payload }))).toEqual(
+      expect(
+        reopened?.objects.map(({ objectId, kind, schemaVersion, payload }) => ({ objectId, kind, schemaVersion, payload })),
+      ).toEqual(
         backup.snapshot.objects.map(({ objectId, kind, schemaVersion, payload }) => ({ objectId, kind, schemaVersion, payload })),
       );
       expect((await repository.verifyProject('backup-copy')).coherent).toBe(true);
@@ -155,32 +158,13 @@ describe('M04.6 backup/import PGlite round-trip', () => {
           reason: 'backup',
         }),
       );
-      const backup = await service.exportProject('backup-fixture');
-      const restorePackage = {
-        ...backup,
-        manifest: { ...backup.manifest, projectId: 'restore-project' },
-        snapshot: { ...backup.snapshot, project: { ...backup.snapshot.project, id: 'restore-project' } },
-      };
 
-      // Re-export through the contract to produce a checksum matching the target project id.
-      const fixturePort = asStoragePort(repository);
-      const targetBackup = await createProjectBackupService(fixturePort).exportProject('restore-project');
-      const packageToRestore = {
-        ...targetBackup,
-        snapshot: {
-          ...targetBackup.snapshot,
-          project: { ...targetBackup.snapshot.project, name: 'Versión restaurada' },
-          objects: backup.snapshot.objects,
-        },
-      };
-      // Deliberately reuse the validated builder path instead of hand-authoring a checksum.
       const restoreSource = await repository.openProject('backup-fixture');
       if (!restoreSource) throw new Error('fixture missing');
-      const { createProjectBackupPackage } = await import('@electrocraft/application');
       const validatedRestore = createProjectBackupPackage({
-        ...restoreSource,
         project: { ...restoreSource.project, id: 'restore-project', name: 'Versión restaurada' },
         objects: restoreSource.objects.map((object) => ({ ...object, projectId: 'restore-project' })),
+        revision: null,
       });
 
       const result = await service.importProject(validatedRestore, { mode: 'replace-existing' });
