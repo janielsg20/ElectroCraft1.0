@@ -12,13 +12,16 @@ test('Project Home crea, reabre y archiva', async ({ page }) => {
   await page.getByRole('button', { name: 'Crear proyecto' }).click();
   await expect(page.locator('[data-editor-canvas-stage]')).toBeVisible({ timeout: 60_000 });
   await page.goto('/');
-  await expect(page.getByRole('button', { name: /Proyecto sin título/ }).first()).toBeVisible({ timeout: 60_000 });
+  const project = page.getByRole('button', { name: /Proyecto sin título/ });
+  await expect(project.first()).toBeVisible({ timeout: 60_000 });
   await page.getByRole('button', { name: 'Archivar' }).first().click();
+  await expect(project).toHaveCount(0, { timeout: 60_000 });
+
   const status = page.getByRole('combobox', { name: 'Estado de proyectos' });
   await status.click();
   await page.getByRole('option', { name: 'Archivados' }).click();
   await expect(status).toContainText('Archivados');
-  await expect(page.getByRole('button', { name: /Proyecto sin título/ }).first()).toBeVisible({ timeout: 60_000 });
+  await expect(project.first()).toBeVisible({ timeout: 60_000 });
 });
 
 test('Project Home es usable en móvil', async ({ page }) => {
