@@ -70,8 +70,26 @@ Resizable
 Scroll Area
 Command/Search
 Sidebar
+Skeleton
+Loader
 
 Use shadcn source components rather than recreating them.
+
+# Loading UX
+
+Loading is progressive and local, not a full-screen interruption.
+
+- Render the Studio shell, navigation, topbar, theme and status surface first.
+- Lazy-load heavy or secondary route modules.
+- Use geometry-matched skeletons only while first-load content has no usable representation yet.
+- Keep already rendered content visible during refreshes and add a compact loader instead of replacing the region.
+- Use loaders for explicit actions such as open, save, create and deferred dialog preparation.
+- Skeletons are `aria-hidden`; the loading region owns the accessible status announcement.
+- Loaders expose meaningful status text and respect reduced-motion.
+- Do not use image placeholders, blur-heavy overlays or gradient shimmer loops.
+- Avoid layout shift: skeleton dimensions should approximate the final interface.
+
+See `.ai/adr/ADR-STUDIO-PROGRESSIVE-LOADING.md`.
 
 # AI-native primitives
 
@@ -121,3 +139,5 @@ Before editing UI:
 - Keep appearance state to a single `light | dark` value.
 - Use CSS `prefers-reduced-motion` instead of React listeners for presentation-only motion.
 - Heavy engines remain lazy-loaded by workspace: Puck, Rete, Refine admin modules, AI SDK/AI Elements, chart/calendar engines.
+- Secondary UI such as project wizards and internal galleries loads on demand.
+- Prefer `content-visibility`/containment for large offscreen collections when accessibility and focus remain correct.
