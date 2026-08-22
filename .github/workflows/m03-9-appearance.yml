@@ -103,6 +103,9 @@ jobs:
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
 
+      - name: Emit canonical gallery spec formatting
+        run: npx prettier tooling/playwright/ui-ux-style-gallery.spec.ts
+
       - name: Verify M03.9 source formatting
         run: >-
           npx prettier --check
