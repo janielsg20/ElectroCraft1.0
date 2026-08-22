@@ -7,8 +7,10 @@ import {
   PROJECT_STORAGE_SCHEMA_VERSION,
   normalizeSaveProjectRequest,
   normalizeStoredProjectObject,
+  type NormalizedSaveProjectRequest,
   type OpenProjectResult,
   type ProjectStoragePort,
+  type ProjectStorageRevision,
   type StoredProjectDefinition,
   type StoredProjectObjectInput,
 } from './project-storage';
@@ -63,6 +65,23 @@ export interface ProjectBackupImportResult {
   readonly safetyRevisionId: string | null;
 }
 
+export interface ProjectBackupPersistenceRequest {
+  readonly mode: ProjectBackupImportMode;
+  readonly saveRequest: NormalizedSaveProjectRequest;
+  readonly media: readonly ProjectBackupMediaEntry[];
+  readonly createSafetyCheckpoint: boolean;
+}
+
+export interface ProjectBackupPersistenceResult {
+  readonly revision: ProjectStorageRevision;
+  readonly safetyRevisionId: string | null;
+}
+
+export interface ProjectBackupStoragePort {
+  listProjectBackupMedia(projectId: string): Promise<readonly ProjectBackupMediaEntry[]>;
+  importProjectBackupSnapshot(request: ProjectBackupPersistenceRequest): Promise<ProjectBackupPersistenceResult>;
+}
+
 function requireNonEmpty(value: string, field: string) {
   const normalized = value.trim();
   if (!normalized) throw new TypeError(`${field} must not be empty`);
@@ -77,7 +96,7 @@ function backupPayload(input: Omit<ProjectBackupPackage, 'checksum'>) {
   });
 }
 
-function normalizeBackupMediaEntry(input: ProjectBackupMediaEntry): ProjectBackupMediaEntry {
+export function normalizeProjectBackupMediaEntry(input: ProjectBackupMediaEntry): ProjectBackupMediaEntry {
   const mediaId = requireNonEmpty(input.mediaId, 'media.mediaId');
   const fileName = input.fileName?.trim();
   const mimeType = input.mimeType?.trim();
@@ -122,7 +141,7 @@ export function createProjectBackupPackage(
 
   const mediaIds = new Set<string>();
   const normalizedMedia = media.map((entry) => {
-    const normalized = normalizeBackupMediaEntry(entry);
+    const normalized = normalizeProjectBackupMediaEntry(entry);
     if (mediaIds.has(normalized.mediaId)) throw new TypeError(`duplicate backup media: ${normalized.mediaId}`);
     mediaIds.add(normalized.mediaId);
     return normalized;
@@ -172,7 +191,7 @@ export function validateProjectBackupPackage(input: ProjectBackupPackage): Proje
 
   const mediaIds = new Set<string>();
   for (const entry of input.media) {
-    const normalized = normalizeBackupMediaEntry(entry);
+    const normalized = normalizeProjectBackupMediaEntry(entry);
     if (mediaIds.has(normalized.mediaId)) throw new TypeError(`duplicate backup media: ${normalized.mediaId}`);
     mediaIds.add(normalized.mediaId);
   }
@@ -184,18 +203,19 @@ export function validateProjectBackupPackage(input: ProjectBackupPackage): Proje
   return input;
 }
 
-export function createProjectBackupService(port: ProjectStoragePort) {
+export function createProjectBackupService(port: ProjectStoragePort, backupPort?: ProjectBackupStoragePort) {
   return Object.freeze({
     async exportProject(projectIdInput: string) {
       const projectId = requireNonEmpty(projectIdInput, 'projectId');
       const opened = await port.openProject(projectId);
       if (!opened) throw new Error(`project not found: ${projectId}`);
-      return createProjectBackupPackage(opened);
+      const media = backupPort ? await backupPort.listProjectBackupMedia(projectId) : [];
+      return createProjectBackupPackage(opened, media);
     },
 
     async importProject(input: ProjectBackupPackage, options: ImportProjectBackupOptions = {}) {
       const backup = validateProjectBackupPackage(input);
-      if (backup.media.length > 0) {
+      if (backup.media.length > 0 && !backupPort) {
         throw new Error('backup contains media payloads that the current storage port cannot restore safely');
       }
 
@@ -210,27 +230,38 @@ export function createProjectBackupService(port: ProjectStoragePort) {
       if (mode === 'reject-collision' && existing) throw new Error(`project already exists: ${targetProjectId}`);
       if (mode === 'import-as-copy' && existing) throw new Error(`target project already exists: ${targetProjectId}`);
 
-      let safetyRevisionId: string | null = null;
-      if (mode === 'replace-existing' && existing) {
-        safetyRevisionId = (await port.createCheckpoint(targetProjectId, 'pre-restore-safety')).id;
-      }
-
       const name = requireNonEmpty(
         options.name ??
           (mode === 'import-as-copy' ? `${backup.snapshot.project.name} (copia importada)` : backup.snapshot.project.name),
         'name',
       );
-      const revision = await port.saveProject(
-        normalizeSaveProjectRequest({
-          project: {
-            id: targetProjectId,
-            name,
-            metadata: backup.snapshot.project.metadata,
-          },
-          objects: backup.snapshot.objects,
-          reason: mode === 'replace-existing' ? 'restore-backup' : 'import-backup',
-        }),
-      );
+      const saveRequest = normalizeSaveProjectRequest({
+        project: {
+          id: targetProjectId,
+          name,
+          metadata: backup.snapshot.project.metadata,
+        },
+        objects: backup.snapshot.objects,
+        reason: mode === 'replace-existing' ? 'restore-backup' : 'import-backup',
+      });
+
+      let revision: ProjectStorageRevision;
+      let safetyRevisionId: string | null = null;
+      if (backupPort) {
+        const persisted = await backupPort.importProjectBackupSnapshot({
+          mode,
+          saveRequest,
+          media: backup.media,
+          createSafetyCheckpoint: mode === 'replace-existing' && existing !== null,
+        });
+        revision = persisted.revision;
+        safetyRevisionId = persisted.safetyRevisionId;
+      } else {
+        if (mode === 'replace-existing' && existing) {
+          safetyRevisionId = (await port.createCheckpoint(targetProjectId, 'pre-restore-safety')).id;
+        }
+        revision = await port.saveProject(saveRequest);
+      }
 
       return Object.freeze<ProjectBackupImportResult>({
         sourceProjectId,
