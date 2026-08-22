@@ -13,11 +13,22 @@ import {
   DialogDescription,
   DialogTitle,
   Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  getStudioIcon,
 } from '@electrocraft/design-system';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { HelpTrigger } from '../../help/help-ui';
 import { projectStorageRuntime } from './project-storage-runtime';
 import { NewProjectWizard } from './new-project-wizard';
+
+const SearchIcon = getStudioIcon('studio.sidebar.queries');
+const GridIcon = getStudioIcon('studio.view.grid');
+const ListIcon = getStudioIcon('studio.view.list');
+const NewProjectIcon = getStudioIcon('studio.sidebar.aiGenerate');
 
 export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void }) {
   const [projects, setProjects] = useState<readonly ProjectSummary[]>([]);
@@ -32,13 +43,19 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
   const [actionError, setActionError] = useState('');
   const [renameProject, setRenameProject] = useState<ProjectSummary | null>(null);
   const [renameValue, setRenameValue] = useState('');
+  const reloadSequence = useRef(0);
   const reload = useCallback(async () => {
+    const sequence = ++reloadSequence.current;
     setState('loading');
+    setError('');
     try {
       await projectStorageRuntime.initialize();
-      setProjects(await projectStorageRuntime.listProjects({ search, status, sort }));
+      const nextProjects = await projectStorageRuntime.listProjects({ search, status, sort });
+      if (sequence !== reloadSequence.current) return;
+      setProjects(nextProjects);
       setState('ready');
     } catch (e) {
+      if (sequence !== reloadSequence.current) return;
       setError(e instanceof Error ? e.message : 'No se pudieron cargar los proyectos.');
       setState('error');
     }
@@ -72,41 +89,49 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
           <p>Abre y organiza los proyectos de este espacio de trabajo.</p>
         </header>
         <div className="ec-project-toolbar" aria-label="Herramientas de proyectos">
-          <Input
-            aria-label="Buscar proyectos"
-            placeholder="Buscar proyectos"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <select
-            aria-label="Estado de proyectos"
-            value={status}
-            onChange={(e) => setStatus(e.target.value as typeof status)}
-          >
-            <option value="active">Activos</option>
-            <option value="archived">Archivados</option>
-            <option value="trashed">Papelera</option>
-            <option value="all">Todos</option>
-          </select>
-          <select
-            aria-label="Ordenar proyectos"
-            value={sort}
-            onChange={(e) => setSort(e.target.value as ProjectListSort)}
-          >
-            <option value="updated-desc">Recientes</option>
-            <option value="updated-asc">Más antiguos</option>
-            <option value="name-asc">Nombre A–Z</option>
-            <option value="name-desc">Nombre Z–A</option>
-          </select>
+          <label className="ec-project-search">
+            <SearchIcon aria-hidden="true" />
+            <Input
+              aria-label="Buscar proyectos"
+              placeholder="Buscar proyectos"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </label>
+          <Select value={status} onValueChange={(value) => setStatus(value as typeof status)}>
+            <SelectTrigger aria-label="Estado de proyectos">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="active">Activos</SelectItem>
+              <SelectItem value="archived">Archivados</SelectItem>
+              <SelectItem value="trashed">Papelera</SelectItem>
+              <SelectItem value="all">Todos</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={sort} onValueChange={(value) => setSort(value as ProjectListSort)}>
+            <SelectTrigger aria-label="Ordenar proyectos">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="updated-desc">Recientes</SelectItem>
+              <SelectItem value="updated-asc">Más antiguos</SelectItem>
+              <SelectItem value="name-asc">Nombre A–Z</SelectItem>
+              <SelectItem value="name-desc">Nombre Z–A</SelectItem>
+            </SelectContent>
+          </Select>
           <div className="ec-project-view" role="group" aria-label="Vista">
             <Button variant="ghost" aria-pressed={view === 'grid'} onClick={() => setView('grid')}>
+              <GridIcon aria-hidden="true" />
               Cuadrícula
             </Button>
             <Button variant="ghost" aria-pressed={view === 'list'} onClick={() => setView('list')}>
+              <ListIcon aria-hidden="true" />
               Lista
             </Button>
           </div>
           <Button className="ec-project-new" disabled={state === 'loading'} onClick={() => setWizardOpen(true)}>
+            <NewProjectIcon aria-hidden="true" />
             Nuevo proyecto
           </Button>
         </div>

@@ -4,6 +4,24 @@ export const editorMessagesEs = Object.freeze({
   'studio.editor.canvasTitle': 'Lienzo',
   'studio.editor.inspectorTitle': 'Inspector',
   'studio.editor.outlineTitle': 'Capas',
+  'studio.editor.context.componentsTab': 'Componentes',
+  'studio.editor.context.screensTab': 'Pantallas',
+  'studio.editor.context.layersTab': 'Capas',
+  'studio.editor.context.screensTitle': 'Pantallas del proyecto',
+  'studio.editor.context.screensSummary':
+    'Organiza las pantallas desde su espacio dedicado sin duplicar el modelo del editor.',
+  'studio.editor.context.openScreens': 'Abrir Pantallas',
+  'studio.editor.inspector.contentTab': 'Contenido',
+  'studio.editor.inspector.designTab': 'Diseño',
+  'studio.editor.inspector.actionsTab': 'Acciones',
+  'studio.editor.inspector.designTitle': 'Diseño y responsive',
+  'studio.editor.inspector.designSummary':
+    'Los controles avanzados aparecen cuando la selección expone propiedades editables.',
+  'studio.editor.inspector.actionsTitle': 'Acciones del elemento',
+  'studio.editor.inspector.actionsSummary':
+    'Selecciona un elemento compatible para configurar navegación, eventos y automatizaciones.',
+  'studio.editor.canvas.viewportLabel': 'Vista adaptable',
+  'studio.editor.canvas.zoomLabel': 'Zoom del lienzo al 100 %',
   'studio.editor.contextStructural':
     'Palette ElectroCraft sobre Puck: catálogo descubrible sin duplicar ComponentDefinitions. La inserción solo se habilita cuando el mapping propietario existe.',
   'studio.editor.canvasStructural':

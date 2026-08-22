@@ -10,7 +10,7 @@
 .ec-palette-header {
   display: grid;
   gap: 8px;
-  padding: 10px;
+  padding: 8px;
   border-bottom: 1px solid hsl(var(--border));
 }
 
@@ -47,6 +47,11 @@
   line-height: 14px;
 }
 
+.ec-palette-heading p,
+.ec-palette-keyboard-help {
+  display: none;
+}
+
 .ec-palette-search {
   position: relative;
   display: block;
@@ -77,13 +82,13 @@
 
 .ec-palette-content {
   display: grid;
-  gap: 12px;
-  padding: 10px;
+  gap: 10px;
+  padding: 8px;
 }
 
 .ec-palette-section {
   display: grid;
-  gap: 6px;
+  gap: 5px;
 }
 
 .ec-palette-section-header {
@@ -142,13 +147,13 @@
   display: grid;
   width: 100%;
   min-width: 0;
-  min-height: 74px;
+  min-height: 60px;
   grid-template-columns: 22px minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr) auto;
   gap: 4px 7px;
   border: 0;
   background: transparent;
-  padding: 8px 26px 7px 8px;
+  padding: 7px 26px 6px 7px;
   text-align: left;
   color: inherit;
   cursor: pointer;

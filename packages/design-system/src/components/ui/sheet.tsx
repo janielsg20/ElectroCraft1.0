@@ -22,7 +22,7 @@ export function SheetContent({ side = 'right', className, children, ...props }: 
 
   return (
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-overlay/45" />
+      <DialogPrimitive.Overlay data-slot="sheet-overlay" className="fixed inset-0 z-50 bg-overlay/45" />
       <DialogPrimitive.Content
         className={cn(
           'fixed z-50 bg-surface p-4 [box-shadow:var(--ec-shadow)]',
@@ -31,6 +31,7 @@ export function SheetContent({ side = 'right', className, children, ...props }: 
           className,
         )}
         data-sheet-side={side}
+        data-slot="sheet-content"
         {...props}
       >
         {children}

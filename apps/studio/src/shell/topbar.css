@@ -46,7 +46,7 @@
   align-items: center;
   gap: 5px;
   border: 1px solid var(--border);
-  border-radius: var(--ec-radius-sm);
+  border-radius: 7px;
   padding: 3px 7px;
   color: var(--muted-foreground);
   font-size: var(--ec-text-xs);
@@ -55,7 +55,21 @@
 
 .ec-topbar-save[data-save-state='error'],
 .ec-topbar-save[data-save-state='blocked'] {
+  border-color: color-mix(in oklab, var(--destructive) 40%, var(--border));
+  background: color-mix(in oklab, var(--destructive) 9%, transparent);
   color: var(--destructive);
+}
+
+.ec-topbar-save[data-save-state='saving'] {
+  border-color: color-mix(in oklab, var(--warning) 45%, var(--border));
+  background: color-mix(in oklab, var(--warning) 10%, transparent);
+  color: color-mix(in oklab, var(--warning) 82%, var(--foreground));
+}
+
+.ec-topbar-save[data-save-state='ready'] {
+  border-color: color-mix(in oklab, var(--success) 35%, var(--border));
+  background: color-mix(in oklab, var(--success) 8%, transparent);
+  color: color-mix(in oklab, var(--success) 76%, var(--foreground));
 }
 
 .ec-topbar-center {
@@ -64,7 +78,16 @@
 }
 
 .ec-topbar-tool-cluster {
-  gap: 3px;
+  gap: 2px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 2px;
+  background: var(--background);
+}
+
+.ec-topbar-tool-cluster .ec-topbar-tool {
+  border: 0;
+  background: var(--surface);
 }
 
 .ec-topbar-tool svg,
@@ -77,6 +100,20 @@
 .ec-topbar-right {
   margin-left: auto;
   gap: 3px;
+}
+
+.ec-topbar-preview,
+.ec-topbar-export {
+  border: 1px solid var(--border);
+}
+
+.ec-topbar-export {
+  background: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+}
+
+.ec-topbar-export:hover {
+  filter: brightness(0.96);
 }
 
 .ec-topbar-tools-trigger {
@@ -156,7 +193,7 @@
   color: var(--muted-foreground);
 }
 
-@media (max-width: 1279px) {
+@media (max-width: 1439px) {
   .ec-topbar-center {
     display: none;
   }

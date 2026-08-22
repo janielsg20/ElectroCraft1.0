@@ -8,6 +8,10 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
   getStudioIcon,
   type SheetSide,
 } from '@electrocraft/design-system';
@@ -22,7 +26,6 @@ import {
 import { useRef, useState, type ReactNode, type RefObject } from 'react';
 import { editorT } from '../i18n/editor.es';
 import { iaT } from '../i18n/information-architecture.es';
-import { AppearancePanelTrigger } from './appearance-panel';
 import {
   editorPaneContract,
   resolveEditorLayoutMode,
@@ -55,14 +58,16 @@ interface EditorRegionProps {
   readonly title: string;
   readonly icon: typeof ContextIcon;
   readonly children: ReactNode;
+  readonly headerActions?: ReactNode;
 }
 
-function EditorRegion({ region, title, icon: Icon, children }: EditorRegionProps) {
+function EditorRegion({ region, title, icon: Icon, children, headerActions }: EditorRegionProps) {
   return (
     <section className="ec-editor-region" data-editor-region={region} aria-label={title}>
       <header className="ec-editor-region-header">
         <Icon aria-hidden="true" />
         <span>{title}</span>
+        {headerActions ? <div className="ec-editor-region-actions">{headerActions}</div> : null}
       </header>
       <div className="ec-editor-region-body">{children}</div>
     </section>
@@ -103,44 +108,116 @@ function FieldsContent() {
 }
 
 function InspectorContent() {
+  const [tab, setTab] = useState<'content' | 'design' | 'actions'>('content');
+
   return (
-    <>
-      <section
-        className="ec-ia-inspector-section"
-        data-information-level="primary"
-        aria-label={iaT('studio.ia.inspector.primaryTitle')}
-      >
-        <h3>{iaT('studio.ia.inspector.primaryTitle')}</h3>
-        <p>{iaT('studio.ia.inspector.primarySummary')}</p>
-        {!hasStructuralContent ? <StudioEmptyState id="inspector" /> : null}
-        <FieldsContent />
-      </section>
-      <ProgressiveDisclosure
-        id="inspector-advanced"
-        title={iaT('studio.ia.inspector.advancedTitle')}
-        summary={iaT('studio.ia.inspector.advancedSummary')}
-      >
-        <div className="ec-ia-inspector-section" data-inspector-advanced-placeholder>
-          <p>{iaT('studio.ia.disclosure.advancedSummary')}</p>
-        </div>
-      </ProgressiveDisclosure>
-    </>
+    <Tabs
+      className="ec-editor-inspector"
+      value={tab}
+      onValueChange={(value) => setTab(value as typeof tab)}
+      orientation="horizontal"
+    >
+      <TabsList className="ec-editor-panel-tabs" aria-label={editorT('studio.editor.inspectorTitle')}>
+        <TabsTrigger className="ec-editor-panel-tab" value="content">
+          {editorT('studio.editor.inspector.contentTab')}
+        </TabsTrigger>
+        <TabsTrigger className="ec-editor-panel-tab" value="design">
+          {editorT('studio.editor.inspector.designTab')}
+        </TabsTrigger>
+        <TabsTrigger className="ec-editor-panel-tab" value="actions">
+          {editorT('studio.editor.inspector.actionsTab')}
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent className="ec-editor-tab-panel" value="content">
+        <section
+          className="ec-ia-inspector-section"
+          data-information-level="primary"
+          aria-label={iaT('studio.ia.inspector.primaryTitle')}
+        >
+          <h3>{iaT('studio.ia.inspector.primaryTitle')}</h3>
+          <p>{iaT('studio.ia.inspector.primarySummary')}</p>
+          {!hasStructuralContent ? <StudioEmptyState id="inspector" /> : null}
+          <FieldsContent />
+        </section>
+      </TabsContent>
+      <TabsContent className="ec-editor-tab-panel" value="design">
+        <section className="ec-ia-inspector-section">
+          <h3>{editorT('studio.editor.inspector.designTitle')}</h3>
+          <p>{editorT('studio.editor.inspector.designSummary')}</p>
+          <ProgressiveDisclosure
+            id="inspector-advanced"
+            title={iaT('studio.ia.inspector.advancedTitle')}
+            summary={iaT('studio.ia.inspector.advancedSummary')}
+          >
+            <div className="ec-ia-inspector-section" data-inspector-advanced-placeholder>
+              <p>{iaT('studio.ia.disclosure.advancedSummary')}</p>
+            </div>
+          </ProgressiveDisclosure>
+        </section>
+      </TabsContent>
+      <TabsContent className="ec-editor-tab-panel" value="actions">
+        <section className="ec-ia-inspector-section">
+          <h3>{editorT('studio.editor.inspector.actionsTitle')}</h3>
+          <p>{editorT('studio.editor.inspector.actionsSummary')}</p>
+        </section>
+      </TabsContent>
+    </Tabs>
   );
 }
 
 function ContextRegion() {
+  const [tab, setTab] = useState<'components' | 'screens' | 'layers'>('components');
+
   return (
     <EditorRegion region="context" title={editorT('studio.editor.contextTitle')} icon={ContextIcon}>
-      <StructuralNotice>{editorT('studio.editor.contextStructural')}</StructuralNotice>
-      <ComponentsContent />
-      <OutlineContent />
+      <Tabs className="ec-editor-context-tabs" value={tab} onValueChange={(value) => setTab(value as typeof tab)}>
+        <TabsList className="ec-editor-panel-tabs" aria-label={editorT('studio.editor.contextTitle')}>
+          <TabsTrigger className="ec-editor-panel-tab" value="components">
+            {editorT('studio.editor.context.componentsTab')}
+          </TabsTrigger>
+          <TabsTrigger className="ec-editor-panel-tab" value="screens">
+            {editorT('studio.editor.context.screensTab')}
+          </TabsTrigger>
+          <TabsTrigger className="ec-editor-panel-tab" value="layers">
+            {editorT('studio.editor.context.layersTab')}
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent className="ec-editor-tab-panel" value="components">
+          <>
+            <StructuralNotice>{editorT('studio.editor.contextStructural')}</StructuralNotice>
+            <ComponentsContent />
+          </>
+        </TabsContent>
+        <TabsContent className="ec-editor-tab-panel" value="screens">
+          <div className="ec-editor-panel-empty">
+            <strong>{editorT('studio.editor.context.screensTitle')}</strong>
+            <p>{editorT('studio.editor.context.screensSummary')}</p>
+            <Button variant="outline" size="sm" asChild>
+              <a href={screensDestination.href}>{editorT('studio.editor.context.openScreens')}</a>
+            </Button>
+          </div>
+        </TabsContent>
+        <TabsContent className="ec-editor-tab-panel" value="layers">
+          <OutlineContent />
+        </TabsContent>
+      </Tabs>
     </EditorRegion>
   );
 }
 
 function CanvasRegion({ stageRef }: { readonly stageRef?: RefObject<HTMLDivElement | null> }) {
   return (
-    <EditorRegion region="canvas" title={editorT('studio.editor.canvasTitle')} icon={CanvasIcon}>
+    <EditorRegion
+      region="canvas"
+      title={editorT('studio.editor.canvasTitle')}
+      icon={CanvasIcon}
+      headerActions={
+        <>
+          <span>{editorT('studio.editor.canvas.viewportLabel')}</span>
+          <span aria-label={editorT('studio.editor.canvas.zoomLabel')}>100%</span>
+        </>
+      }
+    >
       <div className="ec-editor-canvas-stage" data-editor-canvas-stage ref={stageRef} tabIndex={-1}>
         <StructuralNotice>{editorT('studio.editor.canvasStructural')}</StructuralNotice>
         {!hasStructuralContent ? <StudioEmptyState id="canvas" className="ec-editor-canvas-empty" /> : null}
@@ -366,8 +443,6 @@ function MobileEditorLayout() {
             </div>
           </SheetContent>
         </Sheet>
-
-        <AppearancePanelTrigger presentation="mobile" />
 
         <Sheet open={activeTool === 'outline'} onOpenChange={(open) => setMobileTool('outline', open)}>
           <SheetTrigger asChild>
