@@ -60,7 +60,7 @@ test.describe('UI/UX style gallery', () => {
     }
   });
 
-  test('preserves the selected layout after renaming the profile, applying and reloading', async ({ page }) => {
+  test('preserves the selected layout after appearance customization, applying and reloading', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await resetAppearance(page);
     const sheet = await openDesktopAppearance(page);
@@ -69,7 +69,21 @@ test.describe('UI/UX style gallery', () => {
     await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecMarketLayout)).toBe('ide');
 
     await sheet.locator('[data-appearance-profile-name]').fill('Carbon personalizado');
+    await sheet.locator('[data-appearance-group="accent"] [data-appearance-value="rose"]').click();
+    await sheet.locator('[data-appearance-group="typography-family"] [data-appearance-value="humanist"]').click();
+
+    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecMarketLayout)).toBe('ide');
+    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecMarketPreset)).toBe(
+      'market:studio-carbon',
+    );
+    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecAccent)).toBe('rose');
+
     await sheet.locator('[data-appearance-apply]').click();
+    const stored = await page.evaluate(() => window.localStorage.getItem('electrocraft.studio.appearance.v1'));
+    expect(stored).toContain('"productDesign":"market:studio-carbon"');
+    expect(stored).toContain('"accent":"rose"');
+    expect(stored).toContain('"typographyFamily":"humanist"');
+
     await page.reload();
 
     await expect
@@ -79,6 +93,8 @@ test.describe('UI/UX style gallery', () => {
     await expect
       .poll(() => page.evaluate(() => document.documentElement.dataset.ecMarketPreset))
       .toBe('market:studio-carbon');
+    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecAccent)).toBe('rose');
+    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecTypographyFamily)).toBe('humanist');
   });
 
   test('changes computed shell treatment between technical and floating-builder presets', async ({ page }) => {
