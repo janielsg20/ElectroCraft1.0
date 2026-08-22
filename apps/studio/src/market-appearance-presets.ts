@@ -26,6 +26,7 @@ export const MARKET_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset[]
     profile: Object.freeze({
       ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
       name: 'Studio Carbon',
+      productDesign: 'market:studio-carbon',
       framework: 'headlessui',
       tone: 'dark',
       accent: 'blue',
@@ -55,6 +56,7 @@ export const MARKET_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset[]
     profile: Object.freeze({
       ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
       name: 'Canvas Atelier',
+      productDesign: 'market:canvas-atelier',
       framework: 'heroui',
       tone: 'dark',
       accent: 'indigo',
@@ -84,6 +86,7 @@ export const MARKET_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset[]
     profile: Object.freeze({
       ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
       name: 'CMS Editorial',
+      productDesign: 'market:cms-editorial',
       framework: 'electrocraft',
       tone: 'light',
       accent: 'blue',
@@ -113,6 +116,7 @@ export const MARKET_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset[]
     profile: Object.freeze({
       ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
       name: 'Commerce Desk',
+      productDesign: 'market:commerce-desk',
       framework: 'daisyui',
       tone: 'light',
       accent: 'emerald',
@@ -143,6 +147,7 @@ export const MARKET_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset[]
     profile: Object.freeze({
       ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
       name: 'Data Command',
+      productDesign: 'market:data-command',
       framework: 'ark-base',
       tone: 'dark',
       accent: 'amber',
@@ -173,6 +178,7 @@ export const MARKET_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset[]
     profile: Object.freeze({
       ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
       name: 'Linear Neutral',
+      productDesign: 'market:linear-neutral',
       framework: 'headlessui',
       tone: 'system',
       accent: 'indigo',
@@ -202,6 +208,7 @@ export const MARKET_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset[]
     profile: Object.freeze({
       ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
       name: 'Aurora Glass',
+      productDesign: 'market:aurora-glass',
       framework: 'aceternity-magic',
       tone: 'dark',
       accent: 'rose',
@@ -232,6 +239,7 @@ export const MARKET_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset[]
     profile: Object.freeze({
       ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
       name: 'Neo Builder',
+      productDesign: 'market:neo-builder',
       framework: 'daisyui',
       tone: 'light',
       accent: 'amber',
@@ -262,6 +270,7 @@ export const MARKET_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset[]
     profile: Object.freeze({
       ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
       name: 'Soft Graphite',
+      productDesign: 'market:soft-graphite',
       framework: 'heroui',
       tone: 'dark',
       accent: 'emerald',
@@ -291,6 +300,7 @@ export const MARKET_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset[]
     profile: Object.freeze({
       ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
       name: 'Zen Canvas',
+      productDesign: 'market:zen-canvas',
       framework: 'electrocraft',
       tone: 'light',
       accent: 'blue',
@@ -440,33 +450,7 @@ export const MARKET_APPEARANCE_DESCRIPTOR_BY_ID = new Map(
   MARKET_APPEARANCE_DESCRIPTORS.map((descriptor) => [descriptor.presetId, descriptor] as const),
 );
 
-const visualProfileKeys = [
-  'framework',
-  'tone',
-  'accent',
-  'semanticColors',
-  'typographyFamily',
-  'typographyScale',
-  'iconSize',
-  'iconStyle',
-  'radii',
-  'elevation',
-  'density',
-  'controlSize',
-  'buttonShape',
-  'fieldShape',
-  'menuAppearance',
-  'spacingScale',
-  'canvasDensity',
-  'animationIntensity',
-  'contrastPreference',
-] as const satisfies readonly (keyof StudioAppearanceProfile)[];
-
-function matchesVisualProfile(candidate: StudioAppearanceProfile, expected: StudioAppearanceProfile) {
-  return visualProfileKeys.every((key) => candidate[key] === expected[key]);
-}
-
 export function resolveMarketAppearanceDescriptor(profile: StudioAppearanceProfile): MarketAppearanceDescriptor | null {
-  const preset = MARKET_STUDIO_APPEARANCE_PRESETS.find((candidate) => matchesVisualProfile(profile, candidate.profile));
-  return preset ? (MARKET_APPEARANCE_DESCRIPTOR_BY_ID.get(preset.id) ?? null) : null;
+  if (!profile.productDesign || profile.productDesign === 'custom') return null;
+  return MARKET_APPEARANCE_DESCRIPTOR_BY_ID.get(profile.productDesign) ?? null;
 }
