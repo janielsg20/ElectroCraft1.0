@@ -37,7 +37,11 @@ const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'u
 const readJson = (relativePath) => JSON.parse(read(relativePath));
 
 for (const primitive of ['tooltip', 'dropdown-menu', 'sheet', 'scroll-area', 'separator']) {
-  assert.match(read(`packages/design-system/src/components/ui/${primitive}.tsx`), /from 'radix-ui'/, `${primitive} must use radix-ui`);
+  assert.match(
+    read(`packages/design-system/src/components/ui/${primitive}.tsx`),
+    /from 'radix-ui'/,
+    `${primitive} must use radix-ui`,
+  );
 }
 
 const componentsJson = readJson('packages/design-system/components.json');
@@ -80,7 +84,11 @@ for (const removed of [
   'motion',
   'daisyui',
 ]) {
-  assert.equal(packageJson.dependencies?.[removed] ?? packageJson.devDependencies?.[removed], undefined, `${removed} must be removed`);
+  assert.equal(
+    packageJson.dependencies?.[removed] ?? packageJson.devDependencies?.[removed],
+    undefined,
+    `${removed} must be removed`,
+  );
 }
 assert.deepEqual(Object.keys(packageJson.exports), ['.']);
 assert.equal(packageJson.exports['.'], './src/index.ts');
@@ -89,7 +97,10 @@ assert.equal(packageJson.imports['#lib/*'], './src/lib/*.ts');
 
 const tsconfigBase = readJson('tsconfig.base.json');
 assert.equal(tsconfigBase.compilerOptions.resolvePackageJsonImports, true);
-assert.equal(Object.keys(tsconfigBase.compilerOptions.paths).some((alias) => alias.includes('*')), false);
+assert.equal(
+  Object.keys(tsconfigBase.compilerOptions.paths).some((alias) => alias.includes('*')),
+  false,
+);
 assert.doesNotMatch(read('apps/studio/src/App.tsx'), /@electrocraft\/design-system\//);
 
 const studioPackage = readJson('apps/studio/package.json');
@@ -109,7 +120,10 @@ assert.match(read('packages/design-system/src/styles/globals.css'), /@source '\.
 assert.match(read('packages/design-system/src/styles/globals.css'), /min-height: 2\.75rem/);
 assert.doesNotMatch(read('packages/design-system/src/styles/globals.css'), /@heroui|daisyui/);
 assert.match(read('packages/design-system/src/styles/tokens.css'), /--overlay:/);
-assert.doesNotMatch(read('packages/design-system/src/styles/studio-appearance-tokens.css'), /data-ec-framework|data-ec-accent|data-ec-market/);
+assert.doesNotMatch(
+  read('packages/design-system/src/styles/studio-appearance-tokens.css'),
+  /data-ec-framework|data-ec-accent|data-ec-market/,
+);
 assert.doesNotMatch(read('packages/design-system/src/components/ui/sheet.tsx'), /bg-black/);
 assert.match(read('packages/design-system/src/components/ui/scroll-area.tsx'), /role="region"/);
 assert.match(read('.github/workflows/ci.yml'), /playwright install --with-deps chromium/);
@@ -131,12 +145,16 @@ if (!fs.existsSync(lockPath)) {
       blockers.push('package-lock.json does not contain the design-system/studio workspace entries');
     } else {
       for (const [name, version] of Object.entries(exactDesignSystemDependencies)) {
-        if (designSystemLock.dependencies?.[name] !== version) blockers.push(`package-lock workspace pin mismatch for ${name}@${version}`);
-        if (lock.packages?.[`node_modules/${name}`]?.version !== version) blockers.push(`package-lock resolved package mismatch for ${name}@${version}`);
+        if (designSystemLock.dependencies?.[name] !== version)
+          blockers.push(`package-lock workspace pin mismatch for ${name}@${version}`);
+        if (lock.packages?.[`node_modules/${name}`]?.version !== version)
+          blockers.push(`package-lock resolved package mismatch for ${name}@${version}`);
       }
       for (const [name, version] of Object.entries(exactStudioDevDependencies)) {
-        if (studioLock.devDependencies?.[name] !== version) blockers.push(`package-lock Studio pin mismatch for ${name}@${version}`);
-        if (lock.packages?.[`node_modules/${name}`]?.version !== version) blockers.push(`package-lock resolved package mismatch for ${name}@${version}`);
+        if (studioLock.devDependencies?.[name] !== version)
+          blockers.push(`package-lock Studio pin mismatch for ${name}@${version}`);
+        if (lock.packages?.[`node_modules/${name}`]?.version !== version)
+          blockers.push(`package-lock resolved package mismatch for ${name}@${version}`);
       }
       lockVerified = blockers.every((blocker) => !blocker.startsWith('package-lock'));
     }
@@ -179,4 +197,6 @@ if (blockers.length > 0 && !allowExternalBlockers) {
   process.exit(1);
 }
 
-console.log(`PASS_M03_1_DESIGN_SYSTEM_STRUCTURE blockers=${blockers.length} lockVerified=${lockVerified} visual=playwright`);
+console.log(
+  `PASS_M03_1_DESIGN_SYSTEM_STRUCTURE blockers=${blockers.length} lockVerified=${lockVerified} visual=playwright`,
+);
