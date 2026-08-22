@@ -36,6 +36,12 @@ test.describe('M03.7 Progressive Disclosure and information architecture', () =>
     await expect(inspector.getByText('Propiedades principales', { exact: true })).toBeVisible();
     await expect(inspector.getByText('Selecciona un elemento', { exact: true })).toBeVisible();
 
+    const contentTab = inspector.getByRole('tab', { name: 'Contenido' });
+    const designTab = inspector.getByRole('tab', { name: 'Diseño' });
+    await expect(contentTab).toHaveAttribute('data-state', 'active');
+    await designTab.click();
+    await expect(designTab).toHaveAttribute('data-state', 'active');
+
     const advanced = inspector.locator('[data-progressive-disclosure="inspector-advanced"]');
     const advancedTrigger = advanced.getByRole('button', { name: 'Avanzado' });
     await expect(advancedTrigger).toHaveAttribute('data-state', 'closed');
@@ -82,6 +88,12 @@ test.describe('M03.7 Progressive Disclosure and information architecture', () =>
     await expect(dialog).toBeVisible();
     await expect(dialog).toHaveAttribute('data-sheet-side', 'bottom');
     await expect(dialog.getByText('Propiedades principales', { exact: true })).toBeVisible();
-    await expect(dialog.locator('[data-progressive-disclosure="inspector-advanced"]')).toBeVisible();
+
+    const designTab = dialog.getByRole('tab', { name: 'Diseño' });
+    await designTab.click();
+    await expect(designTab).toHaveAttribute('data-state', 'active');
+    const advanced = dialog.locator('[data-progressive-disclosure="inspector-advanced"]');
+    await expect(advanced).toBeVisible();
+    await expect(advanced.getByRole('button', { name: 'Avanzado' })).toHaveAttribute('data-state', 'closed');
   });
 });
