@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
-async function createProject(page: Parameters<typeof test>[0] extends never ? never : any, name: string) {
+async function createProject(page: Page, name: string) {
   const newProject = page.getByRole('button', { name: 'Nuevo proyecto' }).first();
   await expect(newProject).toBeEnabled({ timeout: 60_000 });
   await newProject.click();
@@ -33,7 +33,7 @@ test('M04.6 exporta e importa una copia validada desde Project Home', async ({ p
   await expect(dialog).toBeVisible();
   await dialog.getByLabel('Archivo de copia de seguridad').setInputFiles(backupPath!);
   await expect(dialog.getByRole('heading', { name: 'Resumen de impacto' })).toBeVisible();
-  await expect(dialog.getByText('1')).not.toHaveCount(0);
+  await expect(dialog.getByText(/\d+ objetos/)).toBeVisible();
   await expect(dialog.getByLabel('Nombre de la copia')).toHaveValue('Proyecto backup E2E (copia importada)');
   await dialog.getByRole('button', { name: 'Importar copia' }).click();
 
