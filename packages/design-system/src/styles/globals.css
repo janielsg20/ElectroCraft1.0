@@ -1,17 +1,5 @@
 @layer theme, base, components, utilities;
 @import 'tailwindcss';
-@import '@heroui/styles/base/base.css' layer(base);
-@import '@heroui/styles/themes/shared/theme.css' layer(theme);
-@import '@heroui/styles/themes/default/variables.css' layer(theme);
-@import '@heroui/styles/utilities';
-@import '@heroui/styles/components/button.css' layer(components);
-@plugin 'daisyui' {
-  themes: light;
-  root: '.ec-daisy-scope';
-  include: button;
-  prefix: 'd-';
-  logs: false;
-}
 @import './tokens.css';
 @import './studio-appearance-tokens.css';
 @source '../';
