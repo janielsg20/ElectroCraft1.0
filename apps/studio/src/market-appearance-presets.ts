@@ -1,6 +1,7 @@
 import {
   DEFAULT_EDITOR_APPEARANCE_PROFILE,
   type StudioAppearancePreset,
+  type StudioAppearanceProfile,
 } from './theme';
 
 export type MarketAppearanceLayout =
@@ -21,6 +22,11 @@ export interface MarketAppearanceDescriptor {
   readonly family: 'IDE' | 'Builder' | 'CMS' | 'Admin' | 'Data' | 'Minimal';
   readonly inspiration: string;
   readonly signature: string;
+  readonly workflow: string;
+  readonly interaction: string;
+  readonly stateFeedback: string;
+  readonly recommendedFor: string;
+  readonly traits: readonly string[];
 }
 
 export const MARKET_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset[] = Object.freeze([
@@ -29,14 +35,14 @@ export const MARKET_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset[]
     label: 'Studio Carbon',
     kind: 'built-in' as const,
     framework: 'headlessui' as const,
-    description: 'IDE técnico · oscuro, compacto, preciso y orientado a teclado.',
+    description: 'IDE técnico · oscuro, compacto, preciso y optimizado para sesiones largas.',
     profile: Object.freeze({
       ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
       name: 'Studio Carbon',
       framework: 'headlessui',
       tone: 'dark',
       accent: 'blue',
-      semanticColors: 'muted',
+      semanticColors: 'balanced',
       typographyFamily: 'mono',
       typographyScale: 'compact',
       iconSize: 'compact',
@@ -58,7 +64,7 @@ export const MARKET_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset[]
     label: 'Canvas Atelier',
     kind: 'built-in' as const,
     framework: 'heroui' as const,
-    description: 'Builder visual · canvas protagonista, paneles flotantes y controles suaves.',
+    description: 'Builder visual · canvas protagonista, chrome flotante y controles de inspección suaves.',
     profile: Object.freeze({
       ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
       name: 'Canvas Atelier',
@@ -87,7 +93,7 @@ export const MARKET_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset[]
     label: 'CMS Editorial',
     kind: 'built-in' as const,
     framework: 'electrocraft' as const,
-    description: 'CMS editorial · claro, jerárquico y cómodo para contenido estructurado.',
+    description: 'CMS editorial · claro, jerárquico y cómodo para contenido, colecciones y formularios.',
     profile: Object.freeze({
       ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
       name: 'CMS Editorial',
@@ -116,7 +122,7 @@ export const MARKET_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset[]
     label: 'Commerce Desk',
     kind: 'built-in' as const,
     framework: 'daisyui' as const,
-    description: 'Admin comercial · cálido, claro, amigable y centrado en acciones.',
+    description: 'Admin comercial · cálido, accionable y centrado en estados, ventas y operaciones.',
     profile: Object.freeze({
       ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
       name: 'Commerce Desk',
@@ -146,7 +152,7 @@ export const MARKET_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset[]
     label: 'Data Command',
     kind: 'built-in' as const,
     framework: 'ark-base' as const,
-    description: 'Builder de datos · denso, modular, cuadrado y orientado a señales.',
+    description: 'Builder de datos · denso, modular, cuadrado y orientado a señales operativas.',
     profile: Object.freeze({
       ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
       name: 'Data Command',
@@ -176,7 +182,7 @@ export const MARKET_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset[]
     label: 'Linear Neutral',
     kind: 'built-in' as const,
     framework: 'headlessui' as const,
-    description: 'Productividad neutral · pocos bordes, ritmo calmado y máxima legibilidad.',
+    description: 'Productividad neutral · mínimo chrome, jerarquía tipográfica y foco continuo.',
     profile: Object.freeze({
       ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
       name: 'Linear Neutral',
@@ -205,7 +211,7 @@ export const MARKET_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset[]
     label: 'Aurora Glass',
     kind: 'built-in' as const,
     framework: 'aceternity-magic' as const,
-    description: 'Builder inmersivo · glass, luz ambiental y motion expresivo.',
+    description: 'Builder inmersivo · glass, luz ambiental, profundidad y motion expresivo.',
     profile: Object.freeze({
       ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
       name: 'Aurora Glass',
@@ -235,7 +241,7 @@ export const MARKET_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset[]
     label: 'Neo Builder',
     kind: 'built-in' as const,
     framework: 'daisyui' as const,
-    description: 'Builder expresivo · alto contraste, geometría fuerte y estados físicos.',
+    description: 'Builder expresivo · alto contraste, geometría física y feedback inmediato.',
     profile: Object.freeze({
       ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
       name: 'Neo Builder',
@@ -265,7 +271,7 @@ export const MARKET_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset[]
     label: 'Soft Graphite',
     kind: 'built-in' as const,
     framework: 'heroui' as const,
-    description: 'Admin premium · grafito, capas suaves y acento verde discreto.',
+    description: 'Admin premium · grafito, capas suaves, controles serenos y acento verde discreto.',
     profile: Object.freeze({
       ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
       name: 'Soft Graphite',
@@ -294,7 +300,7 @@ export const MARKET_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset[]
     label: 'Zen Canvas',
     kind: 'built-in' as const,
     framework: 'electrocraft' as const,
-    description: 'Canvas minimal · navegación reducida, superficies neutras y cero ruido.',
+    description: 'Canvas minimal · navegación reducida, superficies neutras y mínima distracción.',
     profile: Object.freeze({
       ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
       name: 'Zen Canvas',
@@ -321,18 +327,163 @@ export const MARKET_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset[]
 ]);
 
 export const MARKET_APPEARANCE_DESCRIPTORS: readonly MarketAppearanceDescriptor[] = Object.freeze([
-  { presetId: 'market:studio-carbon', layout: 'ide', family: 'IDE', inspiration: 'VS Code + JetBrains', signature: 'Rail técnico, paneles densos, azul frío' },
-  { presetId: 'market:canvas-atelier', layout: 'canvas', family: 'Builder', inspiration: 'Framer + Webflow', signature: 'Canvas amplio, paneles flotantes, motion' },
-  { presetId: 'market:cms-editorial', layout: 'cms', family: 'CMS', inspiration: 'WordPress + Directus', signature: 'Jerarquía editorial, bloques claros, navegación amplia' },
-  { presetId: 'market:commerce-desk', layout: 'commerce', family: 'Admin', inspiration: 'Shopify Admin', signature: 'Acciones visibles, verde semántico, superficies cálidas' },
-  { presetId: 'market:data-command', layout: 'data', family: 'Data', inspiration: 'Retool + Directus', signature: 'Densidad alta, grid técnico, señales rápidas' },
-  { presetId: 'market:linear-neutral', layout: 'minimal', family: 'Minimal', inspiration: 'Linear + Notion', signature: 'Chrome mínimo, bordes suaves, foco en contenido' },
-  { presetId: 'market:aurora-glass', layout: 'glass', family: 'Builder', inspiration: 'Creative builders', signature: 'Glass, glow ambiental, iconos energéticos' },
-  { presetId: 'market:neo-builder', layout: 'brutal', family: 'Builder', inspiration: 'Neo-brutal tooling', signature: 'Bordes fuertes, sombras físicas, estados elásticos' },
-  { presetId: 'market:soft-graphite', layout: 'soft', family: 'Admin', inspiration: 'Modern SaaS consoles', signature: 'Grafito suave, paneles premium, verde discreto' },
-  { presetId: 'market:zen-canvas', layout: 'zen', family: 'Minimal', inspiration: 'Distraction-free editors', signature: 'Rail reducido, canvas limpio, poco movimiento' },
+  {
+    presetId: 'market:studio-carbon',
+    layout: 'ide',
+    family: 'IDE',
+    inspiration: 'VS Code + JetBrains',
+    signature: 'Rail técnico, paneles densos y azul frío.',
+    workflow: 'Teclado, navegación rápida y muchas herramientas visibles.',
+    interaction: 'Hover corto, selección precisa e iconos con respuesta direccional.',
+    stateFeedback: 'Estados compactos y persistentes en barra inferior.',
+    recommendedFor: 'Código, lógica y sesiones largas',
+    traits: Object.freeze(['Denso', 'Oscuro', 'Teclado']),
+  },
+  {
+    presetId: 'market:canvas-atelier',
+    layout: 'canvas',
+    family: 'Builder',
+    inspiration: 'Framer + Webflow',
+    signature: 'Canvas amplio, paneles flotantes y profundidad suave.',
+    workflow: 'Manipulación visual con inspector cercano y máximo espacio central.',
+    interaction: 'Motion fluido, elevación en hover y controles redondeados.',
+    stateFeedback: 'Guardado y selección con glow discreto.',
+    recommendedFor: 'Diseño visual y composición',
+    traits: Object.freeze(['Canvas', 'Glass', 'Motion']),
+  },
+  {
+    presetId: 'market:cms-editorial',
+    layout: 'cms',
+    family: 'CMS',
+    inspiration: 'WordPress + Directus',
+    signature: 'Jerarquía editorial, navegación amplia y superficies tranquilas.',
+    workflow: 'Lectura, edición de contenido y formularios de larga duración.',
+    interaction: 'Transiciones mínimas y foco visible sin distracción.',
+    stateFeedback: 'Mensajes legibles y semántica de color moderada.',
+    recommendedFor: 'CMS, contenido y colecciones',
+    traits: Object.freeze(['Claro', 'Editorial', 'Legible']),
+  },
+  {
+    presetId: 'market:commerce-desk',
+    layout: 'commerce',
+    family: 'Admin',
+    inspiration: 'Shopify Admin',
+    signature: 'Acciones visibles, verde semántico y superficies cálidas.',
+    workflow: 'Operaciones repetitivas con acciones primarias fáciles de localizar.',
+    interaction: 'Targets cómodos, hover suave y botones tipo pill.',
+    stateFeedback: 'Éxito, pendiente y error con semántica muy visible.',
+    recommendedFor: 'Ventas, catálogos y administración',
+    traits: Object.freeze(['Acciones', 'Cálido', 'Semántico']),
+  },
+  {
+    presetId: 'market:data-command',
+    layout: 'data',
+    family: 'Data',
+    inspiration: 'Retool + Directus',
+    signature: 'Densidad alta, grid técnico y señales rápidas.',
+    workflow: 'Tablas, queries, automatizaciones y monitoreo simultáneo.',
+    interaction: 'Feedback inmediato, geometría exacta y foco compacto.',
+    stateFeedback: 'Indicadores fuertes y estados de proceso tipo consola.',
+    recommendedFor: 'Datos, workflows y herramientas internas',
+    traits: Object.freeze(['Grid', 'Mono', 'Señales']),
+  },
+  {
+    presetId: 'market:linear-neutral',
+    layout: 'minimal',
+    family: 'Minimal',
+    inspiration: 'Linear + Notion',
+    signature: 'Chrome mínimo, bordes suaves y foco en contenido.',
+    workflow: 'Trabajo continuo con pocas interrupciones visuales.',
+    interaction: 'Estados discretos, respuesta rápida y movimiento reducido.',
+    stateFeedback: 'Indicadores pequeños que no compiten con el contenido.',
+    recommendedFor: 'Productividad general y foco',
+    traits: Object.freeze(['Neutral', 'Rápido', 'Foco']),
+  },
+  {
+    presetId: 'market:aurora-glass',
+    layout: 'glass',
+    family: 'Builder',
+    inspiration: 'Creative builders',
+    signature: 'Glass, glow ambiental e iconos energéticos.',
+    workflow: 'Experiencia inmersiva para creación visual y demos.',
+    interaction: 'Glow, profundidad, motion ambiental e iconos expresivos.',
+    stateFeedback: 'Estados luminosos y guardado con pulso ambiental.',
+    recommendedFor: 'Creación visual y presentaciones',
+    traits: Object.freeze(['Glow', 'Glass', 'Inmersivo']),
+  },
+  {
+    presetId: 'market:neo-builder',
+    layout: 'brutal',
+    family: 'Builder',
+    inspiration: 'Neo-brutal tooling',
+    signature: 'Bordes fuertes, sombras físicas y estados elásticos.',
+    workflow: 'Acciones rápidas donde cada control debe sentirse inequívoco.',
+    interaction: 'Press físico, rebote corto y contraste máximo.',
+    stateFeedback: 'Cambios de estado deliberadamente obvios.',
+    recommendedFor: 'Prototipos, touch y alta visibilidad',
+    traits: Object.freeze(['Brutal', 'Físico', 'Contraste']),
+  },
+  {
+    presetId: 'market:soft-graphite',
+    layout: 'soft',
+    family: 'Admin',
+    inspiration: 'Modern SaaS consoles',
+    signature: 'Grafito suave, paneles premium y verde discreto.',
+    workflow: 'Administración prolongada con baja fatiga visual.',
+    interaction: 'Elevación tenue, hover blando y transiciones serenas.',
+    stateFeedback: 'Estados semánticos discretos pero persistentes.',
+    recommendedFor: 'SaaS, dashboards y administración',
+    traits: Object.freeze(['Grafito', 'Suave', 'Premium']),
+  },
+  {
+    presetId: 'market:zen-canvas',
+    layout: 'zen',
+    family: 'Minimal',
+    inspiration: 'Distraction-free editors',
+    signature: 'Rail reducido, canvas limpio y poco movimiento.',
+    workflow: 'Concentración profunda con navegación secundaria minimizada.',
+    interaction: 'Movimiento reducido y controles que aparecen sin ruido.',
+    stateFeedback: 'Sólo los estados esenciales mantienen protagonismo.',
+    recommendedFor: 'Canvas, escritura y foco profundo',
+    traits: Object.freeze(['Zen', 'Canvas', 'Silencioso']),
+  },
 ]);
 
 export const MARKET_APPEARANCE_DESCRIPTOR_BY_ID = new Map(
   MARKET_APPEARANCE_DESCRIPTORS.map((descriptor) => [descriptor.presetId, descriptor] as const),
 );
+
+const visualProfileKeys = [
+  'framework',
+  'tone',
+  'accent',
+  'semanticColors',
+  'typographyFamily',
+  'typographyScale',
+  'iconSize',
+  'iconStyle',
+  'radii',
+  'elevation',
+  'density',
+  'controlSize',
+  'buttonShape',
+  'fieldShape',
+  'menuAppearance',
+  'spacingScale',
+  'canvasDensity',
+  'animationIntensity',
+  'contrastPreference',
+] as const satisfies readonly (keyof StudioAppearanceProfile)[];
+
+function matchesVisualProfile(candidate: StudioAppearanceProfile, expected: StudioAppearanceProfile) {
+  return visualProfileKeys.every((key) => candidate[key] === expected[key]);
+}
+
+export function resolveMarketAppearanceDescriptor(
+  profile: StudioAppearanceProfile,
+): MarketAppearanceDescriptor | null {
+  const preset = MARKET_STUDIO_APPEARANCE_PRESETS.find((candidate) =>
+    matchesVisualProfile(profile, candidate.profile),
+  );
+  return preset ? MARKET_APPEARANCE_DESCRIPTOR_BY_ID.get(preset.id) ?? null : null;
+}
