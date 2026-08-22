@@ -1,16 +1,19 @@
 import {
+  type DuplicateProjectRequest,
+  type ListProjectsRequest,
   type NormalizedIncrementalSaveProjectRequest,
   type NormalizedSaveProjectRequest,
+  type ProjectBackupPersistenceRequest,
+  type ProjectBackupStoragePort,
+  type ProjectLifecycleStatus,
   type ProjectStorageCoordinationDiagnostics,
   type ProjectStorageDiagnostics,
   type ProjectStoragePort,
-  type ListProjectsRequest,
-  type ProjectLifecycleStatus,
-  type DuplicateProjectRequest,
 } from '@electrocraft/application';
 import type { PGlite } from '@electric-sql/pglite';
 import { PGliteWorker } from '@electric-sql/pglite/worker';
 import { drizzle } from 'drizzle-orm/pglite';
+import { createDrizzleProjectBackupRepository } from './backup-repository';
 import { applyStudioStorageMigrations } from './migration';
 import { createDrizzleProjectRepository } from './repository';
 import * as schema from './schema';
@@ -33,6 +36,10 @@ interface BrowserStorageClient {
   readonly client: PGliteWorker;
   readonly fallbackReason?: string;
 }
+
+type BrowserProjectStoragePort = ProjectStoragePort & ProjectBackupStoragePort;
+type BrowserProjectRepository = ReturnType<typeof createDrizzleProjectRepository> &
+  ReturnType<typeof createDrizzleProjectBackupRepository>;
 
 function canAttemptOpfs() {
   return typeof navigator !== 'undefined' && typeof navigator.storage?.getDirectory === 'function';
@@ -146,10 +153,12 @@ async function storageEstimate() {
   } as const;
 }
 
-export function createBrowserProjectStoragePort(options: BrowserProjectStorageOptions = {}): ProjectStoragePort {
+export function createBrowserProjectStoragePort(
+  options: BrowserProjectStorageOptions = {},
+): BrowserProjectStoragePort {
   const clientId = createStorageClientId();
   let runtime: BrowserStorageClient | null = null;
-  let repository: ReturnType<typeof createDrizzleProjectRepository> | null = null;
+  let repository: BrowserProjectRepository | null = null;
   let initializePromise: Promise<ProjectStorageDiagnostics> | null = null;
   let unsubscribeLeaderChange: (() => void) | null = null;
   let leaderChannel: BroadcastChannel | null = null;
@@ -278,7 +287,11 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
           message: 'Comprobando almacenamiento local…',
         });
         await verifyStudioStorageHealth(runtime.client);
-        repository = createDrizzleProjectRepository(createWorkerDrizzleDatabase(runtime.client));
+        const database = createWorkerDrizzleDatabase(runtime.client);
+        repository = Object.freeze({
+          ...createDrizzleProjectRepository(database),
+          ...createDrizzleProjectBackupRepository(database),
+        });
 
         unsubscribeLeaderChange = runtime.client.onLeaderChange(() => {
           if (runtime) void revalidateAfterLeaderChange(runtime.client);
@@ -398,6 +411,11 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
     async verifyProject(projectId: string) {
       return (await ensureRepository()).verifyProject(projectId);
     },
+    async listProjectBackupMedia(projectId: string) {
+      return (await ensureRepository()).listProjectBackupMedia(projectId);
+    },
+    importProjectBackupSnapshot: (request: ProjectBackupPersistenceRequest) =>
+      persistOperation((repo) => repo.importProjectBackupSnapshot(request)),
     getDiagnostics,
     async repair() {
       if (typeof navigator !== 'undefined' && navigator.storage?.persist) {
