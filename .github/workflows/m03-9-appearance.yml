@@ -1,64 +1,63 @@
-name: M03.9 Editor Appearance Profile Gate
+name: M03.9 Single Studio Theme Gate
 
 on:
   workflow_dispatch:
   pull_request:
     paths:
+      - 'apps/studio/index.html'
       - 'apps/studio/src/theme.ts'
       - 'apps/studio/src/theme-provider.tsx'
-      - 'apps/studio/src/market-appearance-presets.ts'
-      - 'apps/studio/src/help/help-registry.ts'
       - 'apps/studio/src/i18n/appearance.es.ts'
-      - 'apps/studio/src/shell/appearance-*'
-      - 'apps/studio/src/shell/app-shell-route.tsx'
-      - 'apps/studio/src/shell/studio-topbar.tsx'
-      - 'apps/studio/src/shell/editor-workspace.tsx'
-      - 'apps/studio/src/shell/editor-workspace.css'
-      - 'apps/studio/src/shell/responsive-shell.css'
-      - 'packages/design-system/src/components/ui/button.tsx'
-      - 'packages/design-system/src/components/ui/input.tsx'
-      - 'packages/design-system/src/foundation/theme-provider.tsx'
-      - 'packages/design-system/src/styles/globals.css'
-      - 'packages/design-system/src/styles/studio-appearance-tokens.css'
-      - 'tooling/vitest/**/editor-appearance-*.test.ts'
-      - 'tooling/vitest/unit/market-appearance-presets.test.ts'
+      - 'apps/studio/src/shell/appearance-panel.tsx'
+      - 'apps/studio/src/shell/appearance.css'
+      - 'packages/design-system/package.json'
+      - 'packages/design-system/components.json'
+      - 'packages/design-system/src/index.ts'
+      - 'packages/design-system/src/components/ui/**'
+      - 'packages/design-system/src/foundation/**'
+      - 'packages/design-system/src/styles/**'
+      - 'tooling/vitest/unit/editor-appearance-profile.test.ts'
+      - 'tooling/vitest/contract/editor-appearance-isolation.test.ts'
+      - 'tooling/vitest/contract/single-studio-theme-boundary.test.ts'
+      - 'tooling/vitest/integration/editor-appearance-runtime.test.ts'
       - 'tooling/playwright/m03-9-appearance.spec.ts'
-      - 'tooling/playwright/ui-ux-style-gallery.spec.ts'
-      - '.ai/evidence/F03/M03.9/**'
-      - '.ai/STATE.md'
-      - '.ai/TRACKING.md'
-      - '.ai/HANDOFF.md'
+      - '.ai/DESIGN_SYSTEM.md'
+      - '.ai/THEME_SYSTEM.md'
+      - '.ai/ARCHITECTURE.md'
+      - '.ai/RULES.md'
+      - '.ai/MEMORY.md'
+      - '.ai/DECISIONS.md'
+      - '.ai/adr/ADR-STUDIO-SINGLE-SHADCN-RADIX-THEME.md'
       - '.github/workflows/m03-9-appearance.yml'
   push:
     branches:
       - main
-      - codex/m03-9-editor-session-appearance-profile
-      - codex/ui-ux-style-gallery
+      - codex/single-shadcn-radix-theme
     paths:
+      - 'apps/studio/index.html'
       - 'apps/studio/src/theme.ts'
       - 'apps/studio/src/theme-provider.tsx'
-      - 'apps/studio/src/market-appearance-presets.ts'
-      - 'apps/studio/src/help/help-registry.ts'
       - 'apps/studio/src/i18n/appearance.es.ts'
-      - 'apps/studio/src/shell/appearance-*'
-      - 'apps/studio/src/shell/app-shell-route.tsx'
-      - 'apps/studio/src/shell/studio-topbar.tsx'
-      - 'apps/studio/src/shell/editor-workspace.tsx'
-      - 'apps/studio/src/shell/editor-workspace.css'
-      - 'apps/studio/src/shell/responsive-shell.css'
-      - 'packages/design-system/src/components/ui/button.tsx'
-      - 'packages/design-system/src/components/ui/input.tsx'
-      - 'packages/design-system/src/foundation/theme-provider.tsx'
-      - 'packages/design-system/src/styles/globals.css'
-      - 'packages/design-system/src/styles/studio-appearance-tokens.css'
-      - 'tooling/vitest/**/editor-appearance-*.test.ts'
-      - 'tooling/vitest/unit/market-appearance-presets.test.ts'
+      - 'apps/studio/src/shell/appearance-panel.tsx'
+      - 'apps/studio/src/shell/appearance.css'
+      - 'packages/design-system/package.json'
+      - 'packages/design-system/components.json'
+      - 'packages/design-system/src/index.ts'
+      - 'packages/design-system/src/components/ui/**'
+      - 'packages/design-system/src/foundation/**'
+      - 'packages/design-system/src/styles/**'
+      - 'tooling/vitest/unit/editor-appearance-profile.test.ts'
+      - 'tooling/vitest/contract/editor-appearance-isolation.test.ts'
+      - 'tooling/vitest/contract/single-studio-theme-boundary.test.ts'
+      - 'tooling/vitest/integration/editor-appearance-runtime.test.ts'
       - 'tooling/playwright/m03-9-appearance.spec.ts'
-      - 'tooling/playwright/ui-ux-style-gallery.spec.ts'
-      - '.ai/evidence/F03/M03.9/**'
-      - '.ai/STATE.md'
-      - '.ai/TRACKING.md'
-      - '.ai/HANDOFF.md'
+      - '.ai/DESIGN_SYSTEM.md'
+      - '.ai/THEME_SYSTEM.md'
+      - '.ai/ARCHITECTURE.md'
+      - '.ai/RULES.md'
+      - '.ai/MEMORY.md'
+      - '.ai/DECISIONS.md'
+      - '.ai/adr/ADR-STUDIO-SINGLE-SHADCN-RADIX-THEME.md'
       - '.github/workflows/m03-9-appearance.yml'
 
 permissions:
@@ -71,7 +70,7 @@ defaults:
 
 jobs:
   m03-9:
-    name: M03.9 Editor Appearance Profile
+    name: M03.9 Single Studio Theme
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:
@@ -80,7 +79,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            await github.rest.repos.createCommitStatus({ owner: context.repo.owner, repo: context.repo.repo, sha: context.sha, state: 'pending', context: 'electrocraft/M03.9', description: 'M03.9 appearance gate running', target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}` });
+            await github.rest.repos.createCommitStatus({ owner: context.repo.owner, repo: context.repo.repo, sha: context.sha, state: 'pending', context: 'electrocraft/M03.9', description: 'Single Studio theme gate running', target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}` });
 
       - name: Checkout
         uses: actions/checkout@v6
@@ -103,42 +102,41 @@ jobs:
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
 
-      - name: Verify M03.9 source formatting
+      - name: Verify source formatting
         run: >-
           npx prettier --check
           .github/workflows/m03-9-appearance.yml
+          apps/studio/index.html
           apps/studio/src/theme.ts
           apps/studio/src/theme-provider.tsx
-          apps/studio/src/market-appearance-presets.ts
-          apps/studio/src/help/help-registry.ts
           apps/studio/src/i18n/appearance.es.ts
           apps/studio/src/shell/appearance-panel.tsx
-          apps/studio/src/shell/appearance-framework-gallery.tsx
           apps/studio/src/shell/appearance.css
-          apps/studio/src/shell/appearance-market.css
-          apps/studio/src/shell/app-shell-route.tsx
-          apps/studio/src/shell/studio-topbar.tsx
-          apps/studio/src/shell/editor-workspace.tsx
-          apps/studio/src/shell/editor-workspace.css
-          apps/studio/src/shell/responsive-shell.css
-          packages/design-system/src/components/ui/button.tsx
-          packages/design-system/src/components/ui/input.tsx
-          packages/design-system/src/foundation/theme-provider.tsx
+          packages/design-system/package.json
+          packages/design-system/components.json
+          packages/design-system/src/index.ts
           packages/design-system/src/styles/globals.css
+          packages/design-system/src/styles/tokens.css
           packages/design-system/src/styles/studio-appearance-tokens.css
           tooling/vitest/unit/editor-appearance-profile.test.ts
-          tooling/vitest/unit/market-appearance-presets.test.ts
           tooling/vitest/contract/editor-appearance-isolation.test.ts
+          tooling/vitest/contract/single-studio-theme-boundary.test.ts
           tooling/vitest/integration/editor-appearance-runtime.test.ts
           tooling/playwright/m03-9-appearance.spec.ts
-          tooling/playwright/ui-ux-style-gallery.spec.ts
+          .ai/DESIGN_SYSTEM.md
+          .ai/THEME_SYSTEM.md
+          .ai/ARCHITECTURE.md
+          .ai/RULES.md
+          .ai/MEMORY.md
+          .ai/DECISIONS.md
+          .ai/adr/ADR-STUDIO-SINGLE-SHADCN-RADIX-THEME.md
 
-      - name: Execute dedicated M03.9 unit contract integration suite
+      - name: Execute dedicated unit contract integration suite
         run: >-
           npx vitest run --config vitest.config.ts
           tooling/vitest/unit/editor-appearance-profile.test.ts
-          tooling/vitest/unit/market-appearance-presets.test.ts
           tooling/vitest/contract/editor-appearance-isolation.test.ts
+          tooling/vitest/contract/single-studio-theme-boundary.test.ts
           tooling/vitest/integration/editor-appearance-runtime.test.ts
 
       - name: Install Playwright Chromium
@@ -149,28 +147,24 @@ jobs:
             npx playwright install chromium
           fi
 
-      - name: Execute dedicated M03.9 browser audit
-        run: >-
-          npx playwright test --config playwright.config.ts
-          tooling/playwright/m03-9-appearance.spec.ts
-          tooling/playwright/ui-ux-style-gallery.spec.ts
+      - name: Execute dedicated browser audit
+        run: npx playwright test --config playwright.config.ts tooling/playwright/m03-9-appearance.spec.ts
 
       - name: Execute full repository gate
         run: npm run check | tee m03-9-check.log
 
       - name: Emit closure marker
-        run: echo PASS_M03_9_EDITOR_APPEARANCE_PROFILE | tee m03-9-closure.log
+        run: echo PASS_M03_9_SINGLE_STUDIO_THEME | tee m03-9-closure.log
 
       - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: m03-9-appearance-evidence
+          name: m03-9-single-theme-evidence
           path: |
             m03-9-check.log
             m03-9-closure.log
             test-results/**
-            .ai/evidence/F03/M03.9/**
           if-no-files-found: warn
 
       - name: Publish final commit status
@@ -179,4 +173,4 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            await github.rest.repos.createCommitStatus({ owner: context.repo.owner, repo: context.repo.repo, sha: context.sha, state: '${{ job.status }}' === 'success' ? 'success' : 'failure', context: 'electrocraft/M03.9', description: 'M03.9 editor appearance profile gate', target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}` });
+            await github.rest.repos.createCommitStatus({ owner: context.repo.owner, repo: context.repo.repo, sha: context.sha, state: '${{ job.status }}' === 'success' ? 'success' : 'failure', context: 'electrocraft/M03.9', description: 'M03.9 single Studio theme gate', target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}` });
