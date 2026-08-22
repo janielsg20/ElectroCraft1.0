@@ -1,5 +1,7 @@
 import { ThemeProvider } from '@electrocraft/design-system';
 import { createContext, useContext, useEffect, useMemo, useState, type PropsWithChildren } from 'react';
+import { MARKET_STUDIO_APPEARANCE_PRESETS } from './market-appearance-presets';
+import './shell/appearance-market.css';
 import {
   BUILT_IN_STUDIO_APPEARANCE_PRESETS,
   createBrowserEditorAppearanceStorage,
@@ -87,7 +89,12 @@ export function StudioAppearanceProvider({ storage, presetStorage, children }: S
     systemReducedMotion,
   );
   const presets = useMemo(
-    () => Object.freeze([...BUILT_IN_STUDIO_APPEARANCE_PRESETS, ...personalPresets]),
+    () =>
+      Object.freeze([
+        ...BUILT_IN_STUDIO_APPEARANCE_PRESETS,
+        ...MARKET_STUDIO_APPEARANCE_PRESETS,
+        ...personalPresets,
+      ]),
     [personalPresets],
   );
   const accessibilityWarnings = useMemo(
