@@ -100,6 +100,85 @@
   gap: 12px;
 }
 
+.ec-project-wizard-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  background: var(--overlay);
+}
+
+.ec-project-wizard-loading > [data-slot='loader'] {
+  border: 1px solid var(--border);
+  border-radius: var(--ec-radius-md);
+  padding: 10px 12px;
+  background: var(--surface);
+  color: var(--foreground);
+}
+
+.ec-design-system .ec-project-toolbar {
+  background: var(--surface);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.ec-design-system .ec-project-title-icon {
+  background: var(--accent);
+  box-shadow: none;
+}
+
+.ec-design-system .ec-project-new {
+  background: var(--primary);
+  box-shadow: none;
+  transform: none;
+}
+
+.ec-design-system .ec-project-new:hover:not(:disabled) {
+  box-shadow: none;
+  transform: none;
+}
+
+.ec-design-system .ec-project-card {
+  background: var(--surface);
+  box-shadow: none;
+  transform: none;
+  content-visibility: auto;
+  contain-intrinsic-size: 190px;
+}
+
+.ec-design-system .ec-project-card:hover {
+  box-shadow: var(--ec-shadow-sm);
+  transform: none;
+}
+
+.ec-design-system .ec-project-open > span {
+  background: var(--muted);
+  background-image: none;
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.ec-project-loading-indicator {
+  white-space: nowrap;
+}
+
+.ec-project-collection[data-refreshing='true'] {
+  opacity: 0.72;
+}
+
+.ec-project-card[data-pending='true'] {
+  opacity: 0.72;
+}
+
+.ec-project-card-skeleton {
+  pointer-events: none;
+}
+
+.ec-project-skeleton-preview {
+  min-height: 104px;
+  width: 100%;
+}
+
 @media (max-width: 900px) {
   .ec-route-skeleton--editor {
     grid-template-columns: minmax(150px, 210px) minmax(0, 1fr);
