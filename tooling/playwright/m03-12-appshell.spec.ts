@@ -84,7 +84,10 @@ test.describe('M03.12 AppShell E2E closure matrix', () => {
         const dock = page.getByRole('navigation', { name: 'Navegación inferior del editor' });
         await expect(dock).toBeVisible();
         await expect(dock.locator('[data-mobile-destination]')).toHaveCount(5);
-        await expect(page.locator('[data-appearance-trigger="mobile"]')).toBeVisible();
+        await dock.locator('[data-mobile-destination="more"]').click();
+        const moreSheet = page.locator('[data-editor-mobile-sheet="outline"]');
+        await expect(moreSheet).toBeVisible();
+        await expect(moreSheet.locator('[data-appearance-trigger="mobile"]')).toBeVisible();
       }
 
       await assertNoHorizontalOverflow(page);
@@ -144,8 +147,13 @@ test.describe('M03.12 AppShell E2E closure matrix', () => {
     await page.setViewportSize({ width: 1280, height: 820 });
     await page.goto('/queries');
     await expect(page.getByRole('button', { name: '¿Qué puedo hacer aquí?' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Deshacer' })).toBeDisabled();
-    await expect(page.getByRole('button', { name: 'Rehacer' })).toBeDisabled();
+
+    await page.locator('.ec-topbar-tools-trigger').click();
+    const toolsSheet = page.locator('.ec-topbar-sheet:visible');
+    await expect(toolsSheet.getByRole('button', { name: 'Deshacer' })).toBeDisabled();
+    await expect(toolsSheet.getByRole('button', { name: 'Rehacer' })).toBeDisabled();
+    await page.keyboard.press('Escape');
+
     await expect(page.locator('.ec-app-shell-statusbar')).toContainText('Listo');
 
     await page.goto('/ruta-inexistente-m03-12');
