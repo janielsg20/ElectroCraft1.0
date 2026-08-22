@@ -72,13 +72,13 @@ test.describe('UI/UX style gallery', () => {
     await sheet.locator('[data-appearance-apply]').click();
     await page.reload();
 
-    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecAppearanceProfile)).toBe(
-      'Carbon personalizado',
-    );
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.dataset.ecAppearanceProfile))
+      .toBe('Carbon personalizado');
     await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecMarketLayout)).toBe('ide');
-    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecMarketPreset)).toBe(
-      'market:studio-carbon',
-    );
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.dataset.ecMarketPreset))
+      .toBe('market:studio-carbon');
   });
 
   test('changes computed shell treatment between technical and floating-builder presets', async ({ page }) => {
@@ -87,14 +87,22 @@ test.describe('UI/UX style gallery', () => {
     const sheet = await openDesktopAppearance(page);
 
     await sheet.locator('[data-market-style-select="market:studio-carbon"]').click();
-    const carbonRadius = await page.locator('.ec-app-shell-sidebar').evaluate((element) => getComputedStyle(element).borderRadius);
-    const carbonShadow = await page.locator('.ec-app-shell-sidebar').evaluate((element) => getComputedStyle(element).boxShadow);
+    const carbonRadius = await page
+      .locator('.ec-app-shell-sidebar')
+      .evaluate((element) => getComputedStyle(element).borderRadius);
+    const carbonShadow = await page
+      .locator('.ec-app-shell-sidebar')
+      .evaluate((element) => getComputedStyle(element).boxShadow);
     expect(carbonRadius).toBe('0px');
     expect(carbonShadow).toBe('none');
 
     await sheet.locator('[data-market-style-select="market:canvas-atelier"]').click();
-    const atelierRadius = await page.locator('.ec-app-shell-sidebar').evaluate((element) => getComputedStyle(element).borderRadius);
-    const atelierShadow = await page.locator('.ec-app-shell-sidebar').evaluate((element) => getComputedStyle(element).boxShadow);
+    const atelierRadius = await page
+      .locator('.ec-app-shell-sidebar')
+      .evaluate((element) => getComputedStyle(element).borderRadius);
+    const atelierShadow = await page
+      .locator('.ec-app-shell-sidebar')
+      .evaluate((element) => getComputedStyle(element).boxShadow);
     expect(atelierRadius).not.toBe('0px');
     expect(atelierShadow).not.toBe('none');
   });

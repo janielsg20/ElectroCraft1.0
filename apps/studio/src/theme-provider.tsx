@@ -1,9 +1,6 @@
 import { ThemeProvider } from '@electrocraft/design-system';
 import { createContext, useContext, useEffect, useMemo, useState, type PropsWithChildren } from 'react';
-import {
-  MARKET_STUDIO_APPEARANCE_PRESETS,
-  resolveMarketAppearanceDescriptor,
-} from './market-appearance-presets';
+import { MARKET_STUDIO_APPEARANCE_PRESETS, resolveMarketAppearanceDescriptor } from './market-appearance-presets';
 import './shell/appearance-market.css';
 import {
   BUILT_IN_STUDIO_APPEARANCE_PRESETS,
@@ -93,17 +90,10 @@ export function StudioAppearanceProvider({ storage, presetStorage, children }: S
     resolvedProfile.animationIntensity,
     systemReducedMotion,
   );
-  const resolvedMarketDescriptor = useMemo(
-    () => resolveMarketAppearanceDescriptor(resolvedProfile),
-    [resolvedProfile],
-  );
+  const resolvedMarketDescriptor = useMemo(() => resolveMarketAppearanceDescriptor(resolvedProfile), [resolvedProfile]);
   const presets = useMemo(
     () =>
-      Object.freeze([
-        ...BUILT_IN_STUDIO_APPEARANCE_PRESETS,
-        ...MARKET_STUDIO_APPEARANCE_PRESETS,
-        ...personalPresets,
-      ]),
+      Object.freeze([...BUILT_IN_STUDIO_APPEARANCE_PRESETS, ...MARKET_STUDIO_APPEARANCE_PRESETS, ...personalPresets]),
     [personalPresets],
   );
   const accessibilityWarnings = useMemo(

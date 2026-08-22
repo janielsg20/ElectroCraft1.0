@@ -1,20 +1,7 @@
-import {
-  DEFAULT_EDITOR_APPEARANCE_PROFILE,
-  type StudioAppearancePreset,
-  type StudioAppearanceProfile,
-} from './theme';
+import { DEFAULT_EDITOR_APPEARANCE_PROFILE, type StudioAppearancePreset, type StudioAppearanceProfile } from './theme';
 
 export type MarketAppearanceLayout =
-  | 'ide'
-  | 'canvas'
-  | 'cms'
-  | 'commerce'
-  | 'data'
-  | 'minimal'
-  | 'glass'
-  | 'brutal'
-  | 'soft'
-  | 'zen';
+  'ide' | 'canvas' | 'cms' | 'commerce' | 'data' | 'minimal' | 'glass' | 'brutal' | 'soft' | 'zen';
 
 export interface MarketAppearanceDescriptor {
   readonly presetId: string;
@@ -479,11 +466,7 @@ function matchesVisualProfile(candidate: StudioAppearanceProfile, expected: Stud
   return visualProfileKeys.every((key) => candidate[key] === expected[key]);
 }
 
-export function resolveMarketAppearanceDescriptor(
-  profile: StudioAppearanceProfile,
-): MarketAppearanceDescriptor | null {
-  const preset = MARKET_STUDIO_APPEARANCE_PRESETS.find((candidate) =>
-    matchesVisualProfile(profile, candidate.profile),
-  );
-  return preset ? MARKET_APPEARANCE_DESCRIPTOR_BY_ID.get(preset.id) ?? null : null;
+export function resolveMarketAppearanceDescriptor(profile: StudioAppearanceProfile): MarketAppearanceDescriptor | null {
+  const preset = MARKET_STUDIO_APPEARANCE_PRESETS.find((candidate) => matchesVisualProfile(profile, candidate.profile));
+  return preset ? (MARKET_APPEARANCE_DESCRIPTOR_BY_ID.get(preset.id) ?? null) : null;
 }

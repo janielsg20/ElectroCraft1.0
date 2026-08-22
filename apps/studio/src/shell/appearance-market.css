@@ -518,10 +518,14 @@
 @keyframes ec-market-aurora-drift {
   0%,
   100% {
-    background-position: 0% 0%, 100% 100%;
+    background-position:
+      0% 0%,
+      100% 100%;
   }
   50% {
-    background-position: 30% 10%, 70% 85%;
+    background-position:
+      30% 10%,
+      70% 85%;
   }
 }
 
@@ -589,7 +593,9 @@
 }
 
 :root[data-ec-market-layout='ide'] .ec-editor-canvas-stage {
-  background-size: 12px 12px, 100% 100%;
+  background-size:
+    12px 12px,
+    100% 100%;
 }
 
 :root[data-ec-market-layout='ide'] .ec-app-shell[data-status='saving'] .ec-app-shell-statusbar {
@@ -741,8 +747,12 @@
   transform: translateX(2px) scale(1.08);
 }
 
-:root[data-ec-market-layout='data'][data-ec-motion='standard'] .ec-app-shell[data-status='saving'] .ec-app-shell-status-dot,
-:root[data-ec-market-layout='data'][data-ec-motion='high'] .ec-app-shell[data-status='saving'] .ec-app-shell-status-dot {
+:root[data-ec-market-layout='data'][data-ec-motion='standard']
+  .ec-app-shell[data-status='saving']
+  .ec-app-shell-status-dot,
+:root[data-ec-market-layout='data'][data-ec-motion='high']
+  .ec-app-shell[data-status='saving']
+  .ec-app-shell-status-dot {
   animation: ec-market-data-scan 700ms steps(2, jump-none) infinite;
 }
 
@@ -788,7 +798,10 @@
     radial-gradient(circle at 10% 10%, color-mix(in oklab, var(--ec-violet) 24%, transparent), transparent 30%),
     radial-gradient(circle at 90% 90%, color-mix(in oklab, var(--ec-rose) 18%, transparent), transparent 32%),
     var(--background);
-  background-size: 130% 130%, 130% 130%, auto;
+  background-size:
+    130% 130%,
+    130% 130%,
+    auto;
 }
 
 :root[data-ec-market-layout='glass'][data-ec-motion='high'] .ec-app-shell {

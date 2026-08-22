@@ -1,10 +1,7 @@
 import { Button, getStudioIcon } from '@electrocraft/design-system';
 import { FrameworkThemeCard } from '@electrocraft/design-system/framework-themes';
 import { useState } from 'react';
-import {
-  MARKET_APPEARANCE_DESCRIPTOR_BY_ID,
-  type MarketAppearanceDescriptor,
-} from '../market-appearance-presets';
+import { MARKET_APPEARANCE_DESCRIPTOR_BY_ID, type MarketAppearanceDescriptor } from '../market-appearance-presets';
 import type { StudioAppearancePreset } from '../theme';
 
 const EditorIcon = getStudioIcon('studio.sidebar.editor');

@@ -17,9 +17,9 @@ describe('market-inspired Studio appearance presets', () => {
 
     expect(ids.size).toBe(10);
     expect(layouts.size).toBe(10);
-    expect(
-      MARKET_STUDIO_APPEARANCE_PRESETS.every((preset) => MARKET_APPEARANCE_DESCRIPTOR_BY_ID.has(preset.id)),
-    ).toBe(true);
+    expect(MARKET_STUDIO_APPEARANCE_PRESETS.every((preset) => MARKET_APPEARANCE_DESCRIPTOR_BY_ID.has(preset.id))).toBe(
+      true,
+    );
   });
 
   it('keeps every design accessible, high-density capable and intentionally differentiated', () => {
