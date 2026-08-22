@@ -18,10 +18,165 @@
         document.documentElement.dataset.ecTheme = 'light';
       }
     </script>
+    <style>
+      body {
+        margin: 0;
+      }
+      #ec-boot-shell {
+        --boot-bg: #f8fafc;
+        --boot-surface: #ffffff;
+        --boot-border: #e2e8f0;
+        --boot-muted: #e8edf3;
+        height: 100dvh;
+        display: grid;
+        grid-template-columns: 224px minmax(0, 1fr);
+        grid-template-rows: 48px minmax(0, 1fr) 24px;
+        overflow: hidden;
+        background: var(--boot-bg);
+        color: #0f172a;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+      html[data-ec-theme='dark'] #ec-boot-shell {
+        --boot-bg: #111827;
+        --boot-surface: #172033;
+        --boot-border: #2b364a;
+        --boot-muted: #263247;
+        color: #f8fafc;
+      }
+      .ec-boot-sidebar {
+        grid-row: 1 / 4;
+        padding: 12px;
+        border-right: 1px solid var(--boot-border);
+        background: var(--boot-surface);
+      }
+      .ec-boot-topbar,
+      .ec-boot-statusbar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-inline: 14px;
+        border-bottom: 1px solid var(--boot-border);
+        background: var(--boot-surface);
+      }
+      .ec-boot-statusbar {
+        border-top: 1px solid var(--boot-border);
+        border-bottom: 0;
+      }
+      .ec-boot-workspace {
+        display: grid;
+        align-content: start;
+        gap: 12px;
+        padding: 18px;
+      }
+      .ec-boot-line,
+      .ec-boot-card {
+        border-radius: 6px;
+        background: var(--boot-muted);
+      }
+      .ec-boot-line {
+        height: 12px;
+      }
+      .ec-boot-brand {
+        width: 116px;
+        height: 24px;
+        margin-bottom: 24px;
+      }
+      .ec-boot-nav {
+        display: grid;
+        gap: 12px;
+      }
+      .ec-boot-nav .ec-boot-line:nth-child(2n) {
+        width: 78%;
+      }
+      .ec-boot-topbar .ec-boot-line:first-child {
+        width: 128px;
+      }
+      .ec-boot-topbar .ec-boot-line:last-child {
+        width: 72px;
+        margin-left: auto;
+      }
+      .ec-boot-heading {
+        width: 180px;
+        height: 20px;
+      }
+      .ec-boot-toolbar {
+        height: 40px;
+        border: 1px solid var(--boot-border);
+        border-radius: 8px;
+        background: var(--boot-surface);
+      }
+      .ec-boot-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 10px;
+      }
+      .ec-boot-card {
+        min-height: 148px;
+        border: 1px solid var(--boot-border);
+        background: var(--boot-surface);
+      }
+      .ec-boot-sr {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      @media (max-width: 767px) {
+        #ec-boot-shell {
+          grid-template-columns: 1fr;
+        }
+        .ec-boot-sidebar {
+          display: none;
+        }
+        .ec-boot-workspace {
+          padding: 12px;
+        }
+        .ec-boot-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
     <title>ElectroCraft — Desarrollo</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div id="ec-boot-shell" role="status" aria-live="polite" aria-label="Cargando ElectroCraft Studio">
+        <span class="ec-boot-sr">Cargando la interfaz base de ElectroCraft Studio</span>
+        <aside class="ec-boot-sidebar" aria-hidden="true">
+          <div class="ec-boot-line ec-boot-brand"></div>
+          <div class="ec-boot-nav">
+            <div class="ec-boot-line"></div>
+            <div class="ec-boot-line"></div>
+            <div class="ec-boot-line"></div>
+            <div class="ec-boot-line"></div>
+            <div class="ec-boot-line"></div>
+            <div class="ec-boot-line"></div>
+          </div>
+        </aside>
+        <header class="ec-boot-topbar" aria-hidden="true">
+          <div class="ec-boot-line"></div>
+          <div class="ec-boot-line"></div>
+        </header>
+        <main class="ec-boot-workspace" aria-hidden="true">
+          <div class="ec-boot-line ec-boot-heading"></div>
+          <div class="ec-boot-toolbar"></div>
+          <div class="ec-boot-grid">
+            <div class="ec-boot-card"></div>
+            <div class="ec-boot-card"></div>
+            <div class="ec-boot-card"></div>
+            <div class="ec-boot-card"></div>
+          </div>
+        </main>
+        <footer class="ec-boot-statusbar" aria-hidden="true">
+          <div class="ec-boot-line" style="width: 92px"></div>
+        </footer>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
