@@ -1,0 +1,53 @@
+name: Temporary UI UX Product Design Wiring
+
+on:
+  push:
+    branches:
+      - codex/ui-ux-style-gallery
+    paths:
+      - '.github/workflows/ui-ux-wire-product-design.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  wire-and-remove-self:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: codex/ui-ux-style-gallery
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Wire persistent product design identity into gallery
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('apps/studio/src/shell/appearance-panel.tsx')
+          text = path.read_text()
+          old = '''              <AppearanceFrameworkGallery
+                presets={frameworkPresets}
+                resolvedName={resolvedProfile.name}
+                onSelect={previewPreset}
+              />'''
+          new = '''              <AppearanceFrameworkGallery
+                presets={frameworkPresets}
+                resolvedName={resolvedProfile.name}
+                resolvedProductDesign={resolvedProfile.productDesign}
+                onSelect={previewPreset}
+              />'''
+          if old not in text:
+              raise SystemExit('AppearanceFrameworkGallery wiring anchor not found')
+          path.write_text(text.replace(old, new, 1))
+          PY
+      - name: Remove temporary workflow and commit
+        run: |
+          rm .github/workflows/ui-ux-wire-product-design.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m 'fix: keep active product design selected'
+          git push origin HEAD:codex/ui-ux-style-gallery
