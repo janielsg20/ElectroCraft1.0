@@ -5,11 +5,17 @@ on:
   pull_request:
     paths:
       - 'apps/studio/index.html'
+      - 'apps/studio/src/App.tsx'
       - 'apps/studio/src/theme.ts'
       - 'apps/studio/src/theme-provider.tsx'
       - 'apps/studio/src/i18n/appearance.es.ts'
+      - 'apps/studio/src/features/projects/project-home.tsx'
+      - 'apps/studio/src/features/projects/project-home.css'
+      - 'apps/studio/src/features/projects/new-project-wizard.tsx'
       - 'apps/studio/src/shell/appearance-panel.tsx'
       - 'apps/studio/src/shell/appearance.css'
+      - 'apps/studio/src/shell/loading-ui.tsx'
+      - 'apps/studio/src/shell/loading-ui.css'
       - 'packages/design-system/package.json'
       - 'packages/design-system/components.json'
       - 'packages/design-system/src/index.ts'
@@ -20,6 +26,7 @@ on:
       - 'tooling/vitest/unit/editor-appearance-profile.test.ts'
       - 'tooling/vitest/contract/editor-appearance-isolation.test.ts'
       - 'tooling/vitest/contract/single-studio-theme-boundary.test.ts'
+      - 'tooling/vitest/contract/progressive-loading-boundary.test.ts'
       - 'tooling/vitest/integration/editor-appearance-runtime.test.ts'
       - 'tooling/playwright/m03-9-appearance.spec.ts'
       - '.ai/DESIGN_SYSTEM.md'
@@ -29,6 +36,7 @@ on:
       - '.ai/MEMORY.md'
       - '.ai/DECISIONS.md'
       - '.ai/adr/ADR-STUDIO-SINGLE-SHADCN-RADIX-THEME.md'
+      - '.ai/adr/ADR-STUDIO-PROGRESSIVE-LOADING.md'
       - '.github/workflows/m03-9-appearance.yml'
   push:
     branches:
@@ -36,11 +44,17 @@ on:
       - codex/single-shadcn-radix-theme
     paths:
       - 'apps/studio/index.html'
+      - 'apps/studio/src/App.tsx'
       - 'apps/studio/src/theme.ts'
       - 'apps/studio/src/theme-provider.tsx'
       - 'apps/studio/src/i18n/appearance.es.ts'
+      - 'apps/studio/src/features/projects/project-home.tsx'
+      - 'apps/studio/src/features/projects/project-home.css'
+      - 'apps/studio/src/features/projects/new-project-wizard.tsx'
       - 'apps/studio/src/shell/appearance-panel.tsx'
       - 'apps/studio/src/shell/appearance.css'
+      - 'apps/studio/src/shell/loading-ui.tsx'
+      - 'apps/studio/src/shell/loading-ui.css'
       - 'packages/design-system/package.json'
       - 'packages/design-system/components.json'
       - 'packages/design-system/src/index.ts'
@@ -51,6 +65,7 @@ on:
       - 'tooling/vitest/unit/editor-appearance-profile.test.ts'
       - 'tooling/vitest/contract/editor-appearance-isolation.test.ts'
       - 'tooling/vitest/contract/single-studio-theme-boundary.test.ts'
+      - 'tooling/vitest/contract/progressive-loading-boundary.test.ts'
       - 'tooling/vitest/integration/editor-appearance-runtime.test.ts'
       - 'tooling/playwright/m03-9-appearance.spec.ts'
       - '.ai/DESIGN_SYSTEM.md'
@@ -60,6 +75,7 @@ on:
       - '.ai/MEMORY.md'
       - '.ai/DECISIONS.md'
       - '.ai/adr/ADR-STUDIO-SINGLE-SHADCN-RADIX-THEME.md'
+      - '.ai/adr/ADR-STUDIO-PROGRESSIVE-LOADING.md'
       - '.github/workflows/m03-9-appearance.yml'
 
 permissions:
@@ -109,14 +125,22 @@ jobs:
           npx prettier --check
           .github/workflows/m03-9-appearance.yml
           apps/studio/index.html
+          apps/studio/src/App.tsx
           apps/studio/src/theme.ts
           apps/studio/src/theme-provider.tsx
           apps/studio/src/i18n/appearance.es.ts
+          apps/studio/src/features/projects/project-home.tsx
+          apps/studio/src/features/projects/project-home.css
+          apps/studio/src/features/projects/new-project-wizard.tsx
           apps/studio/src/shell/appearance-panel.tsx
           apps/studio/src/shell/appearance.css
+          apps/studio/src/shell/loading-ui.tsx
+          apps/studio/src/shell/loading-ui.css
           packages/design-system/package.json
           packages/design-system/components.json
           packages/design-system/src/index.ts
+          packages/design-system/src/components/ui/loader.tsx
+          packages/design-system/src/components/ui/skeleton.tsx
           packages/design-system/src/styles/globals.css
           packages/design-system/src/styles/tokens.css
           packages/design-system/src/styles/studio-appearance-tokens.css
@@ -124,6 +148,7 @@ jobs:
           tooling/vitest/unit/editor-appearance-profile.test.ts
           tooling/vitest/contract/editor-appearance-isolation.test.ts
           tooling/vitest/contract/single-studio-theme-boundary.test.ts
+          tooling/vitest/contract/progressive-loading-boundary.test.ts
           tooling/vitest/integration/editor-appearance-runtime.test.ts
           tooling/playwright/m03-9-appearance.spec.ts
           .ai/DESIGN_SYSTEM.md
@@ -133,6 +158,7 @@ jobs:
           .ai/MEMORY.md
           .ai/DECISIONS.md
           .ai/adr/ADR-STUDIO-SINGLE-SHADCN-RADIX-THEME.md
+          .ai/adr/ADR-STUDIO-PROGRESSIVE-LOADING.md
 
       - name: Execute dedicated unit contract integration suite
         run: >-
@@ -140,6 +166,7 @@ jobs:
           tooling/vitest/unit/editor-appearance-profile.test.ts
           tooling/vitest/contract/editor-appearance-isolation.test.ts
           tooling/vitest/contract/single-studio-theme-boundary.test.ts
+          tooling/vitest/contract/progressive-loading-boundary.test.ts
           tooling/vitest/integration/editor-appearance-runtime.test.ts
 
       - name: Install Playwright Chromium
