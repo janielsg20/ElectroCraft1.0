@@ -91,10 +91,13 @@
   grid-template-columns: repeat(5, minmax(0, 1fr));
   align-items: stretch;
   border-top: 1px solid var(--border);
-  background: var(--surface);
+  background: color-mix(in oklab, var(--surface) 94%, transparent);
+  box-shadow: 0 -8px 24px color-mix(in oklab, var(--overlay) 12%, transparent);
+  backdrop-filter: blur(14px) saturate(135%);
 }
 
 .ec-editor-mobile-action {
+  --ec-mobile-tone: var(--primary);
   min-width: 0;
   min-height: 58px;
   display: grid;
@@ -113,12 +116,32 @@
   text-decoration: none;
 }
 
+.ec-editor-mobile-action[data-mobile-destination='components'] {
+  --ec-mobile-tone: var(--ec-violet);
+}
+
+.ec-editor-mobile-action[data-mobile-destination='screens'] {
+  --ec-mobile-tone: var(--ec-cyan);
+}
+
+.ec-editor-mobile-action[data-mobile-destination='canvas'] {
+  --ec-mobile-tone: var(--ec-sky);
+}
+
+.ec-editor-mobile-action[data-mobile-destination='properties'] {
+  --ec-mobile-tone: var(--ec-amber);
+}
+
+.ec-editor-mobile-action[data-mobile-destination='more'] {
+  --ec-mobile-tone: var(--ec-rose);
+}
+
 .ec-editor-mobile-action:hover,
 .ec-editor-mobile-action:focus-visible,
 .ec-editor-mobile-action[aria-current='page'],
 .ec-editor-mobile-action[aria-pressed='true'] {
-  background: var(--accent);
-  color: var(--primary);
+  background: color-mix(in oklab, var(--ec-mobile-tone) 10%, var(--surface));
+  color: var(--ec-mobile-tone);
 }
 
 .ec-editor-mobile-action[aria-current='page']::before,
@@ -128,7 +151,8 @@
   width: 28px;
   height: 2px;
   border-radius: 999px;
-  background: var(--primary);
+  background: var(--ec-mobile-tone);
+  box-shadow: 0 0 10px color-mix(in oklab, var(--ec-mobile-tone) 45%, transparent);
   content: '';
 }
 
@@ -147,6 +171,15 @@
 .ec-editor-mobile-action svg {
   width: 20px;
   height: 20px;
+  color: color-mix(in oklab, var(--ec-mobile-tone) 74%, var(--muted-foreground));
+  transition: transform var(--ec-normal) var(--ec-ease-out);
+}
+
+.ec-editor-mobile-action:hover svg,
+.ec-editor-mobile-action:focus-visible svg,
+.ec-editor-mobile-action[aria-current='page'] svg,
+.ec-editor-mobile-action[aria-pressed='true'] svg {
+  transform: translateY(-2px) scale(1.08);
 }
 
 .ec-editor-mobile-action span {

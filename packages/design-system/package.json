@@ -4,18 +4,30 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./framework-themes": "./src/components/framework/index.ts"
   },
   "files": [
     "components.json",
     "src"
   ],
   "dependencies": {
+    "@ark-ui/react": "5.39.0",
+    "@base-ui/react": "1.7.0",
     "@electrocraft/domain": "0.0.0-m01.3",
+    "@headlessui/react": "2.2.10",
+    "@heroui/react": "3.2.4",
+    "@heroui/styles": "3.2.4",
+    "@react-aria/i18n": "3.13.1",
+    "@react-aria/ssr": "3.10.1",
+    "@react-aria/utils": "3.34.1",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "lucide-react": "1.31.0",
+    "motion": "13.1.1",
     "radix-ui": "1.6.7",
+    "react-aria": "3.51.0",
+    "react-aria-components": "1.20.0",
     "tailwind-merge": "3.6.0"
   },
   "peerDependencies": {
@@ -26,5 +38,8 @@
     "#components/*": "./src/components/*.tsx",
     "#lib/*": "./src/lib/*.ts",
     "#hooks/*": "./src/hooks/*.ts"
+  },
+  "devDependencies": {
+    "daisyui": "5.7.20"
   }
 }

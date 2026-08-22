@@ -1,4 +1,5 @@
 # PROMPT MAESTRO — ELECTROCRAFT
+
 ## Octava revisión final — Builder de Apps No-Code, español, multi-target y asistido por Gemini
 
 # 0. Este documento manda
@@ -8,6 +9,7 @@ Este archivo es el contrato principal para construir ElectroCraft.
 ElectroCraft debe desarrollarse como un **Builder de Apps No-Code** desde la primera línea de arquitectura.
 
 No es:
+
 - un gestor PDF;
 - un CMS con un editor visual añadido;
 - un clon de WordPress;
@@ -24,6 +26,7 @@ Si la microfase dice:
 la IA debe ejecutar sus pasos, generar archivos reales, instalar/activar en fixture, ejecutar pruebas y registrar evidencia.
 
 No se acepta:
+
 - placeholder;
 - botón sin backend;
 - opción sin efecto;
@@ -50,6 +53,7 @@ Promesa:
 > Construir una aplicación completa visualmente a partir de Pantallas, Componentes, Navegación, Datos, Estado, Acciones, Formularios, Usuarios y Recursos, probarla y exportarla a distintos runtimes sin que el usuario necesite programar.
 
 ElectroCraft puede crear:
+
 - Web Apps;
 - sitios;
 - PWA;
@@ -95,6 +99,7 @@ App
 Todo feature nuevo debe encajar primero en este modelo.
 
 Si no encaja:
+
 1. revisar Core/Preset/Block/Binding/Action/Provider;
 2. revisar target adapter;
 3. revisar OSS engine;
@@ -161,6 +166,7 @@ La agrupación NO significa prioridad.
 No significa usar la misma tecnología en todos.
 
 Significa:
+
 - todos aparecen en Compatibilidad;
 - todos aparecen en Exportar;
 - todos tienen TargetDescriptor;
@@ -282,6 +288,7 @@ Stack:
 - Tailwind;
 - shadcn/ui;
 - **Radix base fijada explícitamente**;
+- adapters de tema Aceternity/Magic, daisyUI, Headless UI, Ark/Base UI y HeroUI/NextUI bajo ownership exclusivo del Design System;
 - Lucide;
 - i18next;
 - selected AI Elements.
@@ -291,7 +298,7 @@ La base no depende del default actual del CLI.
 Inicialización usa el equivalente oficial actual:
 `shadcn init --base radix`.
 
-No mezclar Radix / Base UI / React Aria dentro del Design System sin ADR.
+Radix conserva ownership de AppShell, overlays, portales y foco. La convivencia multi-framework se limita a temas/adapters según `ADR-STUDIO-MULTI-FRAMEWORK-THEMES.md`; ningún feature importa esas primitivas directamente.
 
 Razón del Radix pin:
 Generar con IA es Core y utiliza AI Elements seleccionados.
@@ -302,6 +309,7 @@ Una foundation coherente evita mezclar primitive contracts.
 # 9. Skills obligatorias para UI
 
 Antes de implementar UI:
+
 1. cargar skill shadcn;
 2. cargar skill UI/UX/Layout/Accessibility disponible;
 3. consultar docs oficiales actuales;
@@ -326,6 +334,7 @@ High Density.
 Canvas dominante.
 
 High Density no significa:
+
 - 22px buttons;
 - texto ilegible;
 - acciones siempre visibles;
@@ -351,8 +360,7 @@ Desktop:
 Sidebar:
 240 expanded / 64 collapsed.
 
-Topbar:
-52.
+Topbar: 52.
 
 Context:
 288 default / 240 min / 380 max.
@@ -363,14 +371,14 @@ flex:1.
 Inspector:
 320 default / 280 min / 440 max.
 
-Status:
-26.
+Status: 26.
 
 ---
 
 # 12. Sidebar exacto
 
 ## CONSTRUIR
+
 Editor
 Pantallas
 Componentes
@@ -378,31 +386,37 @@ Plantillas
 Generar con IA
 
 ## DATOS
+
 Registros
 Modelos
 Fuentes de datos
 Consultas
 
 ## LÓGICA
+
 Acciones y workflows
 Estado y variables
 Formularios
 
 ## APP
+
 Navegación
 Usuarios y permisos
 Administración
 
 ## RECURSOS
+
 Medios
 Extensiones
 
 ## APARIENCIA
+
 Temas
 Sistema de diseño
 Tokens
 
 ## PUBLICAR
+
 Vista previa
 Compatibilidad
 Exportar
@@ -422,6 +436,7 @@ Center contextual:
 document/screen/platform/breakpoint/undo/redo/zoom.
 
 Right:
+
 1. Vista previa
 2. Exportar
 3. Estado local
@@ -1370,6 +1385,7 @@ artifact checksum.
 First-class.
 
 Output:
+
 1. Block Theme ZIP.
 2. Companion Plugin ZIP.
 
@@ -1763,6 +1779,7 @@ decirlo.
 No está terminado hasta que:
 
 Studio:
+
 - español;
 - Help;
 - responsive;
@@ -1770,6 +1787,7 @@ Studio:
 - no fake UI.
 
 Builder:
+
 - projects/persistence;
 - Screen Composer;
 - Navigation;
@@ -1786,6 +1804,7 @@ Builder:
 - Extensions/App Templates.
 
 AI:
+
 - Gemini;
 - AI SDK;
 - AI Elements UI;
@@ -1795,6 +1814,7 @@ AI:
 - Apply/revision.
 
 Export:
+
 - TargetRegistry nine targets;
 - Compatibility all nine;
 - Export Center all nine;
@@ -1809,6 +1829,7 @@ Export:
 - WordPress verified.
 
 Quality:
+
 - security;
 - a11y;
 - performance;

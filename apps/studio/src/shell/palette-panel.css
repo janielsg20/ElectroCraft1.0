@@ -4,14 +4,15 @@
   min-height: 0;
   height: 100%;
   flex-direction: column;
-  background: hsl(var(--background));
+  background: var(--background);
 }
 
 .ec-palette-header {
   display: grid;
   gap: 8px;
   padding: 8px;
-  border-bottom: 1px solid hsl(var(--border));
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, color-mix(in oklab, var(--ec-violet) 7%, var(--background)), var(--background));
 }
 
 .ec-palette-heading {
@@ -25,6 +26,8 @@
   width: 18px;
   height: 18px;
   margin-top: 1px;
+  color: var(--ec-violet);
+  filter: drop-shadow(0 2px 5px color-mix(in oklab, var(--ec-violet) 30%, transparent));
 }
 
 .ec-palette-heading h2,
@@ -42,7 +45,7 @@
 
 .ec-palette-heading p,
 .ec-palette-keyboard-help {
-  color: hsl(var(--muted-foreground));
+  color: var(--muted-foreground);
   font-size: 10px;
   line-height: 14px;
 }
@@ -65,7 +68,7 @@
   width: 14px;
   height: 14px;
   transform: translateY(-50%);
-  color: hsl(var(--muted-foreground));
+  color: var(--muted-foreground);
   pointer-events: none;
 }
 
@@ -87,8 +90,17 @@
 }
 
 .ec-palette-section {
+  --ec-palette-tone: var(--ec-violet);
   display: grid;
   gap: 5px;
+}
+
+.ec-palette-section:nth-of-type(3n + 2) {
+  --ec-palette-tone: var(--ec-cyan);
+}
+
+.ec-palette-section:nth-of-type(3n) {
+  --ec-palette-tone: var(--ec-amber);
 }
 
 .ec-palette-section-header {
@@ -103,16 +115,16 @@
   font-size: 11px;
   line-height: 16px;
   font-weight: 650;
-  color: hsl(var(--foreground));
+  color: color-mix(in oklab, var(--ec-palette-tone) 76%, var(--foreground));
 }
 
 .ec-palette-section-header span {
   min-width: 20px;
   border-radius: 999px;
-  background: hsl(var(--muted));
+  background: color-mix(in oklab, var(--ec-palette-tone) 10%, var(--muted));
   padding: 1px 5px;
   text-align: center;
-  color: hsl(var(--muted-foreground));
+  color: var(--muted-foreground);
   font-size: 9px;
   line-height: 14px;
 }
@@ -132,14 +144,14 @@
 .ec-palette-item {
   position: relative;
   min-width: 0;
-  border: 1px solid hsl(var(--border));
+  border: 1px solid var(--border);
   border-radius: 7px;
-  background: hsl(var(--card));
+  background: var(--card);
   overflow: hidden;
 }
 
 .ec-palette-item:focus-within {
-  outline: 2px solid hsl(var(--ring));
+  outline: 2px solid var(--ring);
   outline-offset: 1px;
 }
 
@@ -160,7 +172,7 @@
 }
 
 .ec-palette-item-main:hover {
-  background: hsl(var(--accent));
+  background: color-mix(in oklab, var(--ec-palette-tone) 9%, var(--accent));
 }
 
 .ec-palette-item-main:focus-visible,
@@ -175,13 +187,18 @@
   width: 22px;
   height: 22px;
   border-radius: 5px;
-  background: hsl(var(--muted));
-  color: hsl(var(--foreground));
+  background: color-mix(in oklab, var(--ec-palette-tone) 12%, var(--muted));
+  color: var(--ec-palette-tone);
+  transition: transform var(--ec-normal) var(--ec-ease-out);
 }
 
 .ec-palette-item-icon svg {
   width: 13px;
   height: 13px;
+}
+
+.ec-palette-item-main:hover .ec-palette-item-icon {
+  transform: rotate(-5deg) scale(1.08);
 }
 
 .ec-palette-item-copy {
@@ -207,7 +224,7 @@
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
-  color: hsl(var(--muted-foreground));
+  color: var(--muted-foreground);
   font-size: 9px;
   line-height: 13px;
 }
@@ -216,10 +233,10 @@
   grid-column: 1 / -1;
   grid-row: 2;
   justify-self: start;
-  border: 1px solid hsl(var(--border));
+  border: 1px solid var(--border);
   border-radius: 999px;
   padding: 0 5px;
-  color: hsl(var(--muted-foreground));
+  color: var(--muted-foreground);
   font-size: 8px;
   line-height: 13px;
   letter-spacing: 0.02em;
@@ -236,34 +253,35 @@
   border: 0;
   border-radius: 5px;
   background: transparent;
-  color: hsl(var(--muted-foreground));
+  color: var(--muted-foreground);
   cursor: pointer;
 }
 
 .ec-palette-favorite:hover {
-  background: hsl(var(--accent));
-  color: hsl(var(--foreground));
+  background: color-mix(in oklab, var(--ec-amber) 12%, var(--accent));
+  color: var(--ec-amber);
+  transform: rotate(10deg) scale(1.08);
 }
 
 .ec-palette-favorite[aria-pressed='true'] {
-  color: hsl(var(--foreground));
+  color: var(--ec-amber);
 }
 
 .ec-palette-empty,
 .ec-palette-diagnostic {
   display: grid;
   gap: 4px;
-  border: 1px dashed hsl(var(--border));
+  border: 1px dashed var(--border);
   border-radius: 7px;
   padding: 9px;
-  background: hsl(var(--muted) / 0.35);
-  color: hsl(var(--muted-foreground));
+  background: color-mix(in oklab, var(--muted) 35%, transparent);
+  color: var(--muted-foreground);
   font-size: 10px;
   line-height: 14px;
 }
 
 .ec-palette-empty strong {
-  color: hsl(var(--foreground));
+  color: var(--foreground);
 }
 
 .ec-palette-diagnostic {
@@ -295,7 +313,7 @@
 }
 
 .ec-palette-diagnostic dt {
-  color: hsl(var(--foreground));
+  color: var(--foreground);
   font-weight: 600;
 }
 
@@ -316,7 +334,7 @@
     position: sticky;
     top: 0;
     z-index: 2;
-    background: hsl(var(--background));
+    background: var(--background);
   }
 
   .ec-palette-item-main {

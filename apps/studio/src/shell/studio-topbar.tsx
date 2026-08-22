@@ -81,6 +81,7 @@ const ZoomIcon = getStudioIcon('studio.topbar.zoom');
 const PreviewIcon = getStudioIcon('studio.sidebar.preview');
 const ExportIcon = getStudioIcon('studio.sidebar.export');
 const SettingsIcon = getStudioIcon('studio.settings');
+const AppearanceIcon = getStudioIcon('studio.theme');
 const CloseIcon = getStudioIcon('window.close');
 
 function subscribeViewport(listener: () => void) {
@@ -269,7 +270,10 @@ export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help 
                 aria-labelledby="workspace-settings-title"
                 data-information-level="primary"
               >
-                <h2 id="workspace-settings-title">{copy.workspaceSettingsTitle}</h2>
+                <h2 id="workspace-settings-title">
+                  <SettingsIcon aria-hidden="true" />
+                  {copy.workspaceSettingsTitle}
+                </h2>
                 <div className="ec-topbar-setting-row">
                   <div>
                     <strong>{copy.sidebarPreferenceLabel}</strong>
@@ -289,7 +293,10 @@ export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help 
                 data-information-level="primary"
                 data-settings-destination="appearance"
               >
-                <h2 id="appearance-settings-title">{appearanceT('title')}</h2>
+                <h2 id="appearance-settings-title">
+                  <AppearanceIcon aria-hidden="true" />
+                  {appearanceT('title')}
+                </h2>
                 <div className="ec-topbar-setting-row">
                   <div>
                     <strong>{appearanceT('title')}</strong>

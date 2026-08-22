@@ -61,3 +61,5 @@ D029 CPTs/data registrations live in Companion Plugin, not Theme.
 D030 final release requires parity evidence for all nine targets.
 
 D031 documentation continuity has single ownership: AGENTS=entry point, README=map, MEMORY=stable facts, STATE=current state/one ACTIVE, TRACKING=position, HANDOFF=next action; detailed decision in `adr/ADR-DOCUMENT-CONVENTIONS.md`.
+
+D032 Studio permits scoped multi-framework appearance adapters under `@electrocraft/design-system`: Aceternity/Magic, daisyUI, Headless UI, Ark/Base UI and HeroUI/NextUI. Radix remains the AppShell primitive owner; see `adr/ADR-STUDIO-MULTI-FRAMEWORK-THEMES.md`.

@@ -52,7 +52,15 @@ const CloseIcon = getStudioIcon('window.close');
 const CollapseIcon = getStudioIcon('studio.sidebar.collapse');
 const ExpandIcon = getStudioIcon('studio.sidebar.expand');
 
-function NavigationLink({ item, active }: { readonly item: SidebarNavigationItem; readonly active: boolean }) {
+function NavigationLink({
+  item,
+  active,
+  groupId,
+}: {
+  readonly item: SidebarNavigationItem;
+  readonly active: boolean;
+  readonly groupId: SidebarNavigationGroup['id'];
+}) {
   const Icon = getStudioIcon(item.iconId);
 
   return (
@@ -64,6 +72,7 @@ function NavigationLink({ item, active }: { readonly item: SidebarNavigationItem
           aria-label={item.label}
           aria-current={active ? 'page' : undefined}
           data-nav-item={item.id}
+          data-nav-group={groupId}
         >
           <Icon className="ec-app-shell-navigation-icon" aria-hidden="true" />
           <span className="ec-app-shell-navigation-label">{item.label}</span>
@@ -96,7 +105,7 @@ function SidebarNavigation({
           <ul className="ec-app-shell-navigation-list">
             {group.items.map((item) => (
               <li key={item.id} className="ec-app-shell-navigation-item">
-                <NavigationLink item={item} active={item.id === activeItemId} />
+                <NavigationLink item={item} active={item.id === activeItemId} groupId={group.id} />
               </li>
             ))}
           </ul>
@@ -133,6 +142,9 @@ export function AppShell({
         data-status={status}
         data-sidebar-collapsed={sidebarCollapsed ? 'true' : 'false'}
       >
+        <a className="ec-skip-link" href="#ec-studio-workspace">
+          Ir al área de trabajo
+        </a>
         <aside className="ec-app-shell-sidebar" aria-label={copy.sidebarLabel}>
           <div className="ec-app-shell-brand" aria-label={copy.title}>
             <span className="ec-app-shell-brand-mark" aria-hidden="true">
@@ -200,7 +212,7 @@ export function AppShell({
           )}
         </header>
 
-        <main className="ec-app-shell-workspace" aria-label={copy.workspaceLabel}>
+        <main id="ec-studio-workspace" className="ec-app-shell-workspace" aria-label={copy.workspaceLabel}>
           {children ?? (
             <div className="ec-app-shell-empty" role="status">
               {copy.emptyWorkspace}

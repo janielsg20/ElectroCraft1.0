@@ -14,7 +14,7 @@ import {
   SheetTrigger,
   getStudioIcon,
 } from '@electrocraft/design-system';
-import { useState, type ReactNode } from 'react';
+import { lazy, Suspense, useState, type ReactNode } from 'react';
 import { appearanceT } from '../i18n/appearance.es';
 import type {
   StudioAnimationIntensity,
@@ -41,6 +41,9 @@ import './appearance.css';
 
 const AppearanceIcon = getStudioIcon('studio.sidebar.themes');
 const CloseIcon = getStudioIcon('window.close');
+const AppearanceFrameworkGallery = lazy(() =>
+  import('./appearance-framework-gallery').then((module) => ({ default: module.AppearanceFrameworkGallery })),
+);
 
 const tones: readonly StudioAppearanceTone[] = ['system', 'light', 'dark'];
 const accents: readonly StudioAppearanceAccent[] = ['indigo', 'blue', 'emerald', 'amber', 'rose'];
@@ -198,7 +201,6 @@ function AppearancePanelContent({ presentation = 'topbar' }: AppearancePanelTrig
     previewProfile,
     resolvedProfile,
     presets,
-    personalPresets,
     accessibilityWarnings,
     systemReducedMotion,
     preview,
@@ -213,6 +215,7 @@ function AppearancePanelContent({ presentation = 'topbar' }: AppearancePanelTrig
   const [pendingCloseDecision, setPendingCloseDecision] = useState(false);
   const isMobile = presentation === 'mobile';
   const hasPreview = previewProfile !== null;
+  const frameworkPresets = presets.filter((preset) => preset.kind === 'built-in');
 
   const requestOpenChange = (nextOpen: boolean) => {
     if (!nextOpen && hasPreview) {
@@ -260,6 +263,23 @@ function AppearancePanelContent({ presentation = 'topbar' }: AppearancePanelTrig
         </SheetHeader>
 
         <div className="ec-appearance-body">
+          <section className="ec-appearance-frameworks" aria-labelledby="appearance-frameworks-title">
+            <div className="ec-appearance-frameworks-heading">
+              <div>
+                <h3 id="appearance-frameworks-title">Temas por framework</h3>
+                <p>Aplica un sistema visual completo sin cambiar el contenido del proyecto.</p>
+              </div>
+              <span>{frameworkPresets.length} temas</span>
+            </div>
+            <Suspense fallback={<p role="status">Cargando estilos de frameworks…</p>}>
+              <AppearanceFrameworkGallery
+                presets={frameworkPresets}
+                resolvedName={resolvedProfile.name}
+                onSelect={previewPreset}
+              />
+            </Suspense>
+          </section>
+
           <section className="ec-appearance-presets" aria-label={appearanceT('presets')}>
             <div className="ec-appearance-preset-row">
               <DropdownMenu>
@@ -271,7 +291,9 @@ function AppearancePanelContent({ presentation = 'topbar' }: AppearancePanelTrig
                 <DropdownMenuContent align="start" data-appearance-preset-menu>
                   {presets.map((preset, index) => (
                     <span key={preset.id}>
-                      {index === 3 && personalPresets.length > 0 ? <DropdownMenuSeparator /> : null}
+                      {preset.kind === 'personal' && presets[index - 1]?.kind === 'built-in' ? (
+                        <DropdownMenuSeparator />
+                      ) : null}
                       <DropdownMenuItem
                         data-appearance-preset={preset.id}
                         data-preset-kind={preset.kind}

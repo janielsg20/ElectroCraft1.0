@@ -1,7 +1,7 @@
 .ec-project-home {
   width: min(100%, 1440px);
   margin-inline: auto;
-  padding: 20px 24px 32px;
+  padding: 16px 20px 28px;
   min-width: 0;
   overflow: auto;
 }
@@ -10,7 +10,7 @@
   align-items: end;
   justify-content: space-between;
   gap: 20px;
-  padding-bottom: 16px;
+  padding-bottom: 12px;
 }
 .ec-project-home > header p {
   margin: 0;
@@ -21,20 +21,41 @@
   align-items: center;
   gap: 8px;
 }
+.ec-project-title-icon {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in oklab, var(--ec-violet) 28%, var(--border));
+  border-radius: 8px;
+  background: linear-gradient(145deg, color-mix(in oklab, var(--ec-violet) 18%, var(--surface)), var(--surface));
+  color: var(--ec-violet);
+  box-shadow: var(--ec-shadow-sm);
+}
+.ec-project-title-icon svg {
+  width: 15px;
+  height: 15px;
+  transition: transform var(--ec-normal) var(--ec-ease-out);
+}
+.ec-project-title:hover .ec-project-title-icon svg {
+  transform: rotate(8deg) scale(1.08);
+}
 .ec-project-title h1 {
   margin: 0;
-  font-size: 1.35rem;
+  font-size: 1.2rem;
   letter-spacing: -0.025em;
 }
 .ec-project-toolbar {
-  min-height: 44px;
+  min-height: 40px;
   display: flex;
   align-items: center;
   gap: 8px;
   border: 1px solid var(--border);
   border-radius: 9px;
-  padding: 6px;
-  background: var(--surface);
+  padding: 4px;
+  background: color-mix(in oklab, var(--surface) 94%, transparent);
+  box-shadow: var(--ec-shadow-sm);
+  backdrop-filter: blur(12px);
 }
 .ec-project-toolbar input {
   max-width: 280px;
@@ -51,7 +72,7 @@
   width: 14px;
   height: 14px;
   transform: translateY(-50%);
-  color: var(--muted-foreground);
+  color: var(--ec-violet);
   pointer-events: none;
 }
 .ec-project-search input {
@@ -69,6 +90,16 @@
 }
 .ec-project-new {
   margin-left: auto;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--primary), color-mix(in oklab, var(--primary) 60%, var(--ec-violet)));
+  box-shadow: 0 5px 16px color-mix(in oklab, var(--primary) 25%, transparent);
+  transition:
+    transform var(--ec-fast) var(--ec-ease-out),
+    box-shadow var(--ec-fast) ease;
+}
+.ec-project-new:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 7px 20px color-mix(in oklab, var(--primary) 32%, transparent);
 }
 .ec-project-collection {
   display: grid;
@@ -82,7 +113,7 @@
   border: 1px solid var(--border);
   border-radius: 9px;
   overflow: hidden;
-  background: var(--surface);
+  background: linear-gradient(160deg, color-mix(in oklab, var(--surface) 94%, var(--ec-violet)), var(--surface) 45%);
   transition:
     border-color var(--ec-fast),
     box-shadow var(--ec-fast),
@@ -90,7 +121,7 @@
 }
 .ec-project-card:hover {
   border-color: color-mix(in oklab, var(--primary) 38%, var(--border));
-  box-shadow: 0 8px 22px rgb(15 23 42 / 0.08);
+  box-shadow: var(--ec-shadow-panel);
   transform: translateY(-1px);
 }
 .ec-project-open {
@@ -113,10 +144,11 @@
     transparent 0.7px
   );
   background-size: 12px 12px;
-  color: var(--primary);
+  color: var(--ec-violet);
   font-size: 1rem;
   font-weight: 800;
   border-radius: 6px;
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ec-violet) 12%, transparent);
 }
 .ec-project-card > div {
   border-top: 1px solid var(--border);

@@ -83,6 +83,9 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
       <main className="ec-project-home" data-project-home data-state={state}>
         <header>
           <div className="ec-project-title">
+            <span className="ec-project-title-icon" aria-hidden="true">
+              <GridIcon />
+            </span>
             <h1>Proyectos</h1>
             <HelpTrigger helpId="help.projects" />
           </div>

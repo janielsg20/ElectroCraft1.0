@@ -48,6 +48,12 @@ const MobileScreensIcon = getStudioIcon('studio.mobile.screens');
 const MobileCanvasIcon = getStudioIcon('studio.mobile.canvas');
 const MobilePropertiesIcon = getStudioIcon('studio.mobile.properties');
 const MobileMoreIcon = getStudioIcon('studio.mobile.more');
+const ComponentsTabIcon = getStudioIcon('studio.sidebar.components');
+const ScreensTabIcon = getStudioIcon('studio.sidebar.screens');
+const LayersTabIcon = getStudioIcon('studio.mobile.outline');
+const ContentTabIcon = getStudioIcon('studio.topbar.document');
+const DesignTabIcon = getStudioIcon('studio.theme');
+const ActionsTabIcon = getStudioIcon('studio.sidebar.workflows');
 const screensDestination = getStudioSidebarNavigationItem('screens');
 const hasStructuralContent = structuralPuckData.content.length > 0;
 
@@ -120,12 +126,15 @@ function InspectorContent() {
     >
       <TabsList className="ec-editor-panel-tabs" aria-label={editorT('studio.editor.inspectorTitle')}>
         <TabsTrigger className="ec-editor-panel-tab" value="content">
+          <ContentTabIcon aria-hidden="true" />
           {editorT('studio.editor.inspector.contentTab')}
         </TabsTrigger>
         <TabsTrigger className="ec-editor-panel-tab" value="design">
+          <DesignTabIcon aria-hidden="true" />
           {editorT('studio.editor.inspector.designTab')}
         </TabsTrigger>
         <TabsTrigger className="ec-editor-panel-tab" value="actions">
+          <ActionsTabIcon aria-hidden="true" />
           {editorT('studio.editor.inspector.actionsTab')}
         </TabsTrigger>
       </TabsList>
@@ -174,12 +183,15 @@ function ContextRegion() {
       <Tabs className="ec-editor-context-tabs" value={tab} onValueChange={(value) => setTab(value as typeof tab)}>
         <TabsList className="ec-editor-panel-tabs" aria-label={editorT('studio.editor.contextTitle')}>
           <TabsTrigger className="ec-editor-panel-tab" value="components">
+            <ComponentsTabIcon aria-hidden="true" />
             {editorT('studio.editor.context.componentsTab')}
           </TabsTrigger>
           <TabsTrigger className="ec-editor-panel-tab" value="screens">
+            <ScreensTabIcon aria-hidden="true" />
             {editorT('studio.editor.context.screensTab')}
           </TabsTrigger>
           <TabsTrigger className="ec-editor-panel-tab" value="layers">
+            <LayersTabIcon aria-hidden="true" />
             {editorT('studio.editor.context.layersTab')}
           </TabsTrigger>
         </TabsList>

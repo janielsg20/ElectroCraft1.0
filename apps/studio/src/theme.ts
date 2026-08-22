@@ -1,4 +1,5 @@
 import type { ThemePreference } from '@electrocraft/design-system';
+import type { FrameworkThemeId } from '@electrocraft/design-system/framework-themes';
 
 export const EDITOR_APPEARANCE_STORAGE_KEY = 'electrocraft.studio.appearance.v1' as const;
 export const STUDIO_APPEARANCE_PRESETS_STORAGE_KEY = 'electrocraft.studio.appearance-presets.v1' as const;
@@ -21,9 +22,11 @@ export type StudioSpacingScale = 'compact' | 'standard' | 'spacious';
 export type StudioCanvasDensity = 'compact' | 'comfortable' | 'spacious';
 export type StudioAnimationIntensity = 'none' | 'reduced' | 'standard' | 'high';
 export type StudioContrastPreference = 'standard' | 'high';
+export type StudioThemeFramework = FrameworkThemeId;
 
 export interface StudioAppearanceProfile {
   readonly name: string;
+  readonly framework: StudioThemeFramework;
   readonly tone: StudioAppearanceTone;
   readonly accent: StudioAppearanceAccent;
   readonly semanticColors: StudioSemanticColors;
@@ -66,11 +69,14 @@ export interface StudioAppearancePreset {
   readonly id: string;
   readonly label: string;
   readonly kind: 'built-in' | 'personal';
+  readonly framework: StudioThemeFramework;
+  readonly description: string;
   readonly profile: StudioAppearanceProfile;
 }
 
 export const DEFAULT_EDITOR_APPEARANCE_PROFILE: StudioAppearanceProfile = Object.freeze({
   name: 'ElectroCraft',
+  framework: 'electrocraft',
   tone: 'system',
   accent: 'indigo',
   semanticColors: 'balanced',
@@ -120,6 +126,14 @@ const spacingScales = new Set<StudioSpacingScale>(['compact', 'standard', 'spaci
 const canvasDensities = new Set<StudioCanvasDensity>(['compact', 'comfortable', 'spacious']);
 const animationIntensities = new Set<StudioAnimationIntensity>(['none', 'reduced', 'standard', 'high']);
 const contrastPreferences = new Set<StudioContrastPreference>(['standard', 'high']);
+const themeFrameworks = new Set<StudioThemeFramework>([
+  'electrocraft',
+  'aceternity-magic',
+  'daisyui',
+  'headlessui',
+  'ark-base',
+  'heroui',
+]);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -140,6 +154,7 @@ export function normalizeEditorAppearanceProfile(value: unknown): StudioAppearan
 
   return Object.freeze({
     name: normalizedName(value.name, DEFAULT_EDITOR_APPEARANCE_PROFILE.name),
+    framework: normalizedString(value.framework, themeFrameworks, DEFAULT_EDITOR_APPEARANCE_PROFILE.framework),
     tone: normalizedString(value.tone, tones, DEFAULT_EDITOR_APPEARANCE_PROFILE.tone),
     accent: normalizedString(value.accent, accents, DEFAULT_EDITOR_APPEARANCE_PROFILE.accent),
     semanticColors: normalizedString(
@@ -313,12 +328,16 @@ export const BUILT_IN_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset
     id: 'built-in:electrocraft',
     label: 'ElectroCraft',
     kind: 'built-in' as const,
+    framework: 'electrocraft' as const,
+    description: 'shadcn/ui + Radix · compacto, técnico y equilibrado.',
     profile: DEFAULT_EDITOR_APPEARANCE_PROFILE,
   }),
   Object.freeze({
     id: 'built-in:focus',
     label: 'Enfoque',
     kind: 'built-in' as const,
+    framework: 'electrocraft' as const,
+    description: 'shadcn/ui + Radix · menor movimiento y máximo foco.',
     profile: Object.freeze({
       ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
       name: 'Enfoque',
@@ -332,7 +351,118 @@ export const BUILT_IN_STUDIO_APPEARANCE_PRESETS: readonly StudioAppearancePreset
     id: 'built-in:accessible',
     label: 'Accesible',
     kind: 'built-in' as const,
+    framework: 'electrocraft' as const,
+    description: 'shadcn/ui + Radix · contraste alto y movimiento reducido.',
     profile: Object.freeze({ ...ACCESSIBLE_EDITOR_APPEARANCE_DEFAULTS, name: 'Accesible' }),
+  }),
+  Object.freeze({
+    id: 'built-in:aceternity-magic',
+    label: 'Aurora Motion',
+    kind: 'built-in' as const,
+    framework: 'aceternity-magic' as const,
+    description: 'Aceternity UI + Magic UI · profundidad oscura, luz ambiental y motion.',
+    profile: Object.freeze({
+      ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
+      name: 'Aurora Motion',
+      framework: 'aceternity-magic',
+      tone: 'dark',
+      semanticColors: 'vivid',
+      typographyFamily: 'geometric',
+      radii: 'rounded',
+      elevation: 'raised',
+      controlSize: 'compact',
+      menuAppearance: 'glass',
+      canvasDensity: 'compact',
+      animationIntensity: 'high',
+      contrastPreference: 'high',
+    }),
+  }),
+  Object.freeze({
+    id: 'built-in:daisyui',
+    label: 'Daisy Pop',
+    kind: 'built-in' as const,
+    framework: 'daisyui' as const,
+    description: 'daisyUI · componentes expresivos, color semántico y formas amigables.',
+    profile: Object.freeze({
+      ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
+      name: 'Daisy Pop',
+      framework: 'daisyui',
+      accent: 'emerald',
+      semanticColors: 'vivid',
+      typographyFamily: 'humanist',
+      iconStyle: 'strong',
+      radii: 'rounded',
+      elevation: 'raised',
+      controlSize: 'compact',
+      buttonShape: 'pill',
+      menuAppearance: 'soft',
+    }),
+  }),
+  Object.freeze({
+    id: 'built-in:headlessui',
+    label: 'Headless Precision',
+    kind: 'built-in' as const,
+    framework: 'headlessui' as const,
+    description: 'Headless UI · minimalista, neutral y optimizado para teclado.',
+    profile: Object.freeze({
+      ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
+      name: 'Headless Precision',
+      framework: 'headlessui',
+      accent: 'blue',
+      semanticColors: 'balanced',
+      radii: 'subtle',
+      elevation: 'flat',
+      controlSize: 'compact',
+      buttonShape: 'square',
+      fieldShape: 'square',
+      animationIntensity: 'reduced',
+      contrastPreference: 'high',
+    }),
+  }),
+  Object.freeze({
+    id: 'built-in:ark-base',
+    label: 'Ark Base Modular',
+    kind: 'built-in' as const,
+    framework: 'ark-base' as const,
+    description: 'Ark UI + Base UI · composición headless modular y geometría precisa.',
+    profile: Object.freeze({
+      ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
+      name: 'Ark Base Modular',
+      framework: 'ark-base',
+      accent: 'amber',
+      typographyFamily: 'mono',
+      typographyScale: 'compact',
+      radii: 'square',
+      elevation: 'flat',
+      controlSize: 'compact',
+      buttonShape: 'square',
+      fieldShape: 'square',
+      animationIntensity: 'reduced',
+      contrastPreference: 'high',
+    }),
+  }),
+  Object.freeze({
+    id: 'built-in:heroui',
+    label: 'Hero / Next Modern',
+    kind: 'built-in' as const,
+    framework: 'heroui' as const,
+    description: 'HeroUI (antes NextUI) · superficies suaves, glass y acciones premium.',
+    profile: Object.freeze({
+      ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
+      name: 'Hero / Next Modern',
+      framework: 'heroui',
+      accent: 'rose',
+      semanticColors: 'vivid',
+      typographyFamily: 'geometric',
+      radii: 'rounded',
+      elevation: 'raised',
+      controlSize: 'compact',
+      buttonShape: 'pill',
+      fieldShape: 'rounded',
+      menuAppearance: 'glass',
+      animationIntensity: 'standard',
+      contrastPreference: 'high',
+    }),
   }),
 ]);
 
@@ -343,6 +473,8 @@ function normalizePersonalPreset(value: unknown): StudioAppearancePreset | null 
     id: value.id.slice(0, 96),
     label: normalizedName(value.label, profile.name),
     kind: 'personal' as const,
+    framework: profile.framework,
+    description: `Preset personal · ${profile.framework}.`,
     profile,
   });
 }
@@ -394,6 +526,8 @@ export function createPersonalStudioAppearancePreset(
     id: `personal:${id.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 72) || 'preset'}`,
     label: normalized.name,
     kind: 'personal',
+    framework: normalized.framework,
+    description: `Preset personal · ${normalized.framework}.`,
     profile: normalized,
   });
 }

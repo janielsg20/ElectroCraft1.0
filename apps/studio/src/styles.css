@@ -24,6 +24,7 @@ body {
   margin: 0;
   background: var(--background);
   color: var(--foreground);
+  font-size: var(--ec-text-sm);
 }
 
 button,
@@ -46,14 +47,36 @@ a:focus-visible {
 }
 
 .ec-app-shell {
+  isolation: isolate;
   width: 100%;
   height: 100dvh;
   min-height: 100dvh;
   display: grid;
-  grid-template-columns: 240px minmax(0, 1fr);
-  grid-template-rows: 52px minmax(0, 1fr) 26px;
+  grid-template-columns: var(--ec-shell-sidebar-width) minmax(0, 1fr);
+  grid-template-rows: var(--ec-shell-topbar-height) minmax(0, 1fr) var(--ec-shell-statusbar-height);
   overflow: hidden;
-  background: var(--surface);
+  background: var(--background);
+}
+
+.ec-skip-link {
+  position: fixed;
+  z-index: 120;
+  top: 8px;
+  left: 8px;
+  transform: translateY(-160%);
+  border: 1px solid var(--ring);
+  border-radius: var(--ec-radius-sm);
+  padding: 7px 10px;
+  background: var(--popover);
+  color: var(--foreground);
+  font-size: var(--ec-text-xs);
+  font-weight: 700;
+  box-shadow: var(--ec-shadow-panel);
+  transition: transform var(--ec-fast) var(--ec-ease-out);
+}
+
+.ec-skip-link:focus {
+  transform: translateY(0);
 }
 
 .ec-app-shell-sidebar {
@@ -62,20 +85,24 @@ a:focus-visible {
   grid-column: 1;
   grid-row: 1 / 4;
   overflow: hidden;
-  border-right: 1px solid var(--border);
-  background: var(--surface);
+  border-right: 1px solid color-mix(in oklab, var(--primary) 15%, var(--border));
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--surface) 95%, var(--primary)) 0%, var(--surface) 38%),
+    var(--surface);
+  box-shadow: 4px 0 18px color-mix(in oklab, var(--overlay) 12%, transparent);
 }
 
 .ec-app-shell-brand {
-  height: 52px;
+  height: var(--ec-shell-topbar-height);
   display: flex;
   align-items: center;
   gap: 10px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid color-mix(in oklab, var(--primary) 14%, var(--border));
   padding: 0 12px;
 }
 
 .ec-app-shell-brand-mark {
+  position: relative;
   width: 32px;
   height: 32px;
   display: inline-flex;
@@ -84,11 +111,24 @@ a:focus-visible {
   justify-content: center;
   border: 0;
   border-radius: 9px;
-  background: var(--primary);
+  background: linear-gradient(145deg, var(--primary), var(--ec-violet));
   color: var(--primary-foreground);
   font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: -0.03em;
+  box-shadow:
+    0 5px 14px color-mix(in oklab, var(--primary) 34%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.2);
+  transition:
+    transform var(--ec-normal) var(--ec-ease-out),
+    box-shadow var(--ec-normal) ease;
+}
+
+.ec-app-shell-brand:hover .ec-app-shell-brand-mark {
+  transform: rotate(-4deg) scale(1.06);
+  box-shadow:
+    0 7px 18px color-mix(in oklab, var(--primary) 42%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.24);
 }
 
 .ec-app-shell-brand-label,
@@ -102,7 +142,7 @@ a:focus-visible {
 }
 
 .ec-app-shell-nav-scroll {
-  height: calc(100% - 52px);
+  height: calc(100% - var(--ec-shell-topbar-height));
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -146,15 +186,17 @@ a:focus-visible {
 
 .ec-app-shell-topbar {
   min-width: 0;
-  height: 52px;
+  height: var(--ec-shell-topbar-height);
   display: flex;
   grid-column: 2;
   grid-row: 1;
   align-items: center;
   gap: 8px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid color-mix(in oklab, var(--primary) 12%, var(--border));
   padding: 0 10px;
-  background: var(--surface);
+  background: color-mix(in oklab, var(--surface) 94%, transparent);
+  box-shadow: 0 3px 16px color-mix(in oklab, var(--overlay) 8%, transparent);
+  backdrop-filter: blur(14px) saturate(135%);
 }
 
 .ec-app-shell-menu-trigger {
@@ -173,7 +215,10 @@ a:focus-visible {
   grid-row: 2;
   overflow: auto;
   overscroll-behavior: contain;
-  background: var(--surface-raised);
+  background:
+    radial-gradient(circle at 88% 6%, color-mix(in oklab, var(--ec-violet) 7%, transparent), transparent 28%),
+    radial-gradient(circle at 16% 100%, color-mix(in oklab, var(--ec-cyan) 6%, transparent), transparent 34%),
+    var(--surface-raised);
 }
 
 .ec-app-shell-empty {
@@ -187,7 +232,7 @@ a:focus-visible {
 
 .ec-app-shell-statusbar {
   min-width: 0;
-  height: 26px;
+  height: var(--ec-shell-statusbar-height);
   display: flex;
   grid-column: 2;
   grid-row: 3;
@@ -228,11 +273,42 @@ a:focus-visible {
   transition:
     transform var(--ec-fast) ease,
     color var(--ec-fast) ease;
+  transform-origin: center;
 }
 
 .ec-design-system button:hover:not(:disabled) > svg,
 .ec-design-system a:hover > svg {
   transform: translateY(-1px) scale(1.06);
+}
+
+.ec-design-system button:active:not(:disabled) > svg,
+.ec-design-system a:active > svg {
+  transform: scale(0.92);
+}
+
+.ec-design-system [aria-label*='Configuración']:hover > svg,
+.ec-design-system [data-nav-item='tokens']:hover svg {
+  transform: rotate(28deg) scale(1.06);
+}
+
+.ec-design-system [aria-label*='navegación']:hover > svg,
+.ec-design-system [aria-label*='menú']:hover > svg {
+  transform: translateX(2px) scaleX(0.92);
+}
+
+.ec-design-system [data-nav-item='ai-generate']:hover svg {
+  animation: ec-icon-spark 500ms var(--ec-ease-out);
+}
+
+.ec-design-system [data-nav-item='deploy']:hover svg,
+.ec-design-system [data-nav-item='export']:hover svg {
+  transform: translate(1px, -2px) scale(1.08);
+}
+
+@keyframes ec-icon-spark {
+  45% {
+    transform: rotate(12deg) scale(1.18);
+  }
 }
 
 .ec-app-shell-mobile-sheet {

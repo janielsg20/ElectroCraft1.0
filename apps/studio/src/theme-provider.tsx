@@ -42,6 +42,7 @@ const StudioAppearanceContext = createContext<StudioAppearanceContextValue | nul
 
 const appearanceDatasetKeys = [
   'ecAppearanceProfile',
+  'ecFramework',
   'ecAccent',
   'ecSemanticColors',
   'ecTypographyFamily',
@@ -106,6 +107,7 @@ export function StudioAppearanceProvider({ storage, presetStorage, children }: S
   useEffect(() => {
     const root = document.documentElement;
     root.dataset.ecAppearanceProfile = resolvedProfile.name;
+    root.dataset.ecFramework = resolvedProfile.framework;
     root.dataset.ecAccent = resolvedProfile.accent;
     root.dataset.ecSemanticColors = resolvedProfile.semanticColors;
     root.dataset.ecTypographyFamily = resolvedProfile.typographyFamily;

@@ -9,12 +9,13 @@ export * from './lib/utils';
 
 export const packageDescriptor = Object.freeze({
   name: '@electrocraft/design-system',
-  responsibility: 'foundation visual, tokens y primitives Radix del Studio',
+  responsibility: 'foundation visual, tokens, primitives Radix y adapters de temas multi-framework del Studio',
   dependencies: [dep0.name] as const,
   engine: Object.freeze({
     shadcnBase: 'radix',
     radixPackage: 'radix-ui',
     iconLibrary: 'lucide',
+    themeFrameworks: ['aceternity-magic', 'daisyui', 'headlessui', 'ark-base', 'heroui'] as const,
   }),
 });
 

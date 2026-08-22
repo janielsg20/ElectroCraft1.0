@@ -1,6 +1,7 @@
 # REQUIREMENTS — ElectroCraft Eighth Final
 
 ## Product
+
 R001 No-Code App Builder.
 R002 Spanish-first Studio.
 R003 contextual Help for every main section.
@@ -28,13 +29,15 @@ R024 Extensions/connector packs.
 R025 App Templates/Kits.
 
 ## Studio UI / Skills
-R026 shadcn/ui Radix base pinned explicitly.
+
+R026 shadcn/ui Radix base pinned explicitly; multi-framework appearance adapters (Aceternity/Magic, daisyUI, Headless UI, Ark/Base UI and HeroUI/NextUI) are allowed only under the design-system ownership contract and ADR.
 R027 AI Elements for standard AI-native UI.
 R028 Lucide icons.
 R029 UI/UX/Layout/Accessibility skills required on UI phases.
 R030 React best-practices review after broad TSX edits.
 
 ## AI
+
 R031 `Construir > Generar con IA`.
 R032 Gemini default provider.
 R033 Vercel AI SDK orchestration.
@@ -52,6 +55,7 @@ R044 generated-code quarantine.
 R045 AI history/cancel/privacy/offline.
 
 ## Export Core — equal status
+
 R046 TargetRegistry contains all nine destinations.
 R047 Local project package.
 R048 React Web.
@@ -70,6 +74,7 @@ R060 artifact evidence per target.
 R061 same canonical fixture tested across all applicable targets.
 
 ## LAMP
+
 R062 Slim 4 routing/middleware.
 R063 PDO/MySQL/MariaDB data compiler.
 R064 Slim-CSRF/forms/security.
@@ -78,6 +83,7 @@ R066 Action/Query/Route compilers.
 R067 install/migrate/security fixture.
 
 ## WordPress
+
 R068 Block Theme.
 R069 theme.json current supported format.
 R070 templates/parts/patterns/style variations where mapped.
@@ -90,6 +96,7 @@ R076 activation/migration/deactivation/uninstall.
 R077 wp-env or approved clean WordPress fixture.
 
 ## Quality
+
 R078 WCAG 2.2 AA target.
 R079 secure imports/connectors/queries/uploads/AI/exports.
 R080 deterministic CI without mandatory AI network.
@@ -97,7 +104,6 @@ R081 dependency pruning.
 R082 performance budgets.
 R083 no duplicate OSS-owned engines.
 R084 no P0/P1 gap.
-
 
 ## Nombres visibles exactos de exportación
 
@@ -113,12 +119,12 @@ R084 no P0/P1 gap.
 
 Ninguno se muestra como destino secundario.
 
-
 ## Ownership gate — M00.1
 
 La trazabilidad atómica de R001–R084 vive en `TRACEABILITY_MATRIX.md` y su fixture ejecutable en `experiments/m00-1-requirements/capability-ownership-matrix.json`.
 
 Reglas congeladas por M00.1:
+
 - toda capacidad tiene un owner canónico y una fase;
 - CMS se subordina a Datos/Pantallas/Administración según semántica;
 - Navegación/Rutas no se incrusta dentro del árbol de Pantallas;

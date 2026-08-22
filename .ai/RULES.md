@@ -22,7 +22,7 @@
 20. Tiptap is one richtext engine; do not persist a second Puck richtext format.
 21. Zustand owns runtime state mechanics.
 22. shadcn/ui uses **Radix base** in Studio.
-23. Do not mix shadcn primitive bases without ADR.
+23. Multi-framework appearance adapters are allowed only by `ADR-STUDIO-MULTI-FRAMEWORK-THEMES.md`, scoped to `@electrocraft/design-system`; Radix retains AppShell/overlay/focus ownership.
 24. AI Elements owns standard AI message/conversation/prompt/tool/plan UI.
 25. Do not install all AI Elements; install only used pieces.
 26. Do not use AI Elements React Flow graph pieces to duplicate Rete.

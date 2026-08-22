@@ -31,6 +31,7 @@ Domain imports no React, Puck, Refine, Rete, Expo, Capacitor, Slim, WordPress or
 # Documents
 
 Kinds:
+
 - screen
 - template
 - form
@@ -47,6 +48,7 @@ ElectroCraftDocument is canonical.
 
 React/Vite.
 shadcn Radix.
+Multi-framework appearance adapters owned exclusively by `@electrocraft/design-system`: Aceternity/Magic source components, daisyUI, Headless UI, Ark/Base UI and HeroUI (formerly NextUI). Radix retains ownership of AppShell primitives, overlays, portals and focus management.
 AI Elements for AI-native UI only.
 i18next.
 Puck.

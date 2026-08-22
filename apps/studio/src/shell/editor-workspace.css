@@ -15,7 +15,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: var(--surface-raised);
+  background: color-mix(in oklab, var(--surface-raised) 92%, var(--primary));
 }
 
 .ec-resizable-tri-pane {
@@ -44,7 +44,7 @@
   justify-content: center;
   cursor: col-resize;
   touch-action: none;
-  background: var(--surface);
+  background: color-mix(in oklab, var(--surface) 94%, var(--primary));
   outline: none;
 }
 
@@ -81,12 +81,26 @@
 }
 
 .ec-editor-region {
+  --ec-panel-tone: var(--primary);
   width: 100%;
   height: 100%;
   display: grid;
   grid-template-rows: 36px minmax(0, 1fr);
   overflow: hidden;
+  border-top: 1px solid color-mix(in oklab, var(--ec-panel-tone) 22%, var(--border));
   background: var(--surface);
+}
+
+.ec-editor-region[data-editor-region='context'] {
+  --ec-panel-tone: var(--ec-violet);
+}
+
+.ec-editor-region[data-editor-region='canvas'] {
+  --ec-panel-tone: var(--ec-cyan);
+}
+
+.ec-editor-region[data-editor-region='inspector'] {
+  --ec-panel-tone: var(--ec-amber);
 }
 
 .ec-editor-region[data-editor-region='canvas'] {
@@ -98,11 +112,13 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  border-bottom: 1px solid var(--border);
-  padding: 0 9px;
+  border-bottom: 1px solid color-mix(in oklab, var(--ec-panel-tone) 18%, var(--border));
+  padding: 0 7px;
+  background: linear-gradient(90deg, color-mix(in oklab, var(--ec-panel-tone) 8%, var(--surface)), var(--surface) 55%);
   color: var(--foreground);
   font-size: var(--ec-text-xs);
-  font-weight: 700;
+  font-weight: 750;
+  letter-spacing: -0.01em;
 }
 
 .ec-editor-region-actions {
@@ -119,14 +135,22 @@
 .ec-editor-region-actions span {
   border: 1px solid var(--border);
   border-radius: 5px;
-  padding: 2px 6px;
-  background: var(--background);
+  padding: 1px 5px;
+  background: color-mix(in oklab, var(--background) 88%, var(--ec-panel-tone));
 }
 
 .ec-editor-region-header svg {
-  width: 14px;
-  height: 14px;
-  color: var(--muted-foreground);
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  padding: 3px;
+  background: color-mix(in oklab, var(--ec-panel-tone) 13%, transparent);
+  color: var(--ec-panel-tone);
+  transition: transform var(--ec-normal) var(--ec-ease-out);
+}
+
+.ec-editor-region:hover > .ec-editor-region-header > svg {
+  transform: rotate(-4deg) scale(1.07);
 }
 
 .ec-editor-region-body {
@@ -141,9 +165,9 @@
 .ec-editor-structural-notice {
   margin: 0;
   border-bottom: 1px solid var(--border);
-  padding: 8px 10px;
+  padding: 6px 8px;
   color: var(--muted-foreground);
-  font-size: 11px;
+  font-size: var(--ec-text-2xs);
   line-height: 1.45;
 }
 
@@ -160,11 +184,12 @@
   grid-template-rows: auto minmax(0, 1fr);
   overflow: hidden;
   background-color: var(--surface-raised);
-  background-image: radial-gradient(
-    color-mix(in oklab, var(--muted-foreground) 24%, transparent) 0.75px,
-    transparent 0.75px
-  );
-  background-size: 14px 14px;
+  background-image:
+    radial-gradient(color-mix(in oklab, var(--ec-cyan) 22%, transparent) 0.75px, transparent 0.75px),
+    radial-gradient(circle at 50% 0%, color-mix(in oklab, var(--ec-cyan) 6%, transparent), transparent 42%);
+  background-size:
+    14px 14px,
+    100% 100%;
 }
 
 .ec-editor-puck-preview {
@@ -179,10 +204,10 @@
   width: min(100%, 1120px);
   min-height: calc(100% - 4px);
   margin-inline: auto;
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  border: 1px solid color-mix(in oklab, var(--ec-cyan) 18%, var(--border));
+  border-radius: 9px;
   background: var(--surface);
-  box-shadow: 0 10px 30px rgb(15 23 42 / 0.09);
+  box-shadow: var(--ec-shadow-panel);
   overflow: hidden;
 }
 
@@ -193,8 +218,8 @@
   grid-auto-columns: minmax(0, 1fr);
   align-items: stretch;
   border-bottom: 1px solid var(--border);
-  padding: 4px 5px 0;
-  background: var(--surface);
+  padding: 3px 4px 0;
+  background: color-mix(in oklab, var(--surface) 96%, var(--primary));
 }
 
 .ec-editor-panel-tab {
@@ -202,11 +227,15 @@
   min-width: 0;
   border: 0;
   border-radius: 6px 6px 0 0;
-  padding: 5px 4px 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 3px 6px;
   overflow: hidden;
   background: transparent;
   color: var(--muted-foreground);
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 650;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -214,12 +243,24 @@
 }
 
 .ec-editor-panel-tab:hover {
-  background: var(--muted);
+  background: color-mix(in oklab, var(--primary) 7%, var(--muted));
   color: var(--foreground);
 }
 
 .ec-editor-panel-tab[aria-selected='true'] {
   color: var(--primary);
+  background: color-mix(in oklab, var(--primary) 8%, transparent);
+}
+
+.ec-editor-panel-tab svg {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 12px;
+  transition: transform var(--ec-normal) var(--ec-ease-out);
+}
+
+.ec-editor-panel-tab:hover svg {
+  transform: translateY(-1px) rotate(-4deg) scale(1.08);
 }
 
 .ec-editor-panel-tab[aria-selected='true']::after {
@@ -247,11 +288,11 @@
   display: grid;
   justify-items: start;
   gap: 8px;
-  margin: 10px;
+  margin: 8px;
   border: 1px dashed var(--border);
   border-radius: 8px;
-  padding: 12px;
-  background: var(--background);
+  padding: 10px;
+  background: color-mix(in oklab, var(--background) 90%, var(--primary));
   font-size: var(--ec-text-xs);
 }
 

@@ -10,6 +10,77 @@
   --ec-editor-canvas-padding: 12px;
 }
 
+/* Multi-framework theme adapters. Radix remains the default primitive owner;
+   these scoped tokens intentionally change only presentation and layout. */
+[data-ec-framework='aceternity-magic'] {
+  --ec-shell-sidebar-width: 224px;
+  --ec-shell-topbar-height: 50px;
+  --surface: color-mix(in oklab, var(--background) 88%, var(--ec-violet));
+  --surface-raised: color-mix(in oklab, var(--background) 94%, var(--ec-cyan));
+  --border: color-mix(in oklab, var(--ec-violet) 22%, var(--background));
+  --ec-shadow-panel: 0 18px 56px color-mix(in oklab, var(--ec-violet) 18%, transparent);
+}
+
+[data-ec-framework='daisyui'] {
+  --ec-shell-sidebar-width: 232px;
+  --ec-shell-topbar-height: 52px;
+  --surface-raised: color-mix(in oklab, var(--surface) 88%, var(--ec-emerald));
+  --ec-shadow-sm: 0 3px 0 color-mix(in oklab, var(--foreground) 13%, transparent);
+  --ec-shadow-panel: 0 7px 0 color-mix(in oklab, var(--foreground) 10%, transparent);
+}
+
+[data-ec-framework='headlessui'] {
+  --ec-shell-sidebar-width: 216px;
+  --ec-shell-topbar-height: 48px;
+  --surface-raised: color-mix(in oklab, var(--surface) 97%, var(--foreground));
+  --ec-shadow: none;
+  --ec-shadow-sm: none;
+  --ec-shadow-panel: none;
+}
+
+[data-ec-framework='ark-base'] {
+  --ec-shell-sidebar-width: 220px;
+  --ec-shell-topbar-height: 48px;
+  --surface-raised: color-mix(in oklab, var(--surface) 92%, var(--ec-amber));
+  --ec-shadow: none;
+  --ec-shadow-sm: 0 1px 0 color-mix(in oklab, var(--foreground) 18%, transparent);
+  --ec-shadow-panel: 0 1px 0 color-mix(in oklab, var(--foreground) 16%, transparent);
+}
+
+[data-ec-framework='heroui'] {
+  --ec-shell-sidebar-width: 236px;
+  --ec-shell-topbar-height: 50px;
+  --surface: color-mix(in oklab, var(--background) 91%, var(--ec-rose));
+  --surface-raised: color-mix(in oklab, var(--background) 95%, var(--ec-violet));
+  --ec-shadow-sm: 0 6px 20px color-mix(in oklab, var(--ec-rose) 12%, transparent);
+  --ec-shadow-panel: 0 18px 52px color-mix(in oklab, var(--ec-violet) 16%, transparent);
+}
+
+[data-ec-framework='aceternity-magic'] .ec-app-shell-workspace {
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--ec-violet) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--ec-cyan) 4%, transparent) 1px, transparent 1px),
+    radial-gradient(circle at 72% 0%, color-mix(in oklab, var(--ec-violet) 16%, transparent), transparent 36%);
+  background-size:
+    24px 24px,
+    24px 24px,
+    100% 100%;
+}
+
+[data-ec-framework='headlessui'] .ec-app-shell-sidebar,
+[data-ec-framework='ark-base'] .ec-app-shell-sidebar {
+  box-shadow: none;
+}
+
+[data-ec-framework='daisyui'] .ec-editor-region-header {
+  border-bottom-width: 2px;
+}
+
+[data-ec-framework='heroui'] .ec-app-shell-topbar {
+  background: color-mix(in oklab, var(--surface) 76%, transparent);
+  backdrop-filter: blur(20px) saturate(150%);
+}
+
 [data-ec-accent='indigo'] {
   --ec-studio-accent-primary: oklch(0.52 0.22 260);
   --ec-studio-accent-ring: oklch(0.62 0.19 258);

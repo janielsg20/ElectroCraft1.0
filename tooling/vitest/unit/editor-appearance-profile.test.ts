@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_EDITOR_APPEARANCE_PROFILE,
+  BUILT_IN_STUDIO_APPEARANCE_PRESETS,
   createPersonalStudioAppearancePreset,
   deserializeEditorAppearanceProfile,
   deserializePersonalStudioAppearancePresets,
@@ -75,6 +76,14 @@ describe('M03.9 editor session appearance profile', () => {
     expect(resolveEditorAppearanceProfile(preview, applied)).toBe(preview);
     expect(resolveEditorAppearanceProfile(null, applied)).toBe(applied);
     expect(resolveEditorAppearanceProfile(null, null)).toBe(DEFAULT_EDITOR_APPEARANCE_PROFILE);
+  });
+
+  it('exposes framework-attributed built-in themes as complete high-density profiles', () => {
+    const external = BUILT_IN_STUDIO_APPEARANCE_PRESETS.filter((preset) => preset.framework !== 'electrocraft');
+
+    expect(external).toHaveLength(5);
+    expect(external.every((preset) => preset.profile.framework === preset.framework)).toBe(true);
+    expect(external.every((preset) => preset.profile.density === 'high')).toBe(true);
   });
 
   it('persists a complete applied profile and reloads it like a remount', () => {
