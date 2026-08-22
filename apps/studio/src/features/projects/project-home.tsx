@@ -38,7 +38,10 @@ const ListIcon = getStudioIcon('studio.view.list');
 const NewProjectIcon = getStudioIcon('studio.sidebar.aiGenerate');
 
 function backupFileName(name: string) {
-  const safe = name.trim().replace(/[^a-z0-9._-]+/gi, '-').replace(/^-+|-+$/g, '');
+  const safe = name
+    .trim()
+    .replace(/[^a-z0-9._-]+/gi, '-')
+    .replace(/^-+|-+$/g, '');
   return `${safe || 'proyecto'}.electrocraft.json`;
 }
 
