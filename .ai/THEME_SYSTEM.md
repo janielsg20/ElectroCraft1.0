@@ -1,14 +1,21 @@
 # THEME / TEMPLATE / APP KIT SYSTEM
 
 # Studio Appearance
+
 Workspace/user preference only.
+One ElectroCraft Studio theme built with shadcn/ui + Radix.
+Supported color modes: `light` and `dark`.
+No Studio appearance presets or framework themes.
 Does not modify generated app.
 
 # App Theme
-Portable visual tokens/variants.
+
+Portable visual tokens/variants for the application being built.
 May include Web/Native adaptations.
+This product capability remains independent from Studio Appearance.
 
 # Template
+
 ElectroCraftDocument kind=template.
 
 Kinds:
