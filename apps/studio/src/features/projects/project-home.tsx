@@ -22,8 +22,9 @@ import {
 } from '@electrocraft/design-system';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { HelpTrigger } from '../../help/help-ui';
-import { projectStorageRuntime } from './project-storage-runtime';
 import { NewProjectWizard } from './new-project-wizard';
+import { ProjectBackupButton, ProjectImportDialog } from './project-backup-actions';
+import { projectStorageRuntime } from './project-storage-runtime';
 
 const SearchIcon = getStudioIcon('studio.sidebar.queries');
 const GridIcon = getStudioIcon('studio.view.grid');
@@ -133,6 +134,12 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
               Lista
             </Button>
           </div>
+          <ProjectImportDialog
+            onImported={(projectId) => {
+              void reload();
+              onOpen(projectId);
+            }}
+          />
           <Button className="ec-project-new" disabled={state === 'loading'} onClick={() => setWizardOpen(true)}>
             <NewProjectIcon aria-hidden="true" />
             Nuevo proyecto
@@ -184,6 +191,7 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
                   >
                     Duplicar
                   </Button>
+                  <ProjectBackupButton project={p} />
                   {p.status === 'active' ? (
                     <Button
                       variant="ghost"
