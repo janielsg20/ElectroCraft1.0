@@ -1,24 +1,113 @@
+.ec-appearance-design-gallery,
+.ec-appearance-market-section,
+.ec-appearance-framework-section {
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.ec-appearance-market-section,
+.ec-appearance-framework-section {
+  border: 1px solid color-mix(in oklab, var(--border) 82%, transparent);
+  border-radius: var(--ec-radius-md);
+  padding: 8px;
+  background: color-mix(in oklab, var(--surface) 97%, var(--primary));
+}
+
+.ec-appearance-gallery-heading {
+  min-width: 0;
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ec-appearance-gallery-heading h4,
+.ec-appearance-gallery-heading p {
+  margin: 0;
+}
+
+.ec-appearance-gallery-heading h4 {
+  color: var(--foreground);
+  font-size: var(--ec-text-xs);
+  font-weight: 800;
+}
+
+.ec-appearance-gallery-heading p {
+  margin-top: 2px;
+  color: var(--muted-foreground);
+  font-size: var(--ec-text-2xs);
+  line-height: 1.4;
+}
+
+.ec-appearance-gallery-heading > span {
+  flex: 0 0 auto;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 6px;
+  color: var(--muted-foreground);
+  background: var(--surface-raised);
+  font: 700 var(--ec-text-2xs) / 1.2 var(--ec-font-mono);
+}
+
+.ec-market-family-filters {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: thin;
+}
+
+.ec-market-family-filters button {
+  min-height: 26px;
+  flex: 0 0 auto;
+  padding-inline: 8px;
+  font-size: 9px;
+}
+
+.ec-market-family-filters button[aria-pressed='true'] {
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--primary) 42%, transparent);
+}
+
+.ec-appearance-market-grid,
+.ec-appearance-framework-grid {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
 .ec-market-style-card {
   --ec-market-tone: var(--primary);
   min-width: 0;
   display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 7px;
   border: 1px solid color-mix(in oklab, var(--ec-market-tone) 24%, var(--border));
   border-radius: 10px;
   padding: 7px;
+  overflow: hidden;
   background: linear-gradient(155deg, color-mix(in oklab, var(--ec-market-tone) 8%, var(--surface)), var(--surface));
   box-shadow: var(--ec-shadow-sm);
   transition:
     transform var(--ec-fast) var(--ec-ease-out),
     border-color var(--ec-fast) ease,
-    box-shadow var(--ec-fast) ease;
+    box-shadow var(--ec-fast) ease,
+    background-color var(--ec-fast) ease;
 }
 
 .ec-market-style-card:hover,
+.ec-market-style-card:focus-within,
 .ec-market-style-card[data-state='selected'] {
   transform: translateY(-2px);
   border-color: color-mix(in oklab, var(--ec-market-tone) 62%, var(--border));
   box-shadow: 0 9px 24px color-mix(in oklab, var(--ec-market-tone) 14%, transparent);
+}
+
+.ec-market-style-card[data-state='selected'] {
+  box-shadow:
+    0 9px 24px color-mix(in oklab, var(--ec-market-tone) 14%, transparent),
+    inset 0 0 0 1px color-mix(in oklab, var(--ec-market-tone) 58%, transparent);
 }
 
 .ec-market-style-card[data-market-style='ide'] {
@@ -33,6 +122,7 @@
 
 .ec-market-style-card[data-market-style='cms'] {
   --ec-market-tone: var(--ec-sky);
+  border-radius: 7px;
 }
 
 .ec-market-style-card[data-market-style='commerce'] {
@@ -56,6 +146,7 @@
   background:
     radial-gradient(circle at 15% 0%, color-mix(in oklab, var(--ec-violet) 25%, transparent), transparent 44%),
     color-mix(in oklab, var(--surface) 80%, transparent);
+  backdrop-filter: blur(12px) saturate(140%);
 }
 
 .ec-market-style-card[data-market-style='brutal'] {
@@ -63,6 +154,13 @@
   border: 2px solid var(--foreground);
   border-radius: 0;
   box-shadow: 4px 4px 0 color-mix(in oklab, var(--foreground) 85%, transparent);
+}
+
+.ec-market-style-card[data-market-style='brutal']:hover,
+.ec-market-style-card[data-market-style='brutal']:focus-within,
+.ec-market-style-card[data-market-style='brutal'][data-state='selected'] {
+  transform: translate(-1px, -1px);
+  box-shadow: 6px 6px 0 color-mix(in oklab, var(--foreground) 85%, transparent);
 }
 
 .ec-market-style-card[data-market-style='soft'] {
@@ -79,7 +177,7 @@
 }
 
 .ec-market-style-preview {
-  height: 64px;
+  height: 74px;
   display: grid;
   grid-template-columns: 18px minmax(0, 1fr);
   overflow: hidden;
@@ -94,8 +192,18 @@
   justify-items: center;
   gap: 4px;
   border-right: 1px solid color-mix(in oklab, var(--ec-market-tone) 28%, var(--border));
-  padding-top: 5px;
+  padding-top: 4px;
   background: color-mix(in oklab, var(--surface) 88%, var(--ec-market-tone));
+}
+
+.ec-market-style-mini-brand {
+  width: 8px;
+  height: 8px;
+  display: block;
+  margin-bottom: 2px;
+  border-radius: 2px;
+  background: var(--ec-market-tone);
+  box-shadow: 0 0 8px color-mix(in oklab, var(--ec-market-tone) 26%, transparent);
 }
 
 .ec-market-style-mini-sidebar svg {
@@ -105,30 +213,35 @@
   transition: transform 180ms var(--ec-ease-out);
 }
 
-.ec-market-style-card:hover .ec-market-style-mini-sidebar svg:nth-child(1) {
+.ec-market-style-card:hover .ec-market-style-mini-sidebar svg:nth-of-type(1) {
   transform: translateY(-1px) rotate(-7deg) scale(1.18);
 }
 
-.ec-market-style-card:hover .ec-market-style-mini-sidebar svg:nth-child(2) {
+.ec-market-style-card:hover .ec-market-style-mini-sidebar svg:nth-of-type(2) {
   transform: translateX(1px) scale(1.16);
 }
 
-.ec-market-style-card:hover .ec-market-style-mini-sidebar svg:nth-child(3) {
+.ec-market-style-card:hover .ec-market-style-mini-sidebar svg:nth-of-type(3) {
   transform: rotate(34deg) scale(1.12);
 }
 
 .ec-market-style-mini-main {
   min-width: 0;
   display: grid;
-  grid-template-rows: 14px minmax(0, 1fr);
+  grid-template-rows: 14px minmax(0, 1fr) 9px;
 }
 
-.ec-market-style-mini-topbar {
+.ec-market-style-mini-topbar,
+.ec-market-style-mini-statusbar {
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 3px;
-  border-bottom: 1px solid color-mix(in oklab, var(--ec-market-tone) 20%, var(--border));
   padding: 0 4px;
+}
+
+.ec-market-style-mini-topbar {
+  border-bottom: 1px solid color-mix(in oklab, var(--ec-market-tone) 20%, var(--border));
 }
 
 .ec-market-style-mini-topbar span {
@@ -136,6 +249,34 @@
   height: 4px;
   border-radius: 999px;
   background: color-mix(in oklab, var(--ec-market-tone) 65%, var(--muted));
+}
+
+.ec-market-style-mini-topbar i {
+  width: 17px;
+  height: 4px;
+  display: block;
+  margin-left: auto;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--ec-market-tone) 18%, var(--muted));
+}
+
+.ec-market-style-mini-statusbar {
+  border-top: 1px solid color-mix(in oklab, var(--ec-market-tone) 18%, var(--border));
+}
+
+.ec-market-style-mini-statusbar span {
+  width: 3px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--ec-market-tone);
+}
+
+.ec-market-style-mini-statusbar i {
+  width: 20px;
+  height: 2px;
+  display: block;
+  border-radius: 99px;
+  background: color-mix(in oklab, var(--ec-market-tone) 20%, var(--muted));
 }
 
 .ec-market-style-mini-workspace {
@@ -148,16 +289,39 @@
 
 .ec-market-style-mini-workspace > span {
   min-width: 0;
+  min-height: 0;
+  display: block;
+  overflow: hidden;
   border: 1px solid color-mix(in oklab, var(--ec-market-tone) 20%, var(--border));
   border-radius: 3px;
   background: color-mix(in oklab, var(--surface-raised) 93%, var(--ec-market-tone));
 }
 
 .ec-market-style-mini-canvas {
+  position: relative;
   background:
     radial-gradient(color-mix(in oklab, var(--ec-market-tone) 22%, transparent) 0.6px, transparent 0.6px),
     color-mix(in oklab, var(--surface) 92%, var(--ec-market-tone)) !important;
   background-size: 6px 6px !important;
+}
+
+.ec-market-style-mini-canvas b {
+  position: absolute;
+  left: 18%;
+  width: 64%;
+  height: 7px;
+  border: 1px solid color-mix(in oklab, var(--ec-market-tone) 26%, var(--border));
+  border-radius: 2px;
+  background: color-mix(in oklab, var(--surface) 86%, var(--ec-market-tone));
+}
+
+.ec-market-style-mini-canvas b:first-child {
+  top: 24%;
+}
+
+.ec-market-style-mini-canvas b:last-child {
+  top: 52%;
+  width: 42%;
 }
 
 .ec-market-style-card[data-market-style='canvas'] .ec-market-style-preview,
@@ -186,12 +350,29 @@
   padding: 3px;
 }
 
+.ec-market-style-card[data-market-style='data'] .ec-market-style-mini-workspace > span,
+.ec-market-style-card[data-market-style='data'] .ec-market-style-preview {
+  border-radius: 0;
+}
+
 .ec-market-style-card[data-market-style='cms'] .ec-market-style-mini-workspace {
   grid-template-columns: 1.05fr 2fr 0.7fr;
 }
 
+.ec-market-style-card[data-market-style='cms'] .ec-market-style-mini-canvas {
+  background: color-mix(in oklab, var(--surface) 96%, var(--ec-market-tone)) !important;
+}
+
 .ec-market-style-card[data-market-style='commerce'] .ec-market-style-mini-workspace {
   grid-template-columns: 0.8fr 1.35fr 1.35fr;
+}
+
+.ec-market-style-card[data-market-style='commerce'] .ec-market-style-mini-workspace > span {
+  border-radius: 6px;
+}
+
+.ec-market-style-card[data-market-style='minimal'] .ec-market-style-mini-workspace {
+  grid-template-columns: 0.45fr 2.5fr 0.55fr;
 }
 
 .ec-market-style-card[data-market-style='zen'] .ec-market-style-preview {
@@ -199,19 +380,27 @@
 }
 
 .ec-market-style-card[data-market-style='zen'] .ec-market-style-mini-workspace {
-  grid-template-columns: 0.35fr 3fr 0.35fr;
+  grid-template-columns: 0.25fr 3fr 0.25fr;
+}
+
+.ec-market-style-card[data-market-style='zen'] .ec-market-style-mini-panel,
+.ec-market-style-card[data-market-style='zen'] .ec-market-style-mini-inspector {
+  opacity: 0.28;
 }
 
 .ec-market-style-card[data-market-style='brutal'] .ec-market-style-preview,
-.ec-market-style-card[data-market-style='brutal'] .ec-market-style-mini-workspace > span {
-  border: 1px solid var(--foreground);
+.ec-market-style-card[data-market-style='brutal'] .ec-market-style-mini-workspace > span,
+.ec-market-style-card[data-market-style='brutal'] .ec-market-style-mini-sidebar,
+.ec-market-style-card[data-market-style='brutal'] .ec-market-style-mini-main {
+  border-color: var(--foreground);
   border-radius: 0;
 }
 
 .ec-market-style-copy {
   min-width: 0;
   display: grid;
-  gap: 2px;
+  align-content: start;
+  gap: 3px;
 }
 
 .ec-market-style-heading {
@@ -230,7 +419,7 @@
   white-space: nowrap;
 }
 
-.ec-market-style-heading span {
+.ec-market-style-heading > span {
   flex: 0 0 auto;
   border: 1px solid color-mix(in oklab, var(--ec-market-tone) 32%, var(--border));
   border-radius: 999px;
@@ -247,14 +436,46 @@
   line-height: 1.3;
 }
 
-.ec-market-style-copy p {
+.ec-market-style-copy > p:not(.ec-market-style-recommended) {
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
 
-/* Runtime interaction language shared by the new designs. */
+.ec-market-style-traits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  padding-top: 2px;
+}
+
+.ec-market-style-traits span {
+  border: 1px solid color-mix(in oklab, var(--ec-market-tone) 22%, var(--border));
+  border-radius: 999px;
+  padding: 1px 4px;
+  color: color-mix(in oklab, var(--ec-market-tone) 62%, var(--foreground));
+  background: color-mix(in oklab, var(--ec-market-tone) 6%, var(--surface));
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.ec-market-style-recommended {
+  padding-top: 1px;
+}
+
+.ec-market-style-recommended strong {
+  color: var(--foreground);
+  font-weight: 700;
+}
+
+.ec-market-style-card > button {
+  min-height: 28px;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+/* Shared runtime state language. */
 :root[data-ec-motion='standard'] .ec-app-shell[data-status='saving'] .ec-app-shell-status-dot,
 :root[data-ec-motion='high'] .ec-app-shell[data-status='saving'] .ec-app-shell-status-dot {
   animation: ec-market-status-pulse 1.15s ease-in-out infinite;
@@ -262,6 +483,23 @@
 
 :root[data-ec-motion='high'] .ec-app-shell-navigation-link[aria-current='page'] .ec-app-shell-navigation-icon {
   animation: ec-market-active-icon 1.8s ease-in-out infinite alternate;
+}
+
+:root[data-ec-market-layout] .ec-app-shell-navigation-link,
+:root[data-ec-market-layout] .ec-editor-region,
+:root[data-ec-market-layout] .ec-app-shell-topbar,
+:root[data-ec-market-layout] .ec-app-shell-statusbar {
+  transition:
+    border-color var(--ec-normal) var(--ec-ease-out),
+    background-color var(--ec-normal) var(--ec-ease-out),
+    box-shadow var(--ec-normal) var(--ec-ease-out),
+    transform var(--ec-normal) var(--ec-ease-out);
+}
+
+:root[data-ec-market-layout] .ec-app-shell[data-status='error'] .ec-app-shell-statusbar,
+:root[data-ec-market-layout] .ec-app-shell[data-status='blocked'] .ec-app-shell-statusbar {
+  border-top-color: color-mix(in oklab, var(--destructive) 48%, var(--border));
+  color: color-mix(in oklab, var(--destructive) 72%, var(--foreground));
 }
 
 @keyframes ec-market-status-pulse {
@@ -293,37 +531,75 @@
   }
 }
 
-/* Studio Carbon — dense IDE shell. */
-:root[data-ec-appearance-profile='Studio Carbon'] .ec-app-shell-sidebar,
-:root[data-ec-appearance-profile='Studio Carbon'] .ec-app-shell-topbar,
-:root[data-ec-appearance-profile='Studio Carbon'] .ec-app-shell-statusbar,
-:root[data-ec-appearance-profile='Studio Carbon'] .ec-editor-region,
-:root[data-ec-appearance-profile='Studio Carbon'] .ec-editor-puck-preview > * {
+@keyframes ec-market-data-scan {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 4px currentcolor);
+  }
+}
+
+/* IDE / Studio Carbon — dense technical shell with deterministic feedback. */
+:root[data-ec-market-layout='ide'] .ec-app-shell-sidebar,
+:root[data-ec-market-layout='ide'] .ec-app-shell-topbar,
+:root[data-ec-market-layout='ide'] .ec-app-shell-statusbar,
+:root[data-ec-market-layout='ide'] .ec-editor-region,
+:root[data-ec-market-layout='ide'] .ec-editor-puck-preview > * {
   border-radius: 0;
   box-shadow: none;
 }
 
-:root[data-ec-appearance-profile='Studio Carbon'] .ec-app-shell-sidebar {
+:root[data-ec-market-layout='ide'] .ec-app-shell-sidebar {
   background: color-mix(in oklab, var(--surface) 96%, black);
 }
 
-:root[data-ec-appearance-profile='Studio Carbon'] .ec-app-shell-navigation-link {
+:root[data-ec-market-layout='ide'] .ec-app-shell-topbar,
+:root[data-ec-market-layout='ide'] .ec-app-shell-statusbar {
+  background: color-mix(in oklab, var(--surface) 98%, black);
+  backdrop-filter: none;
+}
+
+:root[data-ec-market-layout='ide'] .ec-app-shell-navigation-link {
+  min-height: 26px;
   border-radius: 2px;
 }
 
-:root[data-ec-appearance-profile='Studio Carbon'] .ec-app-shell-navigation-link[aria-current='page'] {
+:root[data-ec-market-layout='ide'] .ec-app-shell-navigation-link:hover {
+  transform: none;
+  background: color-mix(in oklab, var(--primary) 8%, var(--surface));
+}
+
+:root[data-ec-market-layout='ide'] .ec-app-shell-navigation-link[aria-current='page'] {
   border-left-color: var(--primary);
   background: color-mix(in oklab, var(--primary) 13%, var(--surface));
 }
 
-:root[data-ec-appearance-profile='Studio Carbon'] .ec-editor-canvas-stage {
+:root[data-ec-market-layout='ide'] .ec-app-shell-navigation-link[aria-current='page']::before {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+:root[data-ec-market-layout='ide'] .ec-editor-region-header {
+  height: 32px;
+  background: color-mix(in oklab, var(--surface) 96%, black);
+  font-family: var(--ec-font-mono);
+}
+
+:root[data-ec-market-layout='ide'] .ec-editor-canvas-stage {
   background-size: 12px 12px, 100% 100%;
 }
 
-/* Canvas Atelier — floating builder chrome. */
-:root[data-ec-appearance-profile='Canvas Atelier'] .ec-app-shell-sidebar,
-:root[data-ec-appearance-profile='Canvas Atelier'] .ec-app-shell-topbar,
-:root[data-ec-appearance-profile='Canvas Atelier'] .ec-app-shell-statusbar {
+:root[data-ec-market-layout='ide'] .ec-app-shell[data-status='saving'] .ec-app-shell-statusbar {
+  background: color-mix(in oklab, var(--warning) 7%, var(--surface));
+}
+
+/* Builder / Canvas Atelier — floating chrome and canvas-first hierarchy. */
+:root[data-ec-market-layout='canvas'] .ec-app-shell-sidebar,
+:root[data-ec-market-layout='canvas'] .ec-app-shell-topbar,
+:root[data-ec-market-layout='canvas'] .ec-app-shell-statusbar {
   border: 1px solid color-mix(in oklab, var(--primary) 18%, var(--border));
   border-radius: 14px;
   background: color-mix(in oklab, var(--surface) 82%, transparent);
@@ -331,112 +607,183 @@
   backdrop-filter: blur(18px) saturate(145%);
 }
 
-:root[data-ec-appearance-profile='Canvas Atelier'] .ec-app-shell-workspace {
+:root[data-ec-market-layout='canvas'] .ec-app-shell-workspace {
   background:
     radial-gradient(circle at 30% 8%, color-mix(in oklab, var(--primary) 13%, transparent), transparent 32%),
     radial-gradient(circle at 80% 90%, color-mix(in oklab, var(--ec-cyan) 10%, transparent), transparent 28%),
     var(--surface-raised);
 }
 
-:root[data-ec-appearance-profile='Canvas Atelier'] .ec-editor-region {
-  border-color: color-mix(in oklab, var(--primary) 14%, var(--border));
+:root[data-ec-market-layout='canvas'] .ec-app-shell-navigation-link {
+  border-radius: 9px;
 }
 
-:root[data-ec-appearance-profile='Canvas Atelier'] .ec-editor-puck-preview > * {
+:root[data-ec-market-layout='canvas'] .ec-app-shell-navigation-link:hover {
+  transform: translateX(2px) scale(1.01);
+}
+
+:root[data-ec-market-layout='canvas'] .ec-editor-region {
+  border-color: color-mix(in oklab, var(--primary) 14%, var(--border));
+  background: color-mix(in oklab, var(--surface) 94%, transparent);
+}
+
+:root[data-ec-market-layout='canvas'] .ec-editor-puck-preview > * {
   border-radius: 16px;
   box-shadow: 0 18px 48px color-mix(in oklab, var(--overlay) 20%, transparent);
 }
 
-/* CMS Editorial — wide editorial navigation and quiet content surfaces. */
-:root[data-ec-appearance-profile='CMS Editorial'] .ec-app-shell-sidebar {
+:root[data-ec-market-layout='canvas'] .ec-app-shell[data-status='saving'] .ec-app-shell-topbar {
+  border-color: color-mix(in oklab, var(--warning) 32%, var(--border));
+}
+
+/* CMS Editorial — readable hierarchy and quiet forms. */
+:root[data-ec-market-layout='cms'] .ec-app-shell-sidebar {
   background: var(--surface);
   box-shadow: none;
 }
 
-:root[data-ec-appearance-profile='CMS Editorial'] .ec-app-shell-navigation-group {
-  padding-bottom: 4px;
+:root[data-ec-market-layout='cms'] .ec-app-shell-navigation-group {
+  padding-bottom: 5px;
   border-bottom: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
 }
 
-:root[data-ec-appearance-profile='CMS Editorial'] .ec-app-shell-navigation-link[aria-current='page'] {
+:root[data-ec-market-layout='cms'] .ec-app-shell-navigation-group-label {
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+:root[data-ec-market-layout='cms'] .ec-app-shell-navigation-link {
+  min-height: 31px;
+  border-radius: 6px;
+}
+
+:root[data-ec-market-layout='cms'] .ec-app-shell-navigation-link[aria-current='page'] {
   background: color-mix(in oklab, var(--primary) 9%, var(--surface));
 }
 
-:root[data-ec-appearance-profile='CMS Editorial'] .ec-editor-region-header {
+:root[data-ec-market-layout='cms'] .ec-editor-region-header {
   background: var(--surface);
   letter-spacing: 0;
+  font-family: var(--ec-font-sans);
 }
 
-:root[data-ec-appearance-profile='CMS Editorial'] .ec-editor-canvas-stage {
+:root[data-ec-market-layout='cms'] .ec-editor-canvas-stage {
   background-image: none;
   background-color: color-mix(in oklab, var(--surface-raised) 92%, white);
 }
 
-/* Commerce Desk — action-oriented admin layout. */
-:root[data-ec-appearance-profile='Commerce Desk'] .ec-app-shell-navigation-link {
-  min-height: 31px;
+:root[data-ec-market-layout='cms'] .ec-editor-puck-preview > * {
+  border-radius: 6px;
+  box-shadow: 0 1px 3px color-mix(in oklab, var(--overlay) 8%, transparent);
+}
+
+/* Commerce Desk — action-first admin surfaces and obvious operational states. */
+:root[data-ec-market-layout='commerce'] .ec-app-shell-sidebar {
+  background: color-mix(in oklab, var(--surface) 97%, var(--success));
+}
+
+:root[data-ec-market-layout='commerce'] .ec-app-shell-navigation-link {
+  min-height: 32px;
   border-radius: 9px;
 }
 
-:root[data-ec-appearance-profile='Commerce Desk'] .ec-app-shell-navigation-link[aria-current='page'] {
+:root[data-ec-market-layout='commerce'] .ec-app-shell-navigation-link[aria-current='page'] {
   background: color-mix(in oklab, var(--success) 12%, var(--surface));
   box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--success) 18%, transparent);
 }
 
-:root[data-ec-appearance-profile='Commerce Desk'] .ec-app-shell-topbar {
+:root[data-ec-market-layout='commerce'] .ec-app-shell-topbar {
   background: color-mix(in oklab, var(--surface) 97%, var(--success));
 }
 
-:root[data-ec-appearance-profile='Commerce Desk'] .ec-editor-puck-preview > * {
+:root[data-ec-market-layout='commerce'] .ec-editor-region {
+  border-radius: 8px;
+}
+
+:root[data-ec-market-layout='commerce'] .ec-editor-puck-preview > * {
   border-radius: 12px;
 }
 
-/* Data Command — dense technical console. */
-:root[data-ec-appearance-profile='Data Command'] .ec-app-shell-sidebar,
-:root[data-ec-appearance-profile='Data Command'] .ec-app-shell-topbar,
-:root[data-ec-appearance-profile='Data Command'] .ec-app-shell-statusbar,
-:root[data-ec-appearance-profile='Data Command'] .ec-editor-region {
+:root[data-ec-market-layout='commerce'] .ec-app-shell[data-status='saving'] .ec-app-shell-statusbar {
+  background: color-mix(in oklab, var(--warning) 8%, var(--surface));
+}
+
+:root[data-ec-market-layout='commerce'] .ec-app-shell[data-status='ready'] .ec-app-shell-statusbar {
+  color: color-mix(in oklab, var(--success) 72%, var(--foreground));
+}
+
+/* Data Command — dense grid, sharp geometry and signal-oriented states. */
+:root[data-ec-market-layout='data'] .ec-app-shell-sidebar,
+:root[data-ec-market-layout='data'] .ec-app-shell-topbar,
+:root[data-ec-market-layout='data'] .ec-app-shell-statusbar,
+:root[data-ec-market-layout='data'] .ec-editor-region,
+:root[data-ec-market-layout='data'] .ec-editor-puck-preview > * {
   border-color: color-mix(in oklab, var(--ec-amber) 22%, var(--border));
   border-radius: 0;
   box-shadow: none;
 }
 
-:root[data-ec-appearance-profile='Data Command'] .ec-app-shell-workspace,
-:root[data-ec-appearance-profile='Data Command'] .ec-editor-canvas-stage {
+:root[data-ec-market-layout='data'] .ec-app-shell-workspace,
+:root[data-ec-market-layout='data'] .ec-editor-canvas-stage {
   background-image:
     linear-gradient(color-mix(in oklab, var(--ec-amber) 7%, transparent) 1px, transparent 1px),
     linear-gradient(90deg, color-mix(in oklab, var(--ec-amber) 7%, transparent) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
-:root[data-ec-appearance-profile='Data Command'] .ec-app-shell-navigation-link:hover .ec-app-shell-navigation-icon {
+:root[data-ec-market-layout='data'] .ec-app-shell-navigation-link {
+  min-height: 25px;
+  border-radius: 0;
+  font-family: var(--ec-font-mono);
+}
+
+:root[data-ec-market-layout='data'] .ec-app-shell-navigation-link:hover .ec-app-shell-navigation-icon {
   transform: translateX(2px) scale(1.08);
 }
 
-/* Linear Neutral — minimal product chrome. */
-:root[data-ec-appearance-profile='Linear Neutral'] .ec-app-shell-sidebar,
-:root[data-ec-appearance-profile='Linear Neutral'] .ec-app-shell-topbar,
-:root[data-ec-appearance-profile='Linear Neutral'] .ec-app-shell-statusbar {
-  box-shadow: none;
-  background: var(--surface);
+:root[data-ec-market-layout='data'][data-ec-motion='standard'] .ec-app-shell[data-status='saving'] .ec-app-shell-status-dot,
+:root[data-ec-market-layout='data'][data-ec-motion='high'] .ec-app-shell[data-status='saving'] .ec-app-shell-status-dot {
+  animation: ec-market-data-scan 700ms steps(2, jump-none) infinite;
 }
 
-:root[data-ec-appearance-profile='Linear Neutral'] .ec-app-shell-navigation-link {
+/* Linear Neutral — minimal chrome, calm rhythm, hierarchy over decoration. */
+:root[data-ec-market-layout='minimal'] .ec-app-shell-sidebar,
+:root[data-ec-market-layout='minimal'] .ec-app-shell-topbar,
+:root[data-ec-market-layout='minimal'] .ec-app-shell-statusbar {
+  box-shadow: none;
+  background: var(--surface);
+  backdrop-filter: none;
+}
+
+:root[data-ec-market-layout='minimal'] .ec-app-shell-navigation-group-label {
+  opacity: 0.68;
+}
+
+:root[data-ec-market-layout='minimal'] .ec-app-shell-navigation-link {
   border-color: transparent;
   background: transparent;
 }
 
-:root[data-ec-appearance-profile='Linear Neutral'] .ec-app-shell-navigation-link[aria-current='page'] {
+:root[data-ec-market-layout='minimal'] .ec-app-shell-navigation-link:hover {
+  transform: none;
+  background: color-mix(in oklab, var(--muted) 70%, transparent);
+}
+
+:root[data-ec-market-layout='minimal'] .ec-app-shell-navigation-link[aria-current='page'] {
   background: var(--muted);
   color: var(--foreground);
 }
 
-:root[data-ec-appearance-profile='Linear Neutral'] .ec-app-shell-navigation-link[aria-current='page']::before {
+:root[data-ec-market-layout='minimal'] .ec-app-shell-navigation-link[aria-current='page']::before {
   display: none;
 }
 
-/* Aurora Glass — immersive motion and luminous surfaces. */
-:root[data-ec-appearance-profile='Aurora Glass'] .ec-app-shell {
+:root[data-ec-market-layout='minimal'] .ec-editor-region-header {
+  background: transparent;
+}
+
+/* Aurora Glass — immersive glass surfaces and expressive luminous feedback. */
+:root[data-ec-market-layout='glass'] .ec-app-shell {
   background:
     radial-gradient(circle at 10% 10%, color-mix(in oklab, var(--ec-violet) 24%, transparent), transparent 30%),
     radial-gradient(circle at 90% 90%, color-mix(in oklab, var(--ec-rose) 18%, transparent), transparent 32%),
@@ -444,169 +791,254 @@
   background-size: 130% 130%, 130% 130%, auto;
 }
 
-:root[data-ec-appearance-profile='Aurora Glass'][data-ec-motion='high'] .ec-app-shell {
+:root[data-ec-market-layout='glass'][data-ec-motion='high'] .ec-app-shell {
   animation: ec-market-aurora-drift 10s ease-in-out infinite;
 }
 
-:root[data-ec-appearance-profile='Aurora Glass'] .ec-app-shell-sidebar,
-:root[data-ec-appearance-profile='Aurora Glass'] .ec-app-shell-topbar,
-:root[data-ec-appearance-profile='Aurora Glass'] .ec-app-shell-statusbar,
-:root[data-ec-appearance-profile='Aurora Glass'] .ec-editor-region {
+:root[data-ec-market-layout='glass'] .ec-app-shell-sidebar,
+:root[data-ec-market-layout='glass'] .ec-app-shell-topbar,
+:root[data-ec-market-layout='glass'] .ec-app-shell-statusbar,
+:root[data-ec-market-layout='glass'] .ec-editor-region {
   border-color: color-mix(in oklab, var(--primary) 24%, var(--border));
   background: color-mix(in oklab, var(--surface) 72%, transparent);
   box-shadow: 0 16px 42px color-mix(in oklab, var(--primary) 10%, transparent);
   backdrop-filter: blur(20px) saturate(150%);
 }
 
-:root[data-ec-appearance-profile='Aurora Glass'] .ec-app-shell-navigation-link:hover .ec-app-shell-navigation-icon {
+:root[data-ec-market-layout='glass'] .ec-app-shell-navigation-link {
+  border-radius: 11px;
+}
+
+:root[data-ec-market-layout='glass'] .ec-app-shell-navigation-link:hover {
+  transform: translateX(2px) translateY(-1px);
+  box-shadow: 0 6px 16px color-mix(in oklab, var(--primary) 10%, transparent);
+}
+
+:root[data-ec-market-layout='glass'] .ec-app-shell-navigation-link:hover .ec-app-shell-navigation-icon {
   transform: rotate(-9deg) translateY(-2px) scale(1.18);
   filter: drop-shadow(0 0 5px currentcolor);
 }
 
-/* Neo Builder — physical high-contrast states. */
-:root[data-ec-appearance-profile='Neo Builder'] .ec-app-shell-sidebar,
-:root[data-ec-appearance-profile='Neo Builder'] .ec-app-shell-topbar,
-:root[data-ec-appearance-profile='Neo Builder'] .ec-app-shell-statusbar,
-:root[data-ec-appearance-profile='Neo Builder'] .ec-editor-region,
-:root[data-ec-appearance-profile='Neo Builder'] .ec-editor-puck-preview > * {
+:root[data-ec-market-layout='glass'] .ec-editor-puck-preview > * {
+  border-radius: 16px;
+  box-shadow: 0 20px 56px color-mix(in oklab, var(--primary) 12%, transparent);
+}
+
+/* Neo Builder — physical high-contrast feedback and deliberate controls. */
+:root[data-ec-market-layout='brutal'] .ec-app-shell-sidebar,
+:root[data-ec-market-layout='brutal'] .ec-app-shell-topbar,
+:root[data-ec-market-layout='brutal'] .ec-app-shell-statusbar,
+:root[data-ec-market-layout='brutal'] .ec-editor-region,
+:root[data-ec-market-layout='brutal'] .ec-editor-puck-preview > * {
   border: 2px solid var(--foreground);
   border-radius: 0;
   box-shadow: 4px 4px 0 color-mix(in oklab, var(--foreground) 82%, transparent);
 }
 
-:root[data-ec-appearance-profile='Neo Builder'] .ec-app-shell-navigation-link {
+:root[data-ec-market-layout='brutal'] .ec-app-shell-navigation-link,
+:root[data-ec-market-layout='brutal'] button,
+:root[data-ec-market-layout='brutal'] input {
   border-radius: 0;
 }
 
-:root[data-ec-appearance-profile='Neo Builder'][data-ec-motion='high'] .ec-app-shell-navigation-link:hover svg,
-:root[data-ec-appearance-profile='Neo Builder'][data-ec-motion='high'] button:hover:not(:disabled) > svg {
+:root[data-ec-market-layout='brutal'] .ec-app-shell-navigation-link:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 2px 2px 0 var(--foreground);
+}
+
+:root[data-ec-market-layout='brutal'][data-ec-motion='high'] .ec-app-shell-navigation-link:hover svg,
+:root[data-ec-market-layout='brutal'][data-ec-motion='high'] button:hover:not(:disabled) > svg {
   animation: ec-market-neo-bounce 360ms var(--ec-ease-out);
 }
 
-/* Soft Graphite — borderless premium console. */
-:root[data-ec-appearance-profile='Soft Graphite'] .ec-app-shell-sidebar,
-:root[data-ec-appearance-profile='Soft Graphite'] .ec-app-shell-topbar,
-:root[data-ec-appearance-profile='Soft Graphite'] .ec-app-shell-statusbar {
+:root[data-ec-market-layout='brutal'] .ec-app-shell[data-status='error'] .ec-app-shell-statusbar,
+:root[data-ec-market-layout='brutal'] .ec-app-shell[data-status='blocked'] .ec-app-shell-statusbar {
+  background: color-mix(in oklab, var(--destructive) 18%, var(--surface));
+}
+
+/* Soft Graphite — low-fatigue premium admin console. */
+:root[data-ec-market-layout='soft'] .ec-app-shell-sidebar,
+:root[data-ec-market-layout='soft'] .ec-app-shell-topbar,
+:root[data-ec-market-layout='soft'] .ec-app-shell-statusbar {
   border-color: transparent;
   background: color-mix(in oklab, var(--surface) 91%, var(--primary));
   box-shadow: 0 12px 36px color-mix(in oklab, var(--overlay) 12%, transparent);
 }
 
-:root[data-ec-appearance-profile='Soft Graphite'] .ec-app-shell-navigation-link {
+:root[data-ec-market-layout='soft'] .ec-app-shell-navigation-link {
   border-radius: 10px;
 }
 
-:root[data-ec-appearance-profile='Soft Graphite'] .ec-editor-region-header {
-  border-bottom-color: transparent;
+:root[data-ec-market-layout='soft'] .ec-app-shell-navigation-link:hover {
+  transform: translateY(-1px);
+  background: color-mix(in oklab, var(--primary) 8%, var(--surface));
 }
 
-/* Zen Canvas — persistent compact rail and distraction-free canvas. */
-:root[data-ec-appearance-profile='Zen Canvas'] .ec-app-shell-sidebar,
-:root[data-ec-appearance-profile='Zen Canvas'] .ec-app-shell-topbar,
-:root[data-ec-appearance-profile='Zen Canvas'] .ec-app-shell-statusbar {
+:root[data-ec-market-layout='soft'] .ec-editor-region {
+  border-color: transparent;
+  border-radius: 12px;
+  box-shadow: 0 10px 28px color-mix(in oklab, var(--overlay) 8%, transparent);
+}
+
+:root[data-ec-market-layout='soft'] .ec-editor-region-header {
+  border-bottom-color: transparent;
+  background: color-mix(in oklab, var(--surface) 94%, var(--primary));
+}
+
+/* Zen Canvas — persistent compact rail, canvas first and intentionally quiet feedback. */
+:root[data-ec-market-layout='zen'] .ec-app-shell-sidebar,
+:root[data-ec-market-layout='zen'] .ec-app-shell-topbar,
+:root[data-ec-market-layout='zen'] .ec-app-shell-statusbar {
   box-shadow: none;
   background: var(--surface);
 }
 
-:root[data-ec-appearance-profile='Zen Canvas'] .ec-app-shell-navigation-link {
+:root[data-ec-market-layout='zen'] .ec-app-shell-topbar,
+:root[data-ec-market-layout='zen'] .ec-app-shell-statusbar {
+  color: color-mix(in oklab, var(--foreground) 72%, var(--muted-foreground));
+}
+
+:root[data-ec-market-layout='zen'] .ec-app-shell-navigation-link {
   justify-content: center;
   border-radius: 10px;
   padding-inline: 0;
 }
 
-:root[data-ec-appearance-profile='Zen Canvas'] .ec-app-shell-navigation-link[aria-current='page']::before {
-  position: absolute;
-  left: 0;
+:root[data-ec-market-layout='zen'] .ec-app-shell-navigation-link:hover {
+  transform: none;
+  background: var(--muted);
 }
 
-:root[data-ec-appearance-profile='Zen Canvas'] .ec-app-shell-navigation-item {
+:root[data-ec-market-layout='zen'] .ec-app-shell-navigation-link[aria-current='page']::before {
+  position: absolute;
+  left: 0;
+  box-shadow: none;
+}
+
+:root[data-ec-market-layout='zen'] .ec-app-shell-navigation-item {
   position: relative;
 }
 
-:root[data-ec-appearance-profile='Zen Canvas'] .ec-editor-region-header {
+:root[data-ec-market-layout='zen'] .ec-editor-region-header {
   background: var(--surface);
 }
 
-:root[data-ec-appearance-profile='Zen Canvas'] .ec-editor-canvas-stage {
+:root[data-ec-market-layout='zen'] .ec-editor-canvas-stage {
   background-image: none;
 }
 
+:root[data-ec-market-layout='zen'] .ec-editor-puck-preview > * {
+  border-color: color-mix(in oklab, var(--border) 70%, transparent);
+  box-shadow: none;
+}
+
 @media (min-width: 1280px) {
-  :root[data-ec-appearance-profile='Studio Carbon'] .ec-app-shell {
+  :root[data-ec-market-layout='ide'] .ec-app-shell {
     grid-template-columns: 226px minmax(0, 1fr);
   }
 
-  :root[data-ec-appearance-profile='Canvas Atelier'] .ec-app-shell,
-  :root[data-ec-appearance-profile='Aurora Glass'] .ec-app-shell {
+  :root[data-ec-market-layout='canvas'] .ec-app-shell,
+  :root[data-ec-market-layout='glass'] .ec-app-shell {
     grid-template-columns: 248px minmax(0, 1fr);
     gap: 8px;
     padding: 8px;
   }
 
-  :root[data-ec-appearance-profile='CMS Editorial'] .ec-app-shell {
+  :root[data-ec-market-layout='cms'] .ec-app-shell {
     grid-template-columns: 276px minmax(0, 1fr);
   }
 
-  :root[data-ec-appearance-profile='Commerce Desk'] .ec-app-shell {
+  :root[data-ec-market-layout='commerce'] .ec-app-shell {
     grid-template-columns: 260px minmax(0, 1fr);
   }
 
-  :root[data-ec-appearance-profile='Data Command'] .ec-app-shell {
+  :root[data-ec-market-layout='data'] .ec-app-shell {
     grid-template-columns: 238px minmax(0, 1fr);
   }
 
-  :root[data-ec-appearance-profile='Linear Neutral'] .ec-app-shell {
+  :root[data-ec-market-layout='minimal'] .ec-app-shell {
     grid-template-columns: 220px minmax(0, 1fr);
   }
 
-  :root[data-ec-appearance-profile='Soft Graphite'] .ec-app-shell {
+  :root[data-ec-market-layout='soft'] .ec-app-shell {
     grid-template-columns: 252px minmax(0, 1fr);
     gap: 5px;
     padding: 5px;
   }
 
-  :root[data-ec-appearance-profile='Zen Canvas'] .ec-app-shell {
+  :root[data-ec-market-layout='zen'] .ec-app-shell {
     grid-template-columns: 72px minmax(0, 1fr);
   }
 
-  :root[data-ec-appearance-profile='Zen Canvas'] .ec-app-shell-brand {
+  :root[data-ec-market-layout='zen'] .ec-app-shell-brand {
     justify-content: center;
     padding-inline: 0;
   }
 
-  :root[data-ec-appearance-profile='Zen Canvas'] .ec-app-shell-brand-label,
-  :root[data-ec-appearance-profile='Zen Canvas'] .ec-app-shell-navigation-group-label,
-  :root[data-ec-appearance-profile='Zen Canvas'] .ec-app-shell-navigation-label,
-  :root[data-ec-appearance-profile='Zen Canvas'] .ec-app-shell-collapse-label {
+  :root[data-ec-market-layout='zen'] .ec-app-shell-brand-label,
+  :root[data-ec-market-layout='zen'] .ec-app-shell-navigation-group-label,
+  :root[data-ec-market-layout='zen'] .ec-app-shell-navigation-label,
+  :root[data-ec-market-layout='zen'] .ec-app-shell-collapse-label {
     display: none;
   }
 
-  :root[data-ec-appearance-profile='Zen Canvas'] .ec-app-shell-navigation {
+  :root[data-ec-market-layout='zen'] .ec-app-shell-navigation {
     padding-inline: 5px;
   }
 
-  :root[data-ec-appearance-profile='Zen Canvas'] .ec-app-shell-collapse-trigger {
+  :root[data-ec-market-layout='zen'] .ec-app-shell-collapse-trigger {
     justify-content: center;
     padding-inline: 0;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 767px) {
+  .ec-appearance-market-grid,
+  .ec-appearance-framework-grid {
+    grid-template-columns: 1fr;
+  }
+
   .ec-market-style-card {
-    min-height: 150px;
+    min-height: 0;
   }
 
   .ec-market-style-preview {
-    height: 58px;
+    height: 68px;
+  }
+
+  :root[data-ec-market-layout='canvas'] .ec-app-shell,
+  :root[data-ec-market-layout='glass'] .ec-app-shell,
+  :root[data-ec-market-layout='soft'] .ec-app-shell {
+    gap: 0;
+    padding: 0;
+  }
+
+  :root[data-ec-market-layout='canvas'] .ec-app-shell-topbar,
+  :root[data-ec-market-layout='canvas'] .ec-app-shell-statusbar,
+  :root[data-ec-market-layout='glass'] .ec-app-shell-topbar,
+  :root[data-ec-market-layout='glass'] .ec-app-shell-statusbar,
+  :root[data-ec-market-layout='soft'] .ec-app-shell-topbar,
+  :root[data-ec-market-layout='soft'] .ec-app-shell-statusbar {
+    border-radius: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .ec-market-family-filters {
+    margin-inline: -2px;
+  }
+
+  .ec-market-style-preview {
+    height: 62px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .ec-market-style-card,
   .ec-market-style-mini-sidebar svg,
-  :root[data-ec-appearance-profile='Aurora Glass'] .ec-app-shell,
-  :root[data-ec-appearance-profile='Neo Builder'] .ec-app-shell-navigation-link:hover svg,
-  :root[data-ec-appearance-profile='Neo Builder'] button:hover:not(:disabled) > svg,
+  :root[data-ec-market-layout='glass'] .ec-app-shell,
+  :root[data-ec-market-layout='brutal'] .ec-app-shell-navigation-link:hover svg,
+  :root[data-ec-market-layout='brutal'] button:hover:not(:disabled) > svg,
   .ec-app-shell[data-status='saving'] .ec-app-shell-status-dot,
   .ec-app-shell-navigation-link[aria-current='page'] .ec-app-shell-navigation-icon {
     animation: none !important;
