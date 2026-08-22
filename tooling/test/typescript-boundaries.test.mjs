@@ -43,6 +43,23 @@ test('negative: domain cannot import React, Puck, Drizzle, Expo, DOM or filesyst
   }
 });
 
+test('declared public workspace subpaths are allowed while undeclared deep imports remain rejected', () => {
+  const snapshot = collectWorkspace(root);
+  const allowed = validateImportRecords(
+    '@electrocraft/studio',
+    record('apps/studio/src/probe.ts', '@electrocraft/design-system/framework-themes'),
+    snapshot,
+  );
+  assert.deepEqual(allowed, []);
+
+  const rejected = validateImportRecords(
+    '@electrocraft/studio',
+    record('apps/studio/src/bad.ts', '@electrocraft/design-system/src/components/ui/button'),
+    snapshot,
+  );
+  assert.ok(rejected.some((error) => error.includes('deep/unknown workspace import')));
+});
+
 test('negative: deep workspace imports are rejected even when the package root is allowed', () => {
   const snapshot = collectWorkspace(root);
   const errors = validateImportRecords(
@@ -94,10 +111,20 @@ test('negative: application cannot depend on runtime or adapter packages', () =>
   assert.ok(result.errors.some((error) => error.includes('application depends on forbidden package @electrocraft/runtime-web')));
 });
 
-test('every workspace package exposes only its public root entry', () => {
+test('workspace manifests expose the root plus only explicitly declared public subpaths', () => {
   const snapshot = collectWorkspace(root);
-  for (const manifest of Object.values(snapshot.manifests)) {
-    assert.deepEqual(Object.keys(manifest.exports), ['.']);
-    assert.equal(manifest.exports['.'], './src/index.ts');
+  for (const [name, manifest] of Object.entries(snapshot.manifests)) {
+    assert.deepEqual(manifest.exports, {
+      '.': './src/index.ts',
+      ...(snapshot.boundaries.publicSubpathExports?.[name] ?? {}),
+    });
   }
+});
+
+test('negative: undeclared package export subpaths are rejected by the workspace snapshot', () => {
+  const snapshot = structuredClone(collectWorkspace(root));
+  snapshot.manifests['@electrocraft/domain'].exports['./internal'] = './src/internal.ts';
+  const result = validateWorkspaceSnapshot(snapshot);
+  assert.equal(result.ok, false);
+  assert.ok(result.errors.includes('@electrocraft/domain public exports mismatch'));
 });
