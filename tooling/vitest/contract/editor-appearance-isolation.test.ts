@@ -4,19 +4,14 @@ import { buildElectroCraftExportIR } from '@electrocraft/application';
 import { serializeElectroCraftExportIR } from '@electrocraft/domain';
 import { structuralPuckData } from '@electrocraft/editor-puck';
 import { describe, expect, it } from 'vitest';
-import {
-  DEFAULT_EDITOR_APPEARANCE_PROFILE,
-  persistEditorAppearanceProfile,
-  resetEditorAppearanceProfile,
-  type EditorAppearanceStorage,
-} from '../../../apps/studio/src/theme';
+import { DEFAULT_STUDIO_THEME, persistStudioTheme, type StudioThemeStorage } from '../../../apps/studio/src/theme';
 import { canonicalExportIrSource } from '../helpers/export-ir-fixture';
 
 const root = process.cwd();
 const read = (relativePath: string) => fs.readFileSync(path.join(root, relativePath), 'utf8');
 
-describe('M03.9 appearance isolation contract', () => {
-  it('keeps the appearance runtime outside editor document and export ownership', () => {
+describe('M03.9 Studio theme isolation contract', () => {
+  it('keeps the Studio theme runtime outside editor document and export ownership', () => {
     const appearanceSources = [
       read('apps/studio/src/theme.ts'),
       read('apps/studio/src/theme-provider.tsx'),
@@ -26,12 +21,13 @@ describe('M03.9 appearance isolation contract', () => {
     expect(appearanceSources).not.toContain('@electrocraft/editor-puck');
     expect(appearanceSources).not.toContain('@electrocraft/export-ir');
     expect(appearanceSources).not.toContain('@electrocraft/exporters');
-    expect(appearanceSources).not.toContain('packages/frontend');
+    expect(appearanceSources).not.toContain('market-appearance-presets');
+    expect(appearanceSources).not.toContain('framework-themes');
   });
 
-  it('does not change serialized editor data, canonical project theme or ExportIR across appearance cycles', () => {
+  it('does not change editor data, canonical app theme or ExportIR when switching Studio color mode', () => {
     let persisted: string | null = null;
-    const storage: EditorAppearanceStorage = {
+    const storage: StudioThemeStorage = {
       read: () => persisted,
       write: (serialized) => {
         persisted = serialized;
@@ -46,27 +42,14 @@ describe('M03.9 appearance isolation contract', () => {
     const sourceBefore = JSON.stringify(source);
     const exportBefore = serializeElectroCraftExportIR(buildElectroCraftExportIR(source).ir);
 
-    const custom = persistEditorAppearanceProfile(storage, {
-      ...DEFAULT_EDITOR_APPEARANCE_PROFILE,
-      name: 'Aislamiento',
-      tone: 'dark',
-      accent: 'rose',
-      typographyFamily: 'mono',
-      iconStyle: 'strong',
-      radii: 'rounded',
-      elevation: 'raised',
-      density: 'comfortable',
-      canvasDensity: 'spacious',
-      animationIntensity: 'high',
-      contrastPreference: 'high',
-    });
-    persistEditorAppearanceProfile(storage, resetEditorAppearanceProfile(custom));
+    persistStudioTheme(storage, 'dark');
+    persistStudioTheme(storage, 'light');
 
     expect(JSON.stringify(structuralPuckData)).toBe(editorBefore);
     expect(JSON.stringify(source.theme)).toBe(projectThemeBefore);
     expect(JSON.stringify(source)).toBe(sourceBefore);
     expect(serializeElectroCraftExportIR(buildElectroCraftExportIR(source).ir)).toBe(exportBefore);
-    expect(DEFAULT_EDITOR_APPEARANCE_PROFILE.name).toBe('ElectroCraft');
+    expect(DEFAULT_STUDIO_THEME).toBe('light');
   });
 
   it('wires appearance through Settings and the six-slot mobile dock without replacing editor destinations', () => {
@@ -84,21 +67,19 @@ describe('M03.9 appearance isolation contract', () => {
     expect(workspace).toContain('data-mobile-destination="canvas"');
     expect(workspace).toContain('data-mobile-destination="properties"');
     expect(workspace).toContain('data-mobile-destination="more"');
-    expect(workspace.indexOf(mobileAppearanceTrigger)).toBeLessThan(
-      workspace.indexOf('data-mobile-destination="more"'),
-    );
     expect(responsive).toContain('grid-template-columns: repeat(6, minmax(0, 1fr));');
   });
 
-  it('keeps appearance values in the design-system token layer instead of feature CSS magic values', () => {
+  it('keeps visual values in one design-system token layer with no framework or preset selectors', () => {
     const provider = read('apps/studio/src/theme-provider.tsx');
     const appearanceCss = read('apps/studio/src/shell/appearance.css');
     const tokens = read('packages/design-system/src/styles/studio-appearance-tokens.css');
 
     expect(provider).not.toContain('oklch(');
     expect(appearanceCss).not.toContain('oklch(');
-    expect(tokens).toContain("[data-ec-typography-family='humanist']");
-    expect(tokens).toContain("[data-ec-motion='high']");
-    expect(tokens).toContain("[data-ec-contrast='high']");
+    expect(tokens).not.toContain('data-ec-framework');
+    expect(tokens).not.toContain('data-ec-accent');
+    expect(tokens).not.toContain('data-ec-market');
+    expect(tokens).toContain('--ec-studio-button-radius: var(--radius);');
   });
 });
