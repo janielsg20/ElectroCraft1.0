@@ -52,9 +52,9 @@ Solo contiene hechos estables y decisiones vigentes. Progreso y siguiente paso p
 
 ## UI foundation
 
-- Studio usa shadcn/ui con base Radix explícita sobre `radix-ui`; `ADR-STUDIO-MULTI-FRAMEWORK-THEMES.md` permite adapters visuales Aceternity/Magic, daisyUI, Headless UI, Ark/Base UI y HeroUI/NextUI exclusivamente bajo ownership de `packages/design-system`.
+- Studio usa una sola foundation visual: componentes source-owned de shadcn/ui con base Radix explícita sobre `radix-ui`; `ADR-STUDIO-SINGLE-SHADCN-RADIX-THEME.md` prohíbe adapters multi-framework, galerías de temas y presets de apariencia salvo ADR que lo sustituya.
 - `packages/design-system` es el owner de tokens/primitives y Lucide se consume mediante un registry semántico tipado.
-- Theme light/dark/system y densidad High Density son preferencias del Studio, no Project Objects del modelo canónico.
+- El Studio tiene un único tema ElectroCraft con modos `light | dark`; esa preferencia es workspace-only y permanece aislada de los App Themes/Project Objects del modelo canónico.
 - El AppShell global usa 100dvh con scroll contenido en workspace; desktop usa Sidebar temática compacta 216–240px, laptop 64px y tablet un rail global de 56px con navegación completa en Sheet Radix. Móvil elimina el rail lateral y prioriza Topbar compacta + navegación inferior.
 - El editor visual conserva cuatro regiones estables: Contexto 288px redimensionable 240–380px, Canvas dominante, Inspector 320px redimensionable 280–440px y Statusbar informativo 26px.
 - En laptop, el editor usa split cuando existe ancho útil >=1152px y un único overlay de herramienta secundaria entre 1024–1151px. Tablet usa Contexto/Inspector en Sheets sin comprimir el Canvas.
