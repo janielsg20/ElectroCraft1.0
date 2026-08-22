@@ -22,16 +22,20 @@ Kinds:
 Screen, Section, Modal, Form, Admin Screen.
 
 # Saved Block
+
 Reusable subtree.
 
 # Global Component
+
 Versioned reusable definition.
 
 # App Template
+
 Full starting app/domain package:
 Screens, Navigation, Data Models, Queries, State, Actions, Forms, Administration, Roles, Theme and optional demo data.
 
 # App Kit
+
 Install UX combining:
 Theme + Templates + App Template configuration.
 

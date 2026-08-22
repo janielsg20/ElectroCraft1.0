@@ -36,6 +36,7 @@ If a primitive is missing, verify current Radix/shadcn APIs first, then wrap any
 # Direction
 
 Professional No-Code builder:
+
 - minimal clean;
 - high density;
 - dominant canvas/workspace;
@@ -105,6 +106,7 @@ No implicit coupling.
 # UI implementation policy
 
 Before editing UI:
+
 1. load shadcn skill;
 2. load relevant UI/UX/Layout/Accessibility guidance;
 3. after broad TSX edits, run React best-practices review;
