@@ -48,7 +48,10 @@ test.describe('M03.9 single Studio theme', () => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await resetTheme(page);
     await page.evaluate(() => {
-      window.localStorage.setItem('electrocraft.studio.appearance.v1', JSON.stringify({ tone: 'dark', accent: 'rose' }));
+      window.localStorage.setItem(
+        'electrocraft.studio.appearance.v1',
+        JSON.stringify({ tone: 'dark', accent: 'rose' }),
+      );
       window.localStorage.setItem('electrocraft.studio.appearance-presets.v1', JSON.stringify([{ id: 'legacy' }]));
     });
 
@@ -56,7 +59,9 @@ test.describe('M03.9 single Studio theme', () => {
     await sheet.locator('[data-appearance-value="dark"]').click();
 
     expect(await page.evaluate(() => window.localStorage.getItem('electrocraft.studio.appearance.v1'))).toBeNull();
-    expect(await page.evaluate(() => window.localStorage.getItem('electrocraft.studio.appearance-presets.v1'))).toBeNull();
+    expect(
+      await page.evaluate(() => window.localStorage.getItem('electrocraft.studio.appearance-presets.v1')),
+    ).toBeNull();
   });
 
   test('remains reachable through Settings with Radix focus-safe Sheet semantics', async ({ page }) => {
