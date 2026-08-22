@@ -232,7 +232,9 @@ export function createProjectBackupService(port: ProjectStoragePort, backupPort?
 
       const name = requireNonEmpty(
         options.name ??
-          (mode === 'import-as-copy' ? `${backup.snapshot.project.name} (copia importada)` : backup.snapshot.project.name),
+          (mode === 'import-as-copy'
+            ? `${backup.snapshot.project.name} (copia importada)`
+            : backup.snapshot.project.name),
         'name',
       );
       const saveRequest = normalizeSaveProjectRequest({

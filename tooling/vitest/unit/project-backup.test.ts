@@ -172,9 +172,6 @@ describe('M04.6 project backup contract', () => {
     });
 
     expect(result.safetyRevisionId).toBeTruthy();
-    expect(operations).toEqual([
-      'checkpoint:project-source:pre-restore-safety',
-      'save:project-source',
-    ]);
+    expect(operations).toEqual(['checkpoint:project-source:pre-restore-safety', 'save:project-source']);
   });
 });

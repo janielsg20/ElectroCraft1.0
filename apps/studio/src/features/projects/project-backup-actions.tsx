@@ -55,7 +55,9 @@ export function ProjectBackupButton({ project }: { readonly project: ProjectSumm
           void projectStorageRuntime
             .exportProjectBackup(project.id)
             .then((backup) => downloadJson(backupFileName(project), backup))
-            .catch((cause) => setError(cause instanceof Error ? cause.message : 'No se pudo crear la copia de seguridad.'))
+            .catch((cause) =>
+              setError(cause instanceof Error ? cause.message : 'No se pudo crear la copia de seguridad.'),
+            )
             .finally(() => setPending(false));
         }}
       >
@@ -190,7 +192,9 @@ export function ProjectImportDialog({ onImported }: { readonly onImported: (proj
                     setOpen(false);
                     onImported(result.projectId);
                   })
-                  .catch((cause) => setError(cause instanceof Error ? cause.message : 'No se pudo importar el proyecto.'))
+                  .catch((cause) =>
+                    setError(cause instanceof Error ? cause.message : 'No se pudo importar el proyecto.'),
+                  )
                   .finally(() => setPending(false));
               }}
             >

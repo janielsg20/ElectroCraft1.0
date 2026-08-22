@@ -44,7 +44,9 @@ test('M04.6 exporta e importa una copia validada desde Project Home', async ({ p
   });
 });
 
-test('M04.6 valida el archivo antes de habilitar importación y mantiene el diálogo usable en móvil', async ({ page }) => {
+test('M04.6 valida el archivo antes de habilitar importación y mantiene el diálogo usable en móvil', async ({
+  page,
+}) => {
   test.setTimeout(120_000);
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto('/');

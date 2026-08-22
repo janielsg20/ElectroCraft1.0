@@ -122,9 +122,19 @@ describe('M04.6 backup/import PGlite round-trip', () => {
       });
       expect(reopened?.project).toMatchObject({ id: 'backup-copy', name: 'Backup copy', metadata: { locale: 'es' } });
       expect(
-        reopened?.objects.map(({ objectId, kind, schemaVersion, payload }) => ({ objectId, kind, schemaVersion, payload })),
+        reopened?.objects.map(({ objectId, kind, schemaVersion, payload }) => ({
+          objectId,
+          kind,
+          schemaVersion,
+          payload,
+        })),
       ).toEqual(
-        backup.snapshot.objects.map(({ objectId, kind, schemaVersion, payload }) => ({ objectId, kind, schemaVersion, payload })),
+        backup.snapshot.objects.map(({ objectId, kind, schemaVersion, payload }) => ({
+          objectId,
+          kind,
+          schemaVersion,
+          payload,
+        })),
       );
       expect(copiedMedia).toEqual(backup.media);
       expect((await repository.verifyProject('backup-copy')).coherent).toBe(true);
