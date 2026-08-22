@@ -53,7 +53,7 @@ a:focus-visible {
   grid-template-columns: 240px minmax(0, 1fr);
   grid-template-rows: 52px minmax(0, 1fr) 26px;
   overflow: hidden;
-  background: var(--background);
+  background: var(--surface);
 }
 
 .ec-app-shell-sidebar {
@@ -82,10 +82,10 @@ a:focus-visible {
   flex: 0 0 32px;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--border);
-  border-radius: var(--ec-radius-md);
-  background: var(--background);
-  color: var(--foreground);
+  border: 0;
+  border-radius: 9px;
+  background: var(--primary);
+  color: var(--primary-foreground);
   font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: -0.03em;
@@ -153,7 +153,7 @@ a:focus-visible {
   align-items: center;
   gap: 8px;
   border-bottom: 1px solid var(--border);
-  padding: 0 12px;
+  padding: 0 10px;
   background: var(--surface);
 }
 
@@ -173,7 +173,7 @@ a:focus-visible {
   grid-row: 2;
   overflow: auto;
   overscroll-behavior: contain;
-  background: var(--background);
+  background: var(--surface-raised);
 }
 
 .ec-app-shell-empty {
@@ -200,6 +200,7 @@ a:focus-visible {
   color: var(--muted-foreground);
   font-size: var(--ec-text-xs);
   white-space: nowrap;
+  box-shadow: 0 -1px 0 color-mix(in oklab, var(--border) 45%, transparent);
 }
 
 .ec-app-shell-status-dot {
@@ -207,12 +208,31 @@ a:focus-visible {
   height: 6px;
   flex: 0 0 6px;
   border-radius: 999px;
-  background: var(--primary);
+  background: var(--success);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--success) 16%, transparent);
+}
+
+.ec-app-shell[data-status='saving'] .ec-app-shell-status-dot {
+  background: var(--warning);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--warning) 18%, transparent);
 }
 
 .ec-app-shell[data-status='error'] .ec-app-shell-status-dot,
 .ec-app-shell[data-status='blocked'] .ec-app-shell-status-dot {
   background: var(--destructive);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--destructive) 18%, transparent);
+}
+
+.ec-design-system button svg,
+.ec-design-system a svg {
+  transition:
+    transform var(--ec-fast) ease,
+    color var(--ec-fast) ease;
+}
+
+.ec-design-system button:hover:not(:disabled) > svg,
+.ec-design-system a:hover > svg {
+  transform: translateY(-1px) scale(1.06);
 }
 
 .ec-app-shell-mobile-sheet {

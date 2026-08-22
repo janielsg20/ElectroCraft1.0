@@ -2,26 +2,32 @@
 [data-ec-theme='light'] {
   color-scheme: light;
 
-  --background: oklch(0.985 0.004 264);
-  --foreground: oklch(0.19 0.015 264);
+  --background: oklch(0.965 0.006 255);
+  --foreground: oklch(0.2 0.018 258);
   --surface: oklch(1 0 0);
-  --surface-raised: oklch(0.97 0.006 264);
+  --surface-raised: oklch(0.982 0.005 255);
   --card: var(--surface);
   --card-foreground: var(--foreground);
   --popover: var(--surface);
   --popover-foreground: var(--foreground);
-  --muted: oklch(0.94 0.008 264);
-  --muted-foreground: oklch(0.47 0.016 264);
-  --border: oklch(0.86 0.012 264);
-  --input: oklch(0.9 0.01 264);
-  --primary: oklch(0.52 0.22 260);
+  --muted: oklch(0.955 0.007 255);
+  --muted-foreground: oklch(0.48 0.018 258);
+  --border: oklch(0.885 0.012 255);
+  --input: oklch(0.91 0.012 255);
+  --primary: oklch(0.55 0.23 258);
   --primary-foreground: oklch(0.985 0.002 264);
   --secondary: oklch(0.94 0.008 264);
   --secondary-foreground: oklch(0.24 0.018 264);
-  --accent: oklch(0.91 0.035 258);
+  --accent: oklch(0.94 0.035 255);
   --accent-foreground: oklch(0.26 0.08 258);
   --destructive: oklch(0.58 0.22 27);
   --destructive-foreground: oklch(0.985 0.002 264);
+  --success: oklch(0.57 0.15 152);
+  --success-foreground: oklch(0.985 0.002 152);
+  --warning: oklch(0.72 0.16 76);
+  --warning-foreground: oklch(0.24 0.04 76);
+  --info: oklch(0.58 0.18 246);
+  --info-foreground: oklch(0.985 0.002 246);
   --ring: oklch(0.62 0.19 258);
   --overlay: oklch(0.08 0.01 264);
 
@@ -54,7 +60,7 @@
 
   --ec-fast: 120ms;
   --ec-normal: 180ms;
-  --ec-shadow: 0 12px 32px rgb(15 23 42 / 0.1);
+  --ec-shadow: 0 14px 42px rgb(15 23 42 / 0.12);
 
   --ec-background: var(--background);
   --ec-foreground: var(--foreground);
@@ -94,6 +100,12 @@
   --accent-foreground: oklch(0.92 0.03 258);
   --destructive: oklch(0.67 0.2 26);
   --destructive-foreground: oklch(0.98 0.004 264);
+  --success: oklch(0.7 0.14 152);
+  --success-foreground: oklch(0.16 0.035 152);
+  --warning: oklch(0.78 0.14 76);
+  --warning-foreground: oklch(0.2 0.035 76);
+  --info: oklch(0.72 0.15 246);
+  --info-foreground: oklch(0.17 0.035 246);
   --ring: oklch(0.72 0.16 258);
   --overlay: oklch(0.05 0.008 264);
   --ec-shadow: 0 18px 44px rgb(0 0 0 / 0.3);

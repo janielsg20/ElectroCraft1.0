@@ -8,11 +8,11 @@
 }
 
 .ec-app-shell-navigation {
-  padding: 6px;
+  padding: 8px 7px;
 }
 
 .ec-app-shell-navigation-group + .ec-app-shell-navigation-group {
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
 .ec-app-shell-navigation-group-label {
@@ -42,21 +42,26 @@
 .ec-app-shell-navigation-link {
   width: 100%;
   min-width: 0;
-  min-height: 30px;
+  min-height: 32px;
   display: flex;
   align-items: center;
   gap: 9px;
-  border-radius: var(--ec-radius-sm);
+  border-radius: 7px;
   padding: 5px 8px;
   color: var(--muted-foreground);
   font-size: var(--ec-text-xs);
   line-height: 1.25;
   text-decoration: none;
+  transition:
+    color var(--ec-fast) ease,
+    background-color var(--ec-fast) ease,
+    transform var(--ec-fast) ease;
 }
 
 .ec-app-shell-navigation-link:hover {
-  background: var(--accent);
+  background: var(--muted);
   color: var(--accent-foreground);
+  transform: translateX(2px);
 }
 
 .ec-app-shell-navigation-link:focus-visible {
@@ -66,14 +71,14 @@
 
 .ec-app-shell-navigation-link[aria-current='page'] {
   background: var(--accent);
-  color: var(--foreground);
+  color: var(--primary);
   font-weight: 700;
 }
 
 .ec-app-shell-navigation-link[aria-current='page']::before {
-  width: 2px;
-  height: 16px;
-  flex: 0 0 2px;
+  width: 3px;
+  height: 18px;
+  flex: 0 0 3px;
   border-radius: 999px;
   background: var(--primary);
   content: '';
@@ -83,6 +88,12 @@
   width: 16px;
   height: 16px;
   flex: 0 0 16px;
+}
+
+.ec-app-shell-navigation-link:hover .ec-app-shell-navigation-icon,
+.ec-app-shell-navigation-link[aria-current='page'] .ec-app-shell-navigation-icon {
+  color: var(--primary);
+  transform: scale(1.08);
 }
 
 .ec-app-shell-sidebar-footer {

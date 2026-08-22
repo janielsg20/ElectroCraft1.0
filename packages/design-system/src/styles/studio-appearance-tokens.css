@@ -35,6 +35,31 @@
   --ec-studio-accent-ring: oklch(0.68 0.15 18);
 }
 
+[data-ec-theme='dark'][data-ec-accent='indigo'] {
+  --ec-studio-accent-primary: oklch(0.7 0.17 260);
+  --ec-studio-accent-ring: oklch(0.76 0.14 258);
+}
+
+[data-ec-theme='dark'][data-ec-accent='blue'] {
+  --ec-studio-accent-primary: oklch(0.72 0.15 245);
+  --ec-studio-accent-ring: oklch(0.78 0.12 245);
+}
+
+[data-ec-theme='dark'][data-ec-accent='emerald'] {
+  --ec-studio-accent-primary: oklch(0.72 0.14 155);
+  --ec-studio-accent-ring: oklch(0.78 0.11 155);
+}
+
+[data-ec-theme='dark'][data-ec-accent='amber'] {
+  --ec-studio-accent-primary: oklch(0.8 0.14 75);
+  --ec-studio-accent-ring: oklch(0.84 0.11 75);
+}
+
+[data-ec-theme='dark'][data-ec-accent='rose'] {
+  --ec-studio-accent-primary: oklch(0.72 0.16 18);
+  --ec-studio-accent-ring: oklch(0.78 0.12 18);
+}
+
 [data-ec-accent] {
   --primary: var(--ec-studio-accent-primary);
   --ring: var(--ec-studio-accent-ring);

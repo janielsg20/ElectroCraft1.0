@@ -88,7 +88,7 @@
 .ec-editor-mobile-dock {
   height: 58px;
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   align-items: stretch;
   border-top: 1px solid var(--border);
   background: var(--surface);
@@ -118,7 +118,25 @@
 .ec-editor-mobile-action[aria-current='page'],
 .ec-editor-mobile-action[aria-pressed='true'] {
   background: var(--accent);
-  color: var(--foreground);
+  color: var(--primary);
+}
+
+.ec-editor-mobile-action[aria-current='page']::before,
+.ec-editor-mobile-action[aria-pressed='true']::before {
+  position: absolute;
+  top: 0;
+  width: 28px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--primary);
+  content: '';
+}
+
+.ec-editor-mobile-action {
+  position: relative;
+  transition:
+    color var(--ec-fast) ease,
+    background-color var(--ec-fast) ease;
 }
 
 .ec-editor-mobile-action:focus-visible {
