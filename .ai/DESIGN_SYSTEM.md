@@ -1,37 +1,37 @@
-# DESIGN SYSTEM — ElectroCraft Studio — Eighth Final
+# DESIGN SYSTEM — ElectroCraft Studio — Single Theme Baseline
 
 # Primitive stack
 
-- React 19 baseline, reverified at F00.
-- Tailwind CSS 4 baseline, reverified at F00.
+- React 19 baseline.
+- Tailwind CSS 4 baseline.
 - shadcn/ui source components.
-- **Radix base pinned explicitly**.
+- **Radix base pinned explicitly** through `radix-ui`.
 - Lucide.
 - i18next/react-i18next.
-- selected AI Elements components for AI-native UI.
+- selected AI Elements components for AI-native UI only.
 
-Initialization must not rely on the current shadcn default.
+Initialization must not rely on an implicit shadcn default. Use the current official equivalent of `shadcn init --base radix`.
 
-Use the current official equivalent of:
-`shadcn init --base radix`.
+# One Studio theme
 
-# Why Radix now
+ElectroCraft Studio has one visual language and one component foundation.
 
-The previous specification selected a different shadcn primitive base; the Eighth review pins Radix for one coherent Studio/AI Elements foundation.
+- Theme: `ElectroCraft`.
+- Color modes: `light` and `dark` only.
+- Base color family: neutral.
+- One restrained primary accent.
+- High-density layout remains the default.
+- No Studio theme presets.
+- No multi-framework appearance adapters.
+- No decorative glass/gradient framework layers.
 
-The eighth review changes this because:
-1. `Generar con IA` is a first-class workspace.
-2. AI Elements avoids rebuilding streaming messages/tool states/plans/Markdown UI.
-3. a single primitive base is safer than mixing AI Elements expectations with another shadcn base.
-
-This is a deliberate product compatibility choice, not a claim that Radix is universally better.
+The Studio theme is a workspace preference. It is not the `ElectroCraftTheme/DesignSystem` authored for generated applications.
 
 # Do not mix bases
 
-No Base UI or React Aria shadcn components inside the production Design System without ADR.
+Do not add Base UI, React Aria, Headless UI, Ark UI, HeroUI, daisyUI, Aceternity/Magic or another UI primitive framework to the production Studio without a superseding ADR.
 
-If a missing primitive requires another library:
-first verify Radix/shadcn current APIs; then wrap the exception behind one ElectroCraft primitive.
+If a primitive is missing, verify current Radix/shadcn APIs first, then wrap any proven exception behind one ElectroCraft primitive.
 
 # Direction
 
@@ -40,9 +40,10 @@ Professional No-Code builder:
 - high density;
 - dominant canvas/workspace;
 - clear hierarchy;
-- restrained borders;
+- restrained borders and shadows;
 - strong focus/selection;
-- no ornamental glass effects by default.
+- system font stack for zero font-download dependency on first paint;
+- motion short and functional only.
 
 # Core Studio primitives
 
@@ -81,40 +82,23 @@ Tool
 Plan
 CodeBlock if required.
 
-ElectroCraft still owns:
-Context Inspector, Artifact Picker, Validation, Draft Preview, Diff and Apply.
+ElectroCraft still owns Context Inspector, Artifact Picker, Validation, Draft Preview, Diff and Apply.
 
 # Density
 
-High Density means:
-- compact grouping;
-- 28–36px desktop visual control heights where appropriate;
-- efficient whitespace;
-- labels remain readable;
-- touch hit targets remain accessible.
+High Density means compact grouping and efficient whitespace while labels, keyboard focus and touch targets remain accessible.
 
 # Icons
 
-Lucide IDs are semantic product IDs.
-Every icon-only control requires label/tooltip.
-
-# Help
-
-Main H1:
-icon + title + CircleHelp.
-
-Complex technical option:
-Info icon.
-
-Do not put Info beside every simple field.
+Lucide IDs are semantic product IDs. Every icon-only control requires an accessible label and contextual tooltip where needed.
 
 # Studio Appearance vs App Theme
 
 Studio Appearance:
-workspace/user only.
+workspace/user only; `light | dark`; persisted before React hydration.
 
 App Theme:
-exported application.
+portable visual tokens/variants of the application being built/exported.
 
 No implicit coupling.
 
@@ -122,16 +106,16 @@ No implicit coupling.
 
 Before editing UI:
 1. load shadcn skill;
-2. load relevant UI/UX/Layout/Accessibility skills;
-3. load React best-practices skill after multi-component work;
-4. consult current official component docs;
-5. follow ElectroCraft layout blueprints.
+2. load relevant UI/UX/Layout/Accessibility guidance;
+3. after broad TSX edits, run React best-practices review;
+4. follow ElectroCraft layout blueprints;
+5. prefer existing Radix/shadcn primitives and semantic tokens.
 
 # Performance
 
-Heavy engines are lazy-loaded by workspace:
-- Puck when Editor opens;
-- Rete when Workflows opens;
-- Refine admin modules when Administration opens;
-- AI SDK UI client/AI Elements only when Generar con IA opens;
-- chart/calendar engines only when used.
+- Do not load alternate UI runtimes or theme CSS.
+- Apply persisted color mode before React hydration to avoid theme flash.
+- Prefer system fonts for first paint.
+- Keep appearance state to a single `light | dark` value.
+- Use CSS `prefers-reduced-motion` instead of React listeners for presentation-only motion.
+- Heavy engines remain lazy-loaded by workspace: Puck, Rete, Refine admin modules, AI SDK/AI Elements, chart/calendar engines.
