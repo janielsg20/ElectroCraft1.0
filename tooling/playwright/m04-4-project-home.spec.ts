@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+
 test('Project Home crea, reabre y archiva', async ({ page }) => {
   test.setTimeout(120_000);
   await page.goto('/');
@@ -11,11 +12,18 @@ test('Project Home crea, reabre y archiva', async ({ page }) => {
   await page.getByRole('button', { name: 'Crear proyecto' }).click();
   await expect(page.locator('[data-editor-canvas-stage]')).toBeVisible({ timeout: 60_000 });
   await page.goto('/');
-  await expect(page.getByRole('button', { name: /Proyecto sin título/ }).first()).toBeVisible({ timeout: 60_000 });
+
+  const project = page.getByRole('button', { name: /Proyecto sin título/ }).first();
+  await expect(project).toBeVisible({ timeout: 60_000 });
   await page.getByRole('button', { name: 'Archivar' }).first().click();
-  await page.getByLabel('Estado de proyectos').selectOption('archived');
+  await expect(project).toBeHidden({ timeout: 60_000 });
+
+  const statusFilter = page.getByRole('combobox', { name: 'Estado de proyectos' });
+  await statusFilter.click();
+  await page.getByRole('option', { name: 'Archivados' }).click();
   await expect(page.getByRole('button', { name: /Proyecto sin título/ }).first()).toBeVisible({ timeout: 60_000 });
 });
+
 test('Project Home es usable en móvil', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto('/');

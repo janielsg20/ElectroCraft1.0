@@ -36,6 +36,7 @@ test.describe('M03.7 Progressive Disclosure and information architecture', () =>
     await expect(inspector.getByText('Propiedades principales', { exact: true })).toBeVisible();
     await expect(inspector.getByText('Selecciona un elemento', { exact: true })).toBeVisible();
 
+    await inspector.getByRole('tab', { name: 'Diseño' }).click();
     const advanced = inspector.locator('[data-progressive-disclosure="inspector-advanced"]');
     const advancedTrigger = advanced.getByRole('button', { name: 'Avanzado' });
     await expect(advancedTrigger).toHaveAttribute('data-state', 'closed');
@@ -82,6 +83,8 @@ test.describe('M03.7 Progressive Disclosure and information architecture', () =>
     await expect(dialog).toBeVisible();
     await expect(dialog).toHaveAttribute('data-sheet-side', 'bottom');
     await expect(dialog.getByText('Propiedades principales', { exact: true })).toBeVisible();
+
+    await dialog.getByRole('tab', { name: 'Diseño' }).click();
     await expect(dialog.locator('[data-progressive-disclosure="inspector-advanced"]')).toBeVisible();
   });
 });

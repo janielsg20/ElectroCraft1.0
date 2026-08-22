@@ -178,16 +178,22 @@ test.describe('M03.9 editor session appearance profile', () => {
     await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecCanvasDensity)).toBe('comfortable');
   });
 
-  test('keeps appearance directly reachable in the six-slot mobile bottom dock', async ({ page }) => {
+  test('keeps appearance reachable through More in the five-slot mobile bottom dock', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
     await resetAppearance(page);
 
     const dock = page.locator('.ec-editor-mobile-dock');
     await expect(dock).toBeVisible();
-    await expect(dock.locator('[data-appearance-trigger="mobile"]')).toBeVisible();
-    expect(await dock.locator(':scope > *').count()).toBe(6);
+    await expect(dock.locator('[data-mobile-destination]')).toHaveCount(5);
 
-    await dock.locator('[data-appearance-trigger="mobile"]').click();
+    await dock.locator('[data-mobile-destination="more"]').click();
+    const moreSheet = page.locator('[data-editor-mobile-sheet="outline"]');
+    await expect(moreSheet).toBeVisible();
+
+    const appearanceTrigger = moreSheet.locator('[data-appearance-trigger="mobile"]');
+    await expect(appearanceTrigger).toBeVisible();
+    await appearanceTrigger.click();
+
     const sheet = page.locator('[data-appearance-sheet="mobile"]');
     await expect(sheet).toBeVisible();
     await expect(sheet).toHaveAttribute('data-sheet-side', 'bottom');
