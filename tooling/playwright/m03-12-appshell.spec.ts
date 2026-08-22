@@ -149,8 +149,13 @@ test.describe('M03.12 AppShell E2E closure matrix', () => {
     await expect(page.locator('.ec-app-shell-statusbar')).toContainText('Listo');
 
     await page.goto('/editor');
-    await expect(page.getByRole('button', { name: 'Deshacer' })).toBeDisabled();
-    await expect(page.getByRole('button', { name: 'Rehacer' })).toBeDisabled();
+    const toolsTrigger = page.getByRole('button', { name: 'Abrir herramientas contextuales' });
+    await expect(toolsTrigger).toBeVisible();
+    await toolsTrigger.click();
+    const tools = page.getByRole('dialog', { name: 'Herramientas contextuales' });
+    await expect(tools.getByRole('button', { name: 'Deshacer' })).toBeDisabled();
+    await expect(tools.getByRole('button', { name: 'Rehacer' })).toBeDisabled();
+    await page.keyboard.press('Escape');
 
     await page.goto('/ruta-inexistente-m03-12');
     await expect(page.getByText('Ruta no disponible', { exact: false })).toBeVisible();
