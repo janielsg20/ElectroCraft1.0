@@ -1,6 +1,8 @@
 import {
   createProjectStorageService,
   type IncrementalSaveProjectRequest,
+  type ProjectBackupPackage,
+  type ProjectImportStrategy,
   type ProjectStorageDiagnostics,
   type SaveProjectRequest,
 } from '@electrocraft/application';
@@ -113,6 +115,19 @@ export const projectStorageRuntime = Object.freeze({
   renameProject: service.renameProject,
   duplicateProject: service.duplicateProject,
   deleteProjectPermanently: service.deleteProjectPermanently,
+  async createBackup(projectId: string) {
+    if (currentProjectId === projectId) await autosave.flush();
+    return service.createBackup(projectId);
+  },
+  async importBackup(input: ProjectBackupPackage, strategy: ProjectImportStrategy) {
+    await autosave.flush();
+    const opened = await runPersistence(() => service.importBackup(input, strategy));
+    if (opened) {
+      currentProjectId = opened.project.id;
+      autosave.noteCheckpointCommitted();
+    }
+    return opened;
+  },
   async openProject(projectId: string) {
     const opened = await service.openProject(projectId);
     if (opened) currentProjectId = opened.project.id;
