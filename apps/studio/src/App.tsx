@@ -6,7 +6,6 @@ import { getHelpIdForNavigationItem } from './help/help-registry';
 import { studioWorkspaceDescriptor } from './index';
 import { studioT } from './i18n/studio-shell.es';
 import { StudioAppShellRoute } from './shell/app-shell-route';
-import { StudioContentListDetailRoute, StudioModuleEmptyStateRoute } from './shell/information-architecture-ui';
 import { StudioRouteSkeleton } from './shell/loading-ui';
 import { resolveSidebarActiveItem } from './shell/sidebar-navigation';
 import './styles.css';
@@ -35,6 +34,12 @@ const StudioEditorWorkspace = lazy(() =>
 );
 const DesignSystemDevelopmentRoute = lazy(() =>
   import('./shell/design-system-route').then((module) => ({ default: module.DesignSystemDevelopmentRoute })),
+);
+const StudioContentListDetailRoute = lazy(() =>
+  import('./shell/information-architecture-ui').then((module) => ({ default: module.StudioContentListDetailRoute })),
+);
+const StudioModuleEmptyStateRoute = lazy(() =>
+  import('./shell/information-architecture-ui').then((module) => ({ default: module.StudioModuleEmptyStateRoute })),
 );
 
 function StudioWorkspaceBootstrap({
@@ -102,8 +107,20 @@ function resolveStudioWorkspace(pathname: string, health: ReturnType<typeof eval
       </Suspense>
     );
   }
-  if (pathname === contentRoute) return <StudioContentListDetailRoute />;
-  if (canonicalEmptyModuleRoutes.has(pathname)) return <StudioModuleEmptyStateRoute pathname={pathname} />;
+  if (pathname === contentRoute) {
+    return (
+      <Suspense fallback={<StudioRouteSkeleton kind="generic" label="Cargando contenido" />}>
+        <StudioContentListDetailRoute />
+      </Suspense>
+    );
+  }
+  if (canonicalEmptyModuleRoutes.has(pathname)) {
+    return (
+      <Suspense fallback={<StudioRouteSkeleton kind="generic" label="Cargando módulo" />}>
+        <StudioModuleEmptyStateRoute pathname={pathname} />
+      </Suspense>
+    );
+  }
   return <StudioWorkspaceBootstrap pathname={pathname} health={health} />;
 }
 
@@ -152,7 +169,8 @@ export function App() {
         <ProjectHome
           onOpen={async (id) => {
             const opened = await projectStorageRuntime.openProject(id);
-            if (opened) openEditor();
+            if (!opened) throw new Error('No se pudo abrir el proyecto.');
+            openEditor();
           }}
         />
       </Suspense>
