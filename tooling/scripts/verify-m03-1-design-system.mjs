@@ -67,8 +67,9 @@ const exactDesignSystemDependencies = Object.freeze({
 for (const [name, version] of Object.entries(exactDesignSystemDependencies)) {
   assert.equal(packageJson.dependencies[name], version, `${name} pin must be ${version}`);
 }
-assert.deepEqual(Object.keys(packageJson.exports), ['.']);
+assert.deepEqual(Object.keys(packageJson.exports), ['.', './framework-themes']);
 assert.equal(packageJson.exports['.'], './src/index.ts');
+assert.equal(packageJson.exports['./framework-themes'], './src/components/framework/index.ts');
 assert.equal(packageJson.imports['#components/*'], './src/components/*.tsx');
 assert.equal(packageJson.imports['#lib/*'], './src/lib/*.ts');
 
