@@ -102,9 +102,11 @@ if (complete) {
     throw new Error('M03.4 post-closure evidence is not GREEN');
   }
 
-  const activeSuccessor = state.match(/M03\.(\d+)[^\n]*ACTIVE/);
-  if (!activeSuccessor || Number(activeSuccessor[1]) <= 4) {
-    throw new Error('M03.4 post-closure regression requires an ACTIVE F03 successor after M03.4');
+  const activeSuccessor = state.match(/M(\d+)\.(\d+)[^\n]*ACTIVE/);
+  const successorMajor = Number(activeSuccessor?.[1] ?? 0);
+  const successorMinor = Number(activeSuccessor?.[2] ?? 0);
+  if (!activeSuccessor || successorMajor < 3 || (successorMajor === 3 && successorMinor <= 4)) {
+    throw new Error('M03.4 post-closure regression requires an ACTIVE successor after M03.4');
   }
 }
 

@@ -26,6 +26,7 @@ import {
 import { useRef, useState, type ReactNode, type RefObject } from 'react';
 import { editorT } from '../i18n/editor.es';
 import { iaT } from '../i18n/information-architecture.es';
+import { AppearancePanelTrigger } from './appearance-panel';
 import {
   editorPaneContract,
   resolveEditorLayoutMode,
@@ -469,6 +470,7 @@ function MobileEditorLayout() {
               </SheetClose>
             </SheetHeader>
             <div className="ec-editor-mobile-sheet-body" aria-label={editorT('studio.editor.outlineTitle')}>
+              <AppearancePanelTrigger presentation="mobile" />
               <div className="ec-editor-mobile-puck-panel" data-mobile-tool="outline">
                 <OutlineContent />
               </div>
