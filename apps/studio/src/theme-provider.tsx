@@ -1,6 +1,9 @@
 import { ThemeProvider } from '@electrocraft/design-system';
 import { createContext, useContext, useEffect, useMemo, useState, type PropsWithChildren } from 'react';
-import { MARKET_STUDIO_APPEARANCE_PRESETS } from './market-appearance-presets';
+import {
+  MARKET_STUDIO_APPEARANCE_PRESETS,
+  resolveMarketAppearanceDescriptor,
+} from './market-appearance-presets';
 import './shell/appearance-market.css';
 import {
   BUILT_IN_STUDIO_APPEARANCE_PRESETS,
@@ -62,6 +65,8 @@ const appearanceDatasetKeys = [
   'ecMotion',
   'ecContrast',
   'ecSystemReducedMotion',
+  'ecMarketLayout',
+  'ecMarketPreset',
 ] as const;
 
 export interface StudioAppearanceProviderProps extends PropsWithChildren {
@@ -87,6 +92,10 @@ export function StudioAppearanceProvider({ storage, presetStorage, children }: S
   const resolvedAnimationIntensity = resolveStudioAnimationIntensity(
     resolvedProfile.animationIntensity,
     systemReducedMotion,
+  );
+  const resolvedMarketDescriptor = useMemo(
+    () => resolveMarketAppearanceDescriptor(resolvedProfile),
+    [resolvedProfile],
   );
   const presets = useMemo(
     () =>
@@ -133,10 +142,18 @@ export function StudioAppearanceProvider({ storage, presetStorage, children }: S
     root.dataset.ecContrast = resolvedProfile.contrastPreference;
     root.dataset.ecSystemReducedMotion = systemReducedMotion ? 'true' : 'false';
 
+    if (resolvedMarketDescriptor) {
+      root.dataset.ecMarketLayout = resolvedMarketDescriptor.layout;
+      root.dataset.ecMarketPreset = resolvedMarketDescriptor.presetId;
+    } else {
+      delete root.dataset.ecMarketLayout;
+      delete root.dataset.ecMarketPreset;
+    }
+
     return () => {
       for (const key of appearanceDatasetKeys) delete root.dataset[key];
     };
-  }, [resolvedAnimationIntensity, resolvedProfile, systemReducedMotion]);
+  }, [resolvedAnimationIntensity, resolvedMarketDescriptor, resolvedProfile, systemReducedMotion]);
 
   const value = useMemo<StudioAppearanceContextValue>(
     () => ({
