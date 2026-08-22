@@ -1,4 +1,11 @@
-import type { ProjectLifecycleStatus, ProjectListSort, ProjectSummary } from '@electrocraft/application';
+import {
+  PROJECT_BACKUP_FORMAT_VERSION,
+  type ProjectBackupPackage,
+  type ProjectImportStrategy,
+  type ProjectLifecycleStatus,
+  type ProjectListSort,
+  type ProjectSummary,
+} from '@electrocraft/application';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,6 +37,11 @@ const GridIcon = getStudioIcon('studio.view.grid');
 const ListIcon = getStudioIcon('studio.view.list');
 const NewProjectIcon = getStudioIcon('studio.sidebar.aiGenerate');
 
+function backupFileName(name: string) {
+  const safe = name.trim().replace(/[^a-z0-9._-]+/gi, '-').replace(/^-+|-+$/g, '');
+  return `${safe || 'proyecto'}.electrocraft.json`;
+}
+
 export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void }) {
   const [projects, setProjects] = useState<readonly ProjectSummary[]>([]);
   const [search, setSearch] = useState('');
@@ -43,6 +55,11 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
   const [actionError, setActionError] = useState('');
   const [renameProject, setRenameProject] = useState<ProjectSummary | null>(null);
   const [renameValue, setRenameValue] = useState('');
+  const [importOpen, setImportOpen] = useState(false);
+  const [importStrategy, setImportStrategy] = useState<ProjectImportStrategy>('copy');
+  const [importPackage, setImportPackage] = useState<ProjectBackupPackage | null>(null);
+  const [importError, setImportError] = useState('');
+  const [importing, setImporting] = useState(false);
   const reloadSequence = useRef(0);
   const reload = useCallback(async () => {
     const sequence = ++reloadSequence.current;
@@ -61,6 +78,7 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
     }
   }, [search, status, sort]);
   useEffect(() => void reload(), [reload]);
+
   async function runProjectAction(id: string, action: () => Promise<unknown>) {
     setPendingProjectId(id);
     setActionError('');
@@ -75,9 +93,69 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
       setPendingProjectId(null);
     }
   }
+
   async function change(id: string, next: ProjectLifecycleStatus) {
     await runProjectAction(id, () => projectStorageRuntime.setProjectStatus(id, next));
   }
+
+  async function downloadBackup(project: ProjectSummary) {
+    setPendingProjectId(project.id);
+    setActionError('');
+    try {
+      const data = await projectStorageRuntime.createBackup(project.id);
+      const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = backupFileName(project.name);
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (cause) {
+      setActionError(cause instanceof Error ? cause.message : 'No se pudo crear la copia del proyecto.');
+    } finally {
+      setPendingProjectId(null);
+    }
+  }
+
+  async function loadImportFile(file: File) {
+    setImportError('');
+    setImportPackage(null);
+    try {
+      const parsed = JSON.parse(await file.text()) as Partial<ProjectBackupPackage>;
+      if (
+        parsed.format !== 'electrocraft-project-backup' ||
+        parsed.version !== PROJECT_BACKUP_FORMAT_VERSION ||
+        !parsed.project ||
+        typeof parsed.project.id !== 'string' ||
+        typeof parsed.project.name !== 'string' ||
+        !Array.isArray(parsed.objects) ||
+        !Array.isArray(parsed.mediaRefs) ||
+        typeof parsed.checksum !== 'string'
+      ) {
+        throw new TypeError('El archivo no es una copia compatible de ElectroCraft.');
+      }
+      setImportPackage(parsed as ProjectBackupPackage);
+    } catch (cause) {
+      setImportError(cause instanceof Error ? cause.message : 'No se pudo leer la copia seleccionada.');
+    }
+  }
+
+  async function confirmImport() {
+    if (!importPackage) return;
+    setImporting(true);
+    setImportError('');
+    try {
+      await projectStorageRuntime.importBackup(importPackage, importStrategy);
+      await reload();
+      setImportOpen(false);
+      setImportPackage(null);
+      setImportStrategy('copy');
+    } catch (cause) {
+      setImportError(cause instanceof Error ? cause.message : 'No se pudo importar la copia.');
+    } finally {
+      setImporting(false);
+    }
+  }
+
   return (
     <>
       <main className="ec-project-home" data-project-home data-state={state}>
@@ -130,6 +208,9 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
               Lista
             </Button>
           </div>
+          <Button variant="outline" disabled={state === 'loading'} onClick={() => setImportOpen(true)}>
+            Importar copia
+          </Button>
           <Button className="ec-project-new" disabled={state === 'loading'} onClick={() => setWizardOpen(true)}>
             <NewProjectIcon aria-hidden="true" />
             Nuevo proyecto
@@ -147,8 +228,13 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
         {state === 'ready' && projects.length === 0 ? (
           <section className="ec-project-empty">
             <h2>No hay proyectos en esta vista</h2>
-            <p>Crea un proyecto o cambia los filtros.</p>
-            <Button onClick={() => setWizardOpen(true)}>Nuevo proyecto</Button>
+            <p>Crea un proyecto, importa una copia o cambia los filtros.</p>
+            <div className="ec-project-empty-actions">
+              <Button variant="outline" onClick={() => setImportOpen(true)}>
+                Importar copia
+              </Button>
+              <Button onClick={() => setWizardOpen(true)}>Nuevo proyecto</Button>
+            </div>
           </section>
         ) : null}
         {state === 'ready' && projects.length ? (
@@ -180,6 +266,9 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
                     }
                   >
                     Duplicar
+                  </Button>
+                  <Button variant="ghost" disabled={pendingProjectId === p.id} onClick={() => void downloadBackup(p)}>
+                    Crear copia
                   </Button>
                   {p.status === 'active' ? (
                     <Button
@@ -244,6 +333,77 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
           </section>
         ) : null}
       </main>
+
+      <Dialog
+        open={importOpen}
+        onOpenChange={(open) => {
+          setImportOpen(open);
+          if (!open) {
+            setImportPackage(null);
+            setImportError('');
+            setImportStrategy('copy');
+          }
+        }}
+      >
+        <DialogContent className="max-w-lg" aria-describedby="import-project-description">
+          <DialogTitle>Importar copia de proyecto</DialogTitle>
+          <DialogDescription id="import-project-description">
+            Selecciona una copia de ElectroCraft. El checksum se valida antes de escribir en el almacenamiento local.
+          </DialogDescription>
+          <label className="ec-project-import-file">
+            <span>Archivo de copia</span>
+            <Input
+              aria-label="Archivo de copia"
+              type="file"
+              accept="application/json,.json,.electrocraft.json"
+              disabled={importing}
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) void loadImportFile(file);
+              }}
+            />
+          </label>
+          {importPackage ? (
+            <section className="ec-project-import-summary" aria-label="Resumen de la copia">
+              <strong>{importPackage.project.name}</strong>
+              <span>{importPackage.objects.length} objetos</span>
+              <span>{importPackage.mediaRefs.length} referencias multimedia</span>
+              <span>Creada {new Date(importPackage.createdAt).toLocaleString('es')}</span>
+            </section>
+          ) : null}
+          <label className="ec-project-import-strategy">
+            <span>Cómo importar</span>
+            <Select value={importStrategy} onValueChange={(value) => setImportStrategy(value as ProjectImportStrategy)}>
+              <SelectTrigger aria-label="Estrategia de importación">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="copy">Importar como copia</SelectItem>
+                <SelectItem value="replace">Restaurar y reemplazar</SelectItem>
+              </SelectContent>
+            </Select>
+          </label>
+          {importStrategy === 'replace' ? (
+            <p className="ec-project-import-warning">
+              Si ya existe el proyecto con ese identificador, se crea un checkpoint de seguridad antes de reemplazarlo.
+            </p>
+          ) : null}
+          {importError ? <p role="alert">{importError}</p> : null}
+          <div className="mt-4 flex justify-end gap-2">
+            <Button variant="outline" disabled={importing} onClick={() => setImportOpen(false)}>
+              Cancelar
+            </Button>
+            <Button
+              variant={importStrategy === 'replace' ? 'destructive' : 'default'}
+              disabled={!importPackage || importing}
+              onClick={() => void confirmImport()}
+            >
+              {importing ? 'Importando…' : importStrategy === 'replace' ? 'Restaurar copia' : 'Importar copia'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={renameProject !== null} onOpenChange={(open) => (open ? undefined : setRenameProject(null))}>
         <DialogContent className="max-w-md" aria-describedby="rename-project-description">
           <DialogTitle>Renombrar proyecto</DialogTitle>
