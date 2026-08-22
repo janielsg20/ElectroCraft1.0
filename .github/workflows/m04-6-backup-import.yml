@@ -42,17 +42,25 @@ jobs:
           test "$(npm config get legacy-peer-deps)" = 'true'
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: Format M04.6 surface
-        run: >-
-          npx prettier --check
-          packages/application/src/projects
-          packages/data-web
-          apps/studio/src/features/projects
-          apps/studio/src/help/help-registry.ts
-          tooling/vitest/unit/project-backup.test.ts
-          tooling/vitest/integration/project-backup-pglite.test.ts
-          tooling/playwright/m04-6-project-backup.spec.ts
-          .github/workflows/m04-6-backup-import.yml
+      - name: Prepare reproducible M04.6 formatting candidate
+        id: formatting
+        run: |
+          npx prettier --write \
+            packages/application/src/projects \
+            packages/data-web \
+            apps/studio/src/features/projects \
+            apps/studio/src/help/help-registry.ts \
+            tooling/vitest/unit/project-backup.test.ts \
+            tooling/vitest/integration/project-backup-pglite.test.ts \
+            tooling/playwright/m04-6-project-backup.spec.ts \
+            .github/workflows/m04-6-backup-import.yml
+          git diff > m04-6-format.patch
+          git diff --name-only > m04-6-format-files.txt
+          if [ -s m04-6-format-files.txt ]; then
+            tar -czf m04-6-format-files.tar.gz -T m04-6-format-files.txt
+          else
+            tar -czf m04-6-format-files.tar.gz --files-from /dev/null
+          fi
       - name: Lint
         run: npm run lint
       - name: Typecheck
@@ -72,6 +80,8 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: M04.6 browser round-trip
         run: npx playwright test tooling/playwright/m04-6-project-backup.spec.ts --config playwright.config.ts
+      - name: Require committed formatting synchronization
+        run: test ! -s m04-6-format-files.txt
       - name: Emit M04.6 marker
         if: success()
         run: echo PASS_M04_6_IMPORT_BACKUP_RESTORE | tee m04-6-closure.log
@@ -81,6 +91,9 @@ jobs:
           name: m04-6-backup-import-evidence
           path: |
             m04-6-closure.log
+            m04-6-format.patch
+            m04-6-format-files.txt
+            m04-6-format-files.tar.gz
             test-results/**
             playwright-report/**
           if-no-files-found: ignore
