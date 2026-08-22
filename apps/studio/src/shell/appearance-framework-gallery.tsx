@@ -2,7 +2,8 @@ import { Button, getStudioIcon } from '@electrocraft/design-system';
 import { FrameworkThemeCard } from '@electrocraft/design-system/framework-themes';
 import { useState } from 'react';
 import { MARKET_APPEARANCE_DESCRIPTOR_BY_ID, type MarketAppearanceDescriptor } from '../market-appearance-presets';
-import type { StudioAppearancePreset, StudioProductDesignId } from '../theme';
+import type { StudioAppearancePreset } from '../theme';
+import { useStudioAppearance } from '../theme-provider';
 
 const EditorIcon = getStudioIcon('studio.sidebar.editor');
 const ComponentsIcon = getStudioIcon('studio.sidebar.components');
@@ -94,14 +95,14 @@ function MarketStyleCard({
 export function AppearanceFrameworkGallery({
   presets,
   resolvedName,
-  resolvedProductDesign,
   onSelect,
 }: {
   readonly presets: readonly StudioAppearancePreset[];
   readonly resolvedName: string;
-  readonly resolvedProductDesign?: StudioProductDesignId;
   readonly onSelect: (presetId: string) => void;
 }) {
+  const { resolvedProfile } = useStudioAppearance();
+  const resolvedProductDesign = resolvedProfile.productDesign ?? 'custom';
   const [family, setFamily] = useState<MarketFamilyFilter>('Todos');
   const marketPresets = presets.flatMap((preset) => {
     const descriptor = MARKET_APPEARANCE_DESCRIPTOR_BY_ID.get(preset.id);
