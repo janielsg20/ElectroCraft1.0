@@ -12,7 +12,7 @@ import { createProjectAutosaveController } from './project-storage-autosave';
 
 const port = createBrowserProjectStoragePort();
 const service = createProjectStorageService(port);
-const backupService = createProjectBackupService(port);
+const backupService = createProjectBackupService(port, port);
 const listeners = new Set<() => void>();
 
 let snapshot: ProjectStorageDiagnostics = Object.freeze({
