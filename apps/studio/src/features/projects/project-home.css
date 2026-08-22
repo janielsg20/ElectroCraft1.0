@@ -126,6 +126,48 @@
   text-align: center;
   margin: 48px auto;
 }
+.ec-project-empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+.ec-project-import-file,
+.ec-project-import-strategy {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+}
+.ec-project-import-file > span,
+.ec-project-import-strategy > span {
+  font-size: var(--ec-text-xs);
+  font-weight: 650;
+}
+.ec-project-import-summary {
+  display: grid;
+  gap: 4px;
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: var(--surface-raised);
+  font-size: var(--ec-text-xs);
+}
+.ec-project-import-summary strong {
+  color: var(--foreground);
+  font-size: var(--ec-text-sm);
+}
+.ec-project-import-warning {
+  margin: 12px 0 0;
+  border-left: 3px solid var(--destructive);
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: color-mix(in oklab, var(--destructive) 8%, var(--surface));
+  color: var(--foreground);
+  font-size: var(--ec-text-xs);
+  line-height: 1.45;
+}
 .ec-project-home [role='alert'] {
   margin-top: 12px;
   border: 1px solid color-mix(in oklab, var(--destructive) 38%, var(--border));
