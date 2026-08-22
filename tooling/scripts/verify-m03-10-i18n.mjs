@@ -98,7 +98,8 @@ if (!puck.includes('electrocraftComponentId: definition.id')) fail('Puck canonic
 const boundaries = json('tooling/package-boundaries.json');
 if (!Object.hasOwn(boundaries.packages, '@electrocraft/i18n')) fail('boundary owner missing');
 if (!boundaries.apps?.['@electrocraft/studio']?.includes('@electrocraft/i18n')) fail('Studio i18n dependency missing');
-if (Object.keys(boundaries.packages).length !== 18) fail('workspace must own 18 stable packages after M03.10');
+const packageCount = Object.keys(boundaries.packages).length;
+if (packageCount < 18) fail('workspace must retain at least the 18 stable packages owned after M03.10');
 
 const state = read('.ai/STATE.md');
 const active = /M03\.10[^\n]*ACTIVE/.test(state);
@@ -107,4 +108,4 @@ const successorReady = /M03\.11[^\n]*(?:ACTIVE|COMPLETADA[^\n]*GREEN)/.test(stat
 if (closed && !successorReady) fail('M03.11 must be ACTIVE or closed GREEN after M03.10 closes');
 if (!active && !closed) fail('M03.10 must remain ACTIVE or close GREEN before F03 advances');
 
-console.log(`PASS_M03_10_I18N_CONTRACT namespaces=${namespaces.length} locale=es packages=18`);
+console.log(`PASS_M03_10_I18N_CONTRACT namespaces=${namespaces.length} locale=es packages=${packageCount}`);

@@ -202,6 +202,22 @@
   overflow: auto;
 }
 
+.ec-editor-mobile-full-sheet .ec-appearance-mobile-trigger {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  grid-template-rows: none;
+  justify-content: flex-start;
+  justify-items: initial;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--background);
+  color: var(--foreground);
+  font-size: var(--ec-text-xs);
+}
+
 .ec-editor-canvas-stage:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: -2px;
