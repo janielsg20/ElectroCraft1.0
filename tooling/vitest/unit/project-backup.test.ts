@@ -117,7 +117,7 @@ function createMemoryPort(initial: readonly OpenProjectResult[] = []) {
 }
 
 describe('M04.6 project backup contract', () => {
-  it('creates a versioned canonical backup and detects tampering', () => {
+  it('creates a versioned canonical backup and detects tampering', async () => {
     const backup = createProjectBackupPackage(validSource(), [], '2026-08-22T12:00:00.000Z');
     expect(backup.manifest).toMatchObject({
       format: 'electrocraft-project-backup',
@@ -137,7 +137,7 @@ describe('M04.6 project backup contract', () => {
     };
     const { port } = createMemoryPort();
     const service = createProjectBackupService(port);
-    expect(service.importProject(tampered, { mode: 'reject-collision' })).rejects.toThrow(
+    await expect(service.importProject(tampered, { mode: 'reject-collision' })).rejects.toThrow(
       'project backup checksum mismatch',
     );
   });

@@ -153,9 +153,7 @@ async function storageEstimate() {
   } as const;
 }
 
-export function createBrowserProjectStoragePort(
-  options: BrowserProjectStorageOptions = {},
-): BrowserProjectStoragePort {
+export function createBrowserProjectStoragePort(options: BrowserProjectStorageOptions = {}): BrowserProjectStoragePort {
   const clientId = createStorageClientId();
   let runtime: BrowserStorageClient | null = null;
   let repository: BrowserProjectRepository | null = null;

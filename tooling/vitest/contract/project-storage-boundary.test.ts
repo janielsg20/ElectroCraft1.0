@@ -40,7 +40,7 @@ describe('M04.1 storage ownership boundary', () => {
   });
 
   it('pins one physical schema independent of user-defined model count', () => {
-    expect(STUDIO_STORAGE_SCHEMA_VERSION).toBe(4);
+    expect(STUDIO_STORAGE_SCHEMA_VERSION).toBe(5);
     expect(STUDIO_STORAGE_TABLES).toEqual(
       expect.arrayContaining([
         'projects',
