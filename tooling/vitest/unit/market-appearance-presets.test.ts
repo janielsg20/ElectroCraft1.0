@@ -20,6 +20,7 @@ describe('market-inspired Studio appearance presets', () => {
     expect(MARKET_STUDIO_APPEARANCE_PRESETS.every((preset) => MARKET_APPEARANCE_DESCRIPTOR_BY_ID.has(preset.id))).toBe(
       true,
     );
+    expect(MARKET_STUDIO_APPEARANCE_PRESETS.every((preset) => preset.profile.productDesign === preset.id)).toBe(true);
   });
 
   it('keeps every design accessible, high-density capable and intentionally differentiated', () => {
@@ -35,22 +36,28 @@ describe('market-inspired Studio appearance presets', () => {
     }
   });
 
-  it('resolves the visual identity independently from the editable profile name', () => {
+  it('resolves the product identity independently from editable profile values', () => {
     const carbon = MARKET_STUDIO_APPEARANCE_PRESETS.find((preset) => preset.id === 'market:studio-carbon');
     expect(carbon).toBeDefined();
 
-    const renamed = { ...carbon!.profile, name: 'Mi entorno de desarrollo' };
-    expect(resolveMarketAppearanceDescriptor(renamed)).toMatchObject({
+    const personalized = {
+      ...carbon!.profile,
+      name: 'Mi entorno de desarrollo',
+      accent: 'rose' as const,
+      typographyFamily: 'humanist' as const,
+      animationIntensity: 'reduced' as const,
+    };
+    expect(resolveMarketAppearanceDescriptor(personalized)).toMatchObject({
       presetId: 'market:studio-carbon',
       layout: 'ide',
     });
   });
 
-  it('drops the market layout when the user customizes the visual recipe away from a preset', () => {
+  it('drops the market layout only when the product design is explicitly reset', () => {
     const carbon = MARKET_STUDIO_APPEARANCE_PRESETS.find((preset) => preset.id === 'market:studio-carbon');
     expect(carbon).toBeDefined();
 
-    expect(resolveMarketAppearanceDescriptor({ ...carbon!.profile, accent: 'rose' })).toBeNull();
+    expect(resolveMarketAppearanceDescriptor({ ...carbon!.profile, productDesign: 'custom' })).toBeNull();
     expect(resolveMarketAppearanceDescriptor(DEFAULT_EDITOR_APPEARANCE_PROFILE)).toBeNull();
   });
 
