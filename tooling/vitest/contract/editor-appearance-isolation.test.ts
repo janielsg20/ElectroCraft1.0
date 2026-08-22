@@ -84,7 +84,9 @@ describe('M03.9 appearance isolation contract', () => {
     expect(workspace).toContain('data-mobile-destination="canvas"');
     expect(workspace).toContain('data-mobile-destination="properties"');
     expect(workspace).toContain('data-mobile-destination="more"');
-    expect(workspace.indexOf(mobileAppearanceTrigger)).toBeLessThan(workspace.indexOf('data-mobile-destination="more"'));
+    expect(workspace.indexOf(mobileAppearanceTrigger)).toBeLessThan(
+      workspace.indexOf('data-mobile-destination="more"'),
+    );
     expect(responsive).toContain('grid-template-columns: repeat(6, minmax(0, 1fr));');
   });
 
