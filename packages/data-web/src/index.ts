@@ -1,6 +1,7 @@
 import { packageDescriptor as dep0 } from '@electrocraft/domain';
 import { packageDescriptor as dep1 } from '@electrocraft/application';
 
+export * from './backup-repository';
 export * from './browser';
 export * from './migration';
 export * from './repository';
