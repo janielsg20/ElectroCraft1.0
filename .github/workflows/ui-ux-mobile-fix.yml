@@ -1,0 +1,66 @@
+name: Temporary Mobile Appearance Dock Fix
+
+on:
+  push:
+    branches:
+      - codex/ui-ux-style-gallery
+    paths:
+      - '.github/workflows/ui-ux-mobile-fix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix-and-remove-self:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: codex/ui-ux-style-gallery
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Restore Appearance as a direct six-slot mobile dock action
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('apps/studio/src/shell/editor-workspace.tsx')
+          text = path.read_text()
+          nested = '''            <div className="ec-editor-mobile-sheet-body" aria-label={editorT('studio.editor.outlineTitle')}>
+              <AppearancePanelTrigger presentation="mobile" />
+              <div className="ec-editor-mobile-puck-panel" data-mobile-tool="outline">'''
+          clean = '''            <div className="ec-editor-mobile-sheet-body" aria-label={editorT('studio.editor.outlineTitle')}>
+              <div className="ec-editor-mobile-puck-panel" data-mobile-tool="outline">'''
+          if nested not in text:
+              raise SystemExit('Nested mobile Appearance trigger contract not found')
+          text = text.replace(nested, clean, 1)
+          anchor = '''        </Sheet>
+
+        <Sheet open={activeTool === 'outline'} onOpenChange={(open) => setMobileTool('outline', open)}>'''
+          replacement = '''        </Sheet>
+
+        <AppearancePanelTrigger presentation="mobile" />
+
+        <Sheet open={activeTool === 'outline'} onOpenChange={(open) => setMobileTool('outline', open)}>'''
+          if anchor not in text:
+              raise SystemExit('Mobile dock insertion anchor not found')
+          text = text.replace(anchor, replacement, 1)
+          path.write_text(text)
+          PY
+          npx prettier --write apps/studio/src/shell/editor-workspace.tsx
+      - name: Remove temporary fixer and commit exact output
+        run: |
+          rm .github/workflows/ui-ux-mobile-fix.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m 'fix: restore direct mobile appearance action'
+          git push origin HEAD:codex/ui-ux-style-gallery
