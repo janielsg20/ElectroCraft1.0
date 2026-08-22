@@ -73,9 +73,9 @@ test.describe('UI/UX style gallery', () => {
     await sheet.locator('[data-appearance-group="typography-family"] [data-appearance-value="humanist"]').click();
 
     await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecMarketLayout)).toBe('ide');
-    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecMarketPreset)).toBe(
-      'market:studio-carbon',
-    );
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.dataset.ecMarketPreset))
+      .toBe('market:studio-carbon');
     await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecAccent)).toBe('rose');
 
     await sheet.locator('[data-appearance-apply]').click();
