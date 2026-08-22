@@ -4,15 +4,18 @@ import {
   defaultDesignSystemFoundationConfig,
   isDesignSystemFoundationConfigV1,
 } from '../../../packages/design-system/src/foundation/design-system-foundation';
+import { packageDescriptor } from '../../../packages/design-system/src/index';
 import { studioNavigationMessageKeys, studioT } from '../../../apps/studio/src/i18n/studio-shell.es';
 import { getStudioHelpDescriptor, studioShellHelpDescriptor } from '../../../apps/studio/src/help/help-registry';
 
 describe('M03.1 design-system owner boundary', () => {
-  it('pins Radix/Lucide semantics without creating project-canonical UI state', () => {
+  it('pins Radix/Lucide semantics and a single ElectroCraft Studio theme', () => {
     expect(isDesignSystemFoundationConfigV1(defaultDesignSystemFoundationConfig)).toBe(true);
     expect(defaultDesignSystemFoundationConfig.primitiveBase).toBe('radix');
     expect(defaultDesignSystemFoundationConfig.iconLibrary).toBe('lucide');
     expect(defaultDesignSystemFoundationConfig.density).toBe('high');
+    expect(packageDescriptor.engine.studioTheme).toBe('electrocraft');
+    expect(packageDescriptor.engine.colorModes).toEqual(['light', 'dark']);
   });
 
   it('keeps closure blockers executable instead of documentation-only', () => {
@@ -21,7 +24,8 @@ describe('M03.1 design-system owner boundary', () => {
     expect(verifier).toContain("route: '/__design-system'");
     expect(verifier).toContain('package-lock.json');
     expect(verifier).toContain('m03-1-design-system-report.json');
-    expect(verifier).toContain('m03-1-lockfile-candidate');
+    expect(verifier).toContain("studioTheme: 'electrocraft'");
+    expect(verifier).toContain("colorModes: ['light', 'dark']");
   });
 
   it('routes M03.1 Studio-visible shell copy through the typed Spanish catalog', () => {
