@@ -4,6 +4,7 @@ export const M04_1_MIGRATION_CHECKSUM = 'm04.1:storage-schema-v1' as const;
 export const M04_3_MIGRATION_CHECKSUM = 'm04.3:incremental-storage-v2' as const;
 export const M04_4_MIGRATION_CHECKSUM = 'm04.4:project-home-v3' as const;
 export const M04_6_REFERENTIAL_INTEGRITY_CHECKSUM = 'm04.6:referential-integrity-v4' as const;
+export const M04_6_BACKUP_MEDIA_CHECKSUM = 'm04.6:backup-media-v5' as const;
 
 export const M04_1_SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS projects (
@@ -156,6 +157,16 @@ ALTER TABLE record_field_index
   ADD CONSTRAINT record_field_index_project_id_projects_id_fk
   FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
 `;
+export const M04_6_BACKUP_MEDIA_SQL = `
+ALTER TABLE media_metadata ADD COLUMN IF NOT EXISTS file_name text;
+ALTER TABLE media_metadata ADD COLUMN IF NOT EXISTS mime_type text;
+ALTER TABLE media_metadata ADD COLUMN IF NOT EXISTS content_base64 text;
+ALTER TABLE media_metadata ADD COLUMN IF NOT EXISTS checksum text;
+ALTER TABLE media_metadata DROP CONSTRAINT IF EXISTS media_metadata_embedded_checksum_check;
+ALTER TABLE media_metadata
+  ADD CONSTRAINT media_metadata_embedded_checksum_check
+  CHECK ((content_base64 IS NULL AND checksum IS NULL) OR (content_base64 IS NOT NULL AND checksum IS NOT NULL));
+`;
 
 export interface PGliteMigrationClient {
   exec(query: string): Promise<unknown>;
@@ -186,10 +197,6 @@ export async function applyStudioStorageMigrations(client: PGliteMigrationClient
   await applyMigration(client, 1, M04_1_MIGRATION_CHECKSUM, M04_1_SCHEMA_SQL);
   await applyMigration(client, 2, M04_3_MIGRATION_CHECKSUM, M04_3_INCREMENTAL_SQL);
   await applyMigration(client, 3, M04_4_MIGRATION_CHECKSUM, M04_4_PROJECT_HOME_SQL);
-  await applyMigration(
-    client,
-    STUDIO_STORAGE_SCHEMA_VERSION,
-    M04_6_REFERENTIAL_INTEGRITY_CHECKSUM,
-    M04_6_REFERENTIAL_INTEGRITY_SQL,
-  );
+  await applyMigration(client, 4, M04_6_REFERENTIAL_INTEGRITY_CHECKSUM, M04_6_REFERENTIAL_INTEGRITY_SQL);
+  await applyMigration(client, STUDIO_STORAGE_SCHEMA_VERSION, M04_6_BACKUP_MEDIA_CHECKSUM, M04_6_BACKUP_MEDIA_SQL);
 }
