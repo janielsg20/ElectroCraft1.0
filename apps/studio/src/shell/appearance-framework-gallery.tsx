@@ -2,7 +2,7 @@ import { Button, getStudioIcon } from '@electrocraft/design-system';
 import { FrameworkThemeCard } from '@electrocraft/design-system/framework-themes';
 import { useState } from 'react';
 import { MARKET_APPEARANCE_DESCRIPTOR_BY_ID, type MarketAppearanceDescriptor } from '../market-appearance-presets';
-import type { StudioAppearancePreset } from '../theme';
+import type { StudioAppearancePreset, StudioProductDesignId } from '../theme';
 
 const EditorIcon = getStudioIcon('studio.sidebar.editor');
 const ComponentsIcon = getStudioIcon('studio.sidebar.components');
@@ -85,7 +85,7 @@ function MarketStyleCard({
         data-market-style-select={preset.id}
         onClick={onSelect}
       >
-        {selected ? 'Previsualizando' : 'Probar diseño'}
+        {selected ? 'Diseño base activo' : 'Probar diseño'}
       </Button>
     </article>
   );
@@ -94,10 +94,12 @@ function MarketStyleCard({
 export function AppearanceFrameworkGallery({
   presets,
   resolvedName,
+  resolvedProductDesign,
   onSelect,
 }: {
   readonly presets: readonly StudioAppearancePreset[];
   readonly resolvedName: string;
+  readonly resolvedProductDesign?: StudioProductDesignId;
   readonly onSelect: (presetId: string) => void;
 }) {
   const [family, setFamily] = useState<MarketFamilyFilter>('Todos');
@@ -143,7 +145,7 @@ export function AppearanceFrameworkGallery({
               key={preset.id}
               preset={preset}
               descriptor={descriptor}
-              selected={resolvedName === preset.profile.name}
+              selected={resolvedProductDesign === preset.id}
               onSelect={() => onSelect(preset.id)}
             />
           ))}
@@ -165,7 +167,7 @@ export function AppearanceFrameworkGallery({
               framework={preset.framework}
               label={preset.label}
               description={preset.description}
-              selected={resolvedName === preset.profile.name}
+              selected={resolvedName === preset.profile.name && resolvedProductDesign === 'custom'}
               onSelect={() => onSelect(preset.id)}
             />
           ))}
