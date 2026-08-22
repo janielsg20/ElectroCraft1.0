@@ -88,7 +88,7 @@
 .ec-editor-mobile-dock {
   height: 58px;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   align-items: stretch;
   border-top: 1px solid var(--border);
   background: color-mix(in oklab, var(--surface) 94%, transparent);
@@ -130,6 +130,10 @@
 
 .ec-editor-mobile-action[data-mobile-destination='properties'] {
   --ec-mobile-tone: var(--ec-amber);
+}
+
+.ec-editor-mobile-action.ec-appearance-mobile-trigger {
+  --ec-mobile-tone: var(--primary);
 }
 
 .ec-editor-mobile-action[data-mobile-destination='more'] {
@@ -233,22 +237,6 @@
 .ec-editor-mobile-puck-panel {
   height: 100%;
   overflow: auto;
-}
-
-.ec-editor-mobile-full-sheet .ec-appearance-mobile-trigger {
-  width: 100%;
-  min-height: 44px;
-  display: flex;
-  grid-template-rows: none;
-  justify-content: flex-start;
-  justify-items: initial;
-  gap: 8px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 8px 10px;
-  background: var(--background);
-  color: var(--foreground);
-  font-size: var(--ec-text-xs);
 }
 
 .ec-editor-canvas-stage:focus-visible {

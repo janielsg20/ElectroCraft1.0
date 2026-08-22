@@ -69,20 +69,25 @@ describe('M03.9 appearance isolation contract', () => {
     expect(DEFAULT_EDITOR_APPEARANCE_PROFILE.name).toBe('ElectroCraft');
   });
 
-  it('wires appearance through Settings and mobile without replacing editor destinations', () => {
+  it('wires appearance through Settings and the six-slot mobile dock without replacing editor destinations', () => {
     const topbar = read('apps/studio/src/shell/studio-topbar.tsx');
     const workspace = read('apps/studio/src/shell/editor-workspace.tsx');
     const responsive = read('apps/studio/src/shell/responsive-shell.css');
+    const mobileAppearanceTrigger = '<AppearancePanelTrigger presentation="mobile" />';
 
     expect(topbar).toContain('data-settings-destination="appearance"');
     expect(topbar).toContain('<AppearancePanelTrigger />');
-    expect(workspace).toContain('<AppearancePanelTrigger presentation="mobile" />');
+    expect(workspace).toContain(mobileAppearanceTrigger);
+    expect(workspace.split(mobileAppearanceTrigger)).toHaveLength(2);
     expect(workspace).toContain('data-mobile-destination="components"');
     expect(workspace).toContain('data-mobile-destination="screens"');
     expect(workspace).toContain('data-mobile-destination="canvas"');
     expect(workspace).toContain('data-mobile-destination="properties"');
     expect(workspace).toContain('data-mobile-destination="more"');
-    expect(responsive).toContain('grid-template-columns: repeat(5, minmax(0, 1fr));');
+    expect(workspace.indexOf(mobileAppearanceTrigger)).toBeLessThan(
+      workspace.indexOf('data-mobile-destination="more"'),
+    );
+    expect(responsive).toContain('grid-template-columns: repeat(6, minmax(0, 1fr));');
   });
 
   it('keeps appearance values in the design-system token layer instead of feature CSS magic values', () => {

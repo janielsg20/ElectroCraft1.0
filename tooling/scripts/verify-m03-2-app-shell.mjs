@@ -10,6 +10,7 @@ const required = [
   'apps/studio/src/help/help-registry.ts',
   'packages/design-system/src/components/ui/sheet.tsx',
   'packages/design-system/src/icons/studio-icon-registry.ts',
+  'packages/design-system/src/styles/tokens.css',
   'tooling/playwright/m03-2-app-shell.spec.ts',
   'tooling/vitest/unit/app-shell-layout.test.ts',
   'tooling/vitest/contract/app-shell-boundary.test.ts',
@@ -25,6 +26,7 @@ const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const css = read('apps/studio/src/styles.css');
 const shell = read('apps/studio/src/shell/app-shell.tsx');
 const layout = read('apps/studio/src/shell/app-shell-layout.ts');
+const tokens = read('packages/design-system/src/styles/tokens.css');
 const i18n = read('apps/studio/src/i18n/studio-shell.es.ts');
 const help = read('apps/studio/src/help/help-registry.ts');
 const sheet = read('packages/design-system/src/components/ui/sheet.tsx');
@@ -33,11 +35,25 @@ const state = read('.ai/STATE.md');
 const predecessorClosure = read('.ai/evidence/F03/M03.1/CLOSURE_2026-08-19.md');
 const m032ClosurePath = path.join(root, '.ai/evidence/F03/M03.2/CLOSURE_2026-08-19.md');
 
-for (const token of ['100dvh', '240px', '64px', '52px', '26px', 'overflow: hidden', 'min-width: 0']) {
+for (const token of [
+  '100dvh',
+  'overflow: hidden',
+  'min-width: 0',
+  'var(--ec-shell-sidebar-width)',
+  'var(--ec-shell-topbar-height)',
+  'var(--ec-shell-statusbar-height)',
+]) {
   if (!css.includes(token)) throw new Error(`M03.2 CSS contract missing: ${token}`);
 }
 for (const token of ['sidebarExpandedPx: 240', 'sidebarCollapsedPx: 64', 'topbarPx: 52', 'statusbarPx: 26']) {
   if (!layout.includes(token)) throw new Error(`M03.2 layout contract missing: ${token}`);
+}
+for (const token of [
+  '--ec-shell-sidebar-width: 240px;',
+  '--ec-shell-topbar-height: 52px;',
+  '--ec-shell-statusbar-height: 26px;',
+]) {
+  if (!tokens.includes(token)) throw new Error(`M03.2 default shell token missing: ${token}`);
 }
 for (const label of [
   'Editor',

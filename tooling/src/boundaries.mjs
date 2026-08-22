@@ -95,6 +95,23 @@ function isInsideOwnedResourceRoot(ownerName, resolved, snapshot) {
   return roots.some((relativeRoot) => isInside(path.join(snapshot.rootDir, relativeRoot), resolved));
 }
 
+function workspaceOwners(boundaries) {
+  return Object.keys({ ...boundaries.packages, ...boundaries.apps }).sort((left, right) => right.length - left.length);
+}
+
+function resolveWorkspaceImport(specifier, boundaries) {
+  const owner = workspaceOwners(boundaries).find(
+    (candidate) => specifier === candidate || specifier.startsWith(`${candidate}/`),
+  );
+  if (!owner) return null;
+  if (specifier === owner) return { owner, subpath: '.' };
+  return { owner, subpath: `.${specifier.slice(owner.length)}` };
+}
+
+function declaredPublicSubpathExports(boundaries, ownerName) {
+  return boundaries.publicSubpathExports?.[ownerName] ?? {};
+}
+
 export function validateImportRecords(ownerName, records, snapshot) {
   const errors = [];
   const { boundaries, ownerDirs, rootDir } = snapshot;
@@ -104,12 +121,23 @@ export function validateImportRecords(ownerName, records, snapshot) {
   for (const record of records) {
     const { specifier } = record;
     if (specifier.startsWith('@electrocraft/')) {
-      const exactOwner = Object.keys({ ...boundaries.packages, ...boundaries.apps }).find((name) => specifier === name);
-      if (!exactOwner) {
+      const workspaceImport = resolveWorkspaceImport(specifier, boundaries);
+      if (!workspaceImport) {
         errors.push(`${ownerName} uses deep/unknown workspace import ${specifier}`);
         continue;
       }
-      if (!allowed.includes(specifier)) errors.push(`${ownerName} imports undeclared/forbidden ${specifier}`);
+
+      if (workspaceImport.subpath !== '.') {
+        const declaredSubpaths = declaredPublicSubpathExports(boundaries, workspaceImport.owner);
+        if (!(workspaceImport.subpath in declaredSubpaths)) {
+          errors.push(`${ownerName} uses deep/unknown workspace import ${specifier}`);
+          continue;
+        }
+      }
+
+      if (!allowed.includes(workspaceImport.owner)) {
+        errors.push(`${ownerName} imports undeclared/forbidden ${workspaceImport.owner}`);
+      }
       continue;
     }
 
@@ -173,6 +201,10 @@ export function validateWorkspaceSnapshot(snapshot) {
     errors.push('root workspaces must be apps/* and packages/*');
   }
 
+  for (const declaredOwner of Object.keys(boundaries.publicSubpathExports ?? {})) {
+    if (!(declaredOwner in allExpected)) errors.push(`public subpath exports declared for unknown workspace ${declaredOwner}`);
+  }
+
   for (const [name, allowed] of Object.entries(allExpected)) {
     const manifest = manifests[name];
     if (!manifest) {
@@ -180,10 +212,16 @@ export function validateWorkspaceSnapshot(snapshot) {
       continue;
     }
     if (manifest.name !== name) errors.push(`${name} manifest name mismatch`);
-    const exportsKeys = Object.keys(manifest.exports ?? {});
-    if (JSON.stringify(exportsKeys) !== JSON.stringify(['.'])) errors.push(`${name} must expose only one public root export`);
-    const rootExport = manifest.exports?.['.'];
-    if (rootExport !== './src/index.ts') errors.push(`${name} public root export must be ./src/index.ts`);
+
+    const expectedExports = {
+      '.': './src/index.ts',
+      ...declaredPublicSubpathExports(boundaries, name),
+    };
+    const actualExports = manifest.exports ?? {};
+    if (JSON.stringify(actualExports) !== JSON.stringify(expectedExports)) {
+      errors.push(`${name} public exports mismatch`);
+    }
+
     const actual = ownInternalDependencies(manifest);
     const expected = [...allowed].sort();
     if (JSON.stringify(actual) !== JSON.stringify(expected)) {

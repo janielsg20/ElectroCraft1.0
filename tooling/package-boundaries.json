@@ -75,6 +75,11 @@
   "ownedResourceRoots": {
     "@electrocraft/i18n": ["locales/es"]
   },
+  "publicSubpathExports": {
+    "@electrocraft/design-system": {
+      "./framework-themes": "./src/components/framework/index.ts"
+    }
+  },
   "invariants": {
     "expectedStablePackageCount": 19,
     "domainForbiddenImports": [

@@ -3,6 +3,7 @@ import type { FrameworkThemeId } from '@electrocraft/design-system/framework-the
 
 export const EDITOR_APPEARANCE_STORAGE_KEY = 'electrocraft.studio.appearance.v1' as const;
 export const STUDIO_APPEARANCE_PRESETS_STORAGE_KEY = 'electrocraft.studio.appearance-presets.v1' as const;
+export const DEFAULT_STUDIO_PRODUCT_DESIGN = 'custom' as const;
 
 export type StudioAppearanceTone = ThemePreference;
 export type StudioAppearanceAccent = 'indigo' | 'blue' | 'emerald' | 'amber' | 'rose';
@@ -23,9 +24,22 @@ export type StudioCanvasDensity = 'compact' | 'comfortable' | 'spacious';
 export type StudioAnimationIntensity = 'none' | 'reduced' | 'standard' | 'high';
 export type StudioContrastPreference = 'standard' | 'high';
 export type StudioThemeFramework = FrameworkThemeId;
+export type StudioProductDesignId =
+  | typeof DEFAULT_STUDIO_PRODUCT_DESIGN
+  | 'market:studio-carbon'
+  | 'market:canvas-atelier'
+  | 'market:cms-editorial'
+  | 'market:commerce-desk'
+  | 'market:data-command'
+  | 'market:linear-neutral'
+  | 'market:aurora-glass'
+  | 'market:neo-builder'
+  | 'market:soft-graphite'
+  | 'market:zen-canvas';
 
 export interface StudioAppearanceProfile {
   readonly name: string;
+  readonly productDesign?: StudioProductDesignId;
   readonly framework: StudioThemeFramework;
   readonly tone: StudioAppearanceTone;
   readonly accent: StudioAppearanceAccent;
@@ -76,6 +90,7 @@ export interface StudioAppearancePreset {
 
 export const DEFAULT_EDITOR_APPEARANCE_PROFILE: StudioAppearanceProfile = Object.freeze({
   name: 'ElectroCraft',
+  productDesign: DEFAULT_STUDIO_PRODUCT_DESIGN,
   framework: 'electrocraft',
   tone: 'system',
   accent: 'indigo',
@@ -126,6 +141,19 @@ const spacingScales = new Set<StudioSpacingScale>(['compact', 'standard', 'spaci
 const canvasDensities = new Set<StudioCanvasDensity>(['compact', 'comfortable', 'spacious']);
 const animationIntensities = new Set<StudioAnimationIntensity>(['none', 'reduced', 'standard', 'high']);
 const contrastPreferences = new Set<StudioContrastPreference>(['standard', 'high']);
+const productDesigns = new Set<StudioProductDesignId>([
+  DEFAULT_STUDIO_PRODUCT_DESIGN,
+  'market:studio-carbon',
+  'market:canvas-atelier',
+  'market:cms-editorial',
+  'market:commerce-desk',
+  'market:data-command',
+  'market:linear-neutral',
+  'market:aurora-glass',
+  'market:neo-builder',
+  'market:soft-graphite',
+  'market:zen-canvas',
+]);
 const themeFrameworks = new Set<StudioThemeFramework>([
   'electrocraft',
   'aceternity-magic',
@@ -154,6 +182,7 @@ export function normalizeEditorAppearanceProfile(value: unknown): StudioAppearan
 
   return Object.freeze({
     name: normalizedName(value.name, DEFAULT_EDITOR_APPEARANCE_PROFILE.name),
+    productDesign: normalizedString(value.productDesign, productDesigns, DEFAULT_STUDIO_PRODUCT_DESIGN),
     framework: normalizedString(value.framework, themeFrameworks, DEFAULT_EDITOR_APPEARANCE_PROFILE.framework),
     tone: normalizedString(value.tone, tones, DEFAULT_EDITOR_APPEARANCE_PROFILE.tone),
     accent: normalizedString(value.accent, accents, DEFAULT_EDITOR_APPEARANCE_PROFILE.accent),

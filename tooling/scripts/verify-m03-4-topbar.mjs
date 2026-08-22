@@ -7,11 +7,13 @@ const required = [
   'apps/studio/src/shell/topbar-model.ts',
   'apps/studio/src/shell/topbar.css',
   'apps/studio/src/shell/app-shell.tsx',
+  'apps/studio/src/shell/app-shell-layout.ts',
   'apps/studio/src/shell/app-shell-route.tsx',
   'apps/studio/src/i18n/studio-shell.es.ts',
   'apps/studio/src/help/help-registry.ts',
   'packages/design-system/src/components/ui/sheet.tsx',
   'packages/design-system/src/icons/studio-icon-registry.ts',
+  'packages/design-system/src/styles/tokens.css',
   'tooling/vitest/unit/topbar-model.test.ts',
   'tooling/vitest/contract/topbar-boundary.test.ts',
   'tooling/vitest/integration/topbar-runtime.test.ts',
@@ -27,6 +29,8 @@ const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const topbar = read('apps/studio/src/shell/studio-topbar.tsx');
 const css = read('apps/studio/src/shell/topbar.css');
 const appCss = read('apps/studio/src/styles.css');
+const layout = read('apps/studio/src/shell/app-shell-layout.ts');
+const tokens = read('packages/design-system/src/styles/tokens.css');
 const route = read('apps/studio/src/shell/app-shell-route.tsx');
 const i18n = read('apps/studio/src/i18n/studio-shell.es.ts');
 const help = read('apps/studio/src/help/help-registry.ts');
@@ -36,7 +40,13 @@ const state = read('.ai/STATE.md');
 const predecessorClosure = read('.ai/evidence/F03/M03.3/CLOSURE_2026-08-19.md');
 const m034ClosurePath = path.join(root, '.ai/evidence/F03/M03.4/CLOSURE_2026-08-19.md');
 
-if (!appCss.includes('height: 52px')) throw new Error('M03.4 must preserve Topbar height 52px');
+if (!appCss.includes('height: var(--ec-shell-topbar-height)')) {
+  throw new Error('M03.4 AppShell must consume the shared Topbar height token');
+}
+if (!layout.includes('topbarPx: 52')) throw new Error('M03.4 layout contract must preserve default Topbar height 52px');
+if (!tokens.includes('--ec-shell-topbar-height: 52px;')) {
+  throw new Error('M03.4 design-system tokens must preserve default Topbar height 52px');
+}
 for (const token of [
   'ec-topbar-left',
   'ec-topbar-center',

@@ -457,6 +457,8 @@ function MobileEditorLayout() {
           </SheetContent>
         </Sheet>
 
+        <AppearancePanelTrigger presentation="mobile" />
+
         <Sheet open={activeTool === 'outline'} onOpenChange={(open) => setMobileTool('outline', open)}>
           <SheetTrigger asChild>
             <button
@@ -482,7 +484,6 @@ function MobileEditorLayout() {
               </SheetClose>
             </SheetHeader>
             <div className="ec-editor-mobile-sheet-body" aria-label={editorT('studio.editor.outlineTitle')}>
-              <AppearancePanelTrigger presentation="mobile" />
               <div className="ec-editor-mobile-puck-panel" data-mobile-tool="outline">
                 <OutlineContent />
               </div>

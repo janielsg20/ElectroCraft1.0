@@ -19,6 +19,7 @@ const requiredFiles = [
   'packages/design-system/src/components/ui/sheet.tsx',
   'packages/design-system/src/components/ui/scroll-area.tsx',
   'packages/design-system/src/components/ui/separator.tsx',
+  'packages/design-system/src/components/framework/index.ts',
   'apps/studio/src/shell/design-system-route.tsx',
   'apps/studio/src/i18n/studio-shell.es.ts',
   'apps/studio/src/help/help-registry.ts',
