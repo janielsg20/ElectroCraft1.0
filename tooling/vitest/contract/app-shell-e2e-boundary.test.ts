@@ -21,10 +21,12 @@ describe('M03.12 AppShell QA boundary', () => {
     expect(config).toContain("screenshot: 'only-on-failure'");
   });
 
-  it('keeps StudioAppearanceProfile outside canonical project Theme and ExportIR', () => {
+  it('keeps the Studio theme preference outside canonical project Theme and ExportIR', () => {
     const provider = read('apps/studio/src/theme-provider.tsx');
     const theme = read('apps/studio/src/theme.ts');
-    expect(theme).toContain("EDITOR_APPEARANCE_STORAGE_KEY = 'electrocraft.studio.appearance.v1'");
+    expect(theme).toContain("STUDIO_THEME_STORAGE_KEY = 'electrocraft.studio.theme.v2'");
+    expect(theme).toContain("LEGACY_STUDIO_APPEARANCE_STORAGE_KEY = 'electrocraft.studio.appearance.v1'");
+    expect(theme).toContain("LEGACY_STUDIO_PRESETS_STORAGE_KEY = 'electrocraft.studio.appearance-presets.v1'");
     expect(provider).not.toContain('ElectroCraftDocument');
     expect(provider).not.toContain('ExportIR');
     expect(provider).not.toContain('source.theme');
