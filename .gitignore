@@ -12,3 +12,4 @@ test-results/
 /FILES.sha256
 /PATCH_BASE.txt
 *.tsbuildinfo
+.tmp-vite-preview.*.log
