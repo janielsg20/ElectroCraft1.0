@@ -6,6 +6,7 @@ on:
     paths:
       - 'apps/studio/src/theme.ts'
       - 'apps/studio/src/theme-provider.tsx'
+      - 'apps/studio/src/market-appearance-presets.ts'
       - 'apps/studio/src/help/help-registry.ts'
       - 'apps/studio/src/i18n/appearance.es.ts'
       - 'apps/studio/src/shell/appearance-*'
@@ -20,7 +21,9 @@ on:
       - 'packages/design-system/src/styles/globals.css'
       - 'packages/design-system/src/styles/studio-appearance-tokens.css'
       - 'tooling/vitest/**/editor-appearance-*.test.ts'
+      - 'tooling/vitest/unit/market-appearance-presets.test.ts'
       - 'tooling/playwright/m03-9-appearance.spec.ts'
+      - 'tooling/playwright/ui-ux-style-gallery.spec.ts'
       - '.ai/evidence/F03/M03.9/**'
       - '.ai/STATE.md'
       - '.ai/TRACKING.md'
@@ -30,9 +33,11 @@ on:
     branches:
       - main
       - codex/m03-9-editor-session-appearance-profile
+      - codex/ui-ux-style-gallery
     paths:
       - 'apps/studio/src/theme.ts'
       - 'apps/studio/src/theme-provider.tsx'
+      - 'apps/studio/src/market-appearance-presets.ts'
       - 'apps/studio/src/help/help-registry.ts'
       - 'apps/studio/src/i18n/appearance.es.ts'
       - 'apps/studio/src/shell/appearance-*'
@@ -47,7 +52,9 @@ on:
       - 'packages/design-system/src/styles/globals.css'
       - 'packages/design-system/src/styles/studio-appearance-tokens.css'
       - 'tooling/vitest/**/editor-appearance-*.test.ts'
+      - 'tooling/vitest/unit/market-appearance-presets.test.ts'
       - 'tooling/playwright/m03-9-appearance.spec.ts'
+      - 'tooling/playwright/ui-ux-style-gallery.spec.ts'
       - '.ai/evidence/F03/M03.9/**'
       - '.ai/STATE.md'
       - '.ai/TRACKING.md'
@@ -66,7 +73,7 @@ jobs:
   m03-9:
     name: M03.9 Editor Appearance Profile
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 40
     steps:
       - name: Publish pending status
         uses: actions/github-script@v7
@@ -102,10 +109,13 @@ jobs:
           .github/workflows/m03-9-appearance.yml
           apps/studio/src/theme.ts
           apps/studio/src/theme-provider.tsx
+          apps/studio/src/market-appearance-presets.ts
           apps/studio/src/help/help-registry.ts
           apps/studio/src/i18n/appearance.es.ts
           apps/studio/src/shell/appearance-panel.tsx
+          apps/studio/src/shell/appearance-framework-gallery.tsx
           apps/studio/src/shell/appearance.css
+          apps/studio/src/shell/appearance-market.css
           apps/studio/src/shell/app-shell-route.tsx
           apps/studio/src/shell/studio-topbar.tsx
           apps/studio/src/shell/editor-workspace.tsx
@@ -117,14 +127,17 @@ jobs:
           packages/design-system/src/styles/globals.css
           packages/design-system/src/styles/studio-appearance-tokens.css
           tooling/vitest/unit/editor-appearance-profile.test.ts
+          tooling/vitest/unit/market-appearance-presets.test.ts
           tooling/vitest/contract/editor-appearance-isolation.test.ts
           tooling/vitest/integration/editor-appearance-runtime.test.ts
           tooling/playwright/m03-9-appearance.spec.ts
+          tooling/playwright/ui-ux-style-gallery.spec.ts
 
       - name: Execute dedicated M03.9 unit contract integration suite
         run: >-
           npx vitest run --config vitest.config.ts
           tooling/vitest/unit/editor-appearance-profile.test.ts
+          tooling/vitest/unit/market-appearance-presets.test.ts
           tooling/vitest/contract/editor-appearance-isolation.test.ts
           tooling/vitest/integration/editor-appearance-runtime.test.ts
 
@@ -137,7 +150,10 @@ jobs:
           fi
 
       - name: Execute dedicated M03.9 browser audit
-        run: npx playwright test --config playwright.config.ts tooling/playwright/m03-9-appearance.spec.ts
+        run: >-
+          npx playwright test --config playwright.config.ts
+          tooling/playwright/m03-9-appearance.spec.ts
+          tooling/playwright/ui-ux-style-gallery.spec.ts
 
       - name: Execute full repository gate
         run: npm run check | tee m03-9-check.log

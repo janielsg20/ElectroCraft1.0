@@ -24,6 +24,7 @@ const required = [
   'apps/studio/src/shell/palette-panel.tsx',
   'apps/studio/src/i18n/editor.es.ts',
   'packages/design-system/src/components/ui/resizable-pane-layout.tsx',
+  'packages/design-system/src/styles/tokens.css',
   'packages/editor-puck/src/puck-editor-composition.ts',
   'tooling/scripts/verify-m03-4-topbar.mjs',
   'tooling/playwright/m03-5-editor-layout.spec.ts',
@@ -42,6 +43,7 @@ test('M03.5 structural gate keeps exact editor dimensions and ownership', () => 
   const palette = read('apps/studio/src/shell/palette-panel.tsx');
   const css = read('apps/studio/src/shell/editor-workspace.css');
   const appCss = read('apps/studio/src/styles.css');
+  const designTokens = read('packages/design-system/src/styles/tokens.css');
   const puck = read('packages/editor-puck/src/puck-editor-composition.ts');
   const help = read('apps/studio/src/help/help-registry.ts');
   const m034Verifier = read('tooling/scripts/verify-m03-4-topbar.mjs');
@@ -59,7 +61,16 @@ test('M03.5 structural gate keeps exact editor dimensions and ownership', () => 
     assert.equal(model.includes(token), true, `M03.5 pane token missing: ${token}`);
   }
 
-  assert.equal(appCss.includes('height: 26px'), true, 'M03.5 must preserve the AppShell 26px Statusbar');
+  assert.equal(
+    appCss.includes('var(--ec-shell-statusbar-height)'),
+    true,
+    'M03.5 AppShell must consume the shared Statusbar height token',
+  );
+  assert.equal(
+    designTokens.includes('--ec-shell-statusbar-height: 26px'),
+    true,
+    'M03.5 shared Statusbar height token must remain exactly 26px',
+  );
   assert.equal(studio.includes("from '@puckeditor/core'"), false, 'Studio must not bypass editor-puck ownership');
   assert.equal(palette.includes("from '@puckeditor/core'"), false, 'Palette must not bypass editor-puck ownership');
   assert.equal(
