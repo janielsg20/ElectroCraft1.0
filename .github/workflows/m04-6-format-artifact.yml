@@ -3,6 +3,7 @@ name: M04.6 Format Artifact
 on:
   push:
     branches: [codex/m04-6-current-main]
+  pull_request:
 
 permissions:
   contents: read
