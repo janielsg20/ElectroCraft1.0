@@ -57,6 +57,17 @@ export interface DuplicateProjectRequest {
   readonly projectId: string;
   readonly name: string;
 }
+export const PROJECT_BACKUP_FORMAT_VERSION = 1 as const;
+export interface ProjectBackupPackage {
+  readonly format: 'electrocraft-project-backup';
+  readonly version: typeof PROJECT_BACKUP_FORMAT_VERSION;
+  readonly createdAt: string;
+  readonly project: StoredProjectDefinition;
+  readonly objects: readonly StoredProjectObjectInput[];
+  readonly mediaRefs: readonly string[];
+  readonly checksum: ElectroCraftCanonicalSnapshotChecksum;
+}
+export type ProjectImportStrategy = 'copy' | 'replace';
 
 export interface StoredProjectObjectInput {
   readonly objectId: string;
@@ -330,6 +341,52 @@ export function normalizeIncrementalSaveProjectRequest(
 }
 
 export function createProjectStorageService(port: ProjectStoragePort) {
+  async function createBackup(projectIdInput: string): Promise<ProjectBackupPackage> {
+    const projectId = requireNonEmpty(projectIdInput, 'projectId');
+    const opened = await port.openProject(projectId);
+    if (!opened) throw new Error(`project not found: ${projectId}`);
+    const body = {
+      format: 'electrocraft-project-backup' as const,
+      version: PROJECT_BACKUP_FORMAT_VERSION,
+      createdAt: new Date().toISOString(),
+      project: opened.project,
+      objects: opened.objects.map(({ objectId, kind, schemaVersion, payload, checksum }) => ({
+        objectId,
+        kind,
+        schemaVersion,
+        payload,
+        checksum,
+      })),
+      mediaRefs: opened.objects.filter((o) => o.kind === 'media').map((o) => o.objectId),
+    };
+    return Object.freeze({ ...body, checksum: createElectroCraftCanonicalSnapshotChecksum(body) });
+  }
+  async function importBackup(
+    input: ProjectBackupPackage,
+    strategy: ProjectImportStrategy,
+    copyId = globalThis.crypto.randomUUID(),
+  ) {
+    if (input.format !== 'electrocraft-project-backup' || input.version !== PROJECT_BACKUP_FORMAT_VERSION)
+      throw new TypeError('unsupported project backup format');
+    const { checksum, ...body } = input;
+    if (createElectroCraftCanonicalSnapshotChecksum(body) !== checksum)
+      throw new TypeError('project backup checksum mismatch');
+    const existing = await port.openProject(input.project.id);
+    if (strategy === 'replace' && existing) await port.createCheckpoint(input.project.id, 'pre-restore-safety');
+    const projectId = strategy === 'copy' ? requireNonEmpty(copyId, 'copyId') : input.project.id;
+    await port.saveProject(
+      normalizeSaveProjectRequest({
+        project: {
+          ...input.project,
+          id: projectId,
+          name: strategy === 'copy' ? `${input.project.name} (importado)` : input.project.name,
+        },
+        objects: input.objects,
+        reason: strategy === 'replace' ? 'backup-restored' : 'backup-imported',
+      }),
+    );
+    return port.openProject(projectId);
+  }
   return Object.freeze({
     initialize: () => port.initialize(),
     diagnostics: () => port.getDiagnostics(),
@@ -347,6 +404,8 @@ export function createProjectStorageService(port: ProjectStoragePort) {
       }),
     deleteProjectPermanently: (projectId: string) =>
       port.deleteProjectPermanently(requireNonEmpty(projectId, 'projectId')),
+    createBackup,
+    importBackup,
     verifyProject: (projectId: string) => port.verifyProject(requireNonEmpty(projectId, 'projectId')),
     saveProject: (request: SaveProjectRequest) => port.saveProject(normalizeSaveProjectRequest(request)),
     saveProjectIncremental: (request: IncrementalSaveProjectRequest) =>
