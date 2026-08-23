@@ -1,10 +1,10 @@
 export const appShellLayout = Object.freeze({
   rootHeight: '100dvh',
-  sidebarExpandedPx: 240,
+  sidebarExpandedPx: 256,
   sidebarCollapsedPx: 64,
   tabletRailPx: 56,
-  topbarPx: 52,
-  statusbarPx: 26,
+  topbarPx: 56,
+  statusbarPx: 24,
   breakpoints: Object.freeze({
     mobileMaxPx: 767,
     tabletMaxPx: 1023,
