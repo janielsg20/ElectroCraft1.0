@@ -11,7 +11,7 @@ import {
   type StoredProjectObject,
 } from '@electrocraft/application';
 import { createElectroCraftCanonicalSnapshotChecksum, type ElectroCraftMetadata, type JsonValue } from '@electrocraft/domain';
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import type { StudioProjectDatabase } from './repository';
 import * as schema from './schema';
 
