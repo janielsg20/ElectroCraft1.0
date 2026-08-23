@@ -163,7 +163,10 @@
   grid-template-rows: auto minmax(0, 1fr);
   overflow: hidden;
   background-color: var(--background);
-  background-image: radial-gradient(color-mix(in srgb, var(--muted-foreground) 18%, transparent) 0.7px, transparent 0.7px);
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--muted-foreground) 18%, transparent) 0.7px,
+    transparent 0.7px
+  );
   background-size: 16px 16px;
 }
 

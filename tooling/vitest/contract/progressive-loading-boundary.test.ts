@@ -16,11 +16,11 @@ describe('Studio progressive loading boundary', () => {
 
   it('renders the React shell before heavy route modules and gives geometry-matched fallbacks', () => {
     const app = read('apps/studio/src/App.tsx');
-    expect(app).toContain("const ProjectHome = lazy(() =>");
-    expect(app).toContain("const StudioEditorWorkspace = lazy(() =>");
-    expect(app).toContain("const DesignSystemDevelopmentRoute = lazy(() =>");
-    expect(app).toContain("const StudioContentListDetailRoute = lazy(() =>");
-    expect(app).toContain("const StudioModuleEmptyStateRoute = lazy(() =>");
+    expect(app).toContain('const ProjectHome = lazy(() =>');
+    expect(app).toContain('const StudioEditorWorkspace = lazy(() =>');
+    expect(app).toContain('const DesignSystemDevelopmentRoute = lazy(() =>');
+    expect(app).toContain('const StudioContentListDetailRoute = lazy(() =>');
+    expect(app).toContain('const StudioModuleEmptyStateRoute = lazy(() =>');
     expect(app).toContain('<StudioAppShellRoute status={shellStatus}>{workspace}</StudioAppShellRoute>');
     expect(app).toContain('<StudioRouteSkeleton kind="projects" label="Cargando proyectos" />');
     expect(app).toContain('<StudioRouteSkeleton kind="editor" label="Cargando editor" />');
@@ -28,7 +28,7 @@ describe('Studio progressive loading boundary', () => {
 
   it('loads project data progressively and defers the new-project wizard until requested', () => {
     const projectHome = read('apps/studio/src/features/projects/project-home.tsx');
-    expect(projectHome).toContain("const NewProjectWizard = lazy(() =>");
+    expect(projectHome).toContain('const NewProjectWizard = lazy(() =>');
     expect(projectHome).toContain("const initialLoading = state === 'loading' && projects.length === 0");
     expect(projectHome).toContain("const refreshing = state === 'loading' && projects.length > 0");
     expect(projectHome).toContain('<ProjectCollectionSkeleton view={view} />');

@@ -153,7 +153,10 @@
   border: 1px solid var(--border);
   border-radius: 6px;
   background-color: var(--background);
-  background-image: radial-gradient(color-mix(in srgb, var(--muted-foreground) 16%, transparent) 0.65px, transparent 0.65px);
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--muted-foreground) 16%, transparent) 0.65px,
+    transparent 0.65px
+  );
   background-size: 14px 14px;
   color: var(--primary);
   font-size: 1rem;

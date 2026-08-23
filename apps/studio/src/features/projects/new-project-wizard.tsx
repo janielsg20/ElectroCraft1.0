@@ -113,7 +113,11 @@ export function NewProjectWizard({
             <>
               <h3>Contenido de demostración</h3>
               <label className="ec-project-choice" htmlFor="project-demo-content">
-                <Checkbox id="project-demo-content" checked={demo} onCheckedChange={(checked) => setDemo(checked === true)} />
+                <Checkbox
+                  id="project-demo-content"
+                  checked={demo}
+                  onCheckedChange={(checked) => setDemo(checked === true)}
+                />
                 <span>Incluir preferencia de contenido demo</span>
               </label>
               <p>La selección se registra como configuración; no crea datos permanentes ocultos.</p>
