@@ -62,8 +62,8 @@ describe('M04.7 workspace preferences contract', () => {
     const desktop = normalizeWorkspaceLayout({
       ...DEFAULT_WORKSPACE_LAYOUT,
       sidebarCollapsed: false,
-      contextWidth: 420,
-      inspectorWidth: 460,
+      contextWidth: WORKSPACE_LAYOUT_LIMITS.context.maxSize,
+      inspectorWidth: WORKSPACE_LAYOUT_LIMITS.inspector.maxSize,
     });
     const mobile = resolveResponsiveWorkspaceLayout(desktop, 360);
 
@@ -71,8 +71,8 @@ describe('M04.7 workspace preferences contract', () => {
     expect(mobile.contextWidth).toBeLessThanOrEqual(Math.floor(360 * 0.82));
     expect(mobile.inspectorWidth).toBeLessThanOrEqual(Math.floor(360 * 0.82));
     expect(desktop.sidebarCollapsed).toBe(false);
-    expect(desktop.contextWidth).toBe(420);
-    expect(desktop.inspectorWidth).toBe(460);
+    expect(desktop.contextWidth).toBe(WORKSPACE_LAYOUT_LIMITS.context.maxSize);
+    expect(desktop.inspectorWidth).toBe(WORKSPACE_LAYOUT_LIMITS.inspector.maxSize);
   });
 
   it('round-trips saved layouts and keeps saved presets when defaults are restored', async () => {
