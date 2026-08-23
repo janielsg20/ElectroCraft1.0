@@ -1,0 +1,63 @@
+name: Temporary UI Console Format
+
+on:
+  push:
+    branches:
+      - codex/google-cloud-console-ui-refresh
+    paths:
+      - '.github/workflows/ui-console-format.yml'
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v6
+        with:
+          ref: codex/google-cloud-console-ui-refresh
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Format reported files
+        run: >-
+          npx prettier --write
+          apps/studio/index.html
+          apps/studio/src/features/projects/new-project-wizard.tsx
+          apps/studio/src/features/projects/project-home.css
+          apps/studio/src/features/projects/project-home.tsx
+          apps/studio/src/shell/editor-workspace.css
+          tooling/vitest/contract/progressive-loading-boundary.test.ts
+
+      - name: Commit formatting
+        run: |
+          if git diff --quiet; then
+            echo 'No formatting changes required.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            apps/studio/index.html \
+            apps/studio/src/features/projects/new-project-wizard.tsx \
+            apps/studio/src/features/projects/project-home.css \
+            apps/studio/src/features/projects/project-home.tsx \
+            apps/studio/src/shell/editor-workspace.css \
+            tooling/vitest/contract/progressive-loading-boundary.test.ts
+          git commit -m 'chore(ui): format console refresh'
+          git push origin HEAD:codex/google-cloud-console-ui-refresh
