@@ -56,7 +56,7 @@ test('M03.5 structural gate keeps exact editor dimensions and ownership', () => 
     'defaultSize: 320',
     'minSize: 280',
     'maxSize: 440',
-    'statusHeight: 26',
+    'statusHeight: 24',
   ]) {
     assert.equal(model.includes(token), true, `M03.5 pane token missing: ${token}`);
   }
@@ -67,9 +67,9 @@ test('M03.5 structural gate keeps exact editor dimensions and ownership', () => 
     'M03.5 AppShell must consume the shared Statusbar height token',
   );
   assert.equal(
-    designTokens.includes('--ec-shell-statusbar-height: 26px'),
+    designTokens.includes('--ec-shell-statusbar-height: 24px'),
     true,
-    'M03.5 shared Statusbar height token must remain exactly 26px',
+    'M03.5 shared Statusbar height token must remain exactly 24px',
   );
   assert.equal(studio.includes("from '@puckeditor/core'"), false, 'Studio must not bypass editor-puck ownership');
   assert.equal(palette.includes("from '@puckeditor/core'"), false, 'Palette must not bypass editor-puck ownership');
