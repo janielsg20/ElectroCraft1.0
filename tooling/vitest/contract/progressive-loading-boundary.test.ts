@@ -6,11 +6,21 @@ const root = process.cwd();
 const read = (relativePath: string) => fs.readFileSync(path.join(root, relativePath), 'utf8');
 
 describe('Studio progressive loading boundary', () => {
-  it('renders the shell before heavy route modules and gives Suspense geometry-matched fallbacks', () => {
+  it('shows a zero-JS boot shell before React replaces the root', () => {
+    const html = read('apps/studio/index.html');
+    expect(html).toContain('id="ec-boot-shell"');
+    expect(html).toContain('Cargando la interfaz base de ElectroCraft Studio');
+    expect(html).toContain("html[data-ec-theme='dark'] #ec-boot-shell");
+    expect(html).not.toContain('@keyframes');
+  });
+
+  it('renders the React shell before heavy route modules and gives geometry-matched fallbacks', () => {
     const app = read('apps/studio/src/App.tsx');
     expect(app).toContain("const ProjectHome = lazy(() =>");
     expect(app).toContain("const StudioEditorWorkspace = lazy(() =>");
     expect(app).toContain("const DesignSystemDevelopmentRoute = lazy(() =>");
+    expect(app).toContain("const StudioContentListDetailRoute = lazy(() =>");
+    expect(app).toContain("const StudioModuleEmptyStateRoute = lazy(() =>");
     expect(app).toContain('<StudioAppShellRoute status={shellStatus}>{workspace}</StudioAppShellRoute>');
     expect(app).toContain('<StudioRouteSkeleton kind="projects" label="Cargando proyectos" />');
     expect(app).toContain('<StudioRouteSkeleton kind="editor" label="Cargando editor" />');
