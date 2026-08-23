@@ -20,6 +20,7 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - '.npmrc'
+      - '.ai/STATE.md'
       - '.ai/MODEL_OWNERSHIP.md'
       - '.ai/ENGINE_PAYLOAD_POLICY.md'
       - '.ai/evidence/F02/**'
@@ -83,9 +84,7 @@ jobs:
         run: |
           node -e "const p=require('./tooling/package-boundaries.json'); const expected=p.invariants.expectedStablePackageCount; const actual=Object.keys(p.packages).length; if(actual!==expected) throw new Error('owner package count drift: expected '+expected+', got '+actual); console.log('ownerPackages='+actual)"
           test ! -d packages/contracts
-          grep -q 'F02.*COMPLETADA' .ai/STATE.md
-          grep -q 'M02.1–M02.9.*COMPLETADAS' .ai/STATE.md
-          grep -q 'Gate F02.*GREEN' .ai/STATE.md
+          grep -Eq 'F02.*Modelo canónico.*`COMPLETADA`.*Gate `GREEN`' .ai/STATE.md
           test -f .ai/MODEL_OWNERSHIP.md
           test -f .ai/ENGINE_PAYLOAD_POLICY.md
           test -f .ai/evidence/F02/CLOSURE_2026-08-18.md

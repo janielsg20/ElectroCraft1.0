@@ -62,6 +62,8 @@ jobs:
           test '${{ github.event.workflow_run.conclusion }}' = success
       - name: Install exact root toolchain and workspaces
         run: npm install --ignore-scripts --no-audit --no-fund --package-lock=false
+      - name: Install managed Chromium for Playwright
+        run: npx playwright install --with-deps chromium
       - name: Verify exact toolchain pins
         run: node tooling/scripts/verify-toolchain.mjs | tee m01-1-toolchain.log
       - name: Lint workspace architecture
