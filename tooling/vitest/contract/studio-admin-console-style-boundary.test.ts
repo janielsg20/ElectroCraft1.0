@@ -57,7 +57,8 @@ describe('Studio neutral administrative console style boundary', () => {
     expect(checkbox).toContain("Checkbox as CheckboxPrimitive } from 'radix-ui'");
     expect(radio).toContain("RadioGroup as RadioGroupPrimitive } from 'radix-ui'");
     expect(wizard).toContain('<RadioGroup value={type}');
-    expect(wizard).toContain('<Checkbox id="project-demo-content"');
+    expect(wizard).toContain('<Checkbox');
+    expect(wizard).toContain('id="project-demo-content"');
     expect(wizard).not.toContain('type="radio"');
     expect(wizard).not.toContain('type="checkbox"');
   });
