@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('M03.5 Context / Canvas / Inspector / Status', () => {
-  test('renders exact desktop pane sizes and a 26px informational statusbar', async ({ page }) => {
+  test('renders exact desktop pane sizes and a 24px informational statusbar', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto('/editor');
 
@@ -13,7 +13,7 @@ test.describe('M03.5 Context / Canvas / Inspector / Status', () => {
     expect(Math.round((await context.boundingBox())?.width ?? 0)).toBe(288);
     expect(Math.round((await inspector.boundingBox())?.width ?? 0)).toBe(320);
     expect((await canvas.boundingBox())?.width ?? 0).toBeGreaterThan(300);
-    expect(Math.round((await page.locator('.ec-app-shell-statusbar').boundingBox())?.height ?? 0)).toBe(26);
+    expect(Math.round((await page.locator('.ec-app-shell-statusbar').boundingBox())?.height ?? 0)).toBe(24);
     await expect(page.locator('.ec-app-shell-statusbar')).toContainText('Listo');
   });
 
