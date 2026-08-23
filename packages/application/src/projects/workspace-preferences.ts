@@ -251,7 +251,10 @@ export function createWorkspacePreferencesService(
 
   function enqueue(operation: () => Promise<WorkspacePreferences>): Promise<WorkspacePreferences> {
     const task = mutationQueue.then(operation);
-    mutationQueue = task.then(() => undefined, () => undefined);
+    mutationQueue = task.then(
+      () => undefined,
+      () => undefined,
+    );
     return task;
   }
 
@@ -283,7 +286,11 @@ export function createWorkspacePreferencesService(
           createdAt: timestamp,
           updatedAt: timestamp,
         });
-        return write({ ...current, savedLayouts: Object.freeze([...current.savedLayouts, saved]), updatedAt: timestamp });
+        return write({
+          ...current,
+          savedLayouts: Object.freeze([...current.savedLayouts, saved]),
+          updatedAt: timestamp,
+        });
       });
     },
     renameSavedLayout(layoutId: string, name: string) {
