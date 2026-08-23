@@ -15,18 +15,21 @@ export interface SheetContentProps extends ComponentProps<typeof DialogPrimitive
 export function SheetContent({ side = 'right', className, children, ...props }: SheetContentProps) {
   const placementClassName =
     side === 'left'
-      ? 'inset-y-0 left-0 w-[min(92vw,360px)] border-r border-border'
+      ? 'inset-y-0 left-0 w-[min(92vw,400px)] border-r border-border'
       : side === 'bottom'
         ? 'inset-x-0 bottom-0 max-h-[88dvh] w-full rounded-t-xl border-t border-border'
-        : 'inset-y-0 right-0 w-[min(92vw,360px)] border-l border-border';
+        : 'inset-y-0 right-0 w-[min(92vw,400px)] border-l border-border';
 
   return (
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay data-slot="sheet-overlay" className="fixed inset-0 z-50 bg-overlay/45" />
+      <DialogPrimitive.Overlay
+        data-slot="sheet-overlay"
+        className="fixed inset-0 z-50 bg-overlay/45 backdrop-blur-none"
+      />
       <DialogPrimitive.Content
         className={cn(
-          'fixed z-50 bg-surface p-4 [box-shadow:var(--ec-shadow)]',
-          'outline-none focus-visible:ring-2 focus-visible:ring-ring',
+          'fixed z-50 bg-surface p-5 [box-shadow:var(--ec-shadow-panel)]',
+          'outline-none focus-visible:ring-2 focus-visible:ring-ring/35',
           placementClassName,
           className,
         )}
@@ -45,7 +48,7 @@ export function SheetHeader({ className, ...props }: ComponentProps<'header'>) {
 }
 
 export function SheetTitle({ className, ...props }: ComponentProps<typeof DialogPrimitive.Title>) {
-  return <DialogPrimitive.Title className={cn('text-sm font-semibold text-foreground', className)} {...props} />;
+  return <DialogPrimitive.Title className={cn('text-base font-semibold text-foreground', className)} {...props} />;
 }
 
 export function SheetDescription({ className, ...props }: ComponentProps<typeof DialogPrimitive.Description>) {
