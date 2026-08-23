@@ -2,6 +2,7 @@ import { packageDescriptor as dep0 } from '@electrocraft/domain';
 import { packageDescriptor as dep1 } from '@electrocraft/application';
 
 export * from './browser';
+export * from './browser-workspace-preferences';
 export * from './migration';
 export * from './repository';
 export * from './schema-contract';
