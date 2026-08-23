@@ -43,7 +43,7 @@
 [data-slot='dialog-overlay'],
 [data-slot='alert-dialog-overlay'] {
   animation: ec-overlay-in var(--ec-normal) ease-out;
-  backdrop-filter: blur(2px);
+  backdrop-filter: none;
 }
 
 [data-slot='sheet-content'][data-state='open'] {
@@ -207,7 +207,7 @@
 }
 
 .ec-gallery-list li {
-  min-height: 1.875rem;
+  min-height: 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
