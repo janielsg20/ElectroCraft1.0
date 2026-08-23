@@ -65,7 +65,12 @@ describe('M04.6 project backup/import with real PGlite', () => {
       await storage.saveProject({ project, objects: [object(99)], reason: 'changed-after-backup' });
 
       const imported = await backups.importBackup(serialized, 'replace');
-      expect(imported).toMatchObject({ projectId: project.id, sourceProjectId: project.id, objectCount: 1, collision: 'replace' });
+      expect(imported).toMatchObject({
+        projectId: project.id,
+        sourceProjectId: project.id,
+        objectCount: 1,
+        collision: 'replace',
+      });
       expect((await storage.openProject(project.id))?.objects[0]?.payload).toEqual({ version: 1, title: 'Inicio' });
 
       const safety = await client.query<{ reason: string; manifest: { objects: { payload: { version: number } }[] } }>(
@@ -94,7 +99,10 @@ describe('M04.6 project backup/import with real PGlite', () => {
       expect(imported.projectId).not.toBe(project.id);
       expect(imported.collision).toBe('copy');
       expect((await storage.openProject(project.id))?.objects[0]?.payload).toEqual({ version: 3, title: 'Inicio' });
-      expect((await storage.openProject(imported.projectId))?.objects[0]?.payload).toEqual({ version: 3, title: 'Inicio' });
+      expect((await storage.openProject(imported.projectId))?.objects[0]?.payload).toEqual({
+        version: 3,
+        title: 'Inicio',
+      });
     } finally {
       await client.close();
     }
@@ -108,10 +116,15 @@ describe('M04.6 project backup/import with real PGlite', () => {
       const storage = createProjectStorageService(createTestPort(repository));
       const backups = createProjectBackupService(storage);
       await storage.saveProject({ project, objects: [object(7)], reason: 'initial' });
-      const parsed = JSON.parse(await backups.backupProject(project.id)) as { checksum: string; project: { id: string } };
+      const parsed = JSON.parse(await backups.backupProject(project.id)) as {
+        checksum: string;
+        project: { id: string };
+      };
       parsed.project.id = 'corrupted-project';
 
-      await expect(backups.importBackup(JSON.stringify(parsed), 'replace')).rejects.toThrow('project backup checksum mismatch');
+      await expect(backups.importBackup(JSON.stringify(parsed), 'replace')).rejects.toThrow(
+        'project backup checksum mismatch',
+      );
       expect(await storage.openProject('corrupted-project')).toBeNull();
       expect((await storage.openProject(project.id))?.objects[0]?.payload).toEqual({ version: 7, title: 'Inicio' });
     } finally {

@@ -406,11 +406,15 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
               <div>
                 <strong>{importPreview.project.name}</strong>
                 <p className="text-sm text-muted-foreground">
-                  {importPreview.objects.length} objetos · copia del {new Date(importPreview.exportedAt).toLocaleString('es')}
+                  {importPreview.objects.length} objetos · copia del{' '}
+                  {new Date(importPreview.exportedAt).toLocaleString('es')}
                 </p>
               </div>
               <label htmlFor="import-project-strategy">Si el proyecto ya existe</label>
-              <Select value={importStrategy} onValueChange={(value) => setImportStrategy(value as ProjectBackupCollisionStrategy)}>
+              <Select
+                value={importStrategy}
+                onValueChange={(value) => setImportStrategy(value as ProjectBackupCollisionStrategy)}
+              >
                 <SelectTrigger id="import-project-strategy" aria-label="Estrategia para proyecto existente">
                   <SelectValue />
                 </SelectTrigger>
@@ -421,7 +425,8 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
                 </SelectContent>
               </Select>
               <p className="text-sm text-muted-foreground">
-                Reemplazar crea primero un checkpoint local <code>pre-import-safety</code> para poder recuperar el estado anterior.
+                Reemplazar crea primero un checkpoint local <code>pre-import-safety</code> para poder recuperar el
+                estado anterior.
               </p>
             </div>
           ) : null}
@@ -430,7 +435,9 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
               Cancelar
             </Button>
             <Button disabled={!importPreview || pendingProjectId !== null} onClick={() => void importBackup()}>
-              {pendingProjectId === importPreview?.project.id ? <Loader label="Importando copia" announce={false} size="xs" /> : null}
+              {pendingProjectId === importPreview?.project.id ? (
+                <Loader label="Importando copia" announce={false} size="xs" />
+              ) : null}
               Importar
             </Button>
           </div>

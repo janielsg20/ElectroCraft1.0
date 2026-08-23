@@ -77,7 +77,10 @@ function canonicalContent(content: ProjectBackupContent): JsonValue {
   } as JsonValue;
 }
 
-function freezePackage(content: ProjectBackupContent, checksum: ElectroCraftCanonicalSnapshotChecksum): ProjectBackupPackage {
+function freezePackage(
+  content: ProjectBackupContent,
+  checksum: ElectroCraftCanonicalSnapshotChecksum,
+): ProjectBackupPackage {
   return Object.freeze({
     ...content,
     project: Object.freeze({ ...content.project }),
@@ -122,7 +125,8 @@ export function createProjectBackupPackage(
 
 export function validateProjectBackupPackage(input: unknown): ProjectBackupPackage {
   const root = requireRecord(input, 'backup');
-  if (root.format !== PROJECT_BACKUP_FORMAT) throw new TypeError(`unsupported project backup format: ${String(root.format)}`);
+  if (root.format !== PROJECT_BACKUP_FORMAT)
+    throw new TypeError(`unsupported project backup format: ${String(root.format)}`);
   if (root.version !== PROJECT_BACKUP_VERSION) {
     throw new TypeError(`unsupported project backup version: ${String(root.version)}`);
   }
@@ -177,7 +181,9 @@ export function parseProjectBackupPackage(serialized: string): ProjectBackupPack
   try {
     parsed = JSON.parse(serialized) as unknown;
   } catch (error) {
-    throw new TypeError(error instanceof Error ? `invalid project backup JSON: ${error.message}` : 'invalid project backup JSON');
+    throw new TypeError(
+      error instanceof Error ? `invalid project backup JSON: ${error.message}` : 'invalid project backup JSON',
+    );
   }
   return validateProjectBackupPackage(parsed);
 }
