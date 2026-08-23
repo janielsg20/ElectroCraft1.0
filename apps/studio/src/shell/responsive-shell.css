@@ -91,13 +91,11 @@
   grid-template-columns: repeat(6, minmax(0, 1fr));
   align-items: stretch;
   border-top: 1px solid var(--border);
-  background: color-mix(in oklab, var(--surface) 94%, transparent);
-  box-shadow: 0 -8px 24px color-mix(in oklab, var(--overlay) 12%, transparent);
-  backdrop-filter: blur(14px) saturate(135%);
+  background: var(--surface);
 }
 
 .ec-editor-mobile-action {
-  --ec-mobile-tone: var(--primary);
+  position: relative;
   min-width: 0;
   min-height: 58px;
   display: grid;
@@ -111,79 +109,42 @@
   background: transparent;
   color: var(--muted-foreground);
   font-size: 10px;
-  font-weight: 650;
+  font-weight: 600;
   line-height: 1.1;
   text-decoration: none;
-}
-
-.ec-editor-mobile-action[data-mobile-destination='components'] {
-  --ec-mobile-tone: var(--ec-violet);
-}
-
-.ec-editor-mobile-action[data-mobile-destination='screens'] {
-  --ec-mobile-tone: var(--ec-cyan);
-}
-
-.ec-editor-mobile-action[data-mobile-destination='canvas'] {
-  --ec-mobile-tone: var(--ec-sky);
-}
-
-.ec-editor-mobile-action[data-mobile-destination='properties'] {
-  --ec-mobile-tone: var(--ec-amber);
-}
-
-.ec-editor-mobile-action.ec-appearance-mobile-trigger {
-  --ec-mobile-tone: var(--primary);
-}
-
-.ec-editor-mobile-action[data-mobile-destination='more'] {
-  --ec-mobile-tone: var(--ec-rose);
+  transition:
+    color var(--ec-fast) ease,
+    background-color var(--ec-fast) ease;
 }
 
 .ec-editor-mobile-action:hover,
 .ec-editor-mobile-action:focus-visible,
 .ec-editor-mobile-action[aria-current='page'],
 .ec-editor-mobile-action[aria-pressed='true'] {
-  background: color-mix(in oklab, var(--ec-mobile-tone) 10%, var(--surface));
-  color: var(--ec-mobile-tone);
+  background: var(--accent);
+  color: var(--accent-foreground);
 }
 
 .ec-editor-mobile-action[aria-current='page']::before,
 .ec-editor-mobile-action[aria-pressed='true']::before {
   position: absolute;
   top: 0;
-  width: 28px;
+  width: 30px;
   height: 2px;
-  border-radius: 999px;
-  background: var(--ec-mobile-tone);
-  box-shadow: 0 0 10px color-mix(in oklab, var(--ec-mobile-tone) 45%, transparent);
+  border-radius: 2px;
+  background: var(--primary);
   content: '';
 }
 
-.ec-editor-mobile-action {
-  position: relative;
-  transition:
-    color var(--ec-fast) ease,
-    background-color var(--ec-fast) ease;
-}
-
 .ec-editor-mobile-action:focus-visible {
-  outline: 2px solid var(--ring);
+  outline: 2px solid color-mix(in srgb, var(--ring) 55%, transparent);
   outline-offset: -2px;
 }
 
 .ec-editor-mobile-action svg {
   width: 20px;
   height: 20px;
-  color: color-mix(in oklab, var(--ec-mobile-tone) 74%, var(--muted-foreground));
-  transition: transform var(--ec-normal) var(--ec-ease-out);
-}
-
-.ec-editor-mobile-action:hover svg,
-.ec-editor-mobile-action:focus-visible svg,
-.ec-editor-mobile-action[aria-current='page'] svg,
-.ec-editor-mobile-action[aria-pressed='true'] svg {
-  transform: translateY(-2px) scale(1.08);
+  color: currentColor;
 }
 
 .ec-editor-mobile-action span {

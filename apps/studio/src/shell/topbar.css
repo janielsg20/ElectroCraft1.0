@@ -3,7 +3,7 @@
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
 }
 
 .ec-topbar-left,
@@ -16,7 +16,7 @@
 }
 
 .ec-topbar-left {
-  gap: 5px;
+  gap: 6px;
   overflow: hidden;
 }
 
@@ -24,16 +24,17 @@
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   color: var(--muted-foreground);
-  font-size: var(--ec-text-2xs);
+  font-size: var(--ec-text-xs);
   white-space: nowrap;
 }
 
 .ec-topbar-breadcrumb strong {
-  max-width: 150px;
+  max-width: 180px;
   overflow: hidden;
   color: var(--foreground);
+  font-weight: 600;
   text-overflow: ellipsis;
 }
 
@@ -41,35 +42,37 @@
 .ec-topbar-save,
 .ec-topbar-local,
 .ec-topbar-tool {
-  min-height: 24px;
+  min-height: 28px;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 2px 6px;
+  gap: 5px;
+  border: 0;
+  border-radius: 5px;
+  padding: 3px 6px;
+  background: transparent;
   color: var(--muted-foreground);
-  font-size: var(--ec-text-2xs);
+  font-size: var(--ec-text-xs);
   white-space: nowrap;
+}
+
+.ec-topbar-project {
+  color: var(--foreground);
 }
 
 .ec-topbar-save[data-save-state='error'],
 .ec-topbar-save[data-save-state='blocked'] {
-  border-color: color-mix(in oklab, var(--destructive) 40%, var(--border));
-  background: color-mix(in oklab, var(--destructive) 9%, transparent);
+  background: color-mix(in srgb, var(--destructive) 8%, transparent);
   color: var(--destructive);
 }
 
 .ec-topbar-save[data-save-state='saving'] {
-  border-color: color-mix(in oklab, var(--warning) 45%, var(--border));
-  background: color-mix(in oklab, var(--warning) 10%, transparent);
-  color: color-mix(in oklab, var(--warning) 82%, var(--foreground));
+  background: color-mix(in srgb, var(--warning) 8%, transparent);
+  color: var(--warning);
 }
 
 .ec-topbar-save[data-save-state='ready'] {
-  border-color: color-mix(in oklab, var(--success) 35%, var(--border));
-  background: color-mix(in oklab, var(--success) 8%, transparent);
-  color: color-mix(in oklab, var(--success) 76%, var(--foreground));
+  background: transparent;
+  color: var(--muted-foreground);
 }
 
 .ec-topbar-center {
@@ -78,33 +81,21 @@
 }
 
 .ec-topbar-tool-cluster {
-  gap: 2px;
-  border: 1px solid color-mix(in oklab, var(--primary) 14%, var(--border));
-  border-radius: 7px;
+  gap: 1px;
+  border: 1px solid transparent;
+  border-radius: 6px;
   padding: 2px;
-  background: color-mix(in oklab, var(--background) 84%, transparent);
-  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--foreground) 5%, transparent);
+  background: var(--muted);
 }
 
 .ec-topbar-tool-cluster .ec-topbar-tool {
-  border: 0;
+  border-color: transparent;
   background: transparent;
 }
 
-.ec-topbar-tool[data-topbar-tool='document'] svg {
-  color: var(--ec-violet);
-}
-
-.ec-topbar-tool[data-topbar-tool='platform'] svg {
-  color: var(--ec-cyan);
-}
-
-.ec-topbar-tool[data-topbar-tool='breakpoint'] svg {
-  color: var(--ec-amber);
-}
-
-.ec-topbar-tool[data-topbar-tool='zoom'] svg {
-  color: var(--ec-sky);
+.ec-topbar-tool-cluster .ec-topbar-tool:hover {
+  background: var(--surface);
+  color: var(--foreground);
 }
 
 .ec-topbar-tool svg,
@@ -112,49 +103,50 @@
 .ec-topbar-tool-cluster button svg {
   width: 15px;
   height: 15px;
+  color: currentColor;
 }
 
 .ec-topbar-right {
   margin-left: auto;
-  gap: 3px;
-}
-
-.ec-topbar-preview,
-.ec-topbar-export {
-  border: 1px solid color-mix(in oklab, var(--primary) 22%, var(--border));
+  gap: 4px;
 }
 
 .ec-topbar-preview {
-  color: color-mix(in oklab, var(--ec-violet) 78%, var(--foreground));
-  background: color-mix(in oklab, var(--ec-violet) 7%, transparent);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--foreground);
+}
+
+.ec-topbar-preview:hover {
+  background: var(--muted);
 }
 
 .ec-topbar-export {
-  border-color: transparent;
-  background: linear-gradient(
-    135deg,
-    var(--primary),
-    color-mix(in oklab, var(--primary) 64%, var(--ec-violet))
-  ) !important;
+  border-color: var(--primary) !important;
+  background: var(--primary) !important;
   color: var(--primary-foreground) !important;
-  box-shadow: 0 4px 13px color-mix(in oklab, var(--primary) 28%, transparent);
+  box-shadow: none;
 }
 
 .ec-topbar-export:hover {
-  filter: brightness(1.06);
-  box-shadow: 0 6px 18px color-mix(in oklab, var(--primary) 36%, transparent);
+  background: color-mix(in srgb, var(--primary) 92%, black) !important;
+  filter: none;
+  box-shadow: none;
 }
 
 .ec-topbar-tools-trigger {
   display: none;
 }
 
+.ec-topbar-local {
+  padding-inline: 5px;
+}
+
 .ec-topbar-local-dot {
   width: 6px;
   height: 6px;
   border-radius: 999px;
-  background: var(--primary);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 13%, transparent);
+  background: var(--success);
 }
 
 .ec-topbar-sheet {
@@ -167,7 +159,7 @@
   min-height: 0;
   display: grid;
   align-content: start;
-  gap: 14px;
+  gap: 16px;
   overflow: auto;
   padding-top: 4px;
 }
@@ -175,11 +167,18 @@
 .ec-topbar-sheet .ec-topbar-tool-cluster {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 .ec-topbar-sheet .ec-topbar-tool {
   min-height: 36px;
+  justify-content: flex-start;
+  border: 1px solid var(--border);
+  padding-inline: 10px;
+  background: var(--background);
 }
 
 .ec-topbar-help-list {
@@ -194,7 +193,7 @@
 
 .ec-topbar-settings-section {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .ec-topbar-settings-section h2,
@@ -207,12 +206,13 @@
   align-items: center;
   gap: 6px;
   font-size: var(--ec-text-sm);
+  font-weight: 600;
 }
 
 .ec-topbar-settings-section h2 svg {
   width: 14px;
   height: 14px;
-  color: var(--primary);
+  color: var(--muted-foreground);
 }
 
 .ec-topbar-setting-row {
@@ -221,10 +221,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--ec-radius-md);
-  padding: 8px;
-  background: color-mix(in oklab, var(--surface-raised) 72%, transparent);
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding: 9px 0 10px;
+  background: transparent;
   font-size: var(--ec-text-xs);
 }
 
@@ -281,7 +282,7 @@
   }
 
   .ec-topbar-breadcrumb strong {
-    max-width: min(32vw, 120px);
+    max-width: min(34vw, 132px);
   }
 
   .ec-topbar-action-label {

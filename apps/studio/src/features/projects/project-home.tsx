@@ -60,11 +60,7 @@ function ProjectCollectionSkeleton({ view }: { readonly view: 'grid' | 'list' })
   );
 }
 
-export function ProjectHome({
-  onOpen,
-}: {
-  readonly onOpen: (id: string) => void | Promise<void>;
-}) {
+export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void | Promise<void> }) {
   const [projects, setProjects] = useState<readonly ProjectSummary[]>([]);
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<ProjectLifecycleStatus | 'all'>('active');
@@ -251,7 +247,9 @@ export function ProjectHome({
                       variant="ghost"
                       disabled={pending}
                       onClick={() =>
-                        void runProjectAction(p.id, () => projectStorageRuntime.duplicateProject(p.id, `${p.name} copia`))
+                        void runProjectAction(p.id, () =>
+                          projectStorageRuntime.duplicateProject(p.id, `${p.name} copia`),
+                        )
                       }
                     >
                       Duplicar
@@ -286,7 +284,9 @@ export function ProjectHome({
                               <Button
                                 variant="destructive"
                                 onClick={() =>
-                                  void runProjectAction(p.id, () => projectStorageRuntime.deleteProjectPermanently(p.id))
+                                  void runProjectAction(p.id, () =>
+                                    projectStorageRuntime.deleteProjectPermanently(p.id),
+                                  )
                                 }
                               >
                                 Eliminar definitivamente

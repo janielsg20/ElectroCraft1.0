@@ -45,7 +45,7 @@ if (preferences.includes('localStorage') || preferences.includes('PGlite'))
   throw new Error('M03.3 must not preempt F04 persistence');
 if (!navigation.includes("iconId: 'studio.sidebar.editor'")) throw new Error('M03.3 semantic icon mapping missing');
 if (!css.includes("data-sidebar-collapsed='true'") || !css.includes('grid-template-columns: 64px')) {
-  throw new Error('M03.3 240 -> 64 collapse CSS missing');
+  throw new Error('M03.3 256 -> 64 collapse CSS missing');
 }
 if (!closure.includes('32272740576') || !closure.includes('GREEN'))
   throw new Error('M03.2 closure evidence is not GREEN');
@@ -68,7 +68,7 @@ const report = {
   engine: 'shadcn/ui Radix + AppShell',
   baseCommit: '38b2f5aac504a406b42537b7aade8f3d26626e7d',
   groups: ['build', 'data', 'logic', 'app', 'resources', 'appearance', 'publish'],
-  sidebar: { expandedPx: 240, collapsedPx: 64, preferencePort: 'WorkspacePreferencesPort' },
+  sidebar: { expandedPx: 256, collapsedPx: 64, preferencePort: 'WorkspacePreferencesPort' },
   responsive: ['desktop-toggle', 'laptop-rail', 'tablet-sheet', 'mobile-sheet'],
   helpId: 'help.studio.shell',
   blockers: [],

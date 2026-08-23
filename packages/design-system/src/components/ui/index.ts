@@ -1,5 +1,6 @@
 export * from './alert-dialog';
 export * from './button';
+export * from './checkbox';
 export * from './collapsible';
 export * from './dialog';
 export * from './dropdown-menu';
@@ -7,6 +8,7 @@ export * from './empty-state';
 export * from './input';
 export * from './loader';
 export * from './popover';
+export * from './radio-group';
 export * from './resizable-pane-layout';
 export * from './scroll-area';
 export * from './select';

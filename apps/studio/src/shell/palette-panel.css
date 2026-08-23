@@ -4,7 +4,7 @@
   min-height: 0;
   height: 100%;
   flex-direction: column;
-  background: var(--background);
+  background: var(--surface);
 }
 
 .ec-palette-header {
@@ -12,7 +12,7 @@
   gap: 8px;
   padding: 8px;
   border-bottom: 1px solid var(--border);
-  background: linear-gradient(180deg, color-mix(in oklab, var(--ec-violet) 7%, var(--background)), var(--background));
+  background: var(--surface);
 }
 
 .ec-palette-heading {
@@ -23,11 +23,10 @@
 }
 
 .ec-palette-heading > svg {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   margin-top: 1px;
-  color: var(--ec-violet);
-  filter: drop-shadow(0 2px 5px color-mix(in oklab, var(--ec-violet) 30%, transparent));
+  color: var(--muted-foreground);
 }
 
 .ec-palette-heading h2,
@@ -38,15 +37,16 @@
 }
 
 .ec-palette-heading h2 {
-  font-size: 13px;
+  color: var(--foreground);
+  font-size: var(--ec-text-xs);
   line-height: 18px;
-  font-weight: 650;
+  font-weight: 600;
 }
 
 .ec-palette-heading p,
 .ec-palette-keyboard-help {
   color: var(--muted-foreground);
-  font-size: 10px;
+  font-size: var(--ec-text-2xs);
   line-height: 14px;
 }
 
@@ -73,9 +73,10 @@
 }
 
 .ec-palette-search input {
-  height: 32px;
+  height: var(--ec-control-md);
   padding-left: 28px;
-  font-size: 12px;
+  background: var(--background);
+  font-size: var(--ec-text-xs);
 }
 
 .ec-palette-scroll {
@@ -85,22 +86,13 @@
 
 .ec-palette-content {
   display: grid;
-  gap: 10px;
+  gap: 12px;
   padding: 8px;
 }
 
 .ec-palette-section {
-  --ec-palette-tone: var(--ec-violet);
   display: grid;
   gap: 5px;
-}
-
-.ec-palette-section:nth-of-type(3n + 2) {
-  --ec-palette-tone: var(--ec-cyan);
-}
-
-.ec-palette-section:nth-of-type(3n) {
-  --ec-palette-tone: var(--ec-amber);
 }
 
 .ec-palette-section-header {
@@ -112,21 +104,18 @@
 }
 
 .ec-palette-section-header h3 {
-  font-size: 11px;
+  color: var(--foreground);
+  font-size: var(--ec-text-2xs);
   line-height: 16px;
-  font-weight: 650;
-  color: color-mix(in oklab, var(--ec-palette-tone) 76%, var(--foreground));
+  font-weight: 600;
 }
 
 .ec-palette-section-header span {
   min-width: 20px;
-  border-radius: 999px;
-  background: color-mix(in oklab, var(--ec-palette-tone) 10%, var(--muted));
-  padding: 1px 5px;
-  text-align: center;
   color: var(--muted-foreground);
   font-size: 9px;
   line-height: 14px;
+  text-align: right;
 }
 
 .ec-palette-grid {
@@ -144,10 +133,14 @@
 .ec-palette-item {
   position: relative;
   min-width: 0;
-  border: 1px solid var(--border);
-  border-radius: 7px;
-  background: var(--card);
   overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--background);
+}
+
+.ec-palette-item:hover {
+  border-color: color-mix(in srgb, var(--foreground) 18%, var(--border));
 }
 
 .ec-palette-item:focus-within {
@@ -159,20 +152,20 @@
   display: grid;
   width: 100%;
   min-width: 0;
-  min-height: 60px;
-  grid-template-columns: 22px minmax(0, 1fr);
+  min-height: 56px;
+  grid-template-columns: 18px minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr) auto;
-  gap: 4px 7px;
+  gap: 3px 7px;
   border: 0;
   background: transparent;
-  padding: 7px 26px 6px 7px;
-  text-align: left;
+  padding: 7px 26px 6px 8px;
   color: inherit;
+  text-align: left;
   cursor: pointer;
 }
 
 .ec-palette-item-main:hover {
-  background: color-mix(in oklab, var(--ec-palette-tone) 9%, var(--accent));
+  background: var(--accent);
 }
 
 .ec-palette-item-main:focus-visible,
@@ -184,12 +177,9 @@
   grid-row: 1;
   display: grid;
   place-items: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 5px;
-  background: color-mix(in oklab, var(--ec-palette-tone) 12%, var(--muted));
-  color: var(--ec-palette-tone);
-  transition: transform var(--ec-normal) var(--ec-ease-out);
+  width: 18px;
+  height: 18px;
+  color: var(--muted-foreground);
 }
 
 .ec-palette-item-icon svg {
@@ -198,7 +188,7 @@
 }
 
 .ec-palette-item-main:hover .ec-palette-item-icon {
-  transform: rotate(-5deg) scale(1.08);
+  color: var(--foreground);
 }
 
 .ec-palette-item-copy {
@@ -207,16 +197,17 @@
   display: grid;
   min-width: 0;
   align-content: start;
-  gap: 2px;
+  gap: 1px;
 }
 
 .ec-palette-item-copy strong {
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: var(--foreground);
   font-size: 11px;
   line-height: 15px;
-  font-weight: 620;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .ec-palette-item-copy span {
@@ -233,19 +224,18 @@
   grid-column: 1 / -1;
   grid-row: 2;
   justify-self: start;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 0 5px;
   color: var(--muted-foreground);
   font-size: 8px;
-  line-height: 13px;
-  letter-spacing: 0.02em;
+  line-height: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .ec-palette-favorite {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: 3px;
+  right: 3px;
   display: grid;
   width: 24px;
   height: 24px;
@@ -258,25 +248,24 @@
 }
 
 .ec-palette-favorite:hover {
-  background: color-mix(in oklab, var(--ec-amber) 12%, var(--accent));
-  color: var(--ec-amber);
-  transform: rotate(10deg) scale(1.08);
+  background: var(--muted);
+  color: var(--foreground);
 }
 
 .ec-palette-favorite[aria-pressed='true'] {
-  color: var(--ec-amber);
+  color: var(--primary);
 }
 
 .ec-palette-empty,
 .ec-palette-diagnostic {
   display: grid;
   gap: 4px;
-  border: 1px dashed var(--border);
-  border-radius: 7px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
   padding: 9px;
-  background: color-mix(in oklab, var(--muted) 35%, transparent);
+  background: var(--background);
   color: var(--muted-foreground);
-  font-size: 10px;
+  font-size: var(--ec-text-2xs);
   line-height: 14px;
 }
 
@@ -286,7 +275,6 @@
 
 .ec-palette-diagnostic {
   margin: 8px 10px 0;
-  border-style: solid;
 }
 
 .ec-palette-diagnostic header {
@@ -334,11 +322,11 @@
     position: sticky;
     top: 0;
     z-index: 2;
-    background: var(--background);
+    background: var(--surface);
   }
 
   .ec-palette-item-main {
-    min-height: 78px;
+    min-height: 64px;
   }
 
   .ec-palette-favorite {

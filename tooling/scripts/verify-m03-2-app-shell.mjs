@@ -45,15 +45,15 @@ for (const token of [
 ]) {
   if (!css.includes(token)) throw new Error(`M03.2 CSS contract missing: ${token}`);
 }
-for (const token of ['sidebarExpandedPx: 240', 'sidebarCollapsedPx: 64', 'topbarPx: 52', 'statusbarPx: 26']) {
+for (const token of ['sidebarExpandedPx: 256', 'sidebarCollapsedPx: 64', 'topbarPx: 56', 'statusbarPx: 24']) {
   if (!layout.includes(token)) throw new Error(`M03.2 layout contract missing: ${token}`);
 }
 for (const token of [
-  '--ec-shell-sidebar-width: 240px;',
-  '--ec-shell-topbar-height: 52px;',
-  '--ec-shell-statusbar-height: 26px;',
+  '--ec-shell-sidebar-width: 256px;',
+  '--ec-shell-topbar-height: 56px;',
+  '--ec-shell-statusbar-height: 24px;',
 ]) {
-  if (!tokens.includes(token)) throw new Error(`M03.2 default shell token missing: ${token}`);
+  if (!tokens.includes(token)) throw new Error(`M03.2 current shell token missing: ${token}`);
 }
 for (const label of [
   'Editor',
@@ -111,7 +111,7 @@ const report = {
   mode: m032Complete ? 'post-closure-regression' : 'active-gate',
   engine: 'shadcn/ui Radix + AppShell',
   baseCommit: 'c0ee291f29405a1f1dd9fb1c14afe7d13b3a45ae',
-  geometry: { root: '100dvh', sidebar: [240, 64], topbar: 52, statusbar: 26 },
+  geometry: { root: '100dvh', sidebar: [256, 64], topbar: 56, statusbar: 24 },
   responsive: ['desktop', 'laptop', 'tablet-rail-sheet', 'mobile-sheet'],
   helpId: 'help.studio.shell',
   blockers: [],
