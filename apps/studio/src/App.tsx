@@ -11,6 +11,7 @@ import {
   useState,
   useSyncExternalStore,
   type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
 } from 'react';
 import { evaluateStudioBootstrapHealth } from './bootstrap-health';
@@ -129,6 +130,33 @@ function WorkspaceAwareEditor() {
     window.addEventListener('pointercancel', stop);
   }
 
+  function resizePaneWithKeyboard(event: ReactKeyboardEvent<HTMLDivElement>) {
+    const target = event.target as HTMLElement;
+    const handle = target.closest<HTMLElement>('[data-resize-side]');
+    const resizeSide = handle?.dataset.resizeSide;
+    if (resizeSide !== 'left' && resizeSide !== 'right') return;
+
+    const panel = resizeSide === 'left' ? 'context' : 'inspector';
+    const limits = WORKSPACE_LAYOUT_LIMITS[panel];
+    const currentWidth = panel === 'context' ? paneWidths.contextWidth : paneWidths.inspectorWidth;
+    const step = event.shiftKey ? 24 : 8;
+    let nextWidth: number | null = null;
+
+    if (event.key === 'Home') nextWidth = limits.minSize;
+    if (event.key === 'End') nextWidth = limits.maxSize;
+    if (event.key === 'ArrowLeft') nextWidth = currentWidth + (panel === 'context' ? -step : step);
+    if (event.key === 'ArrowRight') nextWidth = currentWidth + (panel === 'context' ? step : -step);
+    if (nextWidth === null) return;
+
+    const clampedWidth = clampPaneWidth(panel, nextWidth);
+    setPaneWidths((current) => ({
+      ...current,
+      ...(panel === 'context' ? { contextWidth: clampedWidth } : { inspectorWidth: clampedWidth }),
+    }));
+    const patch = panel === 'context' ? { contextWidth: clampedWidth } : { inspectorWidth: clampedWidth };
+    void workspacePreferencesRuntime.patchLayout(patch);
+  }
+
   const visible = new Set<WorkspacePanelId>(resolved.visiblePanels);
   const style = {
     '--ec-workspace-context-width': `${paneWidths.contextWidth}px`,
@@ -142,6 +170,7 @@ function WorkspaceAwareEditor() {
       data-context-visible={visible.has('context') ? 'true' : 'false'}
       data-inspector-visible={visible.has('inspector') ? 'true' : 'false'}
       onPointerDownCapture={startPaneDrag}
+      onKeyDownCapture={resizePaneWithKeyboard}
     >
       <StudioEditorWorkspace />
     </div>
