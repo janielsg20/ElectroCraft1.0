@@ -24,8 +24,9 @@
 - M04.3 — Persistencia incremental, autosave y recovery: `COMPLETADA`; Gate `GREEN`.
 - M04.4 — Project Home real: `COMPLETADA`; Gate `GREEN`.
 - M04.5 — New Project Wizard y project actions: `COMPLETADA`; Gate `GREEN`.
-- M04.6 — Import/Backup/Restore: `ACTIVE`.
-- Blockers P0/P1 funcionales conocidos: `1` pendiente de cierre: ejecutar el gate E2E completo y CI remoto sobre la remediación local del audit. Los defectos reproducidos quedaron corregidos localmente.
+- M04.6 — Import/Backup/Restore: `COMPLETADA`; Gate `GREEN`.
+- M04.7 — Workspace preferences: `ACTIVE`.
+- Blockers P0/P1 funcionales conocidos: `0`.
 
 ## Cierre F03/M03.12
 
@@ -43,8 +44,12 @@ M04.2 validó el source funcional `6847a5fa410f0478c7e393b3d06800b6f89af072` en 
 
 M04.3 cerró localmente `GREEN` sobre source funcional `987f4c333f6e8b4c48d7ebad9c284e3925e9cf02`: dirty-set incremental, transacciones por objetos afectados, checkpoints restaurables, recovery explícito, UI española y gate dedicado. Evidencia: `.ai/evidence/F04/M04.3/VALIDATION_LATEST.md`.
 
+## Cierre M04.6
+
+M04.6 cerró `GREEN` sobre head funcional `7378b0d69ded493ee8fd6a1cc3b245e2f485ee52`: workflow dedicado `32619053208` `success`, Base CI `32619053241` `success`, merge PR `#45` a `main`. Evidencia: `.ai/evidence/F04/M04.6/CLOSURE_2026-08-23.md`.
+
 ## Microfase activa
 
-`M04.6` — Import/Backup/Restore.
+`M04.7` — Workspace preferences.
 
-Referencias: `.ai/microphases/M04_6.md`, `.ai/evidence/F04/M04.6/AUDIT_REMEDIATION_2026-08-21.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
+Referencias: `.ai/microphases/M04_7.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
