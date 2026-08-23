@@ -13,6 +13,7 @@ import {
 } from '@electrocraft/design-system';
 import { useState } from 'react';
 import { projectStorageRuntime } from './project-storage-runtime';
+import './project-choice.css';
 
 const steps = ['Tipo', 'Diseño', 'Demo', 'Revisar'] as const;
 export function NewProjectWizard({
