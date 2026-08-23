@@ -1,0 +1,33 @@
+.ec-project-choice {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  padding: 8px 10px;
+  color: var(--foreground);
+  font-size: var(--ec-text-sm);
+  cursor: pointer;
+}
+
+.ec-project-choice:hover {
+  background: var(--muted);
+}
+
+.ec-project-choice:has([data-state='checked']) {
+  border-color: color-mix(in srgb, var(--primary) 36%, var(--border));
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.ec-project-choice:focus-within {
+  outline: 2px solid color-mix(in srgb, var(--ring) 35%, transparent);
+  outline-offset: 1px;
+}
+
+@media (max-width: 767px) {
+  .ec-project-choice {
+    min-height: 44px;
+  }
+}
