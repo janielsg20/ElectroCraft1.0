@@ -2,7 +2,7 @@
 
 ## Current
 
-F04 / M04.6 — Import/Backup/Restore — `ACTIVE`.
+F04 / M04.7 — Workspace preferences — `ACTIVE`.
 
 ## Heredado
 
@@ -10,23 +10,23 @@ F04 / M04.6 — Import/Backup/Restore — `ACTIVE`.
 - M04.1 cerró `COMPLETADA / GREEN` con source funcional validado `8fd9460a43a4a3b5eaf91e62b83f4b3cb7edf10b`.
 - M04.2 cerró `COMPLETADA / GREEN` con source funcional `6847a5fa410f0478c7e393b3d06800b6f89af072`; workflow run `32430992572`, job `96622322833`, `success`.
 - M04.3 cerró `COMPLETADA / GREEN` con source funcional `987f4c333f6e8b4c48d7ebad9c284e3925e9cf02` y evidencia `.ai/evidence/F04/M04.3/`.
-- Evidencia M04.2: `.ai/evidence/F04/M04.2/VALIDATION_LATEST.md` + `.ai/evidence/F04/M04.2/CLOSURE_2026-08-20.md`.
+- M04.6 cerró `COMPLETADA / GREEN` con source funcional `7378b0d69ded493ee8fd6a1cc3b245e2f485ee52`, gate `32619053208` success y Base CI `32619053241` success; PR `#45` fusionada a `main`.
+- Evidencia M04.6: `.ai/evidence/F04/M04.6/CLOSURE_2026-08-23.md`.
 - `@electrocraft/data-web` mantiene PGlite `0.5.5` + Drizzle `0.45.2`, IndexedDB baseline, OPFS AHP opt-in, multi-tab Worker oficial, migrations/health fail-closed y leader handoff validado en Chromium.
-- PGlite conserva ownership de la elección; ElectroCraft solo publica una identidad observable del Worker líder desde `worker.init(options)` para evitar una carrera detectada en `PGliteWorker.isLeader`.
-- Monorepo actual: 19 owner packages, 21 aliases, 2 apps.
-- Remediación local del audit registrada en `.ai/evidence/F04/M04.6/AUDIT_REMEDIATION_2026-08-21.md`.
-- Blocker P0/P1 pendiente: gate E2E completo + CI remoto de la remediación; no declarar M04.6 cerrada antes de esa evidencia y de implementar Import/Backup.
+- `workspace_preferences` ya existe en el schema físico con PK `(workspace_id, key)` y `jsonb` para `value`; M04.7 debe reutilizarlo, no introducir localStorage o una segunda persistencia.
+- Blockers P0/P1: `0`.
 
 ## Siguiente acción exacta
 
-1. Ejecutar el E2E completo y CI remoto de la remediación; mantener M04.6 `ACTIVE` hasta obtener evidencia real.
-2. Cambiar primero el contract repository/service para backup e import, sin acceso PGlite desde UI.
-3. Definir backup versionado: manifest + snapshot canónico + referencias/archivos media y checksum verificable.
-4. Validar manifest/version/checksum antes de cualquier escritura y resolver colisiones con `importar como copia` explícito.
-5. Implementar la transacción PGlite/Drizzle y conservar el snapshot `pre-restore-safety` antes de reemplazar.
-6. Conectar `Proyectos > menú del proyecto > Importar/Crear copia/Restaurar` y `Configuración > Almacenamiento` con wizard/confirmación, resumen de impacto y progreso en español.
-7. Añadir unit/contract/negative/round-trip/integration real/E2E responsive y registrar el gate completo.
+1. Definir primero el contract repository/service de Workspace preferences en `packages/application/src/projects/`.
+2. Añadir lectura/escritura/borrado tipado sobre `workspace_preferences` en `packages/data-web/` con transacción Drizzle/PGlite.
+3. Modelar defaults y clamps: Sidebar 240/64, Topbar 52, Context 288, Inspector 320, Status 26; side `left|right`, display `icons|text|icons+text`.
+4. Persistir group order, visible panels, last tabs/document y saved layouts sin mutar contenido canónico del proyecto.
+5. Sincronizar cambios entre tabs mediante storage/event layer.
+6. Conectar `Configuración > Espacio de trabajo` con guardar/renombrar/aplicar/eliminar layout y restaurar default.
+7. Añadir integración PGlite real, negative tests, reopen/round-trip, clamp móvil y E2E responsive.
+8. Ejecutar gate dedicado + Base CI; no declarar M04.7 `COMPLETADA` sin evidencia.
 
 ## Read set
 
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M04_6.md → packages/data-web → packages/application/src/projects → apps/studio/src/features/projects → tooling/package-boundaries.json`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M04_7.md → packages/data-web → packages/application/src/projects → apps/studio/src/features/projects → apps/studio/src/help/help-registry.ts → tooling/package-boundaries.json`.
