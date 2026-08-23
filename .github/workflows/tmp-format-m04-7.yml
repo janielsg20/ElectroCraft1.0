@@ -1,0 +1,39 @@
+name: Temporary M04.7 Formatter
+
+on:
+  push:
+    branches:
+      - 'ai/m04-7-workspace-preferences-20260823'
+    paths:
+      - '.github/workflows/tmp-format-m04-7.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ai/m04-7-workspace-preferences-20260823
+          persist-credentials: true
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run format
+      - name: Commit exact formatting
+        run: |
+          if git diff --quiet; then
+            echo 'No formatting changes required.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'style(m04.7): apply repository formatter'
+          git push origin HEAD:ai/m04-7-workspace-preferences-20260823
