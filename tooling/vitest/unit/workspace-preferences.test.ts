@@ -102,6 +102,24 @@ describe('M04.7 workspace preferences contract', () => {
     expect(current.savedLayouts).toHaveLength(0);
   });
 
+  it('serializes concurrent patches so later changes do not erase earlier ones', async () => {
+    const service = createWorkspacePreferencesService(createMemoryStorage(), {
+      now: () => '2026-08-23T13:00:00.000Z',
+    });
+
+    await Promise.all([
+      service.patchLayout({ sidebarSide: 'right' }),
+      service.patchLayout({ sidebarWidth: 318 }),
+      service.patchLayout({ inspectorWidth: 376 }),
+    ]);
+
+    expect((await service.load()).layout).toMatchObject({
+      sidebarSide: 'right',
+      sidebarWidth: 318,
+      inspectorWidth: 376,
+    });
+  });
+
   it('rejects invalid names, missing presets and more than twenty saved layouts', async () => {
     const service = createWorkspacePreferencesService(createMemoryStorage(), {
       now: () => '2026-08-23T13:00:00.000Z',
