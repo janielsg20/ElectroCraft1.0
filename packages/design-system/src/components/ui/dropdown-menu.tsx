@@ -7,7 +7,7 @@ export const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
 
 export function DropdownMenuContent({
   className,
-  sideOffset = 6,
+  sideOffset = 4,
   align = 'end',
   ...props
 }: ComponentProps<typeof DropdownMenuPrimitive.Content>) {
@@ -17,7 +17,7 @@ export function DropdownMenuContent({
         sideOffset={sideOffset}
         align={align}
         className={cn(
-          'z-50 min-w-44 overflow-hidden rounded-md border border-border bg-popover p-1 text-popover-foreground [box-shadow:var(--ec-shadow)]',
+          'z-50 min-w-48 overflow-hidden rounded-lg border border-border bg-popover p-1.5 text-popover-foreground [box-shadow:var(--ec-shadow)]',
           className,
         )}
         {...props}
@@ -35,9 +35,9 @@ export function DropdownMenuItem({ destructive = false, className, ...props }: D
     <DropdownMenuPrimitive.Item
       data-destructive={destructive ? 'true' : undefined}
       className={cn(
-        'relative flex h-7 cursor-default select-none items-center rounded-sm px-2 text-sm outline-none',
-        'focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-        'data-[destructive=true]:text-destructive data-[destructive=true]:focus:bg-destructive/10',
+        'relative flex min-h-8 cursor-default select-none items-center rounded-md px-2.5 py-1.5 text-[var(--ec-text-sm)] outline-none',
+        'focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-45',
+        'data-[destructive=true]:text-destructive data-[destructive=true]:focus:bg-destructive/10 data-[destructive=true]:focus:text-destructive',
         className,
       )}
       {...props}
@@ -46,5 +46,5 @@ export function DropdownMenuItem({ destructive = false, className, ...props }: D
 }
 
 export function DropdownMenuSeparator({ className, ...props }: ComponentProps<typeof DropdownMenuPrimitive.Separator>) {
-  return <DropdownMenuPrimitive.Separator className={cn('-mx-1 my-1 h-px bg-border', className)} {...props} />;
+  return <DropdownMenuPrimitive.Separator className={cn('-mx-1.5 my-1.5 h-px bg-border', className)} {...props} />;
 }
