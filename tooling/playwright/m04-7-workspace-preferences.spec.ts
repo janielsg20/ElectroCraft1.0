@@ -114,13 +114,13 @@ test.describe('M04.7 Workspace preferences', () => {
     await expect(page.locator('.ec-app-shell')).toHaveAttribute('data-sidebar-side', 'left', { timeout: 60_000 });
   });
 
-  test('mantiene el layout móvil sin overflow aunque existan anchos desktop grandes', async ({ page }) => {
+  test('mantiene el layout móvil sin overflow con los anchos desktop máximos', async ({ page }) => {
     test.setTimeout(180_000);
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/editor');
     const { workspace } = await openWorkspaceSettings(page);
-    await workspace.getByLabel('Ancho de Contexto').fill('420');
-    await workspace.getByLabel('Ancho del Inspector').fill('460');
+    await workspace.getByLabel('Ancho de Contexto').fill('380');
+    await workspace.getByLabel('Ancho del Inspector').fill('440');
     await page.keyboard.press('Escape');
 
     await page.setViewportSize({ width: 360, height: 800 });
