@@ -44,8 +44,8 @@ export interface WorkspacePreferencesStoragePort {
 export const WORKSPACE_LAYOUT_LIMITS = Object.freeze({
   sidebar: Object.freeze({ defaultSize: 240, collapsedSize: 64, minSize: 180, maxSize: 420 }),
   topbar: Object.freeze({ defaultSize: 52 }),
-  context: Object.freeze({ defaultSize: 288, minSize: 240, maxSize: 420 }),
-  inspector: Object.freeze({ defaultSize: 320, minSize: 272, maxSize: 460 }),
+  context: Object.freeze({ defaultSize: 288, minSize: 240, maxSize: 380 }),
+  inspector: Object.freeze({ defaultSize: 320, minSize: 280, maxSize: 440 }),
   status: Object.freeze({ defaultSize: 26 }),
 });
 
