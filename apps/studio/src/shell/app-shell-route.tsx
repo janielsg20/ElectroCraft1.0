@@ -1,13 +1,13 @@
 import type { DesignSystemPackageDescriptor } from '@electrocraft/design-system';
 import { translateStrict, type ElectroCraftResourceKey } from '@electrocraft/i18n';
 import type { ReactNode } from 'react';
+import { workspacePreferencesPort } from '../features/projects/workspace-preferences-runtime';
 import { getStudioHelpDescriptor } from '../help/help-registry';
 import { iaT } from '../i18n/information-architecture.es';
 import { StudioAppearanceProvider } from '../theme-provider';
 import { AppShell, type AppShellCopy, type AppShellStatus } from './app-shell';
 import { resolveSidebarActiveItem, studioSidebarNavigation } from './sidebar-navigation';
 import { StudioTopbar, type StudioTopbarCopy } from './studio-topbar';
-import { createMemoryWorkspacePreferencesPort } from './workspace-preferences';
 
 export const studioDesignSystemOwner: DesignSystemPackageDescriptor['name'] = '@electrocraft/design-system';
 
@@ -85,8 +85,6 @@ const topbarCopy: StudioTopbarCopy = Object.freeze({
   settingsStatusErrorTitle: iaT('studio.ia.settings.statusErrorTitle'),
   settingsStatusErrorSummary: iaT('studio.ia.settings.statusErrorSummary'),
 });
-
-const workspacePreferencesPort = createMemoryWorkspacePreferencesPort();
 
 function resolveActiveLabel(activeItemId: ReturnType<typeof resolveSidebarActiveItem>, pathname: string) {
   if (pathname === '/') return commonT('studio.topbar.projectsLabel');
