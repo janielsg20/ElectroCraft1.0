@@ -30,7 +30,9 @@ test('descarga e importa una copia portable desde Project Home', async ({ page }
   await expect(dialog.getByText(/objetos · copia del/)).toBeVisible();
   await dialog.getByRole('button', { name: 'Importar' }).click();
 
-  await expect(page.getByText('Proyecto backup E2E — copia importada', { exact: true })).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByText('Proyecto backup E2E — copia importada', { exact: true })).toBeVisible({
+    timeout: 60_000,
+  });
 });
 
 test('bloquea una copia corrupta antes de abrir el diálogo de importación', async ({ page }) => {
