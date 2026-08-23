@@ -7,6 +7,7 @@ export * from './repository';
 export * from './schema-contract';
 export * from './schema';
 export * from './storage-health';
+export * from './workspace-preferences-repository';
 
 export const packageDescriptor = Object.freeze({
   name: '@electrocraft/data-web',
