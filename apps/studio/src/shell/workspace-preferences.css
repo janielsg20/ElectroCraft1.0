@@ -6,6 +6,10 @@
   overflow: hidden;
 }
 
+.ec-app-shell[data-status-visible='false'] {
+  grid-template-rows: var(--ec-shell-topbar-height) minmax(0, 1fr) 0;
+}
+
 @media (min-width: 1280px) {
   .ec-workspace-editor-preferences .ec-resizable-tri-pane {
     grid-template-columns:
