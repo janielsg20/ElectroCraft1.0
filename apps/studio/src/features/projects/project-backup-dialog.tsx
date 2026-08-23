@@ -97,10 +97,15 @@ export function ProjectBackupDialog({
       }
       const nextCopyId = portableCopyId();
       const collision = await projectStorageRuntime.inspectBackupImport({ package: validated, strategy: 'reject' });
-      const nextStrategy: ProjectBackupImportStrategy = mode === 'restore' ? 'replace' : collision.projectCollision ? 'copy' : 'reject';
+      const nextStrategy: ProjectBackupImportStrategy =
+        mode === 'restore' ? 'replace' : collision.projectCollision ? 'copy' : 'reject';
       const nextCopyName = `${validated.manifest.projectName} (importado)`;
       setPackage(validated);
-      setImpact({ ...collision, strategy: nextStrategy, targetProjectId: nextStrategy === 'copy' ? nextCopyId : collision.targetProjectId });
+      setImpact({
+        ...collision,
+        strategy: nextStrategy,
+        targetProjectId: nextStrategy === 'copy' ? nextCopyId : collision.targetProjectId,
+      });
       setStrategy(nextStrategy);
       setCopyProjectId(nextCopyId);
       setCopyName(nextCopyName);
@@ -273,7 +278,11 @@ export function ProjectBackupDialog({
               onClick={() => void runImport()}
             >
               {state === 'importing' ? <Loader label="Importando" announce={false} size="xs" /> : null}
-              {strategy === 'replace' ? 'Restaurar y reemplazar' : strategy === 'copy' ? 'Importar como copia' : 'Importar'}
+              {strategy === 'replace'
+                ? 'Restaurar y reemplazar'
+                : strategy === 'copy'
+                  ? 'Importar como copia'
+                  : 'Importar'}
             </Button>
           ) : null}
         </footer>
