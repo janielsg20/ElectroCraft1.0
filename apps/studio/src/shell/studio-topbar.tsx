@@ -10,8 +10,9 @@ import {
   getStudioIcon,
 } from '@electrocraft/design-system';
 import { useEffect, useSyncExternalStore } from 'react';
-import { StorageSettings } from '../features/projects/storage-settings';
 import { projectStorageRuntime } from '../features/projects/project-storage-runtime';
+import { StorageSettings } from '../features/projects/storage-settings';
+import { WorkspaceSettings } from '../features/projects/workspace-settings';
 import { HelpDrawerTrigger } from '../help/help-ui';
 import type { HelpDescriptor } from '../help/help-registry';
 import { appearanceT } from '../i18n/appearance.es';
@@ -143,11 +144,7 @@ function TopbarToolCluster({
 
 export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help }: StudioTopbarProps) {
   const width = useSyncExternalStore(subscribeViewport, getViewportWidth, () => 1440);
-  const preferences = useSyncExternalStore(
-    preferencesPort.subscribe,
-    preferencesPort.getSnapshot,
-    preferencesPort.getSnapshot,
-  );
+  useSyncExternalStore(preferencesPort.subscribe, preferencesPort.getSnapshot, preferencesPort.getSnapshot);
   const storage = useSyncExternalStore(
     projectStorageRuntime.subscribe,
     projectStorageRuntime.getSnapshot,
@@ -159,8 +156,6 @@ export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help 
   }, []);
 
   const breakpoint = resolveStudioViewportBreakpoint(width);
-  const sidebarCollapsed = preferences.sidebarCollapsed;
-  const sidebarAction = sidebarCollapsed ? copy.expandSidebarAction : copy.collapseSidebarAction;
   const storageStatus: AppShellStatus =
     storage.state === 'saving'
       ? 'saving'
@@ -231,7 +226,6 @@ export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help 
         </span>
 
         <AppearancePanelTrigger />
-
         <HelpDrawerTrigger initialHelpId={help.id} label={copy.helpLabel} className="ec-topbar-help-trigger" />
 
         <Sheet>
@@ -264,27 +258,7 @@ export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help 
               ) : null}
 
               <LanguageSettings />
-
-              <section
-                className="ec-topbar-settings-section"
-                aria-labelledby="workspace-settings-title"
-                data-information-level="primary"
-              >
-                <h2 id="workspace-settings-title">
-                  <SettingsIcon aria-hidden="true" />
-                  {copy.workspaceSettingsTitle}
-                </h2>
-                <div className="ec-topbar-setting-row">
-                  <div>
-                    <strong>{copy.sidebarPreferenceLabel}</strong>
-                    <p>{sidebarCollapsed ? copy.sidebarCollapsedLabel : copy.sidebarExpandedLabel}</p>
-                  </div>
-                  <Button variant="outline" size="sm" onClick={preferencesPort.toggleSidebar}>
-                    {sidebarAction}
-                  </Button>
-                </div>
-              </section>
-
+              <WorkspaceSettings />
               <StorageSettings />
 
               <section
