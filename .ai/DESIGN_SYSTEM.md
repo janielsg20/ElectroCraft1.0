@@ -19,13 +19,31 @@ ElectroCraft Studio has one visual language and one component foundation.
 - Theme: `ElectroCraft`.
 - Color modes: `light` and `dark` only.
 - Base color family: neutral.
-- One restrained primary accent.
+- One restrained primary blue accent.
 - High-density layout remains the default.
 - No Studio theme presets.
 - No multi-framework appearance adapters.
 - No decorative glass/gradient framework layers.
 
 The Studio theme is a workspace preference. It is not the `ElectroCraftTheme/DesignSystem` authored for generated applications.
+
+# Administrative console visual baseline
+
+The Studio chrome follows the interaction principles of a modern cloud administration console, using the current Google Cloud Console as a reference for hierarchy and density without copying branded assets.
+
+- Neutral surfaces own the shell, panels, menus, cards and canvas chrome.
+- Primary blue is reserved for selected navigation, focus, links and primary actions.
+- Do not color-code navigation groups or editor regions with unrelated accent hues.
+- Structure comes from spacing and 1px borders before shadows.
+- Gradients, glass blur, glow and decorative elevation are prohibited in normal Studio chrome.
+- Desktop high-density controls use a 28 / 32 / 36px small / medium / large scale.
+- Mobile interactive controls remain at least 44px where touch is the primary input.
+- Navigation rows and menu/select items use a 32px baseline on desktop.
+- Sidebar is 256px expanded and 64px compact; topbar is 56px.
+- Standard radius is 6px, panels/cards 8px, modal/sheet surfaces up to 12px.
+- Hover states change surface/border/color; they do not translate, rotate or scale routine controls.
+- Shadows are reserved for true overlays and floating surfaces.
+- System fonts remain mandatory for zero font-download dependency on first paint.
 
 # Do not mix bases
 
