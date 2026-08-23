@@ -11,6 +11,7 @@ import { resolveSidebarActiveItem } from './shell/sidebar-navigation';
 import './styles.css';
 import './shell/sidebar.css';
 import './shell/topbar.css';
+import './shell/editor-workspace.css';
 import './shell/responsive-shell.css';
 import './shell/information-architecture.css';
 import './shell/loading-ui.css';
