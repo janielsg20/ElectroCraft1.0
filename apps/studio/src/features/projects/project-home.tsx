@@ -12,6 +12,10 @@ import {
   DialogContent,
   DialogDescription,
   DialogTitle,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   Input,
   Loader,
   Select,
@@ -24,6 +28,7 @@ import {
 } from '@electrocraft/design-system';
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { HelpTrigger } from '../../help/help-ui';
+import { downloadProjectBackup, ProjectBackupDialog } from './project-backup-dialog';
 import { projectStorageRuntime } from './project-storage-runtime';
 import './project-home.css';
 
@@ -69,6 +74,8 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
   const [error, setError] = useState('');
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [restoreProject, setRestoreProject] = useState<ProjectSummary | null>(null);
   const [pendingProjectId, setPendingProjectId] = useState<string | null>(null);
   const [actionError, setActionError] = useState('');
   const [renameProject, setRenameProject] = useState<ProjectSummary | null>(null);
@@ -104,6 +111,18 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
     } catch (cause) {
       setActionError(cause instanceof Error ? cause.message : 'No se pudo completar la acción.');
       return false;
+    } finally {
+      setPendingProjectId(null);
+    }
+  }
+
+  async function createBackup(project: ProjectSummary) {
+    setPendingProjectId(project.id);
+    setActionError('');
+    try {
+      await downloadProjectBackup(project);
+    } catch (cause) {
+      setActionError(cause instanceof Error ? cause.message : 'No se pudo crear la copia de seguridad.');
     } finally {
       setPendingProjectId(null);
     }
@@ -191,6 +210,9 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
               showLabel={refreshing}
             />
           ) : null}
+          <Button variant="outline" disabled={initialLoading} onClick={() => setImportOpen(true)}>
+            Importar copia
+          </Button>
           <Button className="ec-project-new" disabled={initialLoading} onClick={() => setWizardOpen(true)}>
             <NewProjectIcon aria-hidden="true" />
             Nuevo proyecto
@@ -208,8 +230,13 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
         {state === 'ready' && projects.length === 0 ? (
           <section className="ec-project-empty">
             <h2>No hay proyectos en esta vista</h2>
-            <p>Crea un proyecto o cambia los filtros.</p>
-            <Button onClick={() => setWizardOpen(true)}>Nuevo proyecto</Button>
+            <p>Crea un proyecto, importa una copia o cambia los filtros.</p>
+            <div className="flex flex-wrap justify-center gap-2">
+              <Button variant="outline" onClick={() => setImportOpen(true)}>
+                Importar copia
+              </Button>
+              <Button onClick={() => setWizardOpen(true)}>Nuevo proyecto</Button>
+            </div>
           </section>
         ) : null}
         {canShowProjects ? (
@@ -225,7 +252,7 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
                 <article className="ec-project-card" key={p.id} data-pending={pending ? 'true' : 'false'}>
                   <button className="ec-project-open" disabled={pending} onClick={() => void openProject(p.id)}>
                     <span aria-hidden={pending ? undefined : 'true'}>
-                      {pending ? <Loader label={`Abriendo ${p.name}`} announce size="sm" /> : 'EC'}
+                      {pending ? <Loader label={`Procesando ${p.name}`} announce size="sm" /> : 'EC'}
                     </span>
                     <strong>{p.name}</strong>
                     <small>
@@ -254,6 +281,17 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
                     >
                       Duplicar
                     </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" disabled={pending}>
+                          Copias
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent aria-label={`Copias de ${p.name}`}>
+                        <DropdownMenuItem onSelect={() => void createBackup(p)}>Crear copia</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => setRestoreProject(p)}>Restaurar desde copia</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                     {p.status === 'active' ? (
                       <Button variant="ghost" disabled={pending} onClick={() => void change(p.id, 'archived')}>
                         Archivar
@@ -344,6 +382,16 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
           </div>
         </DialogContent>
       </Dialog>
+      <ProjectBackupDialog open={importOpen} onOpenChange={setImportOpen} onImported={() => reload()} />
+      <ProjectBackupDialog
+        open={restoreProject !== null}
+        onOpenChange={(open) => {
+          if (!open) setRestoreProject(null);
+        }}
+        mode="restore"
+        restoreProject={restoreProject}
+        onImported={() => reload()}
+      />
       {wizardOpen ? (
         <Suspense
           fallback={
