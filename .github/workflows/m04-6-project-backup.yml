@@ -1,0 +1,123 @@
+name: M04.6 Project Backup Import Restore
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'packages/application/src/projects/**'
+      - 'packages/data-web/**'
+      - 'apps/studio/src/features/projects/**'
+      - 'tooling/vitest/unit/project-backup-contract.test.ts'
+      - 'tooling/vitest/contract/project-backup-boundary.test.ts'
+      - 'tooling/vitest/integration/project-backup-pglite.test.ts'
+      - 'tooling/playwright/m04-6-project-backup.spec.ts'
+      - '.ai/microphases/M04_6.md'
+      - '.ai/evidence/F04/M04.6/**'
+      - '.ai/STATE.md'
+      - '.ai/TRACKING.md'
+      - '.ai/HANDOFF.md'
+      - '.github/workflows/m04-6-project-backup.yml'
+  push:
+    branches:
+      - main
+      - codex/m04-6-import-backup-restore-v2
+    paths:
+      - 'packages/application/src/projects/**'
+      - 'packages/data-web/**'
+      - 'apps/studio/src/features/projects/**'
+      - 'tooling/vitest/unit/project-backup-contract.test.ts'
+      - 'tooling/vitest/contract/project-backup-boundary.test.ts'
+      - 'tooling/vitest/integration/project-backup-pglite.test.ts'
+      - 'tooling/playwright/m04-6-project-backup.spec.ts'
+      - '.github/workflows/m04-6-project-backup.yml'
+
+permissions:
+  contents: read
+  statuses: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  m04-6:
+    name: M04.6 Backup Import Restore
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Publish pending status
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createCommitStatus({ owner: context.repo.owner, repo: context.repo.repo, sha: context.sha, state: 'pending', context: 'electrocraft/M04.6', description: 'M04.6 backup/import/restore gate running', target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}` });
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Verify locked toolchain
+        run: |
+          test "$(node --version)" = 'v22.16.0'
+          test "$(npm --version)" = '10.9.2'
+          test "$(npm config get legacy-peer-deps)" = 'true'
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Verify M04.6 formatting
+        run: >-
+          npx prettier --check
+          packages/application/src/projects/project-backup.ts
+          packages/application/src/projects/index.ts
+          packages/data-web/src/project-backup-repository.ts
+          packages/data-web/src/browser.ts
+          packages/data-web/src/index.ts
+          apps/studio/src/features/projects/project-storage-runtime.ts
+          apps/studio/src/features/projects/project-backup-dialog.tsx
+          apps/studio/src/features/projects/project-backup-dialog.css
+          apps/studio/src/features/projects/project-home.tsx
+          apps/studio/src/features/projects/storage-settings.tsx
+          tooling/vitest/unit/project-backup-contract.test.ts
+          tooling/vitest/contract/project-backup-boundary.test.ts
+          tooling/vitest/integration/project-backup-pglite.test.ts
+          tooling/playwright/m04-6-project-backup.spec.ts
+          .github/workflows/m04-6-project-backup.yml
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: M04.6 unit contract integration suite
+        run: >-
+          npx vitest run --config vitest.config.ts
+          tooling/vitest/unit/project-backup-contract.test.ts
+          tooling/vitest/contract/project-backup-boundary.test.ts
+          tooling/vitest/integration/project-backup-pglite.test.ts
+
+      - name: Full repository test gate
+        run: npm run test
+
+      - name: Full repository build gate
+        run: npm run build
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium
+
+      - name: M04.6 browser round-trip
+        run: npx playwright test --config playwright.config.ts tooling/playwright/m04-6-project-backup.spec.ts
+
+      - name: Publish final commit status
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createCommitStatus({ owner: context.repo.owner, repo: context.repo.repo, sha: context.sha, state: '${{ job.status }}' === 'success' ? 'success' : 'failure', context: 'electrocraft/M04.6', description: 'M04.6 backup/import/restore gate', target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}` });

@@ -3,6 +3,7 @@ import { packageDescriptor as dep1 } from '@electrocraft/application';
 
 export * from './browser';
 export * from './migration';
+export * from './project-backup-repository';
 export * from './repository';
 export * from './schema-contract';
 export * from './schema';

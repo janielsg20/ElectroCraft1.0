@@ -1,0 +1,148 @@
+.ec-project-backup-dialog {
+  display: grid;
+  gap: 14px;
+}
+
+.ec-project-backup-step,
+.ec-project-backup-impact,
+.ec-project-backup-strategy {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--ec-radius-panel);
+  padding: 12px;
+  background: var(--background);
+}
+
+.ec-project-backup-step > label,
+.ec-project-backup-copy-name {
+  display: grid;
+  gap: 2px;
+  color: var(--foreground);
+  font-size: var(--ec-text-xs);
+}
+
+.ec-project-backup-step > label span,
+.ec-project-backup-choice small,
+.ec-project-backup-note {
+  color: var(--muted-foreground);
+  font-size: var(--ec-text-2xs);
+  line-height: 1.45;
+}
+
+.ec-project-backup-status {
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: var(--ec-text-xs);
+}
+
+.ec-project-backup-status[data-state='error'] {
+  border: 1px solid color-mix(in srgb, var(--destructive) 36%, var(--border));
+  background: color-mix(in srgb, var(--destructive) 7%, var(--surface));
+  color: var(--destructive);
+}
+
+.ec-project-backup-status[data-state='success'] {
+  border: 1px solid color-mix(in srgb, var(--success) 32%, var(--border));
+  background: color-mix(in srgb, var(--success) 7%, var(--surface));
+  color: var(--success);
+}
+
+.ec-project-backup-impact h3,
+.ec-project-backup-strategy h3 {
+  margin: 0;
+  font-size: var(--ec-text-sm);
+  font-weight: 600;
+}
+
+.ec-project-backup-impact dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+}
+
+.ec-project-backup-impact dl > div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px;
+  background: var(--surface);
+}
+
+.ec-project-backup-impact dt {
+  color: var(--muted-foreground);
+  font-size: var(--ec-text-2xs);
+}
+
+.ec-project-backup-impact dd {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: var(--ec-text-xs);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ec-project-backup-note {
+  margin: 0;
+  border-left: 2px solid var(--primary);
+  padding-left: 9px;
+}
+
+.ec-project-backup-choice {
+  min-height: 44px;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 9px;
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.ec-project-backup-choice:has([data-state='checked']) {
+  border-color: color-mix(in srgb, var(--primary) 42%, var(--border));
+  background: var(--accent);
+}
+
+.ec-project-backup-choice > span {
+  display: grid;
+  gap: 2px;
+}
+
+.ec-project-backup-copy-name {
+  margin-top: 2px;
+  gap: 5px;
+}
+
+.ec-project-backup-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@media (max-width: 767px) {
+  .ec-project-backup-impact dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ec-project-backup-dialog {
+    gap: 12px;
+  }
+
+  .ec-project-backup-actions > button {
+    min-height: 44px;
+  }
+}
