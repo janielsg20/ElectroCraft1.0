@@ -1,6 +1,21 @@
-import { lazy, Suspense, useEffect, useState, useSyncExternalStore } from 'react';
+import {
+  WORKSPACE_LAYOUT_LIMITS,
+  resolveResponsiveWorkspaceLayout,
+  type WorkspacePanelId,
+} from '@electrocraft/application';
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type CSSProperties,
+  type PointerEvent as ReactPointerEvent,
+} from 'react';
 import { evaluateStudioBootstrapHealth } from './bootstrap-health';
 import { projectStorageRuntime } from './features/projects/project-storage-runtime';
+import { workspacePreferencesRuntime } from './features/projects/workspace-preferences-runtime';
 import { HelpTrigger } from './help/help-ui';
 import { getHelpIdForNavigationItem } from './help/help-registry';
 import { studioWorkspaceDescriptor } from './index';
@@ -15,6 +30,7 @@ import './shell/editor-workspace.css';
 import './shell/responsive-shell.css';
 import './shell/information-architecture.css';
 import './shell/loading-ui.css';
+import './shell/workspace-preferences.css';
 
 const projectHomeRoute = Object.freeze({
   id: 'project-home-development',
@@ -42,6 +58,95 @@ const StudioContentListDetailRoute = lazy(() =>
 const StudioModuleEmptyStateRoute = lazy(() =>
   import('./shell/information-architecture-ui').then((module) => ({ default: module.StudioModuleEmptyStateRoute })),
 );
+
+function subscribeViewport(listener: () => void) {
+  if (typeof window === 'undefined') return () => undefined;
+  window.addEventListener('resize', listener, { passive: true });
+  return () => window.removeEventListener('resize', listener);
+}
+
+function getViewportWidth() {
+  return typeof window === 'undefined' ? 1440 : window.innerWidth;
+}
+
+function clampPaneWidth(side: 'context' | 'inspector', value: number) {
+  const limits = WORKSPACE_LAYOUT_LIMITS[side];
+  return Math.min(limits.maxSize, Math.max(limits.minSize, Math.round(value)));
+}
+
+function WorkspaceAwareEditor() {
+  const preferences = useSyncExternalStore(
+    workspacePreferencesRuntime.subscribe,
+    workspacePreferencesRuntime.getSnapshot,
+    workspacePreferencesRuntime.getSnapshot,
+  );
+  const viewportWidth = useSyncExternalStore(subscribeViewport, getViewportWidth, () => 1440);
+  const resolved = resolveResponsiveWorkspaceLayout(preferences.layout, viewportWidth);
+  const [paneWidths, setPaneWidths] = useState(() => ({
+    contextWidth: resolved.contextWidth,
+    inspectorWidth: resolved.inspectorWidth,
+  }));
+  const cleanupDragRef = useRef<() => void>(() => undefined);
+
+  useEffect(() => {
+    setPaneWidths({ contextWidth: resolved.contextWidth, inspectorWidth: resolved.inspectorWidth });
+  }, [resolved.contextWidth, resolved.inspectorWidth]);
+
+  useEffect(() => () => cleanupDragRef.current(), []);
+
+  function startPaneDrag(event: ReactPointerEvent<HTMLDivElement>) {
+    const target = event.target as HTMLElement;
+    const handle = target.closest<HTMLElement>('[data-resize-side]');
+    const resizeSide = handle?.dataset.resizeSide;
+    if (resizeSide !== 'left' && resizeSide !== 'right') return;
+
+    cleanupDragRef.current();
+    const panel = resizeSide === 'left' ? 'context' : 'inspector';
+    const startX = event.clientX;
+    const startWidth = panel === 'context' ? paneWidths.contextWidth : paneWidths.inspectorWidth;
+    let latestWidth = startWidth;
+
+    const move = (pointerEvent: PointerEvent) => {
+      const delta = pointerEvent.clientX - startX;
+      latestWidth = clampPaneWidth(panel, startWidth + (panel === 'context' ? delta : -delta));
+      setPaneWidths((current) => ({
+        ...current,
+        ...(panel === 'context' ? { contextWidth: latestWidth } : { inspectorWidth: latestWidth }),
+      }));
+    };
+    const stop = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', stop);
+      window.removeEventListener('pointercancel', stop);
+      cleanupDragRef.current = () => undefined;
+      const patch = panel === 'context' ? { contextWidth: latestWidth } : { inspectorWidth: latestWidth };
+      void workspacePreferencesRuntime.patchLayout(patch);
+    };
+
+    cleanupDragRef.current = stop;
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', stop);
+    window.addEventListener('pointercancel', stop);
+  }
+
+  const visible = new Set<WorkspacePanelId>(resolved.visiblePanels);
+  const style = {
+    '--ec-workspace-context-width': `${paneWidths.contextWidth}px`,
+    '--ec-workspace-inspector-width': `${paneWidths.inspectorWidth}px`,
+  } as CSSProperties;
+
+  return (
+    <div
+      className="ec-workspace-editor-preferences"
+      style={style}
+      data-context-visible={visible.has('context') ? 'true' : 'false'}
+      data-inspector-visible={visible.has('inspector') ? 'true' : 'false'}
+      onPointerDownCapture={startPaneDrag}
+    >
+      <StudioEditorWorkspace />
+    </div>
+  );
+}
 
 function StudioWorkspaceBootstrap({
   pathname,
@@ -104,7 +209,7 @@ function resolveStudioWorkspace(pathname: string, health: ReturnType<typeof eval
   if (pathname === editorRoute) {
     return (
       <Suspense fallback={<StudioRouteSkeleton kind="editor" label="Cargando editor" />}>
-        <StudioEditorWorkspace />
+        <WorkspaceAwareEditor />
       </Suspense>
     );
   }
@@ -171,6 +276,7 @@ export function App() {
           onOpen={async (id) => {
             const opened = await projectStorageRuntime.openProject(id);
             if (!opened) throw new Error('No se pudo abrir el proyecto.');
+            await workspacePreferencesRuntime.patchLayout({ lastDocumentId: opened.project.id });
             openEditor();
           }}
         />
