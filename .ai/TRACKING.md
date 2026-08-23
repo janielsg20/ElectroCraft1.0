@@ -1,6 +1,6 @@
 # TRACKING — ElectroCraft current position
 
-Date: 2026-08-21.
+Date: 2026-08-23.
 
 | Scope              | Estado             | Evidencia                                      |
 | ------------------ | ------------------ | ---------------------------------------------- |
@@ -13,7 +13,8 @@ Date: 2026-08-21.
 | F04 / M04.3        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.3/CLOSURE_2026-08-21.md` |
 | F04 / M04.4        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.4/CLOSURE_2026-08-21.md` |
 | F04 / M04.5        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.5/CLOSURE_2026-08-21.md` |
-| F04 / M04.6        | ACTIVE             | `.ai/microphases/M04_6.md` + `.ai/evidence/F04/M04.6/AUDIT_REMEDIATION_2026-08-21.md` |
+| F04 / M04.6        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.6/CLOSURE_2026-08-23.md` |
+| F04 / M04.7        | ACTIVE             | `.ai/microphases/M04_7.md`                     |
 
 ## Cierre M04.1
 
@@ -29,7 +30,7 @@ Date: 2026-08-21.
 - Rama `codex/m04-2-multitab-worker`; PR `#28`.
 - Source funcional validado `6847a5fa410f0478c7e393b3d06800b6f89af072`.
 - Workflow `M04.2 Multi-Tab Worker Gate`: run `32430992572`, job `96622322833`, `success`.
-- `npm ci`, Prettier, lint, typecheck, boundaries, Vitest dedicado, full `npm run test`, full `npm run build`, Chromium y Playwright multi-tab: GREEN.
+- `npm ci`, Prettier, lint, typecheck, boundaries, tests completos, build y Playwright multi-tab: GREEN.
 - IndexedDB es baseline persistente; OPFS AHP queda como optimización capability-aware.
 - Lifecycle real: bootstrap → migrations → health-check → repositories ready.
 - Dos tabs comparten una única DB lógica mediante `PGliteWorker` con el mismo `id`.
@@ -49,13 +50,16 @@ Date: 2026-08-21.
 - Evidencia: `.ai/evidence/F04/M04.3/VALIDATION_LATEST.md` y `.ai/evidence/F04/M04.3/CLOSURE_2026-08-21.md`.
 - Blockers P0/P1: `0`.
 
+## Cierre M04.6
+
+- Source funcional: `7378b0d69ded493ee8fd6a1cc3b245e2f485ee52`.
+- PR `#45`; merge commit `6f37428f49b6cbd16bd262da7ef395c7e6181132`.
+- Gate dedicado `M04.6 Project Backup Gate`: run `32619053208`, `success`.
+- `ElectroCraft Base CI`: run `32619053241`, `success`.
+- Backup portable v1 con checksums; copy/replace/reject; `pre-import-safety`; integración real PGlite; E2E de download/import y rechazo de corrupción.
+- Evidencia: `.ai/evidence/F04/M04.6/CLOSURE_2026-08-23.md`.
+- Blockers P0/P1: `0`.
+
 ## Próxima microfase exacta
 
-`M04.6 — Import/Backup/Restore`.
-
-## Remediación de audit 2026-08-21
-
-- Sincronizado `main` en `e849d0d`; cambios locales previos preservados en `stash@{0}`.
-- Corregidos build npm 10/Tiptap, FKs con cascade, remapeo de referencias al duplicar, snapshot pre-restore, rutas `/` y `/editor`, lazy loading del editor, dialogs Radix accesibles, errores async, timeouts Windows y normalización LF.
-- Validación local: npm 10.9.2 `ci`, árbol Tiptap único 3.29.2, build, lint, typecheck, boundaries, full Vitest 86 archivos/308 tests y matriz E2E efectiva 81/81 (79/81 en corrida completa; 2/2 timeouts históricos pasan aislados con presupuesto portable).
-- Pendiente para cerrar el blocker: CI remoto; M04.6 sigue `ACTIVE` porque Import/Backup aún no está implementado.
+`M04.7 — Workspace preferences`.
