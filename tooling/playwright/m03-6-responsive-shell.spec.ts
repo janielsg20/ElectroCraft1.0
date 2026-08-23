@@ -68,7 +68,9 @@ test.describe('M03.6 responsive AppShell and editor', () => {
     await expect(contextTrigger).toBeFocused();
   });
 
-  test('renders the exact five-action mobile dock with bottom Properties and full-height Outline', async ({ page }) => {
+  test('renders the exact five-action mobile dock with bottom Properties and inset near-full-height Outline', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 360, height: 800 });
     await page.goto('/editor');
 
@@ -107,8 +109,8 @@ test.describe('M03.6 responsive AppShell and editor', () => {
     await expect(moreDialog).toBeVisible();
     await expect(moreDialog.locator('[data-mobile-tool="outline"]')).toBeVisible();
     const moreBox = await moreDialog.boundingBox();
-    expect(Math.round(moreBox?.width ?? 0)).toBe(360);
-    expect(Math.round(moreBox?.height ?? 0)).toBe(800);
+    expect(Math.round(moreBox?.width ?? 0)).toBe(344);
+    expect(Math.round(moreBox?.height ?? 0)).toBe(784);
     await page.keyboard.press('Escape');
     await expect(more).toBeFocused();
 

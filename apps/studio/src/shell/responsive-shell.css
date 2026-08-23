@@ -43,11 +43,6 @@
     position: relative;
   }
 
-  .ec-app-shell-sidebar .ec-app-shell-navigation-link[aria-current='page']::before {
-    position: absolute;
-    left: 0;
-  }
-
   .ec-app-shell-menu-trigger {
     display: inline-flex;
   }
@@ -165,7 +160,7 @@
 }
 
 .ec-editor-mobile-full-sheet {
-  width: 100vw !important;
+  width: calc(100vw - 1rem) !important;
   max-width: none;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
@@ -215,6 +210,6 @@
   }
 
   .ec-editor-tool-sheet {
-    width: 100vw;
+    width: 100%;
   }
 }

@@ -22,7 +22,7 @@ body {
   min-width: 320px;
   min-height: 100dvh;
   margin: 0;
-  background: var(--background);
+  background: var(--surface);
   color: var(--foreground);
   font-size: var(--ec-text-sm);
 }
@@ -41,7 +41,7 @@ a {
 }
 
 a:focus-visible {
-  border-radius: 3px;
+  border-radius: 6px;
   outline: 2px solid var(--ring);
   outline-offset: 2px;
 }
@@ -55,7 +55,7 @@ a:focus-visible {
   grid-template-columns: var(--ec-shell-sidebar-width) minmax(0, 1fr);
   grid-template-rows: var(--ec-shell-topbar-height) minmax(0, 1fr) var(--ec-shell-statusbar-height);
   overflow: hidden;
-  background: var(--background);
+  background: var(--surface);
 }
 
 .ec-skip-link {
@@ -85,7 +85,7 @@ a:focus-visible {
   grid-column: 1;
   grid-row: 1 / 4;
   overflow: hidden;
-  border-right: 1px solid var(--border);
+  border-right: 0;
   background: var(--surface);
 }
 
@@ -94,7 +94,7 @@ a:focus-visible {
   display: flex;
   align-items: center;
   gap: 10px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 0;
   padding: 0 14px;
 }
 
@@ -106,7 +106,7 @@ a:focus-visible {
   align-items: center;
   justify-content: center;
   border: 1px solid var(--border);
-  border-radius: 7px;
+  border-radius: 10px;
   background: var(--surface-raised);
   color: var(--primary);
   font-size: 0.7rem;
@@ -159,7 +159,7 @@ a:focus-visible {
   grid-row: 1;
   align-items: center;
   gap: 8px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 0;
   padding: 0 12px;
   background: var(--surface);
 }
@@ -178,9 +178,13 @@ a:focus-visible {
   min-height: 0;
   grid-column: 2;
   grid-row: 2;
+  margin: 0 var(--ec-shell-gutter) var(--ec-shell-gutter) 0;
   overflow: auto;
   overscroll-behavior: contain;
+  border: 1px solid var(--border);
+  border-radius: var(--ec-radius-window);
   background: var(--background);
+  box-shadow: var(--ec-shadow-sm);
 }
 
 .ec-app-shell-empty {
@@ -200,8 +204,8 @@ a:focus-visible {
   grid-row: 3;
   align-items: center;
   gap: 7px;
-  border-top: 1px solid var(--border);
-  padding: 0 10px;
+  border-top: 0;
+  padding: 0 12px;
   overflow: hidden;
   background: var(--surface);
   color: var(--muted-foreground);
@@ -371,6 +375,10 @@ h2 {
     grid-column: 1;
   }
 
+  .ec-app-shell-workspace {
+    margin-left: var(--ec-shell-gutter);
+  }
+
   .ec-app-shell-menu-trigger {
     display: inline-flex;
   }
@@ -379,6 +387,11 @@ h2 {
 @media (max-width: 767px) {
   .ec-app-shell-topbar {
     padding-inline: 6px;
+  }
+
+  .ec-app-shell-workspace {
+    margin: 0 6px 6px;
+    border-radius: var(--ec-radius-panel);
   }
 
   .ec-app-shell-mobile-sheet {

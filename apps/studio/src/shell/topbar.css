@@ -42,13 +42,13 @@
 .ec-topbar-save,
 .ec-topbar-local,
 .ec-topbar-tool {
-  min-height: 28px;
+  min-height: 32px;
   display: inline-flex;
   align-items: center;
   gap: 5px;
   border: 0;
-  border-radius: 5px;
-  padding: 3px 6px;
+  border-radius: 8px;
+  padding: 4px 8px;
   background: transparent;
   color: var(--muted-foreground);
   font-size: var(--ec-text-xs);
@@ -81,11 +81,11 @@
 }
 
 .ec-topbar-tool-cluster {
-  gap: 1px;
-  border: 1px solid transparent;
-  border-radius: 6px;
+  gap: 2px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
   padding: 2px;
-  background: var(--muted);
+  background: var(--background);
 }
 
 .ec-topbar-tool-cluster .ec-topbar-tool {
@@ -94,7 +94,7 @@
 }
 
 .ec-topbar-tool-cluster .ec-topbar-tool:hover {
-  background: var(--surface);
+  background: var(--muted);
   color: var(--foreground);
 }
 
@@ -113,6 +113,7 @@
 
 .ec-topbar-preview {
   border: 1px solid var(--border);
+  border-radius: 8px;
   background: transparent;
   color: var(--foreground);
 }
@@ -123,6 +124,7 @@
 
 .ec-topbar-export {
   border-color: var(--primary) !important;
+  border-radius: 8px;
   background: var(--primary) !important;
   color: var(--primary-foreground) !important;
   box-shadow: none;
@@ -139,7 +141,7 @@
 }
 
 .ec-topbar-local {
-  padding-inline: 5px;
+  padding-inline: 7px;
 }
 
 .ec-topbar-local-dot {
@@ -167,16 +169,17 @@
 .ec-topbar-sheet .ec-topbar-tool-cluster {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4px;
+  gap: 6px;
   padding: 0;
   border: 0;
   background: transparent;
 }
 
 .ec-topbar-sheet .ec-topbar-tool {
-  min-height: 36px;
+  min-height: 38px;
   justify-content: flex-start;
   border: 1px solid var(--border);
+  border-radius: 10px;
   padding-inline: 10px;
   background: var(--background);
 }
