@@ -34,7 +34,7 @@
   display: grid;
   place-items: center;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--surface);
   color: var(--primary);
 }
@@ -57,9 +57,10 @@
   align-items: center;
   gap: 8px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--ec-radius-panel);
   padding: 5px;
   background: var(--surface);
+  box-shadow: var(--ec-shadow-sm);
 }
 
 .ec-project-toolbar input {
@@ -92,7 +93,7 @@
   gap: 2px;
   padding: 2px;
   border: 1px solid var(--border);
-  border-radius: 7px;
+  border-radius: 10px;
   background: var(--background);
 }
 
@@ -118,7 +119,7 @@
 .ec-project-card {
   overflow: hidden;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--ec-radius-panel);
   background: var(--surface);
   transition:
     border-color var(--ec-fast) ease,
@@ -126,7 +127,7 @@
 }
 
 .ec-project-card:hover {
-  border-color: color-mix(in srgb, var(--primary) 48%, var(--border));
+  border-color: color-mix(in srgb, var(--primary) 42%, var(--border));
   box-shadow: var(--ec-shadow-sm);
 }
 
@@ -151,10 +152,10 @@
   display: grid;
   place-items: center;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 10px;
   background-color: var(--background);
   background-image: radial-gradient(
-    color-mix(in srgb, var(--muted-foreground) 16%, transparent) 0.65px,
+    color-mix(in srgb, var(--muted-foreground) 14%, transparent) 0.65px,
     transparent 0.65px
   );
   background-size: 14px 14px;
@@ -191,7 +192,7 @@
   width: min(100%, 520px);
   margin: 56px auto;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--ec-radius-window);
   padding: 28px;
   background: var(--surface);
   text-align: center;
@@ -201,7 +202,7 @@
   margin-top: 12px;
   border: 1px solid color-mix(in srgb, var(--destructive) 40%, var(--border));
   border-left: 3px solid var(--destructive);
-  border-radius: 6px;
+  border-radius: 10px;
   padding: 10px 12px;
   background: color-mix(in srgb, var(--destructive) 7%, var(--surface));
   color: var(--destructive);
@@ -223,7 +224,7 @@
   max-height: 90dvh;
   overflow: auto;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--ec-radius-window);
   background: var(--surface);
   padding: 20px;
   box-shadow: var(--ec-shadow);
@@ -247,7 +248,7 @@
 
 .ec-project-wizard li {
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 9px;
   padding: 8px;
   background: var(--background);
   color: var(--muted-foreground);
@@ -273,7 +274,7 @@
   display: grid;
   gap: 10px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 12px;
 }
 
