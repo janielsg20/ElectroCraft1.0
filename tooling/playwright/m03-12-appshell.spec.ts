@@ -62,7 +62,7 @@ test.describe('M03.12 AppShell E2E closure matrix', () => {
       const sidebar = page.locator('.ec-app-shell-sidebar');
       if (viewport.mode === 'desktop') {
         await expect(sidebar).toBeVisible();
-        expect(Math.round((await sidebar.boundingBox())?.width ?? 0)).toBe(240);
+        expect(Math.round((await sidebar.boundingBox())?.width ?? 0)).toBe(256);
         await expect(page.locator('[data-editor-region="context"]')).toBeVisible();
         await expect(page.locator('[data-editor-region="canvas"]')).toBeVisible();
         await expect(page.locator('[data-editor-region="inspector"]')).toBeVisible();
@@ -162,28 +162,43 @@ test.describe('M03.12 AppShell E2E closure matrix', () => {
     await expect(page.locator('[aria-current="page"]')).toHaveCount(0);
   });
 
-  test('keeps Studio appearance persistence isolated from project/theme/export storage', async ({ page }) => {
+  test('keeps Studio theme persistence isolated from project/theme/export storage', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/editor');
     await page.evaluate(() => {
-      window.localStorage.removeItem('electrocraft.studio.appearance.v1');
-      window.localStorage.removeItem('electrocraft.studio.appearance-presets.v1');
+      window.localStorage.removeItem('electrocraft.studio.theme.v2');
+      window.localStorage.setItem(
+        'electrocraft.studio.appearance.v1',
+        JSON.stringify({ tone: 'light', accent: 'amber' }),
+      );
+      window.localStorage.setItem('electrocraft.studio.appearance-presets.v1', JSON.stringify([{ id: 'legacy' }]));
+      window.localStorage.setItem('electrocraft.project.e2e-sentinel', 'project-stable');
+      window.localStorage.setItem('electrocraft.theme.e2e-sentinel', 'theme-stable');
+      window.localStorage.setItem('electrocraft.export.e2e-sentinel', 'export-stable');
     });
     await page.reload();
 
     await page.locator('[data-appearance-trigger="topbar"]').first().click();
     const sheet = page.locator('[data-appearance-sheet="topbar"]').last();
-    await sheet.locator('[data-appearance-group="accent"] [data-appearance-value="amber"]').click();
-    await sheet.locator('[data-appearance-apply]').click();
+    await expect(sheet).toBeVisible();
+    await expect(sheet.locator('[data-appearance-value]')).toHaveCount(2);
+    await sheet.locator('[data-appearance-value="dark"]').click();
+    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecTheme)).toBe('dark');
 
     const storage = await page.evaluate(() => ({
-      appearance: window.localStorage.getItem('electrocraft.studio.appearance.v1'),
-      projectKeys: Object.keys(window.localStorage).filter((key) =>
-        /^electrocraft\.(?:project|theme|export)/i.test(key),
-      ),
+      studioTheme: window.localStorage.getItem('electrocraft.studio.theme.v2'),
+      legacyAppearance: window.localStorage.getItem('electrocraft.studio.appearance.v1'),
+      legacyPresets: window.localStorage.getItem('electrocraft.studio.appearance-presets.v1'),
+      project: window.localStorage.getItem('electrocraft.project.e2e-sentinel'),
+      theme: window.localStorage.getItem('electrocraft.theme.e2e-sentinel'),
+      exportValue: window.localStorage.getItem('electrocraft.export.e2e-sentinel'),
     }));
-    expect(storage.appearance).toContain('amber');
-    expect(storage.projectKeys).toEqual([]);
+    expect(storage.studioTheme).toBe(JSON.stringify('dark'));
+    expect(storage.legacyAppearance).toBeNull();
+    expect(storage.legacyPresets).toBeNull();
+    expect(storage.project).toBe('project-stable');
+    expect(storage.theme).toBe('theme-stable');
+    expect(storage.exportValue).toBe('export-stable');
   });
 
   test('does not leak known English release labels, raw translation keys or missing-key diagnostics', async ({
