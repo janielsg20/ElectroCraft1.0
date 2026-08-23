@@ -4,7 +4,7 @@ import { and, eq } from 'drizzle-orm';
 import type { StudioProjectDatabase } from './repository';
 import { workspacePreferences } from './schema';
 
-export interface DrizzleWorkspacePreferencesRepository extends WorkspacePreferencesStoragePort {}
+export type DrizzleWorkspacePreferencesRepository = WorkspacePreferencesStoragePort;
 
 export function createDrizzleWorkspacePreferencesRepository(
   db: StudioProjectDatabase,
