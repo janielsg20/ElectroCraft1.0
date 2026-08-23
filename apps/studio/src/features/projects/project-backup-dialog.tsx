@@ -20,11 +20,13 @@ import { useId, useState } from 'react';
 import { projectStorageRuntime } from './project-storage-runtime';
 import './project-backup-dialog.css';
 
+export type ProjectBackupIdentity = Pick<ProjectSummary, 'id' | 'name'>;
+
 function portableCopyId() {
   return globalThis.crypto?.randomUUID?.() ?? `import-${Date.now()}`;
 }
 
-function safeBackupFilename(project: ProjectSummary) {
+function safeBackupFilename(project: ProjectBackupIdentity) {
   const base = project.name
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
@@ -34,7 +36,7 @@ function safeBackupFilename(project: ProjectSummary) {
   return `${base || 'electrocraft-project'}-${new Date().toISOString().slice(0, 10)}.electrocraft.json`;
 }
 
-export async function downloadProjectBackup(project: ProjectSummary) {
+export async function downloadProjectBackup(project: ProjectBackupIdentity) {
   const pkg = await projectStorageRuntime.createBackup(project.id);
   const blob = new Blob([JSON.stringify(pkg, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -53,7 +55,7 @@ export interface ProjectBackupDialogProps {
   readonly open: boolean;
   readonly onOpenChange: (open: boolean) => void;
   readonly mode?: 'import' | 'restore';
-  readonly restoreProject?: ProjectSummary | null;
+  readonly restoreProject?: ProjectBackupIdentity | null;
   readonly onImported?: (result: ProjectBackupImportResult) => void | Promise<void>;
 }
 
