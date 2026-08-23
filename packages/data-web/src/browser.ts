@@ -1,17 +1,20 @@
 import {
+  type DuplicateProjectRequest,
+  type ListProjectsRequest,
   type NormalizedIncrementalSaveProjectRequest,
+  type NormalizedProjectBackupImportRequest,
   type NormalizedSaveProjectRequest,
+  type ProjectBackupPort,
+  type ProjectLifecycleStatus,
   type ProjectStorageCoordinationDiagnostics,
   type ProjectStorageDiagnostics,
   type ProjectStoragePort,
-  type ListProjectsRequest,
-  type ProjectLifecycleStatus,
-  type DuplicateProjectRequest,
 } from '@electrocraft/application';
 import type { PGlite } from '@electric-sql/pglite';
 import { PGliteWorker } from '@electric-sql/pglite/worker';
 import { drizzle } from 'drizzle-orm/pglite';
 import { applyStudioStorageMigrations } from './migration';
+import { createDrizzleProjectBackupRepository } from './project-backup-repository';
 import { createDrizzleProjectRepository } from './repository';
 import * as schema from './schema';
 import { STUDIO_STORAGE_SCHEMA_VERSION } from './schema-contract';
@@ -146,10 +149,13 @@ async function storageEstimate() {
   } as const;
 }
 
-export function createBrowserProjectStoragePort(options: BrowserProjectStorageOptions = {}): ProjectStoragePort {
+export function createBrowserProjectStoragePort(
+  options: BrowserProjectStorageOptions = {},
+): ProjectStoragePort & ProjectBackupPort {
   const clientId = createStorageClientId();
   let runtime: BrowserStorageClient | null = null;
   let repository: ReturnType<typeof createDrizzleProjectRepository> | null = null;
+  let backupRepository: ReturnType<typeof createDrizzleProjectBackupRepository> | null = null;
   let initializePromise: Promise<ProjectStorageDiagnostics> | null = null;
   let unsubscribeLeaderChange: (() => void) | null = null;
   let leaderChannel: BroadcastChannel | null = null;
@@ -244,7 +250,7 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
   }
 
   async function initialize() {
-    if (runtime && repository) return getDiagnostics();
+    if (runtime && repository && backupRepository) return getDiagnostics();
     if (initializePromise) return initializePromise;
 
     initializePromise = (async () => {
@@ -278,7 +284,9 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
           message: 'Comprobando almacenamiento local…',
         });
         await verifyStudioStorageHealth(runtime.client);
-        repository = createDrizzleProjectRepository(createWorkerDrizzleDatabase(runtime.client));
+        const db = createWorkerDrizzleDatabase(runtime.client);
+        repository = createDrizzleProjectRepository(db);
+        backupRepository = createDrizzleProjectBackupRepository(db);
 
         unsubscribeLeaderChange = runtime.client.onLeaderChange(() => {
           if (runtime) void revalidateAfterLeaderChange(runtime.client);
@@ -310,6 +318,7 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
         const failedRuntime = runtime;
         runtime = null;
         repository = null;
+        backupRepository = null;
         await failedRuntime?.client.close().catch(() => undefined);
         closeLeaderSignalChannel();
         diagnostics = Object.freeze({
@@ -333,6 +342,12 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
     if (!repository) await initialize();
     if (!repository) throw new Error(diagnostics.message);
     return repository;
+  }
+
+  async function ensureBackupRepository() {
+    if (!backupRepository) await initialize();
+    if (!backupRepository) throw new Error(diagnostics.message);
+    return backupRepository;
   }
 
   async function getDiagnostics() {
@@ -373,6 +388,30 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
     }
   }
 
+  async function importOperation(request: NormalizedProjectBackupImportRequest) {
+    const repo = await ensureBackupRepository();
+    diagnostics = Object.freeze({ ...diagnostics, state: 'saving', message: 'Importando copia de seguridad…' });
+    try {
+      const result = await repo.importProjectBackup(request);
+      diagnostics = Object.freeze({
+        ...diagnostics,
+        state: 'saved',
+        lifecyclePhase: 'ready',
+        coordination: coordination(),
+        message: 'Copia de seguridad importada.',
+      });
+      return result;
+    } catch (error) {
+      diagnostics = Object.freeze({
+        ...diagnostics,
+        state: 'error',
+        coordination: coordination(),
+        message: error instanceof Error ? error.message : 'No se pudo importar la copia de seguridad.',
+      });
+      throw error;
+    }
+  }
+
   return Object.freeze({
     initialize,
     saveProject: (request: NormalizedSaveProjectRequest) => persistOperation((repo) => repo.saveProject(request)),
@@ -398,6 +437,13 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
     async verifyProject(projectId: string) {
       return (await ensureRepository()).verifyProject(projectId);
     },
+    async createProjectBackup(projectId: string) {
+      return (await ensureBackupRepository()).createProjectBackup(projectId);
+    },
+    async inspectProjectBackupImport(request: NormalizedProjectBackupImportRequest) {
+      return (await ensureBackupRepository()).inspectProjectBackupImport(request);
+    },
+    importProjectBackup: importOperation,
     getDiagnostics,
     async repair() {
       if (typeof navigator !== 'undefined' && navigator.storage?.persist) {
@@ -433,6 +479,7 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
       await runtime?.client.close();
       runtime = null;
       repository = null;
+      backupRepository = null;
       closeLeaderSignalChannel();
       diagnostics = Object.freeze({
         ...diagnostics,
