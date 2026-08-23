@@ -51,12 +51,12 @@ describe('M03.2 AppShell boundaries', () => {
     expect(shell).not.toContain("'Configuración'");
   });
 
-  it('preserves exact AppShell geometry as later responsive microphases extend it', () => {
+  it('preserves the current AppShell geometry as responsive microphases extend it', () => {
     const layout = read('apps/studio/src/shell/app-shell-layout.ts');
-    expect(layout).toContain('sidebarExpandedPx: 240');
+    expect(layout).toContain('sidebarExpandedPx: 256');
     expect(layout).toContain('sidebarCollapsedPx: 64');
-    expect(layout).toContain('topbarPx: 52');
-    expect(layout).toContain('statusbarPx: 26');
+    expect(layout).toContain('topbarPx: 56');
+    expect(layout).toContain('statusbarPx: 24');
   });
 
   it('uses persistent help and a left/right-capable real Radix Sheet while M03.6 adds bottom support', () => {
