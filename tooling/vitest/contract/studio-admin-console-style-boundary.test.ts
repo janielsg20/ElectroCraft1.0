@@ -25,6 +25,7 @@ describe('Studio neutral administrative console style boundary', () => {
       'apps/studio/src/shell/topbar.css',
       'apps/studio/src/shell/editor-workspace.css',
       'apps/studio/src/shell/responsive-shell.css',
+      'apps/studio/src/shell/palette-panel.css',
       'apps/studio/src/features/projects/project-home.css',
     ]) {
       const source = read(file);
@@ -36,6 +37,16 @@ describe('Studio neutral administrative console style boundary', () => {
       expect(source).not.toContain('linear-gradient');
       expect(source).not.toContain('backdrop-filter');
     }
+  });
+
+  it('keeps the Palette neutral and removes decorative micro-motion', () => {
+    const palette = read('apps/studio/src/shell/palette-panel.css');
+    expect(palette).toContain('container-type: inline-size');
+    expect(palette).toContain('@container (min-width: 272px)');
+    expect(palette).toContain('repeat(2, minmax(0, 1fr))');
+    expect(palette).toContain('background: var(--surface)');
+    expect(palette).not.toContain('drop-shadow');
+    expect(palette).not.toContain('rotate(');
   });
 
   it('keeps the responsive geometry aligned with the same console baseline', () => {
