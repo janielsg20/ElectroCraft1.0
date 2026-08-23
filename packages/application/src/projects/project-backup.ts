@@ -130,7 +130,8 @@ export interface ProjectBackupPort {
 }
 
 function requireRecord(value: unknown, field: string): Record<string, unknown> {
-  if (value === null || typeof value !== 'object' || Array.isArray(value)) throw new TypeError(`${field} must be an object`);
+  if (value === null || typeof value !== 'object' || Array.isArray(value))
+    throw new TypeError(`${field} must be an object`);
   return value as Record<string, unknown>;
 }
 
@@ -151,7 +152,8 @@ function requireIsoDate(value: unknown, field: string): string {
 }
 
 function requireCount(value: unknown, field: string): number {
-  if (!Number.isSafeInteger(value) || (value as number) < 0) throw new TypeError(`${field} must be a non-negative integer`);
+  if (!Number.isSafeInteger(value) || (value as number) < 0)
+    throw new TypeError(`${field} must be a non-negative integer`);
   return value as number;
 }
 
@@ -227,7 +229,8 @@ function normalizeSnapshot(value: unknown, createdAt: string): ProjectBackupSnap
   const objects = requireArray(snapshot.objects, 'snapshot.objects').map((input, index) => {
     const object = requireRecord(input, `snapshot.objects[${index}]`) as unknown as StoredProjectObjectInput;
     const normalized = normalizeStoredProjectObject(project.id, object, createdAt);
-    if (objectIds.has(normalized.objectId)) throw new TypeError(`duplicate backup project object: ${normalized.objectId}`);
+    if (objectIds.has(normalized.objectId))
+      throw new TypeError(`duplicate backup project object: ${normalized.objectId}`);
     objectIds.add(normalized.objectId);
     return Object.freeze({
       objectId: normalized.objectId,
@@ -292,7 +295,8 @@ export function validateProjectBackupPackage(input: unknown): ProjectBackupPacka
   const createdAt = requireIsoDate(manifestInput.createdAt, 'backup.manifest.createdAt');
   const snapshot = normalizeSnapshot(root.snapshot, createdAt);
   const snapshotChecksum = createElectroCraftCanonicalSnapshotChecksum(snapshot);
-  if (manifestInput.snapshotChecksum !== snapshotChecksum) throw new TypeError('project backup snapshot checksum mismatch');
+  if (manifestInput.snapshotChecksum !== snapshotChecksum)
+    throw new TypeError('project backup snapshot checksum mismatch');
 
   const manifest: ProjectBackupManifest = Object.freeze({
     format: PROJECT_BACKUP_FORMAT,
@@ -336,7 +340,9 @@ export function normalizeProjectBackupImportRequest(
     throw new TypeError(`unsupported project import strategy: ${String(strategy)}`);
   }
   const targetProjectId =
-    strategy === 'copy' ? requireString(input.copyProjectId ?? defaultCopyProjectId, 'copyProjectId') : pkg.snapshot.project.id;
+    strategy === 'copy'
+      ? requireString(input.copyProjectId ?? defaultCopyProjectId, 'copyProjectId')
+      : pkg.snapshot.project.id;
   const targetName =
     strategy === 'copy'
       ? requireString(input.copyName ?? `${pkg.snapshot.project.name} (importado)`, 'copyName')
