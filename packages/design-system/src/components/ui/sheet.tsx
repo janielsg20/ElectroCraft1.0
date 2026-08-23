@@ -15,10 +15,10 @@ export interface SheetContentProps extends ComponentProps<typeof DialogPrimitive
 export function SheetContent({ side = 'right', className, children, ...props }: SheetContentProps) {
   const placementClassName =
     side === 'left'
-      ? 'inset-y-0 left-0 w-[min(92vw,400px)] border-r border-border'
+      ? 'inset-y-2 left-2 w-[min(92vw,400px)] rounded-r-[var(--ec-radius-window)] rounded-l-[var(--ec-radius-panel)] border border-border'
       : side === 'bottom'
-        ? 'inset-x-0 bottom-0 max-h-[88dvh] w-full rounded-t-xl border-t border-border'
-        : 'inset-y-0 right-0 w-[min(92vw,400px)] border-l border-border';
+        ? 'inset-x-2 bottom-2 max-h-[88dvh] w-[calc(100%-1rem)] rounded-[var(--ec-radius-window)] border border-border'
+        : 'inset-y-2 right-2 w-[min(92vw,400px)] rounded-l-[var(--ec-radius-window)] rounded-r-[var(--ec-radius-panel)] border border-border';
 
   return (
     <DialogPrimitive.Portal>
