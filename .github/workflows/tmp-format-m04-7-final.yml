@@ -1,0 +1,41 @@
+name: Temporary M04.7 final formatter
+
+on:
+  push:
+    branches:
+      - ai/m04-7-workspace-preferences-20260823
+    paths:
+      - '.github/workflows/tmp-format-m04-7-final.yml'
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Apply repository Prettier
+        run: npx prettier --write packages/application/src/projects/workspace-preferences.ts
+      - name: Commit exact formatting
+        run: |
+          if git diff --quiet -- packages/application/src/projects/workspace-preferences.ts; then
+            echo 'No formatting changes required.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add packages/application/src/projects/workspace-preferences.ts
+          git commit -m 'style(m04.7): apply repository Prettier'
+          git push origin HEAD:ai/m04-7-workspace-preferences-20260823
