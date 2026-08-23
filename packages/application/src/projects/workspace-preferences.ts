@@ -251,10 +251,7 @@ export function createWorkspacePreferencesService(
 
   function enqueue(operation: () => Promise<WorkspacePreferences>): Promise<WorkspacePreferences> {
     const task = mutationQueue.then(operation);
-    mutationQueue = task.then(
-      () => undefined,
-      () => undefined,
-    );
+    mutationQueue = task.then(() => undefined, () => undefined);
     return task;
   }
 
