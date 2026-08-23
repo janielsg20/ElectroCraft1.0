@@ -22,9 +22,9 @@ test.describe('M03.2 AppShell', () => {
       workspace.boundingBox(),
     ]);
 
-    expect(sidebarBox?.width).toBe(240);
-    expect(topbarBox?.height).toBe(52);
-    expect(statusbarBox?.height).toBe(26);
+    expect(sidebarBox?.width).toBe(256);
+    expect(topbarBox?.height).toBe(56);
+    expect(statusbarBox?.height).toBe(24);
     expect(workspaceBox?.width ?? 0).toBeGreaterThan(0);
 
     const metrics = await page.evaluate(() => ({
