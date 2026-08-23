@@ -1,5 +1,6 @@
 import {
   Button,
+  Checkbox,
   Dialog,
   DialogClose,
   DialogContent,
@@ -7,6 +8,8 @@ import {
   DialogTitle,
   Input,
   Loader,
+  RadioGroup,
+  RadioGroupItem,
 } from '@electrocraft/design-system';
 import { useState } from 'react';
 import { projectStorageRuntime } from './project-storage-runtime';
@@ -77,56 +80,40 @@ export function NewProjectWizard({
               <Input id="project-name" value={name} onChange={(e) => setName(e.target.value)} />
               <fieldset>
                 <legend>Tipo</legend>
-                <label>
-                  <input
-                    name="project-type"
-                    type="radio"
-                    checked={type === 'blank'}
-                    onChange={() => setType('blank')}
-                  />{' '}
-                  Básico en blanco
-                </label>
-                <label>
-                  <input
-                    name="project-type"
-                    type="radio"
-                    checked={type === 'blueprint'}
-                    onChange={() => setType('blueprint')}
-                  />{' '}
-                  Blueprint
-                </label>
+                <RadioGroup value={type} onValueChange={setType} aria-label="Tipo de proyecto">
+                  <label className="ec-project-choice" htmlFor="project-type-blank">
+                    <RadioGroupItem id="project-type-blank" value="blank" />
+                    <span>Básico en blanco</span>
+                  </label>
+                  <label className="ec-project-choice" htmlFor="project-type-blueprint">
+                    <RadioGroupItem id="project-type-blueprint" value="blueprint" />
+                    <span>Blueprint</span>
+                  </label>
+                </RadioGroup>
               </fieldset>
             </>
           ) : null}
           {step === 1 ? (
             <fieldset>
               <legend>Diseño inicial</legend>
-              <label>
-                <input
-                  name="project-design"
-                  type="radio"
-                  checked={design === 'system'}
-                  onChange={() => setDesign('system')}
-                />{' '}
-                Sistema
-              </label>
-              <label>
-                <input
-                  name="project-design"
-                  type="radio"
-                  checked={design === 'minimal'}
-                  onChange={() => setDesign('minimal')}
-                />{' '}
-                Minimalista
-              </label>
+              <RadioGroup value={design} onValueChange={setDesign} aria-label="Diseño inicial">
+                <label className="ec-project-choice" htmlFor="project-design-system">
+                  <RadioGroupItem id="project-design-system" value="system" />
+                  <span>Sistema</span>
+                </label>
+                <label className="ec-project-choice" htmlFor="project-design-minimal">
+                  <RadioGroupItem id="project-design-minimal" value="minimal" />
+                  <span>Minimalista</span>
+                </label>
+              </RadioGroup>
             </fieldset>
           ) : null}
           {step === 2 ? (
             <>
               <h3>Contenido de demostración</h3>
-              <label>
-                <input type="checkbox" checked={demo} onChange={(e) => setDemo(e.target.checked)} /> Incluir preferencia
-                de contenido demo
+              <label className="ec-project-choice" htmlFor="project-demo-content">
+                <Checkbox id="project-demo-content" checked={demo} onCheckedChange={(checked) => setDemo(checked === true)} />
+                <span>Incluir preferencia de contenido demo</span>
               </label>
               <p>La selección se registra como configuración; no crea datos permanentes ocultos.</p>
             </>
