@@ -46,31 +46,32 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 3px 8px;
-  background: var(--surface);
+  border: 0;
+  border-radius: 5px;
+  padding: 3px 6px;
+  background: transparent;
   color: var(--muted-foreground);
   font-size: var(--ec-text-xs);
   white-space: nowrap;
 }
 
+.ec-topbar-project {
+  color: var(--foreground);
+}
+
 .ec-topbar-save[data-save-state='error'],
 .ec-topbar-save[data-save-state='blocked'] {
-  border-color: color-mix(in srgb, var(--destructive) 45%, var(--border));
-  background: color-mix(in srgb, var(--destructive) 8%, var(--surface));
+  background: color-mix(in srgb, var(--destructive) 8%, transparent);
   color: var(--destructive);
 }
 
 .ec-topbar-save[data-save-state='saving'] {
-  border-color: color-mix(in srgb, var(--warning) 42%, var(--border));
-  background: color-mix(in srgb, var(--warning) 8%, var(--surface));
+  background: color-mix(in srgb, var(--warning) 8%, transparent);
   color: var(--warning);
 }
 
 .ec-topbar-save[data-save-state='ready'] {
-  border-color: var(--border);
-  background: var(--surface);
+  background: transparent;
   color: var(--muted-foreground);
 }
 
@@ -80,11 +81,11 @@
 }
 
 .ec-topbar-tool-cluster {
-  gap: 2px;
-  border: 1px solid var(--border);
-  border-radius: 7px;
+  gap: 1px;
+  border: 1px solid transparent;
+  border-radius: 6px;
   padding: 2px;
-  background: var(--surface);
+  background: var(--muted);
 }
 
 .ec-topbar-tool-cluster .ec-topbar-tool {
@@ -93,7 +94,7 @@
 }
 
 .ec-topbar-tool-cluster .ec-topbar-tool:hover {
-  background: var(--muted);
+  background: var(--surface);
   color: var(--foreground);
 }
 
@@ -111,9 +112,13 @@
 }
 
 .ec-topbar-preview {
-  border-color: var(--input);
-  background: var(--surface);
+  border: 1px solid var(--border);
+  background: transparent;
   color: var(--foreground);
+}
+
+.ec-topbar-preview:hover {
+  background: var(--muted);
 }
 
 .ec-topbar-export {
@@ -131,6 +136,10 @@
 
 .ec-topbar-tools-trigger {
   display: none;
+}
+
+.ec-topbar-local {
+  padding-inline: 5px;
 }
 
 .ec-topbar-local-dot {
@@ -158,9 +167,10 @@
 .ec-topbar-sheet .ec-topbar-tool-cluster {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 6px;
+  gap: 4px;
   padding: 0;
   border: 0;
+  background: transparent;
 }
 
 .ec-topbar-sheet .ec-topbar-tool {
@@ -168,6 +178,7 @@
   justify-content: flex-start;
   border: 1px solid var(--border);
   padding-inline: 10px;
+  background: var(--background);
 }
 
 .ec-topbar-help-list {
@@ -182,7 +193,7 @@
 
 .ec-topbar-settings-section {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .ec-topbar-settings-section h2,
@@ -210,10 +221,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--ec-radius-md);
-  padding: 10px 12px;
-  background: var(--surface);
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding: 9px 0 10px;
+  background: transparent;
   font-size: var(--ec-text-xs);
 }
 
