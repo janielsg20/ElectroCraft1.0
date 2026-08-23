@@ -29,7 +29,7 @@ The Studio theme is a workspace preference. It is not the `ElectroCraftTheme/Des
 
 # Administrative console visual baseline
 
-The Studio chrome follows the interaction principles of a modern cloud administration console, using the current Google Cloud Console as a reference for hierarchy and density without copying branded assets.
+The Studio chrome combines two reference principles without copying branded assets: Google AI Studio for composition, density and quiet panel hierarchy; Google Cloud Console for the curved content-window boundary that separates application chrome from the working surface.
 
 - Neutral surfaces own the shell, panels, menus, cards and canvas chrome.
 - Primary blue is reserved for selected navigation, focus, links and primary actions.
@@ -40,9 +40,13 @@ The Studio chrome follows the interaction principles of a modern cloud administr
 - Mobile interactive controls remain at least 44px where touch is the primary input.
 - Navigation rows and menu/select items use a 32px baseline on desktop.
 - Sidebar is 256px expanded and 64px compact; topbar is 56px.
-- Standard radius is 6px, panels/cards 8px, modal/sheet surfaces up to 12px.
+- The main workspace is an inset content window with an 8px gutter, 1px border and 18px radius.
+- Editor Context, Canvas and Inspector are separate framed surfaces with 14px panel radius and real gutters between them; they must not read as square columns glued together.
+- Cards, field groups, palette items and grouped controls generally use 10–14px radii according to hierarchy.
+- Dialogs use the main window radius on desktop. Side and bottom Sheets curve their exposed/inner edges instead of presenting a full-height square slab.
+- Navigation active state is a quiet rounded surface; avoid decorative side bars when the selected row already communicates state.
 - Hover states change surface/border/color; they do not translate, rotate or scale routine controls.
-- Shadows are reserved for true overlays and floating surfaces.
+- Shadows are reserved for true overlays and subtle window separation; 1px borders remain the primary structural separator.
 - System fonts remain mandatory for zero font-download dependency on first paint.
 
 # Do not mix bases
