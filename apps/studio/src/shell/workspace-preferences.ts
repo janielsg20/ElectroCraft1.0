@@ -1,8 +1,4 @@
-import type {
-  WorkspaceSidebarDisplay,
-  WorkspaceSidebarSide,
-  WorkspacePanelId,
-} from '@electrocraft/application';
+import type { WorkspaceSidebarDisplay, WorkspaceSidebarSide, WorkspacePanelId } from '@electrocraft/application';
 
 export interface WorkspacePreferences {
   readonly sidebarCollapsed: boolean;

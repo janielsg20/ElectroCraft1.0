@@ -54,7 +54,7 @@ test.describe('M04.7 Workspace preferences', () => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/editor');
 
-    let opened = await openWorkspaceSettings(page);
+    const opened = await openWorkspaceSettings(page);
     await opened.workspace.getByLabel('Lado del panel lateral').click();
     await page.getByRole('option', { name: 'Derecha' }).click();
     await opened.workspace.getByLabel('Nombre del diseño').fill('Diseño E2E');
@@ -77,6 +77,25 @@ test.describe('M04.7 Workspace preferences', () => {
 
     await saved.getByRole('button', { name: 'Eliminar' }).click();
     await expect(opened.workspace.locator('[data-workspace-saved-layout]')).toHaveCount(0);
+  });
+
+  test('restaura las últimas pestañas de Contexto e Inspector después de reload', async ({ page }) => {
+    test.setTimeout(180_000);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/editor');
+
+    const layers = page.getByRole('tab', { name: 'Capas' });
+    const design = page.getByRole('tab', { name: 'Diseño' });
+    await layers.click();
+    await design.click();
+    await expect(layers).toHaveAttribute('aria-selected', 'true');
+    await expect(design).toHaveAttribute('aria-selected', 'true');
+
+    await page.reload();
+    await expect(page.getByRole('tab', { name: 'Capas' })).toHaveAttribute('aria-selected', 'true', {
+      timeout: 60_000,
+    });
+    await expect(page.getByRole('tab', { name: 'Diseño' })).toHaveAttribute('aria-selected', 'true');
   });
 
   test('sincroniza una preferencia entre dos pestañas de la misma base local', async ({ page, context }) => {

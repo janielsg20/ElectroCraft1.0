@@ -85,7 +85,9 @@ function uniqueStrings(value: unknown, max = 100): readonly string[] {
 function normalizeVisiblePanels(value: unknown): readonly WorkspacePanelId[] {
   if (!Array.isArray(value)) return DEFAULT_WORKSPACE_LAYOUT.visiblePanels;
   const allowed = new Set<WorkspacePanelId>(['context', 'inspector', 'status']);
-  const panels = value.filter((item): item is WorkspacePanelId => typeof item === 'string' && allowed.has(item as WorkspacePanelId));
+  const panels = value.filter(
+    (item): item is WorkspacePanelId => typeof item === 'string' && allowed.has(item as WorkspacePanelId),
+  );
   return Object.freeze([...new Set(panels)]);
 }
 
@@ -170,7 +172,8 @@ export function createDefaultWorkspacePreferences(now = new Date().toISOString()
 export function normalizeWorkspacePreferences(value: unknown, now = new Date().toISOString()): WorkspacePreferences {
   const fallbackNow = new Date(now).toISOString();
   const record = asRecord(value);
-  if (!record || record.version !== WORKSPACE_PREFERENCES_VERSION) return createDefaultWorkspacePreferences(fallbackNow);
+  if (!record || record.version !== WORKSPACE_PREFERENCES_VERSION)
+    return createDefaultWorkspacePreferences(fallbackNow);
 
   const savedLayouts = Array.isArray(record.savedLayouts)
     ? record.savedLayouts
@@ -288,7 +291,8 @@ export function createWorkspacePreferencesService(
     async deleteSavedLayout(layoutId) {
       const current = await read();
       const savedLayouts = current.savedLayouts.filter((item) => item.id !== layoutId);
-      if (savedLayouts.length === current.savedLayouts.length) throw new Error(`workspace layout not found: ${layoutId}`);
+      if (savedLayouts.length === current.savedLayouts.length)
+        throw new Error(`workspace layout not found: ${layoutId}`);
       return write({ ...current, savedLayouts: Object.freeze(savedLayouts), updatedAt: now() });
     },
     async restoreDefaults() {

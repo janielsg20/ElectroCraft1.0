@@ -13,11 +13,29 @@ import { useState, useSyncExternalStore } from 'react';
 import { workspacePreferencesRuntime } from './workspace-preferences-runtime';
 
 const DEFAULT_GROUP_ORDER = ['build', 'data', 'logic', 'app', 'resources', 'appearance', 'publish'] as const;
+const GROUP_LABELS: Readonly<Record<(typeof DEFAULT_GROUP_ORDER)[number], string>> = Object.freeze({
+  build: 'Construcción',
+  data: 'Datos',
+  logic: 'Lógica',
+  app: 'Aplicación',
+  resources: 'Recursos',
+  appearance: 'Apariencia',
+  publish: 'Publicación',
+});
 const PANEL_LABELS: Readonly<Record<WorkspacePanelId, string>> = Object.freeze({
   context: 'Contexto',
   inspector: 'Inspector',
   status: 'Barra de estado',
 });
+
+function workspaceErrorMessage(cause: unknown): string {
+  if (!(cause instanceof Error)) return 'No se pudo guardar la configuración del espacio de trabajo.';
+  if (cause.message.includes('name is required')) return 'Escribe un nombre para guardar el diseño.';
+  if (cause.message.includes('name exceeds')) return 'El nombre del diseño es demasiado largo.';
+  if (cause.message.includes('layout limit reached')) return 'Ya alcanzaste el máximo de diseños guardados.';
+  if (cause.message.includes('layout not found')) return 'Ese diseño guardado ya no está disponible.';
+  return 'No se pudo guardar la configuración del espacio de trabajo.';
+}
 
 function normalizedGroupOrder(order: readonly string[]) {
   const known = new Set(DEFAULT_GROUP_ORDER);
@@ -42,7 +60,7 @@ export function WorkspaceSettings() {
     try {
       await operation();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'No se pudo guardar la configuración del espacio de trabajo.');
+      setError(workspaceErrorMessage(cause));
     }
   }
 
@@ -76,7 +94,9 @@ export function WorkspaceSettings() {
       data-workspace-settings
     >
       <h2 id="workspace-preferences-title">Espacio de trabajo</h2>
-      <p>Personaliza el panel lateral, el editor y los diseños reutilizables. Los cambios se guardan en este navegador.</p>
+      <p>
+        Personaliza el panel lateral, el editor y los diseños reutilizables. Los cambios se guardan en este navegador.
+      </p>
 
       {error ? (
         <div className="ec-ia-diagnostic-alert" role="alert">
@@ -93,7 +113,9 @@ export function WorkspaceSettings() {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => void run(() => workspacePreferencesRuntime.patchLayout({ sidebarCollapsed: !layout.sidebarCollapsed }))}
+          onClick={() =>
+            void run(() => workspacePreferencesRuntime.patchLayout({ sidebarCollapsed: !layout.sidebarCollapsed }))
+          }
         >
           {layout.sidebarCollapsed ? 'Expandir' : 'Contraer'}
         </Button>
@@ -223,7 +245,7 @@ export function WorkspaceSettings() {
         <div>
           {groupOrder.map((groupId, index) => (
             <div key={groupId} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ minWidth: 84 }}>{groupId}</span>
+              <span style={{ minWidth: 84 }}>{GROUP_LABELS[groupId as (typeof DEFAULT_GROUP_ORDER)[number]]}</span>
               <Button variant="ghost" size="sm" disabled={index === 0} onClick={() => moveGroup(groupId, -1)}>
                 Subir
               </Button>
@@ -274,7 +296,11 @@ export function WorkspaceSettings() {
             <p>Actualizado {new Date(saved.updatedAt).toLocaleString('es')}</p>
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            <Button size="sm" variant="outline" onClick={() => void run(() => workspacePreferencesRuntime.applySavedLayout(saved.id))}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => void run(() => workspacePreferencesRuntime.applySavedLayout(saved.id))}
+            >
               Aplicar
             </Button>
             <Input
@@ -294,7 +320,11 @@ export function WorkspaceSettings() {
             >
               Renombrar
             </Button>
-            <Button size="sm" variant="ghost" onClick={() => void run(() => workspacePreferencesRuntime.deleteSavedLayout(saved.id))}>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => void run(() => workspacePreferencesRuntime.deleteSavedLayout(saved.id))}
+            >
               Eliminar
             </Button>
           </div>

@@ -23,7 +23,8 @@ import {
   structuralPuckConfig,
   structuralPuckData,
 } from '@electrocraft/editor-puck';
-import { useRef, useState, type ReactNode, type RefObject } from 'react';
+import { useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from 'react';
+import { workspacePreferencesRuntime } from '../features/projects/workspace-preferences-runtime';
 import { editorT } from '../i18n/editor.es';
 import { iaT } from '../i18n/information-architecture.es';
 import { AppearancePanelTrigger } from './appearance-panel';
@@ -59,6 +60,30 @@ const hasStructuralContent = structuralPuckData.content.length > 0;
 
 type SecondaryTool = 'context' | 'inspector';
 type MobileTool = 'components' | 'properties' | 'outline';
+type ContextTab = 'components' | 'screens' | 'layers';
+type InspectorTab = 'content' | 'design' | 'actions';
+
+const contextTabs = ['components', 'screens', 'layers'] as const;
+const inspectorTabs = ['content', 'design', 'actions'] as const;
+
+function resolveWorkspaceTab<T extends string>(
+  lastTabs: readonly string[],
+  slot: 'context' | 'inspector',
+  allowed: readonly T[],
+  fallback: T,
+): T {
+  const prefix = `${slot}:`;
+  const value = lastTabs.find((entry) => entry.startsWith(prefix))?.slice(prefix.length);
+  return value && allowed.includes(value as T) ? (value as T) : fallback;
+}
+
+function persistWorkspaceTab(slot: 'context' | 'inspector', value: string) {
+  const current = workspacePreferencesRuntime.getSnapshot().layout.lastTabs;
+  const prefix = `${slot}:`;
+  const next = [...current.filter((entry) => !entry.startsWith(prefix)), `${prefix}${value}`];
+  if (current.length === next.length && current.every((entry, index) => entry === next[index])) return;
+  void workspacePreferencesRuntime.patchLayout({ lastTabs: next });
+}
 
 interface EditorRegionProps {
   readonly region: 'context' | 'canvas' | 'inspector';
@@ -115,13 +140,18 @@ function FieldsContent() {
 }
 
 function InspectorContent() {
-  const [tab, setTab] = useState<'content' | 'design' | 'actions'>('content');
+  const preferences = useSyncExternalStore(
+    workspacePreferencesRuntime.subscribe,
+    workspacePreferencesRuntime.getSnapshot,
+    workspacePreferencesRuntime.getSnapshot,
+  );
+  const tab = resolveWorkspaceTab<InspectorTab>(preferences.layout.lastTabs, 'inspector', inspectorTabs, 'content');
 
   return (
     <Tabs
       className="ec-editor-inspector"
       value={tab}
-      onValueChange={(value) => setTab(value as typeof tab)}
+      onValueChange={(value) => persistWorkspaceTab('inspector', value)}
       orientation="horizontal"
     >
       <TabsList className="ec-editor-panel-tabs" aria-label={editorT('studio.editor.inspectorTitle')}>
@@ -176,11 +206,20 @@ function InspectorContent() {
 }
 
 function ContextRegion() {
-  const [tab, setTab] = useState<'components' | 'screens' | 'layers'>('components');
+  const preferences = useSyncExternalStore(
+    workspacePreferencesRuntime.subscribe,
+    workspacePreferencesRuntime.getSnapshot,
+    workspacePreferencesRuntime.getSnapshot,
+  );
+  const tab = resolveWorkspaceTab<ContextTab>(preferences.layout.lastTabs, 'context', contextTabs, 'components');
 
   return (
     <EditorRegion region="context" title={editorT('studio.editor.contextTitle')} icon={ContextIcon}>
-      <Tabs className="ec-editor-context-tabs" value={tab} onValueChange={(value) => setTab(value as typeof tab)}>
+      <Tabs
+        className="ec-editor-context-tabs"
+        value={tab}
+        onValueChange={(value) => persistWorkspaceTab('context', value)}
+      >
         <TabsList className="ec-editor-panel-tabs" aria-label={editorT('studio.editor.contextTitle')}>
           <TabsTrigger className="ec-editor-panel-tab" value="components">
             <ComponentsTabIcon aria-hidden="true" />
