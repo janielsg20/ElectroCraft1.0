@@ -14,9 +14,11 @@ on:
       - 'apps/studio/src/features/projects/project-home.css'
       - 'apps/studio/src/features/projects/project-choice.css'
       - 'apps/studio/src/features/projects/new-project-wizard.tsx'
+      - 'apps/studio/src/shell/app-shell-layout.ts'
       - 'apps/studio/src/shell/appearance-panel.tsx'
       - 'apps/studio/src/shell/appearance.css'
       - 'apps/studio/src/shell/editor-workspace.css'
+      - 'apps/studio/src/shell/responsive-shell.css'
       - 'apps/studio/src/shell/sidebar.css'
       - 'apps/studio/src/shell/topbar.css'
       - 'apps/studio/src/shell/loading-ui.tsx'
@@ -28,7 +30,12 @@ on:
       - 'packages/design-system/src/foundation/**'
       - 'packages/design-system/src/styles/**'
       - 'tooling/package-boundaries.json'
+      - 'tooling/scripts/verify-m03-2-app-shell.mjs'
+      - 'tooling/scripts/verify-m03-3-sidebar.mjs'
+      - 'tooling/scripts/verify-m03-4-topbar.mjs'
+      - 'tooling/vitest/unit/app-shell-layout.test.ts'
       - 'tooling/vitest/unit/editor-appearance-profile.test.ts'
+      - 'tooling/vitest/contract/app-shell-boundary.test.ts'
       - 'tooling/vitest/contract/editor-appearance-isolation.test.ts'
       - 'tooling/vitest/contract/single-studio-theme-boundary.test.ts'
       - 'tooling/vitest/contract/progressive-loading-boundary.test.ts'
@@ -60,9 +67,11 @@ on:
       - 'apps/studio/src/features/projects/project-home.css'
       - 'apps/studio/src/features/projects/project-choice.css'
       - 'apps/studio/src/features/projects/new-project-wizard.tsx'
+      - 'apps/studio/src/shell/app-shell-layout.ts'
       - 'apps/studio/src/shell/appearance-panel.tsx'
       - 'apps/studio/src/shell/appearance.css'
       - 'apps/studio/src/shell/editor-workspace.css'
+      - 'apps/studio/src/shell/responsive-shell.css'
       - 'apps/studio/src/shell/sidebar.css'
       - 'apps/studio/src/shell/topbar.css'
       - 'apps/studio/src/shell/loading-ui.tsx'
@@ -74,7 +83,12 @@ on:
       - 'packages/design-system/src/foundation/**'
       - 'packages/design-system/src/styles/**'
       - 'tooling/package-boundaries.json'
+      - 'tooling/scripts/verify-m03-2-app-shell.mjs'
+      - 'tooling/scripts/verify-m03-3-sidebar.mjs'
+      - 'tooling/scripts/verify-m03-4-topbar.mjs'
+      - 'tooling/vitest/unit/app-shell-layout.test.ts'
       - 'tooling/vitest/unit/editor-appearance-profile.test.ts'
+      - 'tooling/vitest/contract/app-shell-boundary.test.ts'
       - 'tooling/vitest/contract/editor-appearance-isolation.test.ts'
       - 'tooling/vitest/contract/single-studio-theme-boundary.test.ts'
       - 'tooling/vitest/contract/progressive-loading-boundary.test.ts'
@@ -147,9 +161,11 @@ jobs:
           apps/studio/src/features/projects/project-home.css
           apps/studio/src/features/projects/project-choice.css
           apps/studio/src/features/projects/new-project-wizard.tsx
+          apps/studio/src/shell/app-shell-layout.ts
           apps/studio/src/shell/appearance-panel.tsx
           apps/studio/src/shell/appearance.css
           apps/studio/src/shell/editor-workspace.css
+          apps/studio/src/shell/responsive-shell.css
           apps/studio/src/shell/sidebar.css
           apps/studio/src/shell/topbar.css
           apps/studio/src/shell/loading-ui.tsx
@@ -171,7 +187,12 @@ jobs:
           packages/design-system/src/styles/tokens.css
           packages/design-system/src/styles/studio-appearance-tokens.css
           tooling/package-boundaries.json
+          tooling/scripts/verify-m03-2-app-shell.mjs
+          tooling/scripts/verify-m03-3-sidebar.mjs
+          tooling/scripts/verify-m03-4-topbar.mjs
+          tooling/vitest/unit/app-shell-layout.test.ts
           tooling/vitest/unit/editor-appearance-profile.test.ts
+          tooling/vitest/contract/app-shell-boundary.test.ts
           tooling/vitest/contract/editor-appearance-isolation.test.ts
           tooling/vitest/contract/single-studio-theme-boundary.test.ts
           tooling/vitest/contract/progressive-loading-boundary.test.ts
@@ -190,7 +211,9 @@ jobs:
       - name: Execute dedicated unit contract integration suite
         run: >-
           npx vitest run --config vitest.config.ts
+          tooling/vitest/unit/app-shell-layout.test.ts
           tooling/vitest/unit/editor-appearance-profile.test.ts
+          tooling/vitest/contract/app-shell-boundary.test.ts
           tooling/vitest/contract/editor-appearance-isolation.test.ts
           tooling/vitest/contract/single-studio-theme-boundary.test.ts
           tooling/vitest/contract/progressive-loading-boundary.test.ts
