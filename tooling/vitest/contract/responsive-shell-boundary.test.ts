@@ -35,7 +35,7 @@ describe('M03.6 responsive shell boundaries', () => {
     expect(workspace).not.toContain('href="/screens"');
   });
 
-  it('uses a bottom Sheet for Properties and a full-height Sheet for Outline', () => {
+  it('uses a bottom Sheet for Properties and an inset near-full-height Sheet for Outline', () => {
     const workspace = read('apps/studio/src/shell/editor-workspace.tsx');
     const css = read('apps/studio/src/shell/responsive-shell.css');
     expect(workspace).toContain('data-editor-mobile-sheet="properties"');
@@ -43,7 +43,7 @@ describe('M03.6 responsive shell boundaries', () => {
     expect(workspace).toContain('data-editor-mobile-sheet="outline"');
     expect(workspace).toContain('data-mobile-tool="outline"');
     expect(css).toContain('.ec-editor-mobile-full-sheet');
-    expect(css).toContain('width: 100vw !important');
+    expect(css).toContain('width: calc(100vw - 1rem) !important');
   });
 
   it('keeps one controlled secondary surface active at a time', () => {
