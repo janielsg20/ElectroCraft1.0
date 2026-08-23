@@ -59,15 +59,18 @@ describe('M03.1 Studio foundation integration', () => {
     expect(read('apps/studio/src/help/help-registry.ts')).toContain("id: 'help.studio.shell'");
   });
 
-  it('pins shadcn Radix and Tailwind v4 integration points', () => {
+  it('pins the single shadcn Radix and Tailwind v4 integration points', () => {
     const components = JSON.parse(read('packages/design-system/components.json'));
     const designSystemPackage = JSON.parse(read('packages/design-system/package.json'));
     const studioPackage = JSON.parse(read('apps/studio/package.json'));
 
-    expect(components.style).toBe('radix-nova');
+    expect(components.style).toBe('new-york');
+    expect(components.tailwind.baseColor).toBe('neutral');
+    expect(components.registries).toBeUndefined();
     expect(components.iconLibrary).toBe('lucide');
     expect(designSystemPackage.dependencies['radix-ui']).toBe('1.6.7');
     expect(designSystemPackage.dependencies['lucide-react']).toBe('1.31.0');
+    expect(designSystemPackage.exports).toEqual({ '.': './src/index.ts' });
     expect(studioPackage.devDependencies.tailwindcss).toBe('4.3.3');
     expect(studioPackage.devDependencies['@tailwindcss/vite']).toBe('4.3.3');
     expect(read('apps/studio/vite.config.ts')).toContain('tailwindcss()');

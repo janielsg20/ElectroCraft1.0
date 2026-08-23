@@ -6,6 +6,7 @@ import {
   DialogDescription,
   DialogTitle,
   Input,
+  Loader,
 } from '@electrocraft/design-system';
 import { useState } from 'react';
 import { projectStorageRuntime } from './project-storage-runtime';
@@ -157,6 +158,7 @@ export function NewProjectWizard({
             </Button>
           ) : (
             <Button disabled={!name.trim() || saving} onClick={() => void create()}>
+              {saving ? <Loader label="Guardando proyecto" announce={false} size="xs" /> : null}
               {saving ? 'Guardando…' : 'Crear proyecto'}
             </Button>
           )}

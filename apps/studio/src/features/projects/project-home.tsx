@@ -13,24 +13,58 @@ import {
   DialogDescription,
   DialogTitle,
   Input,
+  Loader,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Skeleton,
   getStudioIcon,
 } from '@electrocraft/design-system';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { HelpTrigger } from '../../help/help-ui';
 import { projectStorageRuntime } from './project-storage-runtime';
-import { NewProjectWizard } from './new-project-wizard';
+import './project-home.css';
+
+const NewProjectWizard = lazy(() =>
+  import('./new-project-wizard').then((module) => ({ default: module.NewProjectWizard })),
+);
 
 const SearchIcon = getStudioIcon('studio.sidebar.queries');
 const GridIcon = getStudioIcon('studio.view.grid');
 const ListIcon = getStudioIcon('studio.view.list');
 const NewProjectIcon = getStudioIcon('studio.sidebar.aiGenerate');
 
-export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void }) {
+function ProjectCollectionSkeleton({ view }: { readonly view: 'grid' | 'list' }) {
+  return (
+    <section
+      className={`ec-project-collection ec-project-collection--${view} ec-project-collection-skeleton`}
+      aria-label="Cargando proyectos guardados"
+      aria-busy="true"
+    >
+      {Array.from({ length: view === 'grid' ? 6 : 4 }, (_, index) => (
+        <article className="ec-project-card ec-project-card-skeleton" key={index} aria-hidden="true">
+          <div className="ec-project-open">
+            <Skeleton className="ec-project-skeleton-preview" />
+            <Skeleton className="h-4 w-2/3" />
+            <Skeleton className="h-3 w-1/2" />
+          </div>
+          <div className="ec-project-card-actions">
+            <Skeleton className="h-7 w-16" />
+            <Skeleton className="h-7 w-16" />
+          </div>
+        </article>
+      ))}
+    </section>
+  );
+}
+
+export function ProjectHome({
+  onOpen,
+}: {
+  readonly onOpen: (id: string) => void | Promise<void>;
+}) {
   const [projects, setProjects] = useState<readonly ProjectSummary[]>([]);
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<ProjectLifecycleStatus | 'all'>('active');
@@ -44,6 +78,7 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
   const [renameProject, setRenameProject] = useState<ProjectSummary | null>(null);
   const [renameValue, setRenameValue] = useState('');
   const reloadSequence = useRef(0);
+
   const reload = useCallback(async () => {
     const sequence = ++reloadSequence.current;
     setState('loading');
@@ -60,7 +95,9 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
       setState('error');
     }
   }, [search, status, sort]);
+
   useEffect(() => void reload(), [reload]);
+
   async function runProjectAction(id: string, action: () => Promise<unknown>) {
     setPendingProjectId(id);
     setActionError('');
@@ -75,12 +112,30 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
       setPendingProjectId(null);
     }
   }
+
+  async function openProject(id: string) {
+    setPendingProjectId(id);
+    setActionError('');
+    try {
+      await onOpen(id);
+    } catch (cause) {
+      setActionError(cause instanceof Error ? cause.message : 'No se pudo abrir el proyecto.');
+    } finally {
+      setPendingProjectId(null);
+    }
+  }
+
   async function change(id: string, next: ProjectLifecycleStatus) {
     await runProjectAction(id, () => projectStorageRuntime.setProjectStatus(id, next));
   }
+
+  const initialLoading = state === 'loading' && projects.length === 0;
+  const refreshing = state === 'loading' && projects.length > 0;
+  const canShowProjects = projects.length > 0 && (state === 'ready' || refreshing);
+
   return (
     <>
-      <main className="ec-project-home" data-project-home data-state={state}>
+      <main className="ec-project-home" data-project-home data-state={state} aria-busy={state === 'loading'}>
         <header>
           <div className="ec-project-title">
             <span className="ec-project-title-icon" aria-hidden="true">
@@ -133,12 +188,18 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
               Lista
             </Button>
           </div>
-          <Button className="ec-project-new" disabled={state === 'loading'} onClick={() => setWizardOpen(true)}>
+          {state === 'loading' ? (
+            <Loader
+              className="ec-project-loading-indicator"
+              label={initialLoading ? 'Cargando proyectos' : 'Actualizando proyectos'}
+              showLabel={refreshing}
+            />
+          ) : null}
+          <Button className="ec-project-new" disabled={initialLoading} onClick={() => setWizardOpen(true)}>
             <NewProjectIcon aria-hidden="true" />
             Nuevo proyecto
           </Button>
         </div>
-        {state === 'loading' ? <p role="status">Cargando proyectos…</p> : null}
         {state === 'error' ? (
           <div role="alert">
             <strong>No se pudo cargar Project Home.</strong>
@@ -147,6 +208,7 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
           </div>
         ) : null}
         {actionError ? <p role="alert">{actionError}</p> : null}
+        {initialLoading ? <ProjectCollectionSkeleton view={view} /> : null}
         {state === 'ready' && projects.length === 0 ? (
           <section className="ec-project-empty">
             <h2>No hay proyectos en esta vista</h2>
@@ -154,96 +216,95 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
             <Button onClick={() => setWizardOpen(true)}>Nuevo proyecto</Button>
           </section>
         ) : null}
-        {state === 'ready' && projects.length ? (
-          <section className={`ec-project-collection ec-project-collection--${view}`} aria-label="Proyectos guardados">
-            {projects.map((p) => (
-              <article className="ec-project-card" key={p.id}>
-                <button className="ec-project-open" disabled={pendingProjectId === p.id} onClick={() => onOpen(p.id)}>
-                  <span aria-hidden="true">EC</span>
-                  <strong>{p.name}</strong>
-                  <small>
-                    {p.objectCount} objetos · {new Date(p.updatedAt).toLocaleDateString('es')}
-                  </small>
-                </button>
-                <div className="ec-project-card-actions">
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      setRenameProject(p);
-                      setRenameValue(p.name);
-                    }}
-                  >
-                    Renombrar
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    disabled={pendingProjectId === p.id}
-                    onClick={() =>
-                      void runProjectAction(p.id, () => projectStorageRuntime.duplicateProject(p.id, `${p.name} copia`))
-                    }
-                  >
-                    Duplicar
-                  </Button>
-                  {p.status === 'active' ? (
+        {canShowProjects ? (
+          <section
+            className={`ec-project-collection ec-project-collection--${view}`}
+            aria-label="Proyectos guardados"
+            aria-busy={refreshing}
+            data-refreshing={refreshing ? 'true' : 'false'}
+          >
+            {projects.map((p) => {
+              const pending = pendingProjectId === p.id;
+              return (
+                <article className="ec-project-card" key={p.id} data-pending={pending ? 'true' : 'false'}>
+                  <button className="ec-project-open" disabled={pending} onClick={() => void openProject(p.id)}>
+                    <span aria-hidden={pending ? undefined : 'true'}>
+                      {pending ? <Loader label={`Abriendo ${p.name}`} announce size="sm" /> : 'EC'}
+                    </span>
+                    <strong>{p.name}</strong>
+                    <small>
+                      {p.objectCount} objetos · {new Date(p.updatedAt).toLocaleDateString('es')}
+                    </small>
+                  </button>
+                  <div className="ec-project-card-actions">
                     <Button
                       variant="ghost"
-                      disabled={pendingProjectId === p.id}
-                      onClick={() => void change(p.id, 'archived')}
+                      disabled={pending}
+                      onClick={() => {
+                        setRenameProject(p);
+                        setRenameValue(p.name);
+                      }}
                     >
-                      Archivar
+                      Renombrar
                     </Button>
-                  ) : (
                     <Button
                       variant="ghost"
-                      disabled={pendingProjectId === p.id}
-                      onClick={() => void change(p.id, 'active')}
+                      disabled={pending}
+                      onClick={() =>
+                        void runProjectAction(p.id, () => projectStorageRuntime.duplicateProject(p.id, `${p.name} copia`))
+                      }
                     >
-                      Restaurar
+                      Duplicar
                     </Button>
-                  )}
-                  {p.status === 'trashed' ? (
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="ghost" disabled={pendingProjectId === p.id}>
-                          Eliminar permanentemente
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogTitle>¿Eliminar “{p.name}” permanentemente?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Se borrarán el proyecto, sus objetos, índices e historial local. Esta acción no se puede
-                          deshacer.
-                        </AlertDialogDescription>
-                        <div className="flex justify-end gap-2">
-                          <AlertDialogCancel asChild>
-                            <Button variant="outline">Cancelar</Button>
-                          </AlertDialogCancel>
-                          <AlertDialogAction asChild>
-                            <Button
-                              variant="destructive"
-                              onClick={() =>
-                                void runProjectAction(p.id, () => projectStorageRuntime.deleteProjectPermanently(p.id))
-                              }
-                            >
-                              Eliminar definitivamente
-                            </Button>
-                          </AlertDialogAction>
-                        </div>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  ) : null}
-                  {p.status !== 'trashed' ? (
-                    <Button
-                      variant="ghost"
-                      disabled={pendingProjectId === p.id}
-                      onClick={() => void change(p.id, 'trashed')}
-                    >
-                      Mover a papelera
-                    </Button>
-                  ) : null}
-                </div>
-              </article>
-            ))}
+                    {p.status === 'active' ? (
+                      <Button variant="ghost" disabled={pending} onClick={() => void change(p.id, 'archived')}>
+                        Archivar
+                      </Button>
+                    ) : (
+                      <Button variant="ghost" disabled={pending} onClick={() => void change(p.id, 'active')}>
+                        Restaurar
+                      </Button>
+                    )}
+                    {p.status === 'trashed' ? (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" disabled={pending}>
+                            Eliminar permanentemente
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogTitle>¿Eliminar “{p.name}” permanentemente?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Se borrarán el proyecto, sus objetos, índices e historial local. Esta acción no se puede
+                            deshacer.
+                          </AlertDialogDescription>
+                          <div className="flex justify-end gap-2">
+                            <AlertDialogCancel asChild>
+                              <Button variant="outline">Cancelar</Button>
+                            </AlertDialogCancel>
+                            <AlertDialogAction asChild>
+                              <Button
+                                variant="destructive"
+                                onClick={() =>
+                                  void runProjectAction(p.id, () => projectStorageRuntime.deleteProjectPermanently(p.id))
+                                }
+                              >
+                                Eliminar definitivamente
+                              </Button>
+                            </AlertDialogAction>
+                          </div>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    ) : null}
+                    {p.status !== 'trashed' ? (
+                      <Button variant="ghost" disabled={pending} onClick={() => void change(p.id, 'trashed')}>
+                        Mover a papelera
+                      </Button>
+                    ) : null}
+                  </div>
+                </article>
+              );
+            })}
           </section>
         ) : null}
       </main>
@@ -275,12 +336,25 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
                 });
               }}
             >
+              {pendingProjectId === renameProject?.id ? (
+                <Loader label="Guardando nombre" announce={false} size="xs" />
+              ) : null}
               Guardar nombre
             </Button>
           </div>
         </DialogContent>
       </Dialog>
-      <NewProjectWizard open={wizardOpen} onClose={() => setWizardOpen(false)} onCreated={onOpen} />
+      {wizardOpen ? (
+        <Suspense
+          fallback={
+            <div className="ec-project-wizard-loading" role="status" aria-live="polite">
+              <Loader label="Preparando nuevo proyecto" showLabel />
+            </div>
+          }
+        >
+          <NewProjectWizard open onClose={() => setWizardOpen(false)} onCreated={onOpen} />
+        </Suspense>
+      ) : null}
     </>
   );
 }

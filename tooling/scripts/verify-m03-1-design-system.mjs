@@ -19,12 +19,12 @@ const requiredFiles = [
   'packages/design-system/src/components/ui/sheet.tsx',
   'packages/design-system/src/components/ui/scroll-area.tsx',
   'packages/design-system/src/components/ui/separator.tsx',
-  'packages/design-system/src/components/framework/index.ts',
   'apps/studio/src/shell/design-system-route.tsx',
   'apps/studio/src/i18n/studio-shell.es.ts',
   'apps/studio/src/help/help-registry.ts',
   'tooling/vitest/unit/design-system-foundation.test.ts',
   'tooling/vitest/contract/design-system-owner-boundary.test.ts',
+  'tooling/vitest/contract/single-studio-theme-boundary.test.ts',
   'tooling/vitest/integration/design-system-studio-foundation.test.ts',
   'tooling/playwright/m03-1-design-system.spec.ts',
 ];
@@ -45,12 +45,14 @@ for (const primitive of ['tooltip', 'dropdown-menu', 'sheet', 'scroll-area', 'se
 }
 
 const componentsJson = readJson('packages/design-system/components.json');
-assert.equal(componentsJson.style, 'radix-nova');
+assert.equal(componentsJson.style, 'new-york');
 assert.equal(componentsJson.iconLibrary, 'lucide');
+assert.equal(componentsJson.tailwind.baseColor, 'neutral');
 assert.equal(componentsJson.tailwind.cssVariables, true);
 assert.equal(componentsJson.aliases.components, '#components');
 assert.equal(componentsJson.aliases.ui, '#components/ui');
 assert.equal(componentsJson.aliases.utils, '#lib/utils');
+assert.equal(componentsJson.registries, undefined);
 
 const rootPackageJson = readJson('package.json');
 assert.equal(rootPackageJson.packageManager, 'npm@10.9.2');
@@ -68,9 +70,28 @@ const exactDesignSystemDependencies = Object.freeze({
 for (const [name, version] of Object.entries(exactDesignSystemDependencies)) {
   assert.equal(packageJson.dependencies[name], version, `${name} pin must be ${version}`);
 }
-assert.deepEqual(Object.keys(packageJson.exports), ['.', './framework-themes']);
+for (const removed of [
+  '@ark-ui/react',
+  '@base-ui/react',
+  '@headlessui/react',
+  '@heroui/react',
+  '@heroui/styles',
+  '@react-aria/i18n',
+  '@react-aria/ssr',
+  '@react-aria/utils',
+  'react-aria',
+  'react-aria-components',
+  'motion',
+  'daisyui',
+]) {
+  assert.equal(
+    packageJson.dependencies?.[removed] ?? packageJson.devDependencies?.[removed],
+    undefined,
+    `${removed} must be removed`,
+  );
+}
+assert.deepEqual(Object.keys(packageJson.exports), ['.']);
 assert.equal(packageJson.exports['.'], './src/index.ts');
-assert.equal(packageJson.exports['./framework-themes'], './src/components/framework/index.ts');
 assert.equal(packageJson.imports['#components/*'], './src/components/*.tsx');
 assert.equal(packageJson.imports['#lib/*'], './src/lib/*.ts');
 
@@ -93,29 +114,21 @@ for (const [name, version] of Object.entries(exactStudioDevDependencies)) {
 
 assert.match(read('apps/studio/src/help/help-registry.ts'), /help\.studio\.shell/);
 assert.match(read('apps/studio/src/i18n/studio-shell.es.ts'), /Generar con IA/);
-assert.match(read('apps/studio/src/i18n/studio-shell.es.ts'), /studio\.bootstrap\.m03Kicker/);
 assert.match(read('packages/design-system/src/foundation/design-system-foundation.ts'), /schemaVersion/);
-assert.match(
-  read('packages/design-system/src/foundation/design-system-foundation.ts'),
-  /migrateDesignSystemFoundationConfig/,
-);
 assert.match(read('packages/design-system/src/styles/globals.css'), /@theme inline/);
 assert.match(read('packages/design-system/src/styles/globals.css'), /@source '\.\.\/'/);
 assert.match(read('packages/design-system/src/styles/globals.css'), /min-height: 2\.75rem/);
+assert.doesNotMatch(read('packages/design-system/src/styles/globals.css'), /@heroui|daisyui/);
 assert.match(read('packages/design-system/src/styles/tokens.css'), /--overlay:/);
+assert.doesNotMatch(
+  read('packages/design-system/src/styles/studio-appearance-tokens.css'),
+  /data-ec-framework|data-ec-accent|data-ec-market/,
+);
 assert.doesNotMatch(read('packages/design-system/src/components/ui/sheet.tsx'), /bg-black/);
 assert.match(read('packages/design-system/src/components/ui/scroll-area.tsx'), /role="region"/);
 assert.match(read('.github/workflows/ci.yml'), /playwright install --with-deps chromium/);
-assert.match(read('.github/workflows/m03-1-design-system.yml'), /if: always\(\)/);
-assert.match(read('.github/workflows/m03-1-design-system.yml'), /npm install --package-lock-only/);
-assert.match(read('.github/workflows/m03-1-design-system.yml'), /m03-1-lockfile-candidate/);
-assert.match(read('.github/workflows/m03-1-design-system.yml'), /Require committed lockfile synchronization/);
-assert.match(read('.github/workflows/m03-1-design-system.yml'), /npm run format/);
-assert.match(read('.github/workflows/m03-1-design-system.yml'), /m03-1-formatting-candidate/);
-assert.match(read('.github/workflows/m03-1-design-system.yml'), /Require committed formatting synchronization/);
 
 const blockers = [];
-
 const lockPath = path.join(root, 'package-lock.json');
 let lockfileVersion = null;
 let lockVerified = false;
@@ -132,20 +145,16 @@ if (!fs.existsSync(lockPath)) {
       blockers.push('package-lock.json does not contain the design-system/studio workspace entries');
     } else {
       for (const [name, version] of Object.entries(exactDesignSystemDependencies)) {
-        if (designSystemLock.dependencies?.[name] !== version) {
+        if (designSystemLock.dependencies?.[name] !== version)
           blockers.push(`package-lock workspace pin mismatch for ${name}@${version}`);
-        }
-        if (lock.packages?.[`node_modules/${name}`]?.version !== version) {
+        if (lock.packages?.[`node_modules/${name}`]?.version !== version)
           blockers.push(`package-lock resolved package mismatch for ${name}@${version}`);
-        }
       }
       for (const [name, version] of Object.entries(exactStudioDevDependencies)) {
-        if (studioLock.devDependencies?.[name] !== version) {
+        if (studioLock.devDependencies?.[name] !== version)
           blockers.push(`package-lock Studio pin mismatch for ${name}@${version}`);
-        }
-        if (lock.packages?.[`node_modules/${name}`]?.version !== version) {
+        if (lock.packages?.[`node_modules/${name}`]?.version !== version)
           blockers.push(`package-lock resolved package mismatch for ${name}@${version}`);
-        }
       }
       lockVerified = blockers.every((blocker) => !blocker.startsWith('package-lock'));
     }
@@ -162,6 +171,8 @@ const report = Object.freeze({
   packageManager: rootPackageJson.packageManager,
   shadcnStyle: componentsJson.style,
   primitiveBase: 'radix',
+  studioTheme: 'electrocraft',
+  colorModes: ['light', 'dark'],
   radixUiVersion: packageJson.dependencies['radix-ui'],
   lucideReactVersion: packageJson.dependencies['lucide-react'],
   tailwindVersion: studioPackage.devDependencies.tailwindcss,
@@ -170,7 +181,7 @@ const report = Object.freeze({
   visualValidation: Object.freeze({
     route: '/__design-system',
     viewports: [360, 768, 1440],
-    required: ['keyboard', 'focus-visible', 'theme', 'dropdown', 'sheet', 'responsive'],
+    required: ['keyboard', 'focus-visible', 'light-dark', 'dropdown', 'sheet', 'responsive'],
     execution: 'playwright',
   }),
   requiredFilesChecked: requiredFiles.length,

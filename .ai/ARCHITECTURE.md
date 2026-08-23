@@ -47,8 +47,10 @@ ElectroCraftDocument is canonical.
 # Studio
 
 React/Vite.
-shadcn Radix.
-Multi-framework appearance adapters owned exclusively by `@electrocraft/design-system`: Aceternity/Magic source components, daisyUI, Headless UI, Ark/Base UI and HeroUI (formerly NextUI). Radix retains ownership of AppShell primitives, overlays, portals and focus management.
+shadcn/ui source components sobre Radix.
+Un único tema visual del Studio: ElectroCraft, con modos claro y oscuro. No existen adapters multi-framework, galerías de temas ni presets de apariencia del Studio.
+Radix conserva ownership de primitives, overlays, portals y focus management del AppShell.
+El tema del Studio es una preferencia del workspace y permanece aislado de `ElectroCraftTheme/DesignSystem`, que sigue perteneciendo a las aplicaciones creadas/exportadas.
 AI Elements for AI-native UI only.
 i18next.
 Puck.

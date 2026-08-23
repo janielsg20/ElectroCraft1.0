@@ -1,14 +1,12 @@
 import { lazy, Suspense, useEffect, useState, useSyncExternalStore } from 'react';
 import { evaluateStudioBootstrapHealth } from './bootstrap-health';
 import { projectStorageRuntime } from './features/projects/project-storage-runtime';
-import { ProjectHome } from './features/projects/project-home';
 import { HelpTrigger } from './help/help-ui';
 import { getHelpIdForNavigationItem } from './help/help-registry';
 import { studioWorkspaceDescriptor } from './index';
 import { studioT } from './i18n/studio-shell.es';
 import { StudioAppShellRoute } from './shell/app-shell-route';
-import { DesignSystemDevelopmentRoute } from './shell/design-system-route';
-import { StudioContentListDetailRoute, StudioModuleEmptyStateRoute } from './shell/information-architecture-ui';
+import { StudioRouteSkeleton } from './shell/loading-ui';
 import { resolveSidebarActiveItem } from './shell/sidebar-navigation';
 import './styles.css';
 import './shell/sidebar.css';
@@ -16,7 +14,7 @@ import './shell/topbar.css';
 import './shell/editor-workspace.css';
 import './shell/responsive-shell.css';
 import './shell/information-architecture.css';
-import './features/projects/project-home.css';
+import './shell/loading-ui.css';
 
 const projectHomeRoute = Object.freeze({
   id: 'project-home-development',
@@ -28,8 +26,21 @@ const designSystemRoute = '/__design-system';
 const editorRoute = '/editor';
 const contentRoute = '/content';
 const canonicalEmptyModuleRoutes = new Set(['/queries', '/forms', '/admin', '/media', '/export']);
+
+const ProjectHome = lazy(() =>
+  import('./features/projects/project-home').then((module) => ({ default: module.ProjectHome })),
+);
 const StudioEditorWorkspace = lazy(() =>
   import('./shell/editor-workspace').then((module) => ({ default: module.StudioEditorWorkspace })),
+);
+const DesignSystemDevelopmentRoute = lazy(() =>
+  import('./shell/design-system-route').then((module) => ({ default: module.DesignSystemDevelopmentRoute })),
+);
+const StudioContentListDetailRoute = lazy(() =>
+  import('./shell/information-architecture-ui').then((module) => ({ default: module.StudioContentListDetailRoute })),
+);
+const StudioModuleEmptyStateRoute = lazy(() =>
+  import('./shell/information-architecture-ui').then((module) => ({ default: module.StudioModuleEmptyStateRoute })),
 );
 
 function StudioWorkspaceBootstrap({
@@ -92,13 +103,25 @@ function StudioWorkspaceBootstrap({
 function resolveStudioWorkspace(pathname: string, health: ReturnType<typeof evaluateStudioBootstrapHealth>) {
   if (pathname === editorRoute) {
     return (
-      <Suspense fallback={<p role="status">Cargando editor…</p>}>
+      <Suspense fallback={<StudioRouteSkeleton kind="editor" label="Cargando editor" />}>
         <StudioEditorWorkspace />
       </Suspense>
     );
   }
-  if (pathname === contentRoute) return <StudioContentListDetailRoute />;
-  if (canonicalEmptyModuleRoutes.has(pathname)) return <StudioModuleEmptyStateRoute pathname={pathname} />;
+  if (pathname === contentRoute) {
+    return (
+      <Suspense fallback={<StudioRouteSkeleton kind="generic" label="Cargando contenido" />}>
+        <StudioContentListDetailRoute />
+      </Suspense>
+    );
+  }
+  if (canonicalEmptyModuleRoutes.has(pathname)) {
+    return (
+      <Suspense fallback={<StudioRouteSkeleton kind="generic" label="Cargando módulo" />}>
+        <StudioModuleEmptyStateRoute pathname={pathname} />
+      </Suspense>
+    );
+  }
   return <StudioWorkspaceBootstrap pathname={pathname} health={health} />;
 }
 
@@ -122,7 +145,13 @@ export function App() {
   }
 
   if (pathname === designSystemRoute) {
-    return <DesignSystemDevelopmentRoute />;
+    return (
+      <div className="ec-design-system">
+        <Suspense fallback={<StudioRouteSkeleton kind="generic" label="Cargando Design System" />}>
+          <DesignSystemDevelopmentRoute />
+        </Suspense>
+      </div>
+    );
   }
 
   const health = evaluateStudioBootstrapHealth(studioWorkspaceDescriptor.dependencies);
@@ -137,15 +166,15 @@ export function App() {
 
   const workspace =
     pathname === '/' ? (
-      <ProjectHome
-        onOpen={(id) =>
-          void projectStorageRuntime.openProject(id).then((opened) => {
-            if (opened) {
-              openEditor();
-            }
-          })
-        }
-      />
+      <Suspense fallback={<StudioRouteSkeleton kind="projects" label="Cargando proyectos" />}>
+        <ProjectHome
+          onOpen={async (id) => {
+            const opened = await projectStorageRuntime.openProject(id);
+            if (!opened) throw new Error('No se pudo abrir el proyecto.');
+            openEditor();
+          }}
+        />
+      </Suspense>
     ) : (
       resolveStudioWorkspace(pathname, health)
     );

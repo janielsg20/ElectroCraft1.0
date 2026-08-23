@@ -1,0 +1,229 @@
+.ec-route-skeleton {
+  width: min(100%, 1440px);
+  min-height: 100%;
+  margin-inline: auto;
+  padding: 16px 20px 28px;
+  contain: layout paint;
+}
+
+.ec-route-skeleton-heading,
+.ec-route-skeleton-title,
+.ec-route-skeleton-toolbar,
+.ec-route-skeleton-actions {
+  display: flex;
+  align-items: center;
+}
+
+.ec-route-skeleton-heading {
+  min-height: 42px;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 12px;
+}
+
+.ec-route-skeleton-title,
+.ec-route-skeleton-actions {
+  gap: 8px;
+}
+
+.ec-route-skeleton-toolbar {
+  gap: 8px;
+  min-height: 42px;
+  padding: 5px;
+  border: 1px solid var(--border);
+  border-radius: var(--ec-radius-md);
+  background: var(--surface);
+}
+
+.ec-route-skeleton-project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(238px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.ec-route-skeleton-project-card {
+  display: grid;
+  gap: 9px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--ec-radius-md);
+  background: var(--surface);
+}
+
+.ec-route-skeleton--editor {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr) minmax(190px, 260px);
+  gap: 1px;
+  padding: 0;
+  background: var(--border);
+}
+
+.ec-route-skeleton-editor-panel,
+.ec-route-skeleton-canvas {
+  min-width: 0;
+  background: var(--surface);
+}
+
+.ec-route-skeleton-editor-panel {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 14px;
+}
+
+.ec-route-skeleton-canvas {
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 14px;
+  padding: 18px;
+  background: var(--background);
+}
+
+.ec-route-skeleton-canvas-sheet {
+  width: min(760px, 90%);
+  min-height: 420px;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--ec-radius-md);
+  background: var(--surface);
+}
+
+.ec-route-skeleton--generic {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+
+.ec-project-wizard-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  background: var(--overlay);
+}
+
+.ec-project-wizard-loading > [data-slot='loader'] {
+  border: 1px solid var(--border);
+  border-radius: var(--ec-radius-md);
+  padding: 10px 12px;
+  background: var(--surface);
+  color: var(--foreground);
+}
+
+.ec-design-system .ec-project-toolbar {
+  background: var(--surface);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.ec-design-system .ec-project-title-icon {
+  background: var(--accent);
+  box-shadow: none;
+}
+
+.ec-design-system .ec-project-new {
+  background: var(--primary);
+  box-shadow: none;
+  transform: none;
+}
+
+.ec-design-system .ec-project-new:hover:not(:disabled) {
+  box-shadow: none;
+  transform: none;
+}
+
+.ec-design-system .ec-project-card {
+  background: var(--surface);
+  box-shadow: none;
+  transform: none;
+  content-visibility: auto;
+  contain-intrinsic-size: 190px;
+}
+
+.ec-design-system .ec-project-card:hover {
+  box-shadow: var(--ec-shadow-sm);
+  transform: none;
+}
+
+.ec-design-system .ec-project-open > span {
+  background: var(--muted);
+  background-image: none;
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.ec-project-loading-indicator {
+  white-space: nowrap;
+}
+
+.ec-project-collection[data-refreshing='true'] {
+  opacity: 0.72;
+}
+
+.ec-project-card[data-pending='true'] {
+  opacity: 0.72;
+}
+
+.ec-project-card-skeleton {
+  pointer-events: none;
+}
+
+.ec-project-skeleton-preview {
+  min-height: 104px;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .ec-route-skeleton--editor {
+    grid-template-columns: minmax(150px, 210px) minmax(0, 1fr);
+  }
+
+  .ec-route-skeleton--editor > :last-child {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .ec-route-skeleton {
+    padding: 12px;
+  }
+
+  .ec-route-skeleton-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .ec-route-skeleton-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ec-route-skeleton-toolbar > * {
+    width: 100%;
+  }
+
+  .ec-route-skeleton-project-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ec-route-skeleton--editor {
+    grid-template-columns: 1fr;
+  }
+
+  .ec-route-skeleton--editor > aside {
+    display: none;
+  }
+
+  .ec-route-skeleton-canvas-sheet {
+    width: 100%;
+    min-height: 360px;
+    padding: 18px;
+  }
+}
