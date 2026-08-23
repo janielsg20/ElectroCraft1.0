@@ -53,10 +53,15 @@ for (const token of [
   'ec-topbar-right',
   'data-topbar-settings-trigger',
   'data-topbar-settings-sheet',
-  'preferencesPort.toggleSidebar',
+  'preferencesPort.subscribe',
+  'preferencesPort.getSnapshot',
+  'WorkspaceSettings',
   'useSyncExternalStore',
 ]) {
   if (!topbar.includes(token)) throw new Error(`M03.4 Topbar behavior missing: ${token}`);
+}
+if (topbar.includes('@electric-sql/pglite') || topbar.includes('drizzle-orm')) {
+  throw new Error('M03.4 Topbar must not own workspace preference persistence');
 }
 if (topbar.lastIndexOf('data-topbar-settings-trigger') <= topbar.lastIndexOf('ec-topbar-help-trigger')) {
   throw new Error('M03.4 Settings gear must be the final right-side action');
