@@ -1,6 +1,8 @@
 import {
+  createProjectBackupService,
   createProjectStorageService,
   type IncrementalSaveProjectRequest,
+  type ProjectBackupCollisionStrategy,
   type ProjectStorageDiagnostics,
   type SaveProjectRequest,
 } from '@electrocraft/application';
@@ -9,6 +11,7 @@ import { createProjectAutosaveController } from './project-storage-autosave';
 
 const port = createBrowserProjectStoragePort();
 const service = createProjectStorageService(port);
+const backupService = createProjectBackupService(service);
 const listeners = new Set<() => void>();
 
 let snapshot: ProjectStorageDiagnostics = Object.freeze({
@@ -113,6 +116,18 @@ export const projectStorageRuntime = Object.freeze({
   renameProject: service.renameProject,
   duplicateProject: service.duplicateProject,
   deleteProjectPermanently: service.deleteProjectPermanently,
+  async backupProject(projectId: string) {
+    await autosave.flush();
+    return backupService.backupProject(projectId);
+  },
+  previewImport: backupService.previewImport,
+  async importBackup(serialized: string, collisionStrategy: ProjectBackupCollisionStrategy = 'copy') {
+    await autosave.flush();
+    const result = await runPersistence(() => backupService.importBackup(serialized, collisionStrategy));
+    currentProjectId = result.projectId;
+    autosave.noteCheckpointCommitted();
+    return result;
+  },
   async openProject(projectId: string) {
     const opened = await service.openProject(projectId);
     if (opened) currentProjectId = opened.project.id;
