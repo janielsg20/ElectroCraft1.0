@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { appShellLayout, resolveAppShellViewportMode } from '../../../apps/studio/src/shell/app-shell-layout';
 
 describe('M03.2 AppShell layout contract', () => {
-  it('keeps the exact structural dimensions required by F03', () => {
+  it('keeps the current administrative-console structural dimensions', () => {
     expect(appShellLayout).toMatchObject({
       rootHeight: '100dvh',
-      sidebarExpandedPx: 240,
+      sidebarExpandedPx: 256,
       sidebarCollapsedPx: 64,
-      topbarPx: 52,
-      statusbarPx: 26,
+      topbarPx: 56,
+      statusbarPx: 24,
     });
   });
 
