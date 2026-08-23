@@ -1,7 +1,4 @@
-import {
-  normalizeProjectBackupImportRequest,
-  normalizeSaveProjectRequest,
-} from '@electrocraft/application';
+import { normalizeProjectBackupImportRequest, normalizeSaveProjectRequest } from '@electrocraft/application';
 import { PGlite } from '@electric-sql/pglite';
 import { drizzle } from 'drizzle-orm/pglite';
 import { describe, expect, it } from 'vitest';
