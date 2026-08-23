@@ -1,4 +1,4 @@
-import type { WorkspacePreferencesStoragePort } from '@electrocraft/application';
+import type { WorkspacePreferences, WorkspacePreferencesStoragePort } from '@electrocraft/application';
 import type { PGlite } from '@electric-sql/pglite';
 import { PGliteWorker } from '@electric-sql/pglite/worker';
 import { drizzle } from 'drizzle-orm/pglite';
@@ -98,7 +98,7 @@ export function createBrowserWorkspacePreferencesStoragePort(
     async read(workspaceId: string, key: string) {
       return (await initialize()).read(workspaceId, key);
     },
-    async write(workspaceId: string, key: string, value) {
+    async write(workspaceId: string, key: string, value: WorkspacePreferences) {
       const operation = writeQueue.then(async () => (await initialize()).write(workspaceId, key, value));
       writeQueue = operation.catch(() => undefined);
       await operation;
