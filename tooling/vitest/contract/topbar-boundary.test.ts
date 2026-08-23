@@ -16,13 +16,18 @@ describe('M03.4 Topbar boundaries', () => {
     expect(topbar).not.toContain("from 'lucide-react'");
   });
 
-  it('keeps Settings as the last right-side action and uses the same WorkspacePreferencesPort', () => {
+  it('keeps Settings as the last right-side action and consumes the shared WorkspacePreferencesPort', () => {
     const topbar = read('apps/studio/src/shell/studio-topbar.tsx');
     expect(topbar.lastIndexOf('data-topbar-settings-trigger')).toBeGreaterThan(
       topbar.lastIndexOf('ec-topbar-help-trigger'),
     );
-    expect(topbar).toContain('preferencesPort.toggleSidebar');
+    expect(topbar).toContain('readonly preferencesPort: WorkspacePreferencesPort');
+    expect(topbar).toContain('preferencesPort.subscribe');
+    expect(topbar).toContain('preferencesPort.getSnapshot');
+    expect(topbar).toContain('<WorkspaceSettings />');
     expect(topbar).toContain('data-topbar-settings-sheet');
+    expect(topbar).not.toContain('@electric-sql/pglite');
+    expect(topbar).not.toContain('drizzle-orm');
   });
 
   it('uses real Radix Sheets for tools, help and settings without overriding restore-focus', () => {
