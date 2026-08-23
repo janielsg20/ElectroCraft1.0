@@ -18,6 +18,25 @@ describe('Studio neutral administrative console style boundary', () => {
     expect(tokens).not.toContain('Inter,');
   });
 
+  it('keeps a curved content-window hierarchy inspired by modern Google console surfaces', () => {
+    const tokens = read('packages/design-system/src/styles/tokens.css');
+    const shell = read('apps/studio/src/styles.css');
+    const editor = read('apps/studio/src/shell/editor-workspace.css');
+    const dialog = read('packages/design-system/src/components/ui/dialog.tsx');
+    const sheet = read('packages/design-system/src/components/ui/sheet.tsx');
+
+    expect(tokens).toContain('--ec-radius-panel: 0.875rem;');
+    expect(tokens).toContain('--ec-radius-window: 1.125rem;');
+    expect(tokens).toContain('--ec-shell-gutter: 8px;');
+    expect(shell).toContain('border-radius: var(--ec-radius-window);');
+    expect(shell).toContain('margin: 0 var(--ec-shell-gutter) var(--ec-shell-gutter) 0;');
+    expect(editor).toContain('border-radius: var(--ec-radius-panel);');
+    expect(editor).toContain('padding: 8px;');
+    expect(dialog).toContain('[border-radius:var(--ec-radius-window)]');
+    expect(sheet).toContain('rounded-r-[var(--ec-radius-window)]');
+    expect(sheet).toContain('rounded-l-[var(--ec-radius-window)]');
+  });
+
   it('does not color-code navigation or editor regions with decorative hues', () => {
     for (const file of [
       'apps/studio/src/styles.css',
