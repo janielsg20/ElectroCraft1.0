@@ -148,6 +148,7 @@ export function AppShell({
   const sidebarSide = preferences.sidebarSide ?? 'left';
   const sidebarDisplay = preferences.sidebarDisplay ?? 'icons+text';
   const sidebarWidth = sidebarCollapsed ? 64 : (preferences.sidebarWidth ?? 240);
+  const statusVisible = preferences.visiblePanels?.includes('status') ?? true;
   const orderedNavigationGroups = useMemo(
     () => orderNavigationGroups(navigationGroups, preferences.sidebarGroupOrder),
     [navigationGroups, preferences.sidebarGroupOrder],
@@ -163,6 +164,7 @@ export function AppShell({
         style={shellStyle}
         data-help-id={helpId}
         data-status={status}
+        data-status-visible={statusVisible ? 'true' : 'false'}
         data-sidebar-collapsed={sidebarCollapsed ? 'true' : 'false'}
         data-sidebar-side={sidebarSide}
         data-sidebar-display={sidebarDisplay}
@@ -249,12 +251,14 @@ export function AppShell({
           )}
         </main>
 
-        <footer className="ec-app-shell-statusbar" aria-label={copy.statusLabel}>
-          <span className="ec-app-shell-status-dot" aria-hidden="true" />
-          <span role="status" aria-live="polite">
-            {copy.statusLabels[status]}
-          </span>
-        </footer>
+        {statusVisible ? (
+          <footer className="ec-app-shell-statusbar" aria-label={copy.statusLabel}>
+            <span className="ec-app-shell-status-dot" aria-hidden="true" />
+            <span role="status" aria-live="polite">
+              {copy.statusLabels[status]}
+            </span>
+          </footer>
+        ) : null}
       </div>
     </TooltipProvider>
   );
