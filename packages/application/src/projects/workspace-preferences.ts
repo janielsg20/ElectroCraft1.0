@@ -227,6 +227,7 @@ export function createWorkspacePreferencesService(
   const workspaceId = options.workspaceId ?? DEFAULT_WORKSPACE_ID;
   const now = options.now ?? (() => new Date().toISOString());
   const randomId = options.randomId ?? (() => globalThis.crypto.randomUUID());
+  let mutationQueue = Promise.resolve();
 
   async function read(): Promise<WorkspacePreferences> {
     const value = await storage.read(workspaceId, WORKSPACE_PREFERENCES_STORAGE_KEY);
@@ -248,56 +249,82 @@ export function createWorkspacePreferencesService(
     });
   }
 
+  function enqueue(operation: () => Promise<WorkspacePreferences>): Promise<WorkspacePreferences> {
+    const task = mutationQueue.then(operation);
+    mutationQueue = task.then(
+      () => undefined,
+      () => undefined,
+    );
+    return task;
+  }
+
   return Object.freeze({
-    load: read,
-    saveLayout: replaceLayout,
-    async patchLayout(patch: Partial<WorkspaceLayoutSnapshot>) {
-      const current = await read();
-      return replaceLayout({ ...current.layout, ...patch });
+    async load() {
+      await mutationQueue;
+      return read();
     },
-    async saveCurrentAs(name: string) {
-      const current = await read();
-      if (current.savedLayouts.length >= MAX_SAVED_WORKSPACE_LAYOUTS) {
-        throw new Error(`workspace layout limit reached (${MAX_SAVED_WORKSPACE_LAYOUTS})`);
-      }
-      const timestamp = now();
-      const saved: SavedWorkspaceLayout = Object.freeze({
-        id: randomId(),
-        name: normalizeLayoutName(name),
-        layout: current.layout,
-        createdAt: timestamp,
-        updatedAt: timestamp,
+    saveLayout(layout: WorkspaceLayoutSnapshot) {
+      return enqueue(() => replaceLayout(layout));
+    },
+    patchLayout(patch: Partial<WorkspaceLayoutSnapshot>) {
+      return enqueue(async () => {
+        const current = await read();
+        return replaceLayout({ ...current.layout, ...patch });
       });
-      return write({ ...current, savedLayouts: Object.freeze([...current.savedLayouts, saved]), updatedAt: timestamp });
     },
-    async renameSavedLayout(layoutId: string, name: string) {
-      const current = await read();
-      const timestamp = now();
-      let found = false;
-      const savedLayouts = current.savedLayouts.map((item) => {
-        if (item.id !== layoutId) return item;
-        found = true;
-        return Object.freeze({ ...item, name: normalizeLayoutName(name), updatedAt: timestamp });
+    saveCurrentAs(name: string) {
+      return enqueue(async () => {
+        const current = await read();
+        if (current.savedLayouts.length >= MAX_SAVED_WORKSPACE_LAYOUTS) {
+          throw new Error(`workspace layout limit reached (${MAX_SAVED_WORKSPACE_LAYOUTS})`);
+        }
+        const timestamp = now();
+        const saved: SavedWorkspaceLayout = Object.freeze({
+          id: randomId(),
+          name: normalizeLayoutName(name),
+          layout: current.layout,
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        });
+        return write({ ...current, savedLayouts: Object.freeze([...current.savedLayouts, saved]), updatedAt: timestamp });
       });
-      if (!found) throw new Error(`workspace layout not found: ${layoutId}`);
-      return write({ ...current, savedLayouts: Object.freeze(savedLayouts), updatedAt: timestamp });
     },
-    async applySavedLayout(layoutId: string) {
-      const current = await read();
-      const saved = current.savedLayouts.find((item) => item.id === layoutId);
-      if (!saved) throw new Error(`workspace layout not found: ${layoutId}`);
-      return write({ ...current, layout: saved.layout, updatedAt: now() });
+    renameSavedLayout(layoutId: string, name: string) {
+      return enqueue(async () => {
+        const current = await read();
+        const timestamp = now();
+        let found = false;
+        const savedLayouts = current.savedLayouts.map((item) => {
+          if (item.id !== layoutId) return item;
+          found = true;
+          return Object.freeze({ ...item, name: normalizeLayoutName(name), updatedAt: timestamp });
+        });
+        if (!found) throw new Error(`workspace layout not found: ${layoutId}`);
+        return write({ ...current, savedLayouts: Object.freeze(savedLayouts), updatedAt: timestamp });
+      });
     },
-    async deleteSavedLayout(layoutId: string) {
-      const current = await read();
-      const savedLayouts = current.savedLayouts.filter((item) => item.id !== layoutId);
-      if (savedLayouts.length === current.savedLayouts.length)
-        throw new Error(`workspace layout not found: ${layoutId}`);
-      return write({ ...current, savedLayouts: Object.freeze(savedLayouts), updatedAt: now() });
+    applySavedLayout(layoutId: string) {
+      return enqueue(async () => {
+        const current = await read();
+        const saved = current.savedLayouts.find((item) => item.id === layoutId);
+        if (!saved) throw new Error(`workspace layout not found: ${layoutId}`);
+        return write({ ...current, layout: saved.layout, updatedAt: now() });
+      });
     },
-    async restoreDefaults() {
-      const current = await read();
-      return write({ ...current, layout: DEFAULT_WORKSPACE_LAYOUT, updatedAt: now() });
+    deleteSavedLayout(layoutId: string) {
+      return enqueue(async () => {
+        const current = await read();
+        const savedLayouts = current.savedLayouts.filter((item) => item.id !== layoutId);
+        if (savedLayouts.length === current.savedLayouts.length)
+          throw new Error(`workspace layout not found: ${layoutId}`);
+        return write({ ...current, savedLayouts: Object.freeze(savedLayouts), updatedAt: now() });
+      });
+    },
+    restoreDefaults() {
+      return enqueue(async () => {
+        const current = await read();
+        return write({ ...current, layout: DEFAULT_WORKSPACE_LAYOUT, updatedAt: now() });
+      });
     },
   });
 }
