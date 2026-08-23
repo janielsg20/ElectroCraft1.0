@@ -1,0 +1,212 @@
+name: Temporary M04.7 Tabs Patch
+
+on:
+  push:
+    branches:
+      - 'ai/m04-7-workspace-preferences-20260823'
+    paths:
+      - '.github/workflows/tmp-patch-m04-7-tabs.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ai/m04-7-workspace-preferences-20260823
+          persist-credentials: true
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Patch persistent tabs and Spanish workspace UI
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          editor_path = Path('apps/studio/src/shell/editor-workspace.tsx')
+          editor = editor_path.read_text()
+          editor = editor.replace(
+              "import { useRef, useState, type ReactNode, type RefObject } from 'react';",
+              "import { useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from 'react';",
+          )
+          runtime_import = "import { workspacePreferencesRuntime } from '../features/projects/workspace-preferences-runtime';\n"
+          if runtime_import not in editor:
+              editor = editor.replace("import { editorT } from '../i18n/editor.es';\n", runtime_import + "import { editorT } from '../i18n/editor.es';\n")
+
+          marker = "type SecondaryTool = 'context' | 'inspector';\ntype MobileTool = 'components' | 'properties' | 'outline';\n"
+          helpers = """type SecondaryTool = 'context' | 'inspector';
+          type MobileTool = 'components' | 'properties' | 'outline';
+          type ContextTab = 'components' | 'screens' | 'layers';
+          type InspectorTab = 'content' | 'design' | 'actions';
+
+          const contextTabs = ['components', 'screens', 'layers'] as const;
+          const inspectorTabs = ['content', 'design', 'actions'] as const;
+
+          function resolveWorkspaceTab<T extends string>(
+            lastTabs: readonly string[],
+            slot: 'context' | 'inspector',
+            allowed: readonly T[],
+            fallback: T,
+          ): T {
+            const prefix = `${slot}:`;
+            const value = lastTabs.find((entry) => entry.startsWith(prefix))?.slice(prefix.length);
+            return value && allowed.includes(value as T) ? (value as T) : fallback;
+          }
+
+          function persistWorkspaceTab(slot: 'context' | 'inspector', value: string) {
+            const current = workspacePreferencesRuntime.getSnapshot().layout.lastTabs;
+            const prefix = `${slot}:`;
+            const next = [...current.filter((entry) => !entry.startsWith(prefix)), `${prefix}${value}`];
+            if (current.length === next.length && current.every((entry, index) => entry === next[index])) return;
+            void workspacePreferencesRuntime.patchLayout({ lastTabs: next });
+          }
+          """
+          if 'function resolveWorkspaceTab' not in editor:
+              assert marker in editor, 'editor type marker not found'
+              editor = editor.replace(marker, helpers)
+
+          old = """function InspectorContent() {
+            const [tab, setTab] = useState<'content' | 'design' | 'actions'>('content');
+
+            return (
+              <Tabs
+                className=\"ec-editor-inspector\"
+                value={tab}
+                onValueChange={(value) => setTab(value as typeof tab)}
+                orientation=\"horizontal\"
+              >"""
+          new = """function InspectorContent() {
+            const preferences = useSyncExternalStore(
+              workspacePreferencesRuntime.subscribe,
+              workspacePreferencesRuntime.getSnapshot,
+              workspacePreferencesRuntime.getSnapshot,
+            );
+            const tab = resolveWorkspaceTab<InspectorTab>(preferences.layout.lastTabs, 'inspector', inspectorTabs, 'content');
+
+            return (
+              <Tabs
+                className=\"ec-editor-inspector\"
+                value={tab}
+                onValueChange={(value) => persistWorkspaceTab('inspector', value)}
+                orientation=\"horizontal\"
+              >"""
+          if old in editor:
+              editor = editor.replace(old, new)
+          elif "persistWorkspaceTab('inspector'" not in editor:
+              raise SystemExit('InspectorContent target not found')
+
+          old = """function ContextRegion() {
+            const [tab, setTab] = useState<'components' | 'screens' | 'layers'>('components');
+
+            return (
+              <EditorRegion region=\"context\" title={editorT('studio.editor.contextTitle')} icon={ContextIcon}>
+                <Tabs className=\"ec-editor-context-tabs\" value={tab} onValueChange={(value) => setTab(value as typeof tab)}>"""
+          new = """function ContextRegion() {
+            const preferences = useSyncExternalStore(
+              workspacePreferencesRuntime.subscribe,
+              workspacePreferencesRuntime.getSnapshot,
+              workspacePreferencesRuntime.getSnapshot,
+            );
+            const tab = resolveWorkspaceTab<ContextTab>(preferences.layout.lastTabs, 'context', contextTabs, 'components');
+
+            return (
+              <EditorRegion region=\"context\" title={editorT('studio.editor.contextTitle')} icon={ContextIcon}>
+                <Tabs
+                  className=\"ec-editor-context-tabs\"
+                  value={tab}
+                  onValueChange={(value) => persistWorkspaceTab('context', value)}
+                >"""
+          if old in editor:
+              editor = editor.replace(old, new)
+          elif "persistWorkspaceTab('context'" not in editor:
+              raise SystemExit('ContextRegion target not found')
+          editor_path.write_text(editor)
+
+          settings_path = Path('apps/studio/src/features/projects/workspace-settings.tsx')
+          settings = settings_path.read_text()
+          labels_marker = "const DEFAULT_GROUP_ORDER = ['build', 'data', 'logic', 'app', 'resources', 'appearance', 'publish'] as const;\n"
+          labels = labels_marker + """const GROUP_LABELS: Readonly<Record<(typeof DEFAULT_GROUP_ORDER)[number], string>> = Object.freeze({
+            build: 'Construcción',
+            data: 'Datos',
+            logic: 'Lógica',
+            app: 'Aplicación',
+            resources: 'Recursos',
+            appearance: 'Apariencia',
+            publish: 'Publicación',
+          });
+          """
+          if 'const GROUP_LABELS' not in settings:
+              assert labels_marker in settings, 'settings group marker not found'
+              settings = settings.replace(labels_marker, labels)
+
+          function_marker = "function normalizedGroupOrder(order: readonly string[]) {\n"
+          error_helper = """function workspaceErrorMessage(cause: unknown): string {
+            if (!(cause instanceof Error)) return 'No se pudo guardar la configuración del espacio de trabajo.';
+            if (cause.message.includes('name is required')) return 'Escribe un nombre para guardar el diseño.';
+            if (cause.message.includes('name exceeds')) return 'El nombre del diseño es demasiado largo.';
+            if (cause.message.includes('layout limit reached')) return 'Ya alcanzaste el máximo de diseños guardados.';
+            if (cause.message.includes('layout not found')) return 'Ese diseño guardado ya no está disponible.';
+            return 'No se pudo guardar la configuración del espacio de trabajo.';
+          }
+
+          """
+          if 'function workspaceErrorMessage' not in settings:
+              assert function_marker in settings, 'settings function marker not found'
+              settings = settings.replace(function_marker, error_helper + function_marker)
+          settings = settings.replace(
+              "setError(cause instanceof Error ? cause.message : 'No se pudo guardar la configuración del espacio de trabajo.');",
+              "setError(workspaceErrorMessage(cause));",
+          )
+          settings = settings.replace(
+              '<span style={{ minWidth: 84 }}>{groupId}</span>',
+              '<span style={{ minWidth: 84 }}>{GROUP_LABELS[groupId as (typeof DEFAULT_GROUP_ORDER)[number]]}</span>',
+          )
+          settings_path.write_text(settings)
+
+          e2e_path = Path('tooling/playwright/m04-7-workspace-preferences.spec.ts')
+          e2e = e2e_path.read_text().replace('    let opened = await openWorkspaceSettings(page);', '    const opened = await openWorkspaceSettings(page);')
+          tab_test = """
+            test('restaura las últimas pestañas de Contexto e Inspector después de reload', async ({ page }) => {
+              test.setTimeout(180_000);
+              await page.setViewportSize({ width: 1440, height: 900 });
+              await page.goto('/editor');
+
+              const layers = page.getByRole('tab', { name: 'Capas' });
+              const design = page.getByRole('tab', { name: 'Diseño' });
+              await layers.click();
+              await design.click();
+              await expect(layers).toHaveAttribute('aria-selected', 'true');
+              await expect(design).toHaveAttribute('aria-selected', 'true');
+
+              await page.reload();
+              await expect(page.getByRole('tab', { name: 'Capas' })).toHaveAttribute('aria-selected', 'true', { timeout: 60_000 });
+              await expect(page.getByRole('tab', { name: 'Diseño' })).toHaveAttribute('aria-selected', 'true');
+            });
+          """
+          if 'restaura las últimas pestañas' not in e2e:
+              insertion = "\n  test('sincroniza una preferencia entre dos pestañas de la misma base local'"
+              assert insertion in e2e, 'E2E insertion marker not found'
+              e2e = e2e.replace(insertion, tab_test + insertion)
+          e2e_path.write_text(e2e)
+          PY
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run format
+      - name: Commit final patch
+        run: |
+          if git diff --quiet; then
+            echo 'No patch changes required.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'feat(m04.7): persist editor tabs and polish workspace UI'
+          git pull --rebase origin ai/m04-7-workspace-preferences-20260823
+          git push origin HEAD:ai/m04-7-workspace-preferences-20260823
