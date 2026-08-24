@@ -56,6 +56,7 @@ const topbarCopy: StudioTopbarCopy = Object.freeze({
   }),
   undoLabel: commonT('studio.topbar.undoLabel'),
   redoLabel: commonT('studio.topbar.redoLabel'),
+  historyLabel: commonT('studio.topbar.historyLabel'),
   historyUnavailable: commonT('studio.topbar.historyUnavailable'),
   zoomLabel: commonT('studio.topbar.zoomLabel'),
   toolsLabel: commonT('studio.topbar.toolsLabel'),
@@ -88,6 +89,7 @@ const topbarCopy: StudioTopbarCopy = Object.freeze({
 
 function resolveActiveLabel(activeItemId: ReturnType<typeof resolveSidebarActiveItem>, pathname: string) {
   if (pathname === '/') return commonT('studio.topbar.projectsLabel');
+  if (pathname === '/history') return commonT('studio.topbar.historyLabel');
   for (const group of studioSidebarNavigation) {
     for (const item of group.items) {
       if (item.id === activeItemId) return item.label;
