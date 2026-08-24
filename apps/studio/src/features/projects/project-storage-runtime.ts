@@ -14,6 +14,8 @@ const service = createProjectStorageService(port);
 const backupService = createProjectBackupService(service);
 const listeners = new Set<() => void>();
 
+export const workspacePreferencesStoragePort = port.workspacePreferences;
+
 let snapshot: ProjectStorageDiagnostics = Object.freeze({
   state: 'initial',
   backend: 'indexeddb',
