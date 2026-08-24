@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
 
+async function waitForWorkspacePersistence(page: import('@playwright/test').Page) {
+  await expect(page.locator('html')).toHaveAttribute('data-workspace-persistence-state', 'ready', { timeout: 60_000 });
+}
+
 async function openWorkspaceSettings(page: import('@playwright/test').Page) {
   const settings = page.getByRole('button', { name: 'Configuración' });
   await expect(settings).toBeEnabled({ timeout: 60_000 });
@@ -19,6 +23,7 @@ async function selectSidebarSide(page: import('@playwright/test').Page, side: 'I
     'data-sidebar-side',
     side === 'Derecha' ? 'right' : 'left',
   );
+  await waitForWorkspacePersistence(page);
   await page.keyboard.press('Escape');
 }
 
@@ -42,6 +47,7 @@ test.describe('M04.7 Workspace preferences', () => {
     await expect(page.locator('.ec-app-shell')).toHaveAttribute('data-sidebar-side', 'right');
     await expect(page.locator('.ec-app-shell')).toHaveAttribute('data-sidebar-display', 'text');
     await expect(page.locator('.ec-app-shell-sidebar')).toHaveCSS('width', '318px');
+    await waitForWorkspacePersistence(page);
 
     await page.reload();
     await expect(page.locator('.ec-app-shell')).toHaveAttribute('data-sidebar-side', 'right', { timeout: 60_000 });
@@ -59,6 +65,7 @@ test.describe('M04.7 Workspace preferences', () => {
     await page.getByRole('option', { name: 'Derecha' }).click();
     await opened.workspace.getByPlaceholder('Nombre del diseño').fill('Diseño E2E');
     await opened.workspace.getByRole('button', { name: 'Guardar', exact: true }).click();
+    await waitForWorkspacePersistence(page);
 
     let saved = opened.workspace.locator('[data-workspace-saved-layout]').filter({ hasText: 'Diseño E2E' });
     await expect(saved).toBeVisible();
@@ -66,16 +73,20 @@ test.describe('M04.7 Workspace preferences', () => {
     await opened.workspace.getByLabel('Lado del panel lateral').click();
     await page.getByRole('option', { name: 'Izquierda' }).click();
     await expect(page.locator('.ec-app-shell')).toHaveAttribute('data-sidebar-side', 'left');
+    await waitForWorkspacePersistence(page);
 
     await saved.getByRole('button', { name: 'Aplicar' }).click();
+    await waitForWorkspacePersistence(page);
     await expect(page.locator('.ec-app-shell')).toHaveAttribute('data-sidebar-side', 'right');
 
     await saved.getByLabel('Nuevo nombre para Diseño E2E').fill('Diseño E2E renombrado');
     await saved.getByRole('button', { name: 'Renombrar' }).click();
+    await waitForWorkspacePersistence(page);
     saved = opened.workspace.locator('[data-workspace-saved-layout]').filter({ hasText: 'Diseño E2E renombrado' });
     await expect(saved).toBeVisible();
 
     await saved.getByRole('button', { name: 'Eliminar' }).click();
+    await waitForWorkspacePersistence(page);
     await expect(opened.workspace.locator('[data-workspace-saved-layout]')).toHaveCount(0);
   });
 
@@ -90,6 +101,7 @@ test.describe('M04.7 Workspace preferences', () => {
     await design.click();
     await expect(layers).toHaveAttribute('aria-selected', 'true');
     await expect(design).toHaveAttribute('aria-selected', 'true');
+    await waitForWorkspacePersistence(page);
 
     await page.reload();
     await expect(page.getByRole('tab', { name: 'Capas' })).toHaveAttribute('aria-selected', 'true', {
@@ -121,6 +133,7 @@ test.describe('M04.7 Workspace preferences', () => {
     const { workspace } = await openWorkspaceSettings(page);
     await workspace.getByLabel('Ancho de Contexto').fill('380');
     await workspace.getByLabel('Ancho del Inspector').fill('440');
+    await waitForWorkspacePersistence(page);
     await page.keyboard.press('Escape');
 
     await page.setViewportSize({ width: 360, height: 800 });
