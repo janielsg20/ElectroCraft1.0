@@ -58,7 +58,7 @@ async function runPersistence<T>(operation: () => Promise<T>) {
 
 const autosave = createProjectAutosaveController({
   saveProjectIncremental: (request) => runPersistence(() => service.saveProjectIncremental(request)),
-  createCheckpoint: (projectId, reason) => runPersistence(() => service.createCheckpoint(projectId, reason)),
+  createCheckpoint: (projectId, reason) => runPersistence(() => revisionService.checkpoint(projectId, reason)),
 });
 
 export const projectStorageRuntime = Object.freeze({
