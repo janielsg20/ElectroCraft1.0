@@ -4,7 +4,9 @@ import { and, eq } from 'drizzle-orm';
 import type { StudioProjectDatabase } from './repository';
 import { workspacePreferences } from './schema';
 
-export type DrizzleWorkspacePreferencesRepository = WorkspacePreferencesStoragePort;
+export interface DrizzleWorkspacePreferencesRepository extends WorkspacePreferencesStoragePort {
+  delete(workspaceId: string, key: string): Promise<void>;
+}
 
 export function createDrizzleWorkspacePreferencesRepository(
   db: StudioProjectDatabase,
@@ -36,6 +38,14 @@ export function createDrizzleWorkspacePreferencesRepository(
               updatedAt: new Date(value.updatedAt),
             },
           });
+      });
+    },
+
+    async delete(workspaceId: string, key: string): Promise<void> {
+      await db.transaction(async (tx) => {
+        await tx
+          .delete(workspacePreferences)
+          .where(and(eq(workspacePreferences.workspaceId, workspaceId), eq(workspacePreferences.key, key)));
       });
     },
   });
