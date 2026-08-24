@@ -4,6 +4,7 @@ export const M04_1_MIGRATION_CHECKSUM = 'm04.1:storage-schema-v1' as const;
 export const M04_3_MIGRATION_CHECKSUM = 'm04.3:incremental-storage-v2' as const;
 export const M04_4_MIGRATION_CHECKSUM = 'm04.4:project-home-v3' as const;
 export const M04_6_REFERENTIAL_INTEGRITY_CHECKSUM = 'm04.6:referential-integrity-v4' as const;
+export const M04_8_REVISION_STORE_CHECKSUM = 'm04.8:revision-object-versions-v5' as const;
 
 export const M04_1_SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS projects (
@@ -156,6 +157,31 @@ ALTER TABLE record_field_index
   ADD CONSTRAINT record_field_index_project_id_projects_id_fk
   FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
 `;
+export const M04_8_REVISION_STORE_SQL = `
+CREATE TABLE IF NOT EXISTS project_object_versions (
+  project_id text NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  version_id text NOT NULL,
+  kind text NOT NULL,
+  schema_version integer NOT NULL CHECK (schema_version > 0),
+  payload jsonb NOT NULL,
+  checksum text NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (project_id, version_id)
+);
+CREATE INDEX IF NOT EXISTS project_object_versions_checksum_idx
+  ON project_object_versions(project_id, checksum, schema_version, kind);
+INSERT INTO project_object_versions(project_id, version_id, kind, schema_version, payload, checksum, created_at)
+SELECT
+  project_id,
+  concat('v:', schema_version, ':', kind, ':', checksum),
+  kind,
+  schema_version,
+  payload,
+  checksum,
+  updated_at
+FROM project_objects
+ON CONFLICT (project_id, version_id) DO NOTHING;
+`;
 
 export interface PGliteMigrationClient {
   exec(query: string): Promise<unknown>;
@@ -186,10 +212,11 @@ export async function applyStudioStorageMigrations(client: PGliteMigrationClient
   await applyMigration(client, 1, M04_1_MIGRATION_CHECKSUM, M04_1_SCHEMA_SQL);
   await applyMigration(client, 2, M04_3_MIGRATION_CHECKSUM, M04_3_INCREMENTAL_SQL);
   await applyMigration(client, 3, M04_4_MIGRATION_CHECKSUM, M04_4_PROJECT_HOME_SQL);
+  await applyMigration(client, 4, M04_6_REFERENTIAL_INTEGRITY_CHECKSUM, M04_6_REFERENTIAL_INTEGRITY_SQL);
   await applyMigration(
     client,
     STUDIO_STORAGE_SCHEMA_VERSION,
-    M04_6_REFERENTIAL_INTEGRITY_CHECKSUM,
-    M04_6_REFERENTIAL_INTEGRITY_SQL,
+    M04_8_REVISION_STORE_CHECKSUM,
+    M04_8_REVISION_STORE_SQL,
   );
 }
