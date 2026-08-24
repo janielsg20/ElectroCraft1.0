@@ -393,7 +393,11 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
     async read(workspaceId: string, key: string) {
       return (await ensureWorkspacePreferencesRepository()).read(workspaceId, key);
     },
-    async write(workspaceId, key, value) {
+    async write(
+      workspaceId: string,
+      key: string,
+      value: Parameters<WorkspacePreferencesStoragePort['write']>[2],
+    ) {
       return (await ensureWorkspacePreferencesRepository()).write(workspaceId, key, value);
     },
   });
