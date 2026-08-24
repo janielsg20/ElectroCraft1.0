@@ -5,11 +5,10 @@ import {
   type WorkspaceLayoutSnapshot,
   type WorkspacePreferences,
 } from '@electrocraft/application';
-import { createBrowserWorkspacePreferencesStoragePort } from '@electrocraft/data-web';
+import { workspacePreferencesStoragePort } from './project-storage-runtime';
 
 const CHANNEL_NAME = 'electrocraft-workspace-preferences:studio';
-const storage = createBrowserWorkspacePreferencesStoragePort();
-const service = createWorkspacePreferencesService(storage);
+const service = createWorkspacePreferencesService(workspacePreferencesStoragePort);
 const listeners = new Set<() => void>();
 
 let snapshot: WorkspacePreferences = createDefaultWorkspacePreferences();
@@ -99,7 +98,6 @@ export const workspacePreferencesRuntime = Object.freeze({
   async close() {
     channel?.close();
     channel = null;
-    await storage.close();
   },
 });
 
