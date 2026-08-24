@@ -5,7 +5,6 @@ import {
   type ProjectObjectVersionReference,
   type ProjectRevisionActor,
   type ProjectRevisionHistoryEntry,
-  type ProjectRevisionManifestEntry,
   type ProjectRevisionPort,
   type ProjectRevisionRestoreResult,
   type ProjectRevisionSource,
@@ -23,6 +22,12 @@ import * as schema from './schema';
 type RevisionRow = typeof schema.projectRevisions.$inferSelect;
 type ProjectObjectRow = typeof schema.projectObjects.$inferSelect;
 type ProjectTransaction = Parameters<Parameters<StudioProjectDatabase['transaction']>[0]>[0];
+
+type VersionIdentity = Readonly<{
+  kind: string;
+  schemaVersion: number;
+  checksum: ElectroCraftCanonicalSnapshotChecksum;
+}>;
 
 interface EnhancedRevisionManifest {
   readonly schemaVersion: 1;
@@ -49,7 +54,7 @@ function asRecord(value: unknown): Record<string, unknown> | null {
   return value as Record<string, unknown>;
 }
 
-function versionIdFor(entry: Pick<ProjectRevisionManifestEntry, 'kind' | 'schemaVersion' | 'checksum'>) {
+function versionIdFor(entry: VersionIdentity) {
   return `v:${entry.schemaVersion}:${entry.kind}:${entry.checksum}`;
 }
 
@@ -93,12 +98,16 @@ function parseRevision(row: RevisionRow): ParsedRevision {
     ) {
       throw new Error(`invalid project revision object reference: ${row.id}`);
     }
+    const checksum = entry.checksum as ElectroCraftCanonicalSnapshotChecksum;
     const reference: ProjectObjectVersionReference = Object.freeze({
       objectId: entry.objectId,
       kind: entry.kind,
       schemaVersion: entry.schemaVersion,
-      checksum: entry.checksum as ElectroCraftCanonicalSnapshotChecksum,
-      versionId: typeof entry.versionId === 'string' && entry.versionId ? entry.versionId : versionIdFor(entry as never),
+      checksum,
+      versionId:
+        typeof entry.versionId === 'string' && entry.versionId
+          ? entry.versionId
+          : versionIdFor({ kind: entry.kind, schemaVersion: entry.schemaVersion, checksum }),
     });
     if (entry.payload !== undefined) payloads.set(reference.objectId, entry.payload as JsonValue);
     return reference;
@@ -144,9 +153,9 @@ async function createReferenceRevision(
   projectId: string,
   objects: readonly ReturnType<typeof toStoredObject>[],
   reason: string,
+  timestamp = new Date().toISOString(),
 ): Promise<ProjectStorageRevision> {
   const revisionId = globalThis.crypto.randomUUID();
-  const timestamp = new Date().toISOString();
   const source = inferProjectRevisionSource(reason);
   const actor = inferProjectRevisionActor(source);
   const references: ProjectObjectVersionReference[] = [];
@@ -326,15 +335,18 @@ export function createDrizzleProjectRevisionRepository(db: StudioProjectDatabase
           .select()
           .from(schema.projectObjects)
           .where(eq(schema.projectObjects.projectId, projectId));
+        const safetyTimestamp = new Date().toISOString();
         const safetyRevision = await createReferenceRevision(
           tx,
           projectId,
           currentRows.map(toStoredObject),
           'pre-restore-safety',
+          safetyTimestamp,
         );
 
         await tx.delete(schema.projectObjects).where(eq(schema.projectObjects.projectId, projectId));
-        const now = new Date();
+        const restoreTimestamp = new Date(new Date(safetyTimestamp).getTime() + 1).toISOString();
+        const now = new Date(restoreTimestamp);
         for (const object of targetObjects) {
           await tx.insert(schema.projectObjects).values({
             projectId,
@@ -350,8 +362,9 @@ export function createDrizzleProjectRevisionRepository(db: StudioProjectDatabase
         const restoredRevision = await createReferenceRevision(
           tx,
           projectId,
-          targetObjects.map((object) => ({ ...object, updatedAt: now.toISOString() })),
+          targetObjects.map((object) => ({ ...object, updatedAt: restoreTimestamp })),
           `restore:${revisionId}`,
+          restoreTimestamp,
         );
         await tx
           .update(schema.projects)
