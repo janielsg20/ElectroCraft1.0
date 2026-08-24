@@ -59,13 +59,21 @@ async function loadInitialPreferences() {
   pendingInitializationPatch = {};
   initialized = true;
   publish(next);
-  if (pendingMutations === 0) setPersistenceState('ready');
+  if (pendingMutations > 0) return next;
+  if (deferredReload) {
+    deferredReload = false;
+    return reload();
+  }
+  setPersistenceState('ready');
   return next;
 }
 
 async function reload() {
   ensureCrossTabSync();
-  if (!initialized) return initialize();
+  if (!initialized) {
+    if (initializePromise || pendingMutations > 0) deferredReload = true;
+    return initialize();
+  }
   if (pendingMutations > 0) {
     deferredReload = true;
     return snapshot;
