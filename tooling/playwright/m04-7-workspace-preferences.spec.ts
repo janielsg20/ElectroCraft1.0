@@ -39,15 +39,24 @@ test.describe('M04.7 Workspace preferences', () => {
     await workspace.getByLabel('Lado del panel lateral').click();
     await page.getByRole('option', { name: 'Derecha' }).click();
 
-    await workspace.getByLabel('Contenido del panel lateral').click();
+    const display = workspace.getByLabel('Contenido del panel lateral');
+    await display.click();
+    await page.getByRole('option', { name: 'Solo iconos' }).click();
+    await expect(page.locator('.ec-app-shell')).toHaveAttribute('data-sidebar-display', 'icons');
+
+    await display.click();
+    await page.getByRole('option', { name: 'Iconos y texto' }).click();
+    await expect(page.locator('.ec-app-shell')).toHaveAttribute('data-sidebar-display', 'icons+text');
+
+    await display.click();
     await page.getByRole('option', { name: 'Solo texto' }).click();
+    await expect(page.locator('.ec-app-shell')).toHaveAttribute('data-sidebar-display', 'text');
 
     const width = workspace.getByLabel('Ancho del panel');
     await width.fill('318');
     await width.blur();
 
     await expect(page.locator('.ec-app-shell')).toHaveAttribute('data-sidebar-side', 'right');
-    await expect(page.locator('.ec-app-shell')).toHaveAttribute('data-sidebar-display', 'text');
     await expect(page.locator('.ec-app-shell-sidebar')).toHaveCSS('width', '318px');
     await waitForWorkspacePersistence(page);
     await expect(workspace.locator('.ec-workspace-persistence-status')).toHaveText('Guardado');
