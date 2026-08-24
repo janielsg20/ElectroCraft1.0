@@ -50,6 +50,7 @@ test.describe('M04.7 Workspace preferences', () => {
     await expect(page.locator('.ec-app-shell')).toHaveAttribute('data-sidebar-display', 'text');
     await expect(page.locator('.ec-app-shell-sidebar')).toHaveCSS('width', '318px');
     await waitForWorkspacePersistence(page);
+    await expect(workspace.locator('.ec-workspace-persistence-status')).toHaveText('Guardado');
 
     await page.reload();
     await expect(page.locator('.ec-app-shell')).toHaveAttribute('data-sidebar-side', 'right', { timeout: 60_000 });
@@ -71,6 +72,7 @@ test.describe('M04.7 Workspace preferences', () => {
 
     let saved = opened.workspace.locator('[data-workspace-saved-layout]').filter({ hasText: 'Diseño E2E' });
     await expect(saved).toBeVisible();
+    await expect(saved.getByRole('img', { name: /Vista previa: panel lateral a la derecha/ })).toBeVisible();
 
     await opened.workspace.getByLabel('Lado del panel lateral').click();
     await page.getByRole('option', { name: 'Izquierda' }).click();
