@@ -1,3 +1,49 @@
+.ec-project-history-route,
+.ec-project-history-route-empty {
+  width: min(1180px, 100%);
+  min-width: 0;
+  margin: 0 auto;
+  padding: 18px;
+}
+
+.ec-project-history-route {
+  display: grid;
+  gap: 12px;
+}
+
+.ec-project-history-route > nav a,
+.ec-project-history-route-empty a {
+  color: var(--primary);
+  font-size: var(--ec-text-sm);
+  text-decoration: none;
+}
+
+.ec-project-history-route > nav a:hover,
+.ec-project-history-route > nav a:focus-visible,
+.ec-project-history-route-empty a:hover,
+.ec-project-history-route-empty a:focus-visible {
+  text-decoration: underline;
+}
+
+.ec-project-history-route-empty {
+  min-height: 320px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.ec-project-history-route-empty h1,
+.ec-project-history-route-empty p {
+  margin: 0;
+}
+
+.ec-project-history-route-empty p {
+  max-width: 520px;
+  color: var(--muted-foreground);
+}
+
 .ec-revision-history {
   min-width: 0;
   display: grid;
@@ -198,6 +244,11 @@
 }
 
 @media (max-width: 767px) {
+  .ec-project-history-route,
+  .ec-project-history-route-empty {
+    padding: 12px;
+  }
+
   .ec-revision-history-header,
   .ec-revision-detail-heading {
     align-items: stretch;
