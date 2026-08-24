@@ -14,6 +14,7 @@ import {
   type WorkspacePanelId,
 } from '@electrocraft/application';
 import { useState, useSyncExternalStore } from 'react';
+import { HelpTrigger } from '../../help/help-ui';
 import { workspacePreferencesRuntime } from './workspace-preferences-runtime';
 
 const DEFAULT_GROUP_ORDER = ['build', 'data', 'logic', 'app', 'resources', 'appearance', 'publish'] as const;
@@ -135,7 +136,10 @@ export function WorkspaceSettings() {
     >
       <div className="ec-workspace-settings-heading">
         <div>
-          <h2 id="workspace-preferences-title">Espacio de trabajo</h2>
+          <div className="flex items-center gap-2">
+            <h2 id="workspace-preferences-title">Espacio de trabajo</h2>
+            <HelpTrigger helpId="help.projects" />
+          </div>
           <p>
             Personaliza el panel lateral, el editor y los diseños reutilizables. Los cambios se guardan en este navegador.
           </p>
