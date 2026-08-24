@@ -22,6 +22,8 @@ describe('M03.3 Sidebar boundaries', () => {
     const preferences = read('apps/studio/src/shell/workspace-preferences.ts');
     const route = read('apps/studio/src/shell/app-shell-route.tsx');
     const runtime = read('apps/studio/src/features/projects/workspace-preferences-runtime.ts');
+    const projectStorageRuntime = read('apps/studio/src/features/projects/project-storage-runtime.ts');
+    const browserStorage = read('packages/data-web/src/browser.ts');
 
     expect(shell).toContain('aria-current');
     expect(shell).toContain('TooltipTrigger');
@@ -29,8 +31,10 @@ describe('M03.3 Sidebar boundaries', () => {
     expect(shell).toContain('data-sidebar-collapsed');
     expect(preferences).toContain('export interface WorkspacePreferencesPort');
     expect(route).toContain('workspacePreferencesPort');
-    expect(runtime).toContain('createBrowserWorkspacePreferencesStoragePort');
+    expect(runtime).toContain('workspacePreferencesStoragePort');
     expect(runtime).toContain('BroadcastChannel');
+    expect(projectStorageRuntime).toContain('port.workspacePreferences');
+    expect(browserStorage).toContain('workspacePreferencesRepository');
     expect(preferences).not.toContain('localStorage');
     expect(preferences).not.toContain('PGlite');
   });
