@@ -40,6 +40,30 @@ export const projectObjects = pgTable(
   ],
 );
 
+export const projectObjectVersions = pgTable(
+  'project_object_versions',
+  {
+    projectId: text('project_id')
+      .notNull()
+      .references(() => projects.id, { onDelete: 'cascade' }),
+    versionId: text('version_id').notNull(),
+    kind: text('kind').notNull(),
+    schemaVersion: integer('schema_version').notNull(),
+    payload: jsonb('payload').$type<JsonValue>().notNull(),
+    checksum: text('checksum').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.projectId, table.versionId] }),
+    index('project_object_versions_checksum_idx').on(
+      table.projectId,
+      table.checksum,
+      table.schemaVersion,
+      table.kind,
+    ),
+  ],
+);
+
 export const projectRevisions = pgTable(
   'project_revisions',
   {
