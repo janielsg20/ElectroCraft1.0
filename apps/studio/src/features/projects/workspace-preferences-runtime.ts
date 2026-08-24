@@ -11,23 +11,72 @@ const CHANNEL_NAME = 'electrocraft-workspace-preferences:studio';
 const service = createWorkspacePreferencesService(workspacePreferencesStoragePort);
 const listeners = new Set<() => void>();
 
+export type WorkspacePreferencesPersistenceState = 'loading' | 'saving' | 'ready' | 'error';
+
 let snapshot: WorkspacePreferences = createDefaultWorkspacePreferences();
+let persistenceState: WorkspacePreferencesPersistenceState = 'loading';
 let initializePromise: Promise<WorkspacePreferences> | null = null;
 let initialized = false;
 let mutationRevision = 0;
+let pendingMutations = 0;
+let pendingInitializationPatch: Partial<WorkspaceLayoutSnapshot> = {};
+let deferredReload = false;
 let channel: BroadcastChannel | null = null;
 let visibilityListenerInstalled = false;
 
+function notify() {
+  for (const listener of listeners) listener();
+}
+
 function publish(next: WorkspacePreferences) {
   snapshot = next;
-  for (const listener of listeners) listener();
+  notify();
   return snapshot;
 }
 
-async function reload() {
-  const next = publish(await service.load());
+function setPersistenceState(next: WorkspacePreferencesPersistenceState) {
+  if (persistenceState === next) return;
+  persistenceState = next;
+  notify();
+}
+
+function hasPendingInitializationPatch() {
+  return Object.keys(pendingInitializationPatch).length > 0;
+}
+
+async function loadInitialPreferences() {
+  const loaded = await service.load();
+  const next = hasPendingInitializationPatch()
+    ? Object.freeze({
+        ...loaded,
+        layout: normalizeWorkspaceLayout({ ...loaded.layout, ...pendingInitializationPatch }),
+        updatedAt: snapshot.updatedAt,
+      })
+    : loaded;
+  pendingInitializationPatch = {};
   initialized = true;
+  publish(next);
+  if (pendingMutations === 0) setPersistenceState('ready');
   return next;
+}
+
+async function reload() {
+  ensureCrossTabSync();
+  if (!initialized) return initialize();
+  if (pendingMutations > 0) {
+    deferredReload = true;
+    return snapshot;
+  }
+
+  setPersistenceState('loading');
+  try {
+    const next = publish(await service.load());
+    setPersistenceState('ready');
+    return next;
+  } catch (error) {
+    setPersistenceState('error');
+    throw error;
+  }
 }
 
 function announceChange() {
@@ -55,31 +104,61 @@ async function initialize() {
   ensureCrossTabSync();
   if (initialized) return snapshot;
   if (!initializePromise) {
-    initializePromise = reload().finally(() => {
-      initializePromise = null;
-    });
+    if (pendingMutations === 0) setPersistenceState('loading');
+    initializePromise = loadInitialPreferences()
+      .catch((error) => {
+        setPersistenceState('error');
+        throw error;
+      })
+      .finally(() => {
+        initializePromise = null;
+      });
   }
   return initializePromise;
 }
 
+function beginMutation() {
+  pendingMutations += 1;
+  setPersistenceState('saving');
+}
+
+function finishMutation(success: boolean) {
+  pendingMutations = Math.max(0, pendingMutations - 1);
+  if (!success) {
+    if (pendingMutations === 0) setPersistenceState('error');
+    return;
+  }
+  if (pendingMutations > 0) return;
+  if (deferredReload) {
+    deferredReload = false;
+    void reload();
+    return;
+  }
+  setPersistenceState('ready');
+}
+
 async function commit(operation: () => Promise<WorkspacePreferences>) {
-  if (!initialized) await initialize();
   const revision = ++mutationRevision;
+  beginMutation();
   try {
+    if (!initialized) await initialize();
     const next = await operation();
     if (revision === mutationRevision) publish(next);
     announceChange();
+    finishMutation(true);
     return next;
   } catch (error) {
-    if (revision === mutationRevision) await reload().catch(() => undefined);
+    if (revision === mutationRevision && initialized) await reload().catch(() => undefined);
+    finishMutation(false);
     throw error;
   }
 }
 
 async function patchLayout(patch: Partial<WorkspaceLayoutSnapshot>) {
-  if (!initialized) await initialize();
   const revision = ++mutationRevision;
+  if (!initialized) pendingInitializationPatch = { ...pendingInitializationPatch, ...patch };
   const optimisticLayout = normalizeWorkspaceLayout({ ...snapshot.layout, ...patch });
+  beginMutation();
   publish(
     Object.freeze({
       ...snapshot,
@@ -89,12 +168,15 @@ async function patchLayout(patch: Partial<WorkspaceLayoutSnapshot>) {
   );
 
   try {
+    if (!initialized) await initialize();
     const next = await service.patchLayout(patch);
     if (revision === mutationRevision) publish(next);
     announceChange();
+    finishMutation(true);
     return next;
   } catch (error) {
-    if (revision === mutationRevision) await reload().catch(() => undefined);
+    if (revision === mutationRevision && initialized) await reload().catch(() => undefined);
+    finishMutation(false);
     throw error;
   }
 }
@@ -107,6 +189,7 @@ export const workspacePreferencesRuntime = Object.freeze({
   },
   getSnapshot: () => snapshot,
   getLayoutSnapshot: () => snapshot.layout,
+  getPersistenceState: () => persistenceState,
   initialize,
   refresh: reload,
   saveLayout(layout: WorkspaceLayoutSnapshot) {
