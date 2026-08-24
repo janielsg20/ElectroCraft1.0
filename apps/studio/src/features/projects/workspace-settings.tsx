@@ -8,7 +8,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@electrocraft/design-system';
-import { WORKSPACE_LAYOUT_LIMITS, type WorkspacePanelId } from '@electrocraft/application';
+import {
+  WORKSPACE_LAYOUT_LIMITS,
+  type WorkspaceLayoutSnapshot,
+  type WorkspacePanelId,
+} from '@electrocraft/application';
 import { useState, useSyncExternalStore } from 'react';
 import { workspacePreferencesRuntime } from './workspace-preferences-runtime';
 
@@ -27,6 +31,12 @@ const PANEL_LABELS: Readonly<Record<WorkspacePanelId, string>> = Object.freeze({
   inspector: 'Inspector',
   status: 'Barra de estado',
 });
+const PERSISTENCE_LABELS = Object.freeze({
+  loading: 'Cargando espacio de trabajo…',
+  saving: 'Guardando…',
+  ready: 'Guardado',
+  error: 'Error al guardar',
+});
 
 function workspaceErrorMessage(cause: unknown): string {
   if (!(cause instanceof Error)) return 'No se pudo guardar la configuración del espacio de trabajo.';
@@ -43,11 +53,41 @@ function normalizedGroupOrder(order: readonly string[]) {
   return [...existing, ...DEFAULT_GROUP_ORDER.filter((id) => !existing.includes(id))];
 }
 
+function WorkspaceLayoutPreview({ layout }: { readonly layout: WorkspaceLayoutSnapshot }) {
+  const visible = new Set(layout.visiblePanels);
+  const sidebarLabel = layout.sidebarSide === 'right' ? 'derecha' : 'izquierda';
+  const collapsedLabel = layout.sidebarCollapsed ? 'contraído' : 'expandido';
+
+  return (
+    <div
+      className="ec-workspace-layout-preview"
+      role="img"
+      aria-label={`Vista previa: panel lateral a la ${sidebarLabel}, ${collapsedLabel}`}
+      data-sidebar-side={layout.sidebarSide}
+      data-sidebar-collapsed={layout.sidebarCollapsed ? 'true' : 'false'}
+      data-context-visible={visible.has('context') ? 'true' : 'false'}
+      data-inspector-visible={visible.has('inspector') ? 'true' : 'false'}
+      data-status-visible={visible.has('status') ? 'true' : 'false'}
+    >
+      <span className="ec-workspace-layout-preview-sidebar" aria-hidden="true" />
+      <span className="ec-workspace-layout-preview-context" aria-hidden="true" />
+      <span className="ec-workspace-layout-preview-canvas" aria-hidden="true" />
+      <span className="ec-workspace-layout-preview-inspector" aria-hidden="true" />
+      <span className="ec-workspace-layout-preview-status" aria-hidden="true" />
+    </div>
+  );
+}
+
 export function WorkspaceSettings() {
   const preferences = useSyncExternalStore(
     workspacePreferencesRuntime.subscribe,
     workspacePreferencesRuntime.getSnapshot,
     workspacePreferencesRuntime.getSnapshot,
+  );
+  const persistenceState = useSyncExternalStore(
+    workspacePreferencesRuntime.subscribe,
+    workspacePreferencesRuntime.getPersistenceState,
+    workspacePreferencesRuntime.getPersistenceState,
   );
   const [layoutName, setLayoutName] = useState('');
   const [renameValues, setRenameValues] = useState<Record<string, string>>({});
@@ -93,10 +133,22 @@ export function WorkspaceSettings() {
       data-information-level="primary"
       data-workspace-settings
     >
-      <h2 id="workspace-preferences-title">Espacio de trabajo</h2>
-      <p>
-        Personaliza el panel lateral, el editor y los diseños reutilizables. Los cambios se guardan en este navegador.
-      </p>
+      <div className="ec-workspace-settings-heading">
+        <div>
+          <h2 id="workspace-preferences-title">Espacio de trabajo</h2>
+          <p>
+            Personaliza el panel lateral, el editor y los diseños reutilizables. Los cambios se guardan en este navegador.
+          </p>
+        </div>
+        <span
+          className="ec-workspace-persistence-status"
+          data-state={persistenceState}
+          role="status"
+          aria-live="polite"
+        >
+          {PERSISTENCE_LABELS[persistenceState]}
+        </span>
+      </div>
 
       {error ? (
         <div className="ec-ia-diagnostic-alert" role="alert">
@@ -290,12 +342,19 @@ export function WorkspaceSettings() {
       </div>
 
       {preferences.savedLayouts.map((saved) => (
-        <div className="ec-topbar-setting-row" key={saved.id} data-workspace-saved-layout={saved.id}>
-          <div>
-            <strong>{saved.name}</strong>
-            <p>Actualizado {new Date(saved.updatedAt).toLocaleString('es')}</p>
+        <div
+          className="ec-topbar-setting-row ec-workspace-saved-layout"
+          key={saved.id}
+          data-workspace-saved-layout={saved.id}
+        >
+          <div className="ec-workspace-saved-layout-summary">
+            <WorkspaceLayoutPreview layout={saved.layout} />
+            <div>
+              <strong>{saved.name}</strong>
+              <p>Actualizado {new Date(saved.updatedAt).toLocaleString('es')}</p>
+            </div>
           </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+          <div className="ec-workspace-saved-layout-actions">
             <Button
               size="sm"
               variant="outline"
