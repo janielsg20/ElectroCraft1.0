@@ -1,7 +1,9 @@
 import { expect, test } from '@playwright/test';
 
 async function waitForWorkspacePersistence(page: import('@playwright/test').Page) {
-  await expect(page.locator('html')).toHaveAttribute('data-workspace-persistence-state', 'ready', { timeout: 60_000 });
+  await expect(page.locator('html')).toHaveAttribute('data-workspace-persistence-state', 'ready', {
+    timeout: 60_000,
+  });
 }
 
 async function openWorkspaceSettings(page: import('@playwright/test').Page) {
