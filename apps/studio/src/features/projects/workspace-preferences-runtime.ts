@@ -35,9 +35,12 @@ function publish(next: WorkspacePreferences) {
 }
 
 function setPersistenceState(next: WorkspacePreferencesPersistenceState) {
-  if (persistenceState === next) return;
+  const changed = persistenceState !== next;
   persistenceState = next;
-  notify();
+  if (typeof document !== 'undefined') {
+    document.documentElement.dataset.workspacePersistenceState = next;
+  }
+  if (changed) notify();
 }
 
 function hasPendingInitializationPatch() {
