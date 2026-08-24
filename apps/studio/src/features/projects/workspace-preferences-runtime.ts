@@ -95,7 +95,7 @@ export const workspacePreferencesRuntime = Object.freeze({
   restoreDefaults() {
     return commit(() => service.restoreDefaults());
   },
-  async close() {
+  close() {
     channel?.close();
     channel = null;
   },
