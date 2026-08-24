@@ -57,7 +57,7 @@ test.describe('M04.7 Workspace preferences', () => {
     const opened = await openWorkspaceSettings(page);
     await opened.workspace.getByLabel('Lado del panel lateral').click();
     await page.getByRole('option', { name: 'Derecha' }).click();
-    await opened.workspace.getByLabel('Nombre del diseño').fill('Diseño E2E');
+    await opened.workspace.getByPlaceholder('Nombre del diseño').fill('Diseño E2E');
     await opened.workspace.getByRole('button', { name: 'Guardar', exact: true }).click();
 
     let saved = opened.workspace.locator('[data-workspace-saved-layout]').filter({ hasText: 'Diseño E2E' });
