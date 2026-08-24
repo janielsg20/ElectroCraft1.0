@@ -13,6 +13,8 @@ const listeners = new Set<() => void>();
 
 let snapshot: WorkspacePreferences = createDefaultWorkspacePreferences();
 let initializePromise: Promise<WorkspacePreferences> | null = null;
+let initialized = false;
+let mutationRevision = 0;
 let channel: BroadcastChannel | null = null;
 let visibilityListenerInstalled = false;
 
@@ -23,7 +25,9 @@ function publish(next: WorkspacePreferences) {
 }
 
 async function reload() {
-  return publish(await service.load());
+  const next = publish(await service.load());
+  initialized = true;
+  return next;
 }
 
 function announceChange() {
@@ -49,6 +53,7 @@ function ensureCrossTabSync() {
 
 async function initialize() {
   ensureCrossTabSync();
+  if (initialized) return snapshot;
   if (!initializePromise) {
     initializePromise = reload().finally(() => {
       initializePromise = null;
@@ -58,10 +63,40 @@ async function initialize() {
 }
 
 async function commit(operation: () => Promise<WorkspacePreferences>) {
-  await initialize();
-  const next = publish(await operation());
-  announceChange();
-  return next;
+  if (!initialized) await initialize();
+  const revision = ++mutationRevision;
+  try {
+    const next = await operation();
+    if (revision === mutationRevision) publish(next);
+    announceChange();
+    return next;
+  } catch (error) {
+    if (revision === mutationRevision) await reload().catch(() => undefined);
+    throw error;
+  }
+}
+
+async function patchLayout(patch: Partial<WorkspaceLayoutSnapshot>) {
+  if (!initialized) await initialize();
+  const revision = ++mutationRevision;
+  const optimisticLayout = normalizeWorkspaceLayout({ ...snapshot.layout, ...patch });
+  publish(
+    Object.freeze({
+      ...snapshot,
+      layout: optimisticLayout,
+      updatedAt: new Date().toISOString(),
+    }),
+  );
+
+  try {
+    const next = await service.patchLayout(patch);
+    if (revision === mutationRevision) publish(next);
+    announceChange();
+    return next;
+  } catch (error) {
+    if (revision === mutationRevision) await reload().catch(() => undefined);
+    throw error;
+  }
 }
 
 export const workspacePreferencesRuntime = Object.freeze({
@@ -77,9 +112,7 @@ export const workspacePreferencesRuntime = Object.freeze({
   saveLayout(layout: WorkspaceLayoutSnapshot) {
     return commit(() => service.saveLayout(normalizeWorkspaceLayout(layout)));
   },
-  patchLayout(patch: Partial<WorkspaceLayoutSnapshot>) {
-    return commit(() => service.patchLayout(patch));
-  },
+  patchLayout,
   saveCurrentAs(name: string) {
     return commit(() => service.saveCurrentAs(name));
   },
