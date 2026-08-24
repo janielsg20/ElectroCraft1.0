@@ -1,4 +1,6 @@
 import {
+  DEFAULT_WORKSPACE_ID,
+  WORKSPACE_PREFERENCES_STORAGE_KEY,
   createProjectBackupService,
   createProjectStorageService,
   createWorkspacePreferencesService,
@@ -96,6 +98,29 @@ describe('M04.7 workspace preferences with real PGlite', () => {
         'SELECT workspace_id, key FROM workspace_preferences ORDER BY workspace_id, key',
       );
       expect(rows.rows).toEqual([{ workspace_id: 'studio', key: 'workspace.preferences.v1' }]);
+    } finally {
+      await client.close();
+    }
+  });
+
+  it('deletes a workspace preference row through the typed Drizzle transaction', async () => {
+    const client = await PGlite.create('memory://');
+    try {
+      await applyStudioStorageMigrations(client);
+      const db = drizzle(client, { schema: storageSchema });
+      const repository = createDrizzleWorkspacePreferencesRepository(db);
+      const preferences = createWorkspacePreferencesService(repository, {
+        now: () => '2026-08-23T13:15:00.000Z',
+      });
+
+      await preferences.patchLayout({ sidebarSide: 'right' });
+      expect(await repository.read(DEFAULT_WORKSPACE_ID, WORKSPACE_PREFERENCES_STORAGE_KEY)).not.toBeNull();
+
+      await repository.delete(DEFAULT_WORKSPACE_ID, WORKSPACE_PREFERENCES_STORAGE_KEY);
+
+      expect(await repository.read(DEFAULT_WORKSPACE_ID, WORKSPACE_PREFERENCES_STORAGE_KEY)).toBeNull();
+      const rows = await client.query<{ count: string }>('SELECT COUNT(*)::text AS count FROM workspace_preferences');
+      expect(rows.rows).toEqual([{ count: '0' }]);
     } finally {
       await client.close();
     }
