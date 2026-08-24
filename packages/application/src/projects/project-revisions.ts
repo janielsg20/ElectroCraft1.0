@@ -149,6 +149,9 @@ export function createProjectRevisionService(port: ProjectRevisionPort) {
     list(projectId: string) {
       return port.listRevisionHistory(requireNonEmpty(projectId, 'projectId'));
     },
+    checkpoint(projectId: string, reason: string) {
+      return port.createCheckpoint(requireNonEmpty(projectId, 'projectId'), requireNonEmpty(reason, 'reason'));
+    },
     saveRevision(projectId: string) {
       return port.createCheckpoint(requireNonEmpty(projectId, 'projectId'), 'manual');
     },
