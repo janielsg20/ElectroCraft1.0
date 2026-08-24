@@ -113,9 +113,9 @@
   background: var(--muted);
 }
 
-.ec-workspace-layout-preview-sidebar {
+.ec-workspace-layout-preview > .ec-workspace-layout-preview-sidebar {
   grid-area: sidebar;
-  background: var(--foreground) !important;
+  background: var(--foreground);
   opacity: 0.78;
 }
 
@@ -123,9 +123,9 @@
   grid-area: context;
 }
 
-.ec-workspace-layout-preview-canvas {
+.ec-workspace-layout-preview > .ec-workspace-layout-preview-canvas {
   grid-area: canvas;
-  background: var(--card) !important;
+  background: var(--card);
   box-shadow: inset 0 0 0 1px var(--border);
 }
 
