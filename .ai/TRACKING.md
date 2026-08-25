@@ -8,70 +8,40 @@ Date: 2026-08-25.
 | F01                | COMPLETADA / GREEN | `.ai/evidence/F01/`                            |
 | F02                | COMPLETADA / GREEN | `.ai/evidence/F02/`                            |
 | F03 / M03.1–M03.12 | COMPLETADA / GREEN | `.ai/evidence/F03/CLOSURE_2026-08-20.md`       |
-| F04 / M04.1        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.1/CLOSURE_2026-08-20.md` |
-| F04 / M04.2        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.2/CLOSURE_2026-08-20.md` |
-| F04 / M04.3        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.3/CLOSURE_2026-08-21.md` |
-| F04 / M04.4        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.4/CLOSURE_2026-08-21.md` |
-| F04 / M04.5        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.5/CLOSURE_2026-08-21.md` |
-| F04 / M04.6        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.6/CLOSURE_2026-08-23.md` |
-| F04 / M04.7        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.7/CLOSURE_2026-08-25.md` |
-| F04 / M04.8        | ACTIVE             | `.ai/microphases/M04_8.md`                     |
+| F04 / M04.1–M04.8  | COMPLETADA / GREEN | `.ai/evidence/F04/CLOSURE_2026-08-25.md`       |
+| F05 / M05.1        | ACTIVE             | `.ai/microphases/M05_1.md`                     |
 
-## Cierre M04.1
+## Cierre F04 / M04.8
 
-- Rama `codex/m04-1-storage-foundation`; PR `#27`.
-- Source funcional validado `8fd9460a43a4a3b5eaf91e62b83f4b3cb7edf10b`.
-- Informe `.ai/evidence/F04/M04.1/VALIDATION_LATEST.md`: `GREEN`.
-- Browser E2E: inicialización real de storage; save mediante runtime; reload; reopen del mismo proyecto; Settings > Almacenamiento usable en móvil sin overflow.
-- Owner `@electrocraft/data-web` con PGlite `0.5.5` + Drizzle `0.45.2`, Worker, schema físico versionado y migration journal.
-- Schema estable: projects, project_objects, project_revisions, content_records, taxonomy_terms, record_terms, relation_edges, record_field_index, workspace_preferences, media_metadata, audit_events, storage_migration_journal.
-
-## Cierre M04.2
-
-- Rama `codex/m04-2-multitab-worker`; PR `#28`.
-- Source funcional validado `6847a5fa410f0478c7e393b3d06800b6f89af072`.
-- Workflow `M04.2 Multi-Tab Worker Gate`: run `32430992572`, job `96622322833`, `success`.
-- `npm ci`, Prettier, lint, typecheck, boundaries, tests completos, build y Playwright multi-tab: GREEN.
-- IndexedDB es baseline persistente; OPFS AHP queda como optimización capability-aware.
-- Lifecycle real: bootstrap → migrations → health-check → repositories ready.
-- Dos tabs comparten una única DB lógica mediante `PGliteWorker` con el mismo `id`.
-- `onLeaderChange` revalida health; el E2E cierra el líder, verifica el handoff y guarda nuevamente desde el nuevo líder.
-- La identidad observable del líder se anuncia desde `worker.init(options)`, ejecutado por PGlite únicamente en el Worker elegido como líder; PGlite/Web Locks conserva ownership de la elección.
-- UI/application no importan PGlite/Drizzle raw.
-- Blockers P0/P1 al cierre: `0`.
-
-## Cierre M04.3
-
-- Source funcional `987f4c333f6e8b4c48d7ebad9c284e3925e9cf02`.
-- Dirty-set con debounce configurable, checksum canónico y reintento sin pérdida tras commit fallido.
-- PGlite/Drizzle upsert/delete únicamente objetos afectados; no crea revisión por autosave.
-- Checkpoints manual/pre-import/pre-migration/pre-publish/pre-export/interval y restauración explícita de la última revisión válida.
-- Configuración > Almacenamiento expone integridad y recovery en español; screenshot browser versionado.
-- Dedicado: 17/17; full Vitest: 82 archivos/300 tests; lint/typecheck/boundaries/test/build y Playwright Chromium 1/1 `GREEN`.
-- Evidencia: `.ai/evidence/F04/M04.3/VALIDATION_LATEST.md` y `.ai/evidence/F04/M04.3/CLOSURE_2026-08-21.md`.
+- Head funcional M04.8: `1df11b22fcd3bee7ea37846a459e28374271fc85`.
+- PR `#48`; squash merge a `main`: `ad64c0e5468b13a3fa3a712adb6621fa33d22fd0`.
+- `ElectroCraft Base CI` run `32859794266`: `success`.
+- Base CI verificó documentación, lint/Prettier, typecheck, tests, build, Playwright repository gate, empty-repo y artifacts base.
+- El E2E heredado M04.3 de autosave/recovery volvió a GREEN después de unificar Studio recovery/restore sobre `ProjectRevisionService`.
+- `project_object_versions` deduplica payloads por versión/checksum; manifests de revisión usan refs y conservan compatibilidad con manifests legacy embebidos.
+- Restore crea checkpoint de seguridad y una nueva revisión restaurada; no borra historial ni mueve destructivamente un pointer.
+- `RevisionHistoryPanel` usa design-system/Radix, español, diff summary, estados loading/error/empty y confirmación accesible.
+- Workflow dedicado M04.7 archivado tras el cierre de F04 para evitar duplicar GitHub Actions; Base CI queda como gate transversal.
 - Blockers P0/P1: `0`.
 
-## Cierre M04.6
+## M05.1 en curso
 
-- Source funcional: `7378b0d69ded493ee8fd6a1cc3b245e2f485ee52`.
-- PR `#45`; merge commit `6f37428f49b6cbd16bd262da7ef395c7e6181132`.
-- Gate dedicado `M04.6 Project Backup Gate`: run `32619053208`, `success`.
-- `ElectroCraft Base CI`: run `32619053241`, `success`.
-- Backup portable v1 con checksums; copy/replace/reject; `pre-import-safety`; integración real PGlite; E2E de download/import y rechazo de corrupción.
-- Evidencia: `.ai/evidence/F04/M04.6/CLOSURE_2026-08-23.md`.
-- Blockers P0/P1: `0`.
+Archivos/áreas preparadas en `codex/m05-1-puck-adapter`:
+- `packages/editor-puck/src/puck-adapter-contract.ts`;
+- `packages/editor-puck/src/puck-component-adapter.ts`;
+- `packages/editor-puck/src/puck-document-adapter.ts`;
+- `apps/studio/src/features/editor/puck-document-session.ts`;
+- `apps/studio/src/features/editor/puck-diagnostic-renderer.ts`;
+- unit/contract/integration/Playwright de M05.1.
 
-## Cierre M04.7
-
-- Source funcional: `aa39665f8f395087755a068dd52b0eed6a4b2b1e`.
-- PR `#46`; merge commit `b51242b889343daa7e86db7d9f167586abec1522`.
-- Gate dedicado `M04.7 Workspace Preferences Gate`: run `32811032183`, job `97690264341`, `success`.
-- `ElectroCraft Base CI`: run `32811032115`, job `97690264356`, `success`.
-- Persistencia PGlite/Drizzle compartida con el Worker multi-tab, saved layouts, sync entre tabs, reopen/round-trip y clamp móvil.
-- Geometría vigente: Sidebar `240/64`, Topbar `52`, Context `288`, Inspector `320`, Status `26`.
-- Evidencia: `.ai/evidence/F04/M04.7/CLOSURE_2026-08-25.md`.
-- Blockers P0/P1: `0`.
+Decisiones activas:
+- Puck permanece encapsulado por `@electrocraft/editor-puck`.
+- `ElectroCraftDocument.root` es envelope canónico y sus hijos se proyectan a `Data.content`.
+- Slots públicos preservan nesting/IDs.
+- Unknown components permanecen visibles y recuperables.
+- `zones` legacy con contenido falla cerrado para impedir pérdida silenciosa.
+- Editor history sigue separado de Project Revisions.
 
 ## Próxima microfase exacta
 
-`M04.8 — Construir Project Revision Checkpoints y Restore`.
+Completar y validar `M05.1 — Crear PuckAdapter y component mapping`; solo después activar M05.2.

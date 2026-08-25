@@ -26,6 +26,8 @@ Solo contiene hechos estables y decisiones vigentes. Progreso y siguiente paso p
 - Un payload OSS persistible usa el wrapper JSON portable `{ engine, schemaVersion, value }`; `domain` no importa tipos del engine y cada adapter owner valida/interpreta/migra su `value`.
 - Los wrappers iniciales aprobados son React Query Builder rules y Tiptap rich-text JSON. RQB usa `@react-querybuilder/core@8.23.0`; el baseline Tiptap usa un grafo mínimo coherente `3.29.2` de core/html/Document/Paragraph/Text.
 - Puck AppState/history, Rete NodeEditor/sockets/history, Zustand store instances y TanStack Query cache permanecen prohibidos como payload persistido; se reconstruyen desde definiciones ElectroCraft canónicas.
+- Project Revisions son historial durable separado del Undo/history de engines. Cada restore es no destructivo: crea un checkpoint de seguridad y una nueva revisión actual; el historial previo permanece intacto.
+- `project_object_versions` deduplica payloads por identidad de versión/checksum para que los manifests de revisión puedan referenciar objetos sin duplicar contenido.
 
 ## AI
 
@@ -43,6 +45,7 @@ Solo contiene hechos estables y decisiones vigentes. Progreso y siguiente paso p
 ## Tooling estable
 
 - El package manager canónico del repositorio es `npm@10.9.2`; no cambiar a pnpm solo porque una microfase o documentación externa muestre comandos de ejemplo con pnpm.
+- Los gates dedicados de microfases cerradas se archivan cuando dejan de aportar señal; `ElectroCraft Base CI` es el gate transversal por defecto y no debe duplicarse sin una necesidad específica.
 
 ## Reglas de continuidad
 
