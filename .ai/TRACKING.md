@@ -1,6 +1,6 @@
 # TRACKING — ElectroCraft current position
 
-Date: 2026-08-23.
+Date: 2026-08-25.
 
 | Scope              | Estado             | Evidencia                                      |
 | ------------------ | ------------------ | ---------------------------------------------- |
@@ -14,7 +14,8 @@ Date: 2026-08-23.
 | F04 / M04.4        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.4/CLOSURE_2026-08-21.md` |
 | F04 / M04.5        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.5/CLOSURE_2026-08-21.md` |
 | F04 / M04.6        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.6/CLOSURE_2026-08-23.md` |
-| F04 / M04.7        | ACTIVE             | `.ai/microphases/M04_7.md`                     |
+| F04 / M04.7        | COMPLETADA / GREEN | `.ai/evidence/F04/M04.7/CLOSURE_2026-08-25.md` |
+| F04 / M04.8        | ACTIVE             | `.ai/microphases/M04_8.md`                     |
 
 ## Cierre M04.1
 
@@ -60,6 +61,17 @@ Date: 2026-08-23.
 - Evidencia: `.ai/evidence/F04/M04.6/CLOSURE_2026-08-23.md`.
 - Blockers P0/P1: `0`.
 
+## Cierre M04.7
+
+- Source funcional: `aa39665f8f395087755a068dd52b0eed6a4b2b1e`.
+- PR `#46`; merge commit `b51242b889343daa7e86db7d9f167586abec1522`.
+- Gate dedicado `M04.7 Workspace Preferences Gate`: run `32811032183`, job `97690264341`, `success`.
+- `ElectroCraft Base CI`: run `32811032115`, job `97690264356`, `success`.
+- Persistencia PGlite/Drizzle compartida con el Worker multi-tab, saved layouts, sync entre tabs, reopen/round-trip y clamp móvil.
+- Geometría vigente: Sidebar `240/64`, Topbar `52`, Context `288`, Inspector `320`, Status `26`.
+- Evidencia: `.ai/evidence/F04/M04.7/CLOSURE_2026-08-25.md`.
+- Blockers P0/P1: `0`.
+
 ## Próxima microfase exacta
 
-`M04.7 — Workspace preferences`.
+`M04.8 — Construir Project Revision Checkpoints y Restore`.
