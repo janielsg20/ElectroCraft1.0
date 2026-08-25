@@ -1,5 +1,5 @@
 import { Button, Input, ScrollArea, getStudioIcon } from '@electrocraft/design-system';
-import { PuckEditorComponents, structuralPuckConfig, usePuckPaletteInsert } from '@electrocraft/editor-puck';
+import { PuckEditorComponents, usePuckPaletteInsert } from '@electrocraft/editor-puck';
 import { useMemo, useState, type KeyboardEvent } from 'react';
 import { paletteT } from '../i18n/palette.es';
 import {
@@ -17,6 +17,7 @@ import './palette-panel.css';
 const SearchIcon = getStudioIcon('studio.sidebar.queries');
 const PaletteIcon = getStudioIcon('studio.sidebar.components');
 const CloseIcon = getStudioIcon('window.close');
+const emptyComponentTypes: ReadonlySet<string> = new Set();
 
 function focusCanvas() {
   const canvas = document.querySelector<HTMLElement>('[data-editor-canvas-stage]');
@@ -138,12 +139,15 @@ function PaletteDiagnosticNotice({
   );
 }
 
-export function StudioPalette() {
+export interface StudioPaletteProps {
+  readonly availableComponentTypes?: ReadonlySet<string>;
+}
+
+export function StudioPalette({ availableComponentTypes = emptyComponentTypes }: StudioPaletteProps = {}) {
   const [query, setQuery] = useState('');
   const [diagnostic, setDiagnostic] = useState<PaletteDiagnostic | null>(null);
   const insertWithPuck = usePuckPaletteInsert();
   const { preferences, toggleFavorite, rememberRecent } = usePalettePreferences();
-  const availableComponentTypes = useMemo(() => new Set(Object.keys(structuralPuckConfig.components)), []);
   const results = useMemo(() => searchPaletteCatalog(query), [query]);
   const favorites = useMemo(() => new Set(preferences.favorites), [preferences.favorites]);
   const favoriteItems = useMemo(
