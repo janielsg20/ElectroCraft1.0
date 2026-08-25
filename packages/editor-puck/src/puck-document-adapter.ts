@@ -16,10 +16,7 @@ import {
 
 export type PuckEditorData = Data;
 export type PuckDocumentDiagnosticCode =
-  | 'unknown-component'
-  | 'unsupported-children'
-  | 'reserved-prop'
-  | 'unknown-puck-component';
+  'unknown-component' | 'unsupported-children' | 'reserved-prop' | 'unknown-puck-component';
 
 type CanonicalDiagnosticCode = Exclude<PuckDocumentDiagnosticCode, 'unknown-puck-component'>;
 
