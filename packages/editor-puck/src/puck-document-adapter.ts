@@ -47,7 +47,7 @@ export interface PuckDocumentAdapter {
   fromPuck(data: PuckEditorData, baseDocument: ElectroCraftDocument): PuckDocumentReconstruction;
 }
 
-const defaultSlots = Object.freeze({ Container: ELECTROCRAFT_PUCK_CHILDREN_SLOT });
+const defaultSlots: Readonly<Record<string, string>> = Object.freeze({ Container: ELECTROCRAFT_PUCK_CHILDREN_SLOT });
 
 function cloneCanonicalProps(props: Readonly<Record<string, JsonValue>>): Record<string, JsonValue> {
   return structuredClone(props);
@@ -103,7 +103,10 @@ function pushDiagnostic(
 
 export function createPuckDocumentAdapter(options: PuckDocumentAdapterOptions): PuckDocumentAdapter {
   const knownComponentRefs = new Set(options.knownComponentRefs);
-  const slotByComponentRef = Object.freeze({ ...defaultSlots, ...options.slotByComponentRef });
+  const slotByComponentRef: Readonly<Record<string, string>> = Object.freeze({
+    ...defaultSlots,
+    ...options.slotByComponentRef,
+  });
 
   function diagnosticComponent(
     node: ElectroCraftDocumentNode,
@@ -149,7 +152,7 @@ export function createPuckDocumentAdapter(options: PuckDocumentAdapterOptions): 
       return diagnosticComponent(node, diagnosticCode, children);
     }
 
-    const props: Record<string, unknown> = { id: node.id, ...cloneCanonicalProps(node.props) };
+    const props: ComponentData['props'] = { id: node.id, ...cloneCanonicalProps(node.props) };
     if (slot) props[slot] = children;
     return { type: node.componentRef, props };
   }
