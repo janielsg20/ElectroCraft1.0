@@ -3,6 +3,7 @@ import {
   inferProjectRevisionSource,
   summarizeProjectRevisionDiff,
   type ProjectObjectVersionReference,
+  type ProjectRecoveryCandidate,
   type ProjectRevisionActor,
   type ProjectRevisionHistoryEntry,
   type ProjectRevisionPort,
@@ -318,6 +319,31 @@ export function createDrizzleProjectRevisionRepository(db: StudioProjectDatabase
           });
         }),
       );
+    },
+
+    async findRecoveryCandidate(projectId: string): Promise<ProjectRecoveryCandidate | null> {
+      const rows = await db
+        .select()
+        .from(schema.projectRevisions)
+        .where(eq(schema.projectRevisions.projectId, projectId))
+        .orderBy(desc(schema.projectRevisions.createdAt), desc(schema.projectRevisions.id));
+
+      for (const row of rows) {
+        try {
+          const parsed = parseRevision(row);
+          await db.transaction((tx) => hydrateRevisionObjects(tx, parsed));
+          return Object.freeze({
+            projectId,
+            revisionId: parsed.revision.id,
+            reason: parsed.revision.reason,
+            createdAt: parsed.timestamp,
+            objectCount: parsed.entries.length,
+          });
+        } catch {
+          // Skip corrupt or incomplete revisions and keep searching for the newest restorable checkpoint.
+        }
+      }
+      return null;
     },
 
     async restoreRevision(projectId: string, revisionId: string): Promise<ProjectRevisionRestoreResult> {
