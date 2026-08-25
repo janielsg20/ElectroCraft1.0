@@ -134,6 +134,9 @@ describe('M04.8 project revisions with real PGlite', () => {
         ),
       );
       const broken = await revisions.saveRevision(PROJECT_ID);
+      await client.query("UPDATE project_revisions SET created_at = created_at + interval '1 second' WHERE id = $1", [
+        broken.id,
+      ]);
       const refs = await client.query<{ version_id: string }>(
         `SELECT item->>'versionId' AS version_id
          FROM project_revisions, jsonb_array_elements(manifest->'objects') AS item
