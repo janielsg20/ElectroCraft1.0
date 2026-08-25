@@ -1,6 +1,7 @@
 import {
   type NormalizedIncrementalSaveProjectRequest,
   type NormalizedSaveProjectRequest,
+  type ProjectRevisionPort,
   type ProjectStorageCoordinationDiagnostics,
   type ProjectStorageDiagnostics,
   type ProjectStoragePort,
@@ -13,6 +14,7 @@ import type { PGlite } from '@electric-sql/pglite';
 import { PGliteWorker } from '@electric-sql/pglite/worker';
 import { drizzle } from 'drizzle-orm/pglite';
 import { applyStudioStorageMigrations } from './migration';
+import { createDrizzleProjectRevisionRepository } from './project-revision-repository';
 import { createDrizzleProjectRepository } from './repository';
 import * as schema from './schema';
 import { STUDIO_STORAGE_SCHEMA_VERSION } from './schema-contract';
@@ -31,6 +33,7 @@ export interface BrowserProjectStorageOptions {
 }
 
 export interface BrowserProjectStoragePort extends ProjectStoragePort {
+  readonly revisions: ProjectRevisionPort;
   readonly workspacePreferences: WorkspacePreferencesStoragePort;
 }
 
@@ -156,6 +159,7 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
   const clientId = createStorageClientId();
   let runtime: BrowserStorageClient | null = null;
   let repository: ReturnType<typeof createDrizzleProjectRepository> | null = null;
+  let revisionRepository: ReturnType<typeof createDrizzleProjectRevisionRepository> | null = null;
   let workspacePreferencesRepository: ReturnType<typeof createDrizzleWorkspacePreferencesRepository> | null = null;
   let initializePromise: Promise<ProjectStorageDiagnostics> | null = null;
   let unsubscribeLeaderChange: (() => void) | null = null;
@@ -251,7 +255,7 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
   }
 
   async function initialize() {
-    if (runtime && repository && workspacePreferencesRepository) return getDiagnostics();
+    if (runtime && repository && revisionRepository && workspacePreferencesRepository) return getDiagnostics();
     if (initializePromise) return initializePromise;
 
     initializePromise = (async () => {
@@ -287,6 +291,7 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
         await verifyStudioStorageHealth(runtime.client);
         const db = createWorkerDrizzleDatabase(runtime.client);
         repository = createDrizzleProjectRepository(db);
+        revisionRepository = createDrizzleProjectRevisionRepository(db);
         workspacePreferencesRepository = createDrizzleWorkspacePreferencesRepository(db);
 
         unsubscribeLeaderChange = runtime.client.onLeaderChange(() => {
@@ -319,6 +324,7 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
         const failedRuntime = runtime;
         runtime = null;
         repository = null;
+        revisionRepository = null;
         workspacePreferencesRepository = null;
         await failedRuntime?.client.close().catch(() => undefined);
         closeLeaderSignalChannel();
@@ -343,6 +349,12 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
     if (!repository) await initialize();
     if (!repository) throw new Error(diagnostics.message);
     return repository;
+  }
+
+  async function ensureRevisionRepository() {
+    if (!revisionRepository) await initialize();
+    if (!revisionRepository) throw new Error(diagnostics.message);
+    return revisionRepository;
   }
 
   async function ensureWorkspacePreferencesRepository() {
@@ -389,6 +401,44 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
     }
   }
 
+  async function persistRevisionOperation<T>(
+    operation: (repo: NonNullable<typeof revisionRepository>) => Promise<T>,
+  ): Promise<T> {
+    const repo = await ensureRevisionRepository();
+    diagnostics = Object.freeze({ ...diagnostics, state: 'saving', message: 'Guardando revisión…' });
+    try {
+      const result = await operation(repo);
+      diagnostics = Object.freeze({
+        ...diagnostics,
+        state: 'saved',
+        lifecyclePhase: 'ready',
+        coordination: coordination(),
+        message: 'Revisión guardada.',
+      });
+      return result;
+    } catch (error) {
+      diagnostics = Object.freeze({
+        ...diagnostics,
+        state: 'error',
+        coordination: coordination(),
+        message: error instanceof Error ? error.message : 'No se pudo guardar la revisión.',
+      });
+      throw error;
+    }
+  }
+
+  const revisions: ProjectRevisionPort = Object.freeze({
+    createCheckpoint(projectId: string, reason: string) {
+      return persistRevisionOperation((repo) => repo.createCheckpoint(projectId, reason));
+    },
+    async listRevisionHistory(projectId: string) {
+      return (await ensureRevisionRepository()).listRevisionHistory(projectId);
+    },
+    restoreRevision(projectId: string, revisionId: string) {
+      return persistRevisionOperation((repo) => repo.restoreRevision(projectId, revisionId));
+    },
+  });
+
   const workspacePreferences: WorkspacePreferencesStoragePort = Object.freeze({
     async read(workspaceId: string, key: string) {
       return (await ensureWorkspacePreferencesRepository()).read(workspaceId, key);
@@ -403,6 +453,7 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
   });
 
   return Object.freeze({
+    revisions,
     workspacePreferences,
     initialize,
     saveProject: (request: NormalizedSaveProjectRequest) => persistOperation((repo) => repo.saveProject(request)),
@@ -463,6 +514,7 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
       await runtime?.client.close();
       runtime = null;
       repository = null;
+      revisionRepository = null;
       workspacePreferencesRepository = null;
       closeLeaderSignalChannel();
       diagnostics = Object.freeze({

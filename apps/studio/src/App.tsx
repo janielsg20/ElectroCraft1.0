@@ -41,11 +41,15 @@ const projectHomeRoute = Object.freeze({
 
 const designSystemRoute = '/__design-system';
 const editorRoute = '/editor';
+const historyRoute = '/history';
 const contentRoute = '/content';
 const canonicalEmptyModuleRoutes = new Set(['/queries', '/forms', '/admin', '/media', '/export']);
 
 const ProjectHome = lazy(() =>
   import('./features/projects/project-home').then((module) => ({ default: module.ProjectHome })),
+);
+const RevisionHistoryPanel = lazy(() =>
+  import('./features/projects/revision-history-panel').then((module) => ({ default: module.RevisionHistoryPanel })),
 );
 const StudioEditorWorkspace = lazy(() =>
   import('./shell/editor-workspace').then((module) => ({ default: module.StudioEditorWorkspace })),
@@ -177,6 +181,44 @@ function WorkspaceAwareEditor() {
   );
 }
 
+function ProjectRevisionHistoryRoute() {
+  const preferences = useSyncExternalStore(
+    workspacePreferencesRuntime.subscribe,
+    workspacePreferencesRuntime.getSnapshot,
+    workspacePreferencesRuntime.getSnapshot,
+  );
+  const projectId = projectStorageRuntime.currentProjectId() ?? preferences.layout.lastDocumentId;
+  const preferenceState = workspacePreferencesRuntime.getPersistenceState();
+
+  if (!projectId) {
+    return (
+      <section className="ec-project-history-route-empty" data-revision-history-route-empty>
+        <h1>Historial de versiones</h1>
+        <p>
+          {preferenceState === 'loading'
+            ? 'Recuperando el último proyecto abierto…'
+            : 'Abre un proyecto para consultar o restaurar sus revisiones persistentes.'}
+        </p>
+        {preferenceState !== 'loading' ? <a href="/">Volver a Proyectos</a> : null}
+      </section>
+    );
+  }
+
+  return (
+    <section className="ec-project-history-route" data-revision-history-route data-project-id={projectId}>
+      <nav aria-label="Navegación del historial">
+        <a href={editorRoute}>← Volver al editor</a>
+      </nav>
+      <RevisionHistoryPanel
+        projectId={projectId}
+        onRestored={async () => {
+          await projectStorageRuntime.openProject(projectId);
+        }}
+      />
+    </section>
+  );
+}
+
 function StudioWorkspaceBootstrap({
   pathname,
   health,
@@ -235,6 +277,13 @@ function StudioWorkspaceBootstrap({
 }
 
 function resolveStudioWorkspace(pathname: string, health: ReturnType<typeof evaluateStudioBootstrapHealth>) {
+  if (pathname === historyRoute) {
+    return (
+      <Suspense fallback={<StudioRouteSkeleton kind="generic" label="Cargando historial" />}>
+        <ProjectRevisionHistoryRoute />
+      </Suspense>
+    );
+  }
   if (pathname === editorRoute) {
     return (
       <Suspense fallback={<StudioRouteSkeleton kind="editor" label="Cargando editor" />}>
