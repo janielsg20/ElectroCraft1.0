@@ -1,5 +1,5 @@
 import { Button, Input, ScrollArea, getStudioIcon } from '@electrocraft/design-system';
-import { PuckEditorComponents, usePuckPaletteInsert } from '@electrocraft/editor-puck';
+import { PuckEditorComponents, usePuckEditorConfig, usePuckPaletteInsert } from '@electrocraft/editor-puck';
 import { useMemo, useState, type KeyboardEvent } from 'react';
 import { paletteT } from '../i18n/palette.es';
 import {
@@ -12,12 +12,12 @@ import {
   type PaletteItemDescriptor,
 } from './palette-catalog';
 import { usePalettePreferences } from './palette-preferences';
+import '../features/editor/puck-composition.css';
 import './palette-panel.css';
 
 const SearchIcon = getStudioIcon('studio.sidebar.queries');
 const PaletteIcon = getStudioIcon('studio.sidebar.components');
 const CloseIcon = getStudioIcon('window.close');
-const emptyComponentTypes: ReadonlySet<string> = new Set();
 
 function focusCanvas() {
   const canvas = document.querySelector<HTMLElement>('[data-editor-canvas-stage]');
@@ -143,11 +143,16 @@ export interface StudioPaletteProps {
   readonly availableComponentTypes?: ReadonlySet<string>;
 }
 
-export function StudioPalette({ availableComponentTypes = emptyComponentTypes }: StudioPaletteProps = {}) {
+export function StudioPalette({ availableComponentTypes }: StudioPaletteProps = {}) {
   const [query, setQuery] = useState('');
   const [diagnostic, setDiagnostic] = useState<PaletteDiagnostic | null>(null);
+  const activePuckConfig = usePuckEditorConfig();
   const insertWithPuck = usePuckPaletteInsert();
   const { preferences, toggleFavorite, rememberRecent } = usePalettePreferences();
+  const effectiveComponentTypes = useMemo(
+    () => availableComponentTypes ?? new Set(Object.keys(activePuckConfig.components)),
+    [activePuckConfig, availableComponentTypes],
+  );
   const results = useMemo(() => searchPaletteCatalog(query), [query]);
   const favorites = useMemo(() => new Set(preferences.favorites), [preferences.favorites]);
   const favoriteItems = useMemo(
@@ -161,7 +166,7 @@ export function StudioPalette({ availableComponentTypes = emptyComponentTypes }:
   );
 
   const insert = (descriptor: PaletteItemDescriptor) => {
-    const resolution = resolvePaletteInsert(descriptor, availableComponentTypes);
+    const resolution = resolvePaletteInsert(descriptor, effectiveComponentTypes);
     if (resolution.status === 'blocked') {
       setDiagnostic(resolution.diagnostic);
       rememberRecent(descriptor.id);
@@ -200,6 +205,7 @@ export function StudioPalette({ availableComponentTypes = emptyComponentTypes }:
       className="ec-palette"
       aria-label={paletteT('studio.palette.title')}
       data-studio-palette
+      data-puck-active-components={effectiveComponentTypes.size}
       onKeyDown={onPanelKeyDown}
     >
       <header className="ec-palette-header">
