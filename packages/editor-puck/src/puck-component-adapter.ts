@@ -1,9 +1,6 @@
 import type { ComponentConfig, Config, Field } from '@puckeditor/core';
 import type { ElectroCraftComponentDefinition, ElectroCraftComponentField } from '@electrocraft/domain';
-import {
-  ELECTROCRAFT_PUCK_CHILDREN_SLOT,
-  ELECTROCRAFT_PUCK_DIAGNOSTIC_COMPONENT,
-} from './puck-adapter-contract';
+import { ELECTROCRAFT_PUCK_CHILDREN_SLOT, ELECTROCRAFT_PUCK_DIAGNOSTIC_COMPONENT } from './puck-adapter-contract';
 
 export type PuckCanonicalProps = Record<string, unknown>;
 export type PuckCanonicalComponentConfig = ComponentConfig<PuckCanonicalProps>;

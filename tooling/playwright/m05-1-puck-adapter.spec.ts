@@ -9,7 +9,7 @@ test.describe('M05.1 Puck adapter browser contract', () => {
       const result = await page.evaluate(async () => {
         const { createStudioPuckDocumentSession } = await import('/src/features/editor/puck-document-session.ts');
         const { createStudioPuckDocumentPersistenceBridge } = await import(
-          '/src/features/editor/puck-document-persistence.ts'
+          '/src/features/editor/puck-document-persistence.ts',
         );
         const { projectStorageRuntime } = await import('/src/features/projects/project-storage-runtime.ts');
         const projectId = crypto.randomUUID();

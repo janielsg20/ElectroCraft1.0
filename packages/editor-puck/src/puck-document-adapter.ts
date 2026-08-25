@@ -21,6 +21,8 @@ export type PuckDocumentDiagnosticCode =
   | 'reserved-prop'
   | 'unknown-puck-component';
 
+type CanonicalDiagnosticCode = Exclude<PuckDocumentDiagnosticCode, 'unknown-puck-component'>;
+
 export interface PuckDocumentDiagnostic {
   readonly code: PuckDocumentDiagnosticCode;
   readonly nodeId: string;
@@ -76,7 +78,8 @@ function diagnosticMessage(code: PuckDocumentDiagnosticCode, componentRef: strin
 }
 
 function hasLegacyZoneContent(data: PuckEditorData) {
-  return data.zones ? Object.values(data.zones).some((zone) => zone.length > 0) : false;
+  if (!data.zones) return false;
+  return Object.values(data.zones).some((zone) => zone.length > 0);
 }
 
 function currentRootProps(data: PuckEditorData): Record<string, unknown> {
@@ -87,13 +90,27 @@ function currentRootProps(data: PuckEditorData): Record<string, unknown> {
   return root.props;
 }
 
+function pushDiagnostic(
+  diagnostics: PuckDocumentDiagnostic[],
+  code: PuckDocumentDiagnosticCode,
+  nodeId: string,
+  componentRef: string,
+) {
+  diagnostics.push({
+    code,
+    nodeId,
+    componentRef,
+    message: diagnosticMessage(code, componentRef),
+  });
+}
+
 export function createPuckDocumentAdapter(options: PuckDocumentAdapterOptions): PuckDocumentAdapter {
   const knownComponentRefs = new Set(options.knownComponentRefs);
   const slotByComponentRef = Object.freeze({ ...defaultSlots, ...options.slotByComponentRef });
 
   function diagnosticComponent(
     node: ElectroCraftDocumentNode,
-    code: Exclude<PuckDocumentDiagnosticCode, 'unknown-puck-component'>,
+    code: CanonicalDiagnosticCode,
     children: ComponentData[],
   ): ComponentData {
     return {
@@ -120,7 +137,7 @@ export function createPuckDocumentAdapter(options: PuckDocumentAdapterOptions): 
 
     const children = node.children.map((child) => projectNode(child, diagnostics, seenIds));
     const slot = slotByComponentRef[node.componentRef];
-    let diagnosticCode: Exclude<PuckDocumentDiagnosticCode, 'unknown-puck-component'> | null = null;
+    let diagnosticCode: CanonicalDiagnosticCode | null = null;
 
     if (!knownComponentRefs.has(node.componentRef)) {
       diagnosticCode = 'unknown-component';
@@ -131,18 +148,44 @@ export function createPuckDocumentAdapter(options: PuckDocumentAdapterOptions): 
     }
 
     if (diagnosticCode) {
-      diagnostics.push({
-        code: diagnosticCode,
-        nodeId: node.id,
-        componentRef: node.componentRef,
-        message: diagnosticMessage(diagnosticCode, node.componentRef),
-      });
+      pushDiagnostic(diagnostics, diagnosticCode, node.id, node.componentRef);
       return diagnosticComponent(node, diagnosticCode, children);
     }
 
     const props: Record<string, unknown> = { id: node.id, ...cloneCanonicalProps(node.props) };
     if (slot) props[slot] = children;
     return { type: node.componentRef, props };
+  }
+
+  function reconstructDiagnostic(
+    props: Record<string, unknown>,
+    id: string,
+    diagnostics: PuckDocumentDiagnostic[],
+    seenIds: Set<string>,
+  ): ElectroCraftDocumentNode {
+    const componentRef = stringProp(props, ELECTROCRAFT_PUCK_DIAGNOSTIC_REF_PROP);
+    const originalProps = props[ELECTROCRAFT_PUCK_DIAGNOSTIC_PROPS_PROP];
+    const rawChildren = props[ELECTROCRAFT_PUCK_CHILDREN_SLOT] ?? [];
+
+    if (!componentRef || !isRecord(originalProps) || !Array.isArray(rawChildren)) {
+      throw new TypeError(`invalid ElectroCraft diagnostic component: ${id}`);
+    }
+
+    const codeValue = props[ELECTROCRAFT_PUCK_DIAGNOSTIC_CODE_PROP];
+    let code: CanonicalDiagnosticCode = 'unknown-component';
+    if (codeValue === 'unsupported-children' || codeValue === 'reserved-prop') {
+      code = codeValue;
+    }
+
+    pushDiagnostic(diagnostics, code, id, componentRef);
+    const children = rawChildren.map((child) => reconstructNode(child as ComponentData, diagnostics, seenIds));
+
+    return electroCraftDocumentNodeSchema.parse({
+      id,
+      componentRef,
+      props: structuredClone(originalProps),
+      children,
+    });
   }
 
   function reconstructNode(
@@ -153,49 +196,35 @@ export function createPuckDocumentAdapter(options: PuckDocumentAdapterOptions): 
     if (!isRecord(component.props)) {
       throw new TypeError(`Puck component props must be an object: ${String(component.type)}`);
     }
+
     const props = component.props;
     const id = stringProp(props, 'id');
-    if (!id) throw new TypeError(`Puck component is missing a stable id: ${String(component.type)}`);
-    if (seenIds.has(id)) throw new TypeError(`duplicate Puck component id: ${id}`);
+    if (!id) {
+      throw new TypeError(`Puck component is missing a stable id: ${String(component.type)}`);
+    }
+    if (seenIds.has(id)) {
+      throw new TypeError(`duplicate Puck component id: ${id}`);
+    }
     seenIds.add(id);
 
     if (component.type === ELECTROCRAFT_PUCK_DIAGNOSTIC_COMPONENT) {
-      const componentRef = stringProp(props, ELECTROCRAFT_PUCK_DIAGNOSTIC_REF_PROP);
-      const originalProps = props[ELECTROCRAFT_PUCK_DIAGNOSTIC_PROPS_PROP];
-      const rawChildren = props[ELECTROCRAFT_PUCK_CHILDREN_SLOT] ?? [];
-      if (!componentRef || !isRecord(originalProps) || !Array.isArray(rawChildren)) {
-        throw new TypeError(`invalid ElectroCraft diagnostic component: ${id}`);
-      }
-      const codeValue = props[ELECTROCRAFT_PUCK_DIAGNOSTIC_CODE_PROP];
-      const code: PuckDocumentDiagnosticCode =
-        codeValue === 'unsupported-children' || codeValue === 'reserved-prop' ? codeValue : 'unknown-component';
-      diagnostics.push({ code, nodeId: id, componentRef, message: diagnosticMessage(code, componentRef) });
-      return electroCraftDocumentNodeSchema.parse({
-        id,
-        componentRef,
-        props: structuredClone(originalProps),
-        children: rawChildren.map((child) => reconstructNode(child as ComponentData, diagnostics, seenIds)),
-      });
+      return reconstructDiagnostic(props, id, diagnostics, seenIds);
     }
 
     const componentRef = String(component.type);
     const slot = slotByComponentRef[componentRef];
     let rawChildren: unknown = slot ? props[slot] : undefined;
-    let unknownComponent = false;
-    if (!knownComponentRefs.has(componentRef)) {
-      unknownComponent = true;
-      rawChildren = Array.isArray(props[ELECTROCRAFT_PUCK_CHILDREN_SLOT])
-        ? props[ELECTROCRAFT_PUCK_CHILDREN_SLOT]
-        : [];
-      diagnostics.push({
-        code: 'unknown-puck-component',
-        nodeId: id,
-        componentRef,
-        message: diagnosticMessage('unknown-puck-component', componentRef),
-      });
+    const unknownComponent = !knownComponentRefs.has(componentRef);
+
+    if (unknownComponent) {
+      const fallbackChildren = props[ELECTROCRAFT_PUCK_CHILDREN_SLOT];
+      rawChildren = Array.isArray(fallbackChildren) ? fallbackChildren : [];
+      pushDiagnostic(diagnostics, 'unknown-puck-component', id, componentRef);
     }
+
     if (rawChildren !== undefined && !Array.isArray(rawChildren)) {
-      throw new TypeError(`Puck slot ${componentRef}.${slot ?? ELECTROCRAFT_PUCK_CHILDREN_SLOT} must be an array`);
+      const slotName = slot ?? ELECTROCRAFT_PUCK_CHILDREN_SLOT;
+      throw new TypeError(`Puck slot ${componentRef}.${slotName} must be an array`);
     }
 
     const canonicalProps: Record<string, unknown> = {};
@@ -206,11 +235,13 @@ export function createPuckDocumentAdapter(options: PuckDocumentAdapterOptions): 
       canonicalProps[key] = structuredClone(value);
     }
 
+    const children = (rawChildren ?? []).map((child) => reconstructNode(child as ComponentData, diagnostics, seenIds));
+
     return electroCraftDocumentNodeSchema.parse({
       id,
       componentRef,
       props: canonicalProps,
-      children: (rawChildren ?? []).map((child) => reconstructNode(child as ComponentData, diagnostics, seenIds)),
+      children,
     });
   }
 
@@ -220,6 +251,7 @@ export function createPuckDocumentAdapter(options: PuckDocumentAdapterOptions): 
       const diagnostics: PuckDocumentDiagnostic[] = [];
       const seenIds = new Set<string>([canonical.root.id]);
       const content = canonical.root.children.map((child) => projectNode(child, diagnostics, seenIds));
+
       return Object.freeze({
         data: { content, root: { props: cloneCanonicalProps(canonical.root.props) } },
         diagnostics: Object.freeze(diagnostics),
@@ -232,6 +264,7 @@ export function createPuckDocumentAdapter(options: PuckDocumentAdapterOptions): 
       if (!Array.isArray(data.content)) {
         throw new TypeError('Puck data content must be an array');
       }
+
       const base = electroCraftDocumentSchema.parse(baseDocument);
       const diagnostics: PuckDocumentDiagnostic[] = [];
       const seenIds = new Set<string>([base.root.id]);
@@ -242,6 +275,7 @@ export function createPuckDocumentAdapter(options: PuckDocumentAdapterOptions): 
         children,
       });
       const document = electroCraftDocumentSchema.parse({ ...base, root });
+
       return Object.freeze({ document, diagnostics: Object.freeze(diagnostics) });
     },
   });
