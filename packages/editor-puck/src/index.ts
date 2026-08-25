@@ -1,7 +1,9 @@
 import { packageDescriptor as dep0 } from '@electrocraft/domain';
 import { packageDescriptor as dep1 } from '@electrocraft/application';
 
+export * from './puck-adapter-contract';
 export * from './puck-component-adapter';
+export * from './puck-document-adapter';
 export * from './puck-editor-composition';
 
 export const packageDescriptor = Object.freeze({

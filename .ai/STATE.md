@@ -6,8 +6,27 @@
 - F01 — Monorepo, límites, documentación y CI: `COMPLETADA`; Gate `GREEN`.
 - F02 — Modelo canónico del proyecto: `COMPLETADA`; Gate `GREEN`.
 - F03 — Design System, AppShell, español y ayuda: `COMPLETADA`; Gate `GREEN`.
+- M03.1 — Design System del Studio: `COMPLETADA`; Gate `GREEN`.
+- M03.2 — AppShell base del Studio: `COMPLETADA`; Gate `GREEN`.
+- M03.3 — Sidebar global: `COMPLETADA`; Gate `GREEN`.
+- M03.4 — Topbar global + Settings: `COMPLETADA`; Gate `GREEN`.
+- M03.5 — Context / Canvas / Inspector / Status: `COMPLETADA`; Gate `GREEN`.
+- M03.6 — AppShell y editor responsive: `COMPLETADA`; Gate `GREEN`.
+- M03.7 — Progressive Disclosure y arquitectura de información: `COMPLETADA`; Gate `GREEN`.
+- M03.8 — Palette descubrible: `COMPLETADA`; Gate `GREEN`.
+- M03.9 — Apariencia del Studio Editor: `COMPLETADA`; Gate `GREEN`.
+- M03.10 — Infraestructura español-primero e i18n tipado: `COMPLETADA`; Gate `GREEN`.
+- M03.11 — Sistema de ayuda contextual: `COMPLETADA`; Gate `GREEN`.
+- M03.12 — E2E AppShell completo: `COMPLETADA`; Gate `GREEN`.
 - F04 — Persistencia local, proyectos y revisiones: `COMPLETADA`; Gate `GREEN`.
-- M04.1–M04.8: `COMPLETADAS / GREEN`.
+- M04.1 — Schema físico estable con PGlite/Drizzle + storage browser: `COMPLETADA`; Gate `GREEN`.
+- M04.2 — Inicializar PGlite Multi-Tab Worker y migrations: `COMPLETADA`; Gate `GREEN`.
+- M04.3 — Persistencia incremental, autosave y recovery: `COMPLETADA`; Gate `GREEN`.
+- M04.4 — Project Home real: `COMPLETADA`; Gate `GREEN`.
+- M04.5 — New Project Wizard y project actions: `COMPLETADA`; Gate `GREEN`.
+- M04.6 — Import/Backup/Restore: `COMPLETADA`; Gate `GREEN`.
+- M04.7 — Workspace preferences: `COMPLETADA`; Gate `GREEN`.
+- M04.8 — Project Revision Checkpoints y Restore: `COMPLETADA`; Gate `GREEN`.
 - F05 — Screen Composer con Puck: `IN_PROGRESS`.
 - M05.1 — Crear PuckAdapter y component mapping: `ACTIVE`.
 - Blockers P0/P1 funcionales conocidos: `0`.
