@@ -28,7 +28,8 @@
 - M04.7 — Workspace preferences: `COMPLETADA`; Gate `GREEN`.
 - M04.8 — Project Revision Checkpoints y Restore: `COMPLETADA`; Gate `GREEN`.
 - F05 — Screen Composer con Puck: `IN_PROGRESS`.
-- M05.1 — Crear PuckAdapter y component mapping: `ACTIVE`.
+- M05.1 — Crear PuckAdapter y component mapping: `COMPLETADA`; Gate `GREEN`.
+- M05.2 — Componer Components/Outline/Preview/Fields: `ACTIVE`.
 - Blockers P0/P1 funcionales conocidos: `0`.
 
 ## Cierre F04 / M04.8
@@ -39,8 +40,14 @@ La PR `#48` fue fusionada mediante squash a `main` en `ad64c0e5468b13a3fa3a712ad
 
 El workflow dedicado de M04.7 se archiva tras el cierre de F04; el quality gate transversal continúa siendo `.github/workflows/ci.yml`.
 
+## Cierre F05 / M05.1
+
+M05.1 cerró sobre head `9aa330dbf44b39485516ee0d3dc181a9aee4196b` y PR `#49`. `ElectroCraft Base CI` run `32868029914` (#656) terminó `success` con documentación, lint/Prettier, typecheck, tests, build, Playwright repository gate, empty repository fixture y artifacts base en GREEN.
+
+La PR `#49` fue fusionada mediante squash a `main` en `733abdc44f21d16b56b4624c7bec61f0131bd3f1` (`feat(f05): add canonical Puck adapter and component mapping`). El adapter canónico preserva IDs/nesting, mantiene diagnostics recuperables, rechaza internals legacy no portables y mantiene el historial del editor separado de Project Revisions.
+
 ## Microfase activa
 
-`M05.1` — Crear PuckAdapter y component mapping.
+`M05.2` — Componer Components/Outline/Preview/Fields.
 
-Referencias: `.ai/microphases/M05_1.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
+Referencias: `.ai/microphases/M05_2.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
