@@ -79,6 +79,13 @@ describe('M04.8 project revisions with real PGlite', () => {
       const second = historyBeforeRestore.find((entry) => entry.revisionId === secondManual.id);
       expect(second?.diff).toMatchObject({ changed: 1, added: 0, removed: 0, unchanged: 1 });
 
+      const recovery = await revisions.recoveryCandidate(PROJECT_ID);
+      expect(recovery).toMatchObject({
+        projectId: PROJECT_ID,
+        revisionId: secondManual.id,
+        objectCount: 2,
+      });
+
       const restored = await revisions.restore(PROJECT_ID, firstManual.id);
       expect(restored.restoredFromRevisionId).toBe(firstManual.id);
       expect(restored.safetyRevisionId).not.toBe(firstManual.id);
@@ -99,6 +106,49 @@ describe('M04.8 project revisions with real PGlite', () => {
         [PROJECT_ID],
       );
       expect(versionRows.rows).toEqual([{ count: '3' }]);
+    } finally {
+      await client.close();
+    }
+  });
+
+  it('skips a broken newest revision and returns the next restorable checkpoint', async () => {
+    const client = await PGlite.create('memory://');
+    try {
+      await applyStudioStorageMigrations(client);
+      const db = drizzle(client, { schema: storageSchema });
+      const projects = createDrizzleProjectRepository(db);
+      const revisionRepository = createDrizzleProjectRevisionRepository(db);
+      const revisions = createProjectRevisionService(revisionRepository);
+
+      await projects.saveProject(initialRequest());
+      const stable = await revisions.saveRevision(PROJECT_ID);
+      await projects.saveProjectIncremental(
+        normalizeIncrementalSaveProjectRequest(
+          {
+            project: { id: PROJECT_ID, name: 'Proyecto revisiones', metadata: {} },
+            dirtyObjects: [
+              { objectId: 'screen-home', kind: 'screen', schemaVersion: 1, payload: { title: 'Inicio roto' } },
+            ],
+          },
+          '2026-08-24T20:10:00.000Z',
+        ),
+      );
+      const broken = await revisions.saveRevision(PROJECT_ID);
+      const refs = await client.query<{ version_id: string }>(
+        `SELECT item->>'versionId' AS version_id
+         FROM project_revisions, jsonb_array_elements(manifest->'objects') AS item
+         WHERE id = $1 AND item->>'objectId' = 'screen-home'`,
+        [broken.id],
+      );
+      await client.query('DELETE FROM project_object_versions WHERE project_id = $1 AND version_id = $2', [
+        PROJECT_ID,
+        refs.rows[0]!.version_id,
+      ]);
+
+      await expect(revisions.recoveryCandidate(PROJECT_ID)).resolves.toMatchObject({
+        revisionId: stable.id,
+        objectCount: 2,
+      });
     } finally {
       await client.close();
     }
