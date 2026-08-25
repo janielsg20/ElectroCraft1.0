@@ -1,4 +1,5 @@
 import type {
+  ProjectRecoveryCandidate,
   ProjectRevisionManifestEntry,
   ProjectStorageRevision,
 } from './project-storage';
@@ -60,6 +61,7 @@ export interface ProjectRevisionRestoreResult {
 export interface ProjectRevisionPort {
   createCheckpoint(projectId: string, reason: string): Promise<ProjectStorageRevision>;
   listRevisionHistory(projectId: string): Promise<readonly ProjectRevisionHistoryEntry[]>;
+  findRecoveryCandidate(projectId: string): Promise<ProjectRecoveryCandidate | null>;
   restoreRevision(projectId: string, revisionId: string): Promise<ProjectRevisionRestoreResult>;
 }
 
@@ -151,6 +153,9 @@ export function createProjectRevisionService(port: ProjectRevisionPort) {
     },
     checkpoint(projectId: string, reason: string) {
       return port.createCheckpoint(requireNonEmpty(projectId, 'projectId'), requireNonEmpty(reason, 'reason'));
+    },
+    recoveryCandidate(projectId: string) {
+      return port.findRecoveryCandidate(requireNonEmpty(projectId, 'projectId'));
     },
     saveRevision(projectId: string) {
       return port.createCheckpoint(requireNonEmpty(projectId, 'projectId'), 'manual');
