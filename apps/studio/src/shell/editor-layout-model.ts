@@ -1,7 +1,7 @@
 export const editorPaneContract = Object.freeze({
   context: Object.freeze({ defaultSize: 288, minSize: 240, maxSize: 380 }),
   inspector: Object.freeze({ defaultSize: 320, minSize: 280, maxSize: 440 }),
-  statusHeight: 24,
+  statusHeight: 26,
 });
 
 export const responsiveEditorContract = Object.freeze({

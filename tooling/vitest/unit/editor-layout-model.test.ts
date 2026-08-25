@@ -6,7 +6,7 @@ describe('M03.5 editor layout model', () => {
   it('keeps the exact pane contract', () => {
     expect(editorPaneContract.context).toEqual({ defaultSize: 288, minSize: 240, maxSize: 380 });
     expect(editorPaneContract.inspector).toEqual({ defaultSize: 320, minSize: 280, maxSize: 440 });
-    expect(editorPaneContract.statusHeight).toBe(24);
+    expect(editorPaneContract.statusHeight).toBe(26);
   });
 
   it('resolves the required responsive bands', () => {
