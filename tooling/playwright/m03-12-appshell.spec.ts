@@ -62,7 +62,7 @@ test.describe('M03.12 AppShell E2E closure matrix', () => {
       const sidebar = page.locator('.ec-app-shell-sidebar');
       if (viewport.mode === 'desktop') {
         await expect(sidebar).toBeVisible();
-        expect(Math.round((await sidebar.boundingBox())?.width ?? 0)).toBe(256);
+        expect(Math.round((await sidebar.boundingBox())?.width ?? 0)).toBe(240);
         await expect(page.locator('[data-editor-region="context"]')).toBeVisible();
         await expect(page.locator('[data-editor-region="canvas"]')).toBeVisible();
         await expect(page.locator('[data-editor-region="inspector"]')).toBeVisible();

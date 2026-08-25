@@ -26,7 +26,7 @@ test.describe('M03.4 Topbar global + Settings', () => {
     await settings.click();
     const dialog = page.getByRole('dialog', { name: 'Configuración' });
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByText('Espacio de trabajo')).toBeVisible();
+    await expect(dialog.getByRole('heading', { name: 'Espacio de trabajo' })).toBeVisible();
 
     await dialog.getByRole('button', { name: 'Contraer' }).click();
     await expect(page.locator('.ec-app-shell')).toHaveAttribute('data-sidebar-collapsed', 'true');

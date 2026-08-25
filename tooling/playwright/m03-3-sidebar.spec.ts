@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 const groupLabels = ['Construir', 'Datos', 'Lógica', 'App', 'Recursos', 'Apariencia', 'Publicar'] as const;
 
 test.describe('M03.3 Sidebar global', () => {
-  test('renders exact groups, active item and 256 to 64 collapse on desktop', async ({ page }) => {
+  test('renders exact groups, active item and 240 to 64 collapse on desktop', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto('/editor');
 
@@ -13,7 +13,7 @@ test.describe('M03.3 Sidebar global', () => {
 
     for (const group of groupLabels) await expect(page.getByText(group, { exact: true })).toBeVisible();
     await expect(editor).toHaveAttribute('aria-current', 'page');
-    expect((await sidebar.boundingBox())?.width).toBe(256);
+    expect((await sidebar.boundingBox())?.width).toBe(240);
 
     await page.getByRole('button', { name: 'Contraer barra lateral' }).click();
     await expect(shell).toHaveAttribute('data-sidebar-collapsed', 'true');
@@ -25,7 +25,7 @@ test.describe('M03.3 Sidebar global', () => {
 
     await page.getByRole('button', { name: 'Expandir barra lateral' }).click();
     await expect(shell).toHaveAttribute('data-sidebar-collapsed', 'false');
-    expect((await sidebar.boundingBox())?.width).toBe(256);
+    expect((await sidebar.boundingBox())?.width).toBe(240);
   });
 
   test('tracks the active destination through pathname semantics', async ({ page }) => {
