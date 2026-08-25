@@ -52,7 +52,9 @@ export function RevisionHistoryPanel({
     try {
       const next = await projectStorageRuntime.listRevisionHistory(projectId);
       setEntries(next);
-      setSelectedId((current) => (current && next.some((entry) => entry.revisionId === current) ? current : next[0]?.revisionId ?? null));
+      setSelectedId((current) =>
+        current && next.some((entry) => entry.revisionId === current) ? current : (next[0]?.revisionId ?? null),
+      );
       setState('ready');
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'No se pudo cargar el historial de versiones.');

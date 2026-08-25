@@ -86,7 +86,9 @@ describe('M04.8 project revisions with real PGlite', () => {
       expect(restored.currentRevision.reason).toBe(`restore:${firstManual.id}`);
 
       const opened = await projects.openProject(PROJECT_ID);
-      expect(opened?.objects.find((object) => object.objectId === 'screen-home')?.payload).toEqual({ title: 'Inicio v1' });
+      expect(opened?.objects.find((object) => object.objectId === 'screen-home')?.payload).toEqual({
+        title: 'Inicio v1',
+      });
 
       const historyAfterRestore = await revisions.list(PROJECT_ID);
       expect(historyAfterRestore[0]?.source).toBe('restore');

@@ -1,7 +1,4 @@
-import type {
-  ProjectRevisionManifestEntry,
-  ProjectStorageRevision,
-} from './project-storage';
+import type { ProjectRevisionManifestEntry, ProjectStorageRevision } from './project-storage';
 
 export type ProjectRevisionActor = 'user' | 'system';
 export type ProjectRevisionSource =
