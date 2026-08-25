@@ -1,0 +1,93 @@
+name: M04.8 Project Revisions Gate
+
+on:
+  pull_request:
+    paths:
+      - 'packages/application/src/projects/**'
+      - 'packages/data-web/src/**'
+      - 'packages/data-web/drizzle/**'
+      - 'apps/studio/src/App.tsx'
+      - 'apps/studio/src/features/projects/**'
+      - 'apps/studio/src/shell/**'
+      - 'locales/es/common.json'
+      - 'locales/es/help.json'
+      - 'tooling/vitest/contract/project-storage-boundary.test.ts'
+      - 'tooling/vitest/unit/project-revisions.test.ts'
+      - 'tooling/vitest/unit/project-storage-multitab-lifecycle.test.ts'
+      - 'tooling/vitest/integration/project-revisions-pglite.test.ts'
+      - 'tooling/vitest/integration/project-storage-multitab-migrations.test.ts'
+      - 'tooling/playwright/m04-8-project-revisions.spec.ts'
+      - '.github/workflows/m04-8-project-revisions.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'packages/application/src/projects/**'
+      - 'packages/data-web/src/**'
+      - 'packages/data-web/drizzle/**'
+      - 'apps/studio/src/App.tsx'
+      - 'apps/studio/src/features/projects/**'
+      - 'apps/studio/src/shell/**'
+      - 'locales/es/common.json'
+      - 'locales/es/help.json'
+      - 'tooling/vitest/contract/project-storage-boundary.test.ts'
+      - 'tooling/vitest/unit/project-revisions.test.ts'
+      - 'tooling/vitest/unit/project-storage-multitab-lifecycle.test.ts'
+      - 'tooling/vitest/integration/project-revisions-pglite.test.ts'
+      - 'tooling/vitest/integration/project-storage-multitab-migrations.test.ts'
+      - 'tooling/playwright/m04-8-project-revisions.spec.ts'
+      - '.github/workflows/m04-8-project-revisions.yml'
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  verify:
+    name: M04.8 revisions dedupe history and restore
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Verify formatting
+        run: npm run format:check
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Revision contracts boundaries and real PGlite restore
+        run: >-
+          npx vitest run --config vitest.config.ts
+          tooling/vitest/contract/project-storage-boundary.test.ts
+          tooling/vitest/unit/project-revisions.test.ts
+          tooling/vitest/unit/project-storage-multitab-lifecycle.test.ts
+          tooling/vitest/integration/project-revisions-pglite.test.ts
+          tooling/vitest/integration/project-storage-multitab-migrations.test.ts
+      - name: Build Studio
+        run: npm run build:studio
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Browser history save restore reload and mobile
+        run: npx playwright test --config playwright.config.ts tooling/playwright/m04-8-project-revisions.spec.ts
+      - name: Emit closure candidate
+        run: echo PASS_M04_8_PROJECT_REVISIONS | tee m04-8-closure.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m04-8-project-revisions-evidence
+          path: |
+            m04-8-closure.log
+            test-results
+            playwright-report
+          if-no-files-found: ignore
