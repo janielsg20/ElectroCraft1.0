@@ -40,6 +40,13 @@ export interface ProjectRevisionDiffSummary {
   readonly byKind: readonly ProjectRevisionKindDiff[];
 }
 
+export interface ProjectRevisionDiagnostic {
+  readonly code: 'REVISION_NOT_RESTORABLE';
+  readonly location: string;
+  readonly cause: string;
+  readonly action: string;
+}
+
 export interface ProjectRevisionHistoryEntry {
   readonly revisionId: string;
   readonly projectId: string;
@@ -49,6 +56,8 @@ export interface ProjectRevisionHistoryEntry {
   readonly source: ProjectRevisionSource;
   readonly objectCount: number;
   readonly diff: ProjectRevisionDiffSummary;
+  readonly restorable: boolean;
+  readonly diagnostic: ProjectRevisionDiagnostic | null;
 }
 
 export interface ProjectRevisionRestoreResult {
@@ -61,7 +70,6 @@ export interface ProjectRevisionRestoreResult {
 export interface ProjectRevisionPort {
   createCheckpoint(projectId: string, reason: string): Promise<ProjectStorageRevision>;
   listRevisionHistory(projectId: string): Promise<readonly ProjectRevisionHistoryEntry[]>;
-  findRecoveryCandidate?(projectId: string): Promise<ProjectRecoveryCandidate | null>;
   restoreRevision(projectId: string, revisionId: string): Promise<ProjectRevisionRestoreResult>;
 }
 
@@ -154,9 +162,18 @@ export function createProjectRevisionService(port: ProjectRevisionPort) {
     checkpoint(projectId: string, reason: string) {
       return port.createCheckpoint(requireNonEmpty(projectId, 'projectId'), requireNonEmpty(reason, 'reason'));
     },
-    recoveryCandidate(projectId: string) {
-      if (!port.findRecoveryCandidate) throw new Error('project revision recovery is not available');
-      return port.findRecoveryCandidate(requireNonEmpty(projectId, 'projectId'));
+    async recoveryCandidate(projectId: string): Promise<ProjectRecoveryCandidate | null> {
+      const normalizedProjectId = requireNonEmpty(projectId, 'projectId');
+      const history = await port.listRevisionHistory(normalizedProjectId);
+      const entry = history.find((candidate) => candidate.restorable);
+      if (!entry) return null;
+      return Object.freeze({
+        projectId: normalizedProjectId,
+        revisionId: entry.revisionId,
+        reason: entry.reason,
+        createdAt: entry.timestamp,
+        objectCount: entry.objectCount,
+      });
     },
     saveRevision(projectId: string) {
       return port.createCheckpoint(requireNonEmpty(projectId, 'projectId'), 'manual');
