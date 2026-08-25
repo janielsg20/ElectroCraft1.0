@@ -62,6 +62,18 @@ const autosave = createProjectAutosaveController({
     runPersistence(() => revisionService.checkpoint(projectId, reason ?? 'manual')),
 });
 
+async function recoveryCandidate(projectId: string) {
+  const latest = (await revisionService.list(projectId))[0];
+  if (!latest) return service.recoveryCandidate(projectId);
+  return Object.freeze({
+    projectId,
+    revisionId: latest.revisionId,
+    reason: latest.reason,
+    createdAt: latest.timestamp,
+    objectCount: latest.objectCount,
+  });
+}
+
 export const projectStorageRuntime = Object.freeze({
   subscribe(listener: () => void) {
     listeners.add(listener);
@@ -161,15 +173,16 @@ export const projectStorageRuntime = Object.freeze({
     const integrity = await service.verifyProject(projectId);
     return Object.freeze({
       integrity,
-      recovery: integrity.coherent ? null : await service.recoveryCandidate(projectId),
+      recovery: integrity.coherent ? null : await recoveryCandidate(projectId),
     });
   },
-  recoveryCandidate: service.recoveryCandidate,
+  recoveryCandidate,
   async restoreRevision(projectId: string, revisionId: string) {
     await autosave.flush();
-    const revision = await runPersistence(() => service.restoreRevision(projectId, revisionId));
+    const result = await revisionService.restore(projectId, revisionId);
     currentProjectId = projectId;
-    return revision;
+    autosave.noteCheckpointCommitted();
+    return result.currentRevision;
   },
   async close() {
     await autosave.flush();
