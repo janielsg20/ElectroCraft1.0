@@ -6,7 +6,10 @@ const read = (path: string) => readFileSync(path, 'utf8');
 
 describe('M04.1 storage ownership boundary', () => {
   it('keeps PGlite and Drizzle out of application ports', () => {
-    const application = read('packages/application/src/projects/project-storage.ts');
+    const application = [
+      read('packages/application/src/projects/project-storage.ts'),
+      read('packages/application/src/projects/project-revisions.ts'),
+    ].join('\n');
     expect(application).not.toContain('@electric-sql/pglite');
     expect(application).not.toContain('drizzle-orm');
   });
@@ -14,6 +17,7 @@ describe('M04.1 storage ownership boundary', () => {
   it('keeps raw storage engines out of Studio project UI and runtime wiring', () => {
     const studioSources = [
       read('apps/studio/src/features/projects/project-storage-runtime.ts'),
+      read('apps/studio/src/features/projects/revision-history-panel.tsx'),
       read('apps/studio/src/features/projects/storage-settings.tsx'),
       read('apps/studio/src/shell/studio-topbar.tsx'),
     ].join('\n');
@@ -40,11 +44,12 @@ describe('M04.1 storage ownership boundary', () => {
   });
 
   it('pins one physical schema independent of user-defined model count', () => {
-    expect(STUDIO_STORAGE_SCHEMA_VERSION).toBe(4);
+    expect(STUDIO_STORAGE_SCHEMA_VERSION).toBe(5);
     expect(STUDIO_STORAGE_TABLES).toEqual(
       expect.arrayContaining([
         'projects',
         'project_objects',
+        'project_object_versions',
         'project_revisions',
         'content_records',
         'taxonomy_terms',
@@ -59,22 +64,29 @@ describe('M04.1 storage ownership boundary', () => {
     const migration = read('packages/data-web/drizzle/0000_m04_1_storage.sql');
     const incrementalMigration = read('packages/data-web/drizzle/0001_m04_3_incremental.sql');
     const integrityMigration = read('packages/data-web/drizzle/0003_m04_6_referential_integrity.sql');
+    const revisionMigration = read('packages/data-web/drizzle/0004_m04_8_revision_object_versions.sql');
     expect(migration).toContain('data jsonb NOT NULL');
     expect(migration).toContain('record_field_index_fts_idx');
     expect(migration).not.toMatch(/CREATE TABLE[^;]*(user_model|dynamic_model)/i);
     expect(incrementalMigration).toContain('current_revision_base');
     expect(integrityMigration).toContain('ON DELETE CASCADE');
+    expect(revisionMigration).toContain('project_object_versions');
+    expect(revisionMigration).toContain('ON CONFLICT (project_id, version_id) DO NOTHING');
   });
 
   it('keeps autosave incremental and histories session-local', () => {
     const application = read('packages/application/src/projects/project-storage.ts');
     const repository = read('packages/data-web/src/repository.ts');
+    const revisionRepository = read('packages/data-web/src/project-revision-repository.ts');
     const autosave = read('apps/studio/src/features/projects/project-storage-autosave.ts');
 
     expect(application).toContain('dirtyObjects');
     expect(application).toContain('deletedObjectIds');
     expect(repository).toContain('saveProjectIncremental');
+    expect(revisionRepository).toContain('projectObjectVersions');
     expect(autosave).toContain('saveProjectIncremental');
-    expect([application, repository, autosave].join('\n')).not.toMatch(/PuckHistory|ReteHistory|historySnapshot/);
+    expect([application, repository, revisionRepository, autosave].join('\n')).not.toMatch(
+      /PuckHistory|ReteHistory|historySnapshot/,
+    );
   });
 });

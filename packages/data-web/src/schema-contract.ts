@@ -1,8 +1,9 @@
-export const STUDIO_STORAGE_SCHEMA_VERSION = 4 as const;
+export const STUDIO_STORAGE_SCHEMA_VERSION = 5 as const;
 
 export const STUDIO_STORAGE_TABLES = Object.freeze([
   'projects',
   'project_objects',
+  'project_object_versions',
   'project_revisions',
   'content_records',
   'taxonomy_terms',

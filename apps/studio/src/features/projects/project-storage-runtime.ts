@@ -1,5 +1,6 @@
 import {
   createProjectBackupService,
+  createProjectRevisionService,
   createProjectStorageService,
   type IncrementalSaveProjectRequest,
   type ProjectBackupCollisionStrategy,
@@ -11,6 +12,7 @@ import { createProjectAutosaveController } from './project-storage-autosave';
 
 const port = createBrowserProjectStoragePort();
 const service = createProjectStorageService(port);
+const revisionService = createProjectRevisionService(port.revisions);
 const backupService = createProjectBackupService(service);
 const listeners = new Set<() => void>();
 
@@ -56,8 +58,21 @@ async function runPersistence<T>(operation: () => Promise<T>) {
 
 const autosave = createProjectAutosaveController({
   saveProjectIncremental: (request) => runPersistence(() => service.saveProjectIncremental(request)),
-  createCheckpoint: (projectId, reason) => runPersistence(() => service.createCheckpoint(projectId, reason)),
+  createCheckpoint: (projectId, reason) =>
+    runPersistence(() => revisionService.checkpoint(projectId, reason ?? 'manual')),
 });
+
+async function recoveryCandidate(projectId: string) {
+  const latest = (await revisionService.list(projectId))[0];
+  if (!latest) return service.recoveryCandidate(projectId);
+  return Object.freeze({
+    projectId,
+    revisionId: latest.revisionId,
+    reason: latest.reason,
+    createdAt: latest.timestamp,
+    objectCount: latest.objectCount,
+  });
+}
 
 export const projectStorageRuntime = Object.freeze({
   subscribe(listener: () => void) {
@@ -118,6 +133,24 @@ export const projectStorageRuntime = Object.freeze({
   renameProject: service.renameProject,
   duplicateProject: service.duplicateProject,
   deleteProjectPermanently: service.deleteProjectPermanently,
+  async listRevisionHistory(projectId: string) {
+    await autosave.flush();
+    return revisionService.list(projectId);
+  },
+  async saveRevision(projectId: string) {
+    await autosave.flush();
+    const revision = await revisionService.saveRevision(projectId);
+    currentProjectId = projectId;
+    autosave.noteCheckpointCommitted();
+    return revision;
+  },
+  async restoreRevisionFromHistory(projectId: string, revisionId: string) {
+    await autosave.flush();
+    const result = await revisionService.restore(projectId, revisionId);
+    currentProjectId = projectId;
+    autosave.noteCheckpointCommitted();
+    return result;
+  },
   async backupProject(projectId: string) {
     await autosave.flush();
     return backupService.backupProject(projectId);
@@ -140,15 +173,16 @@ export const projectStorageRuntime = Object.freeze({
     const integrity = await service.verifyProject(projectId);
     return Object.freeze({
       integrity,
-      recovery: integrity.coherent ? null : await service.recoveryCandidate(projectId),
+      recovery: integrity.coherent ? null : await recoveryCandidate(projectId),
     });
   },
-  recoveryCandidate: service.recoveryCandidate,
+  recoveryCandidate,
   async restoreRevision(projectId: string, revisionId: string) {
     await autosave.flush();
-    const revision = await runPersistence(() => service.restoreRevision(projectId, revisionId));
+    const result = await revisionService.restore(projectId, revisionId);
     currentProjectId = projectId;
-    return revision;
+    autosave.noteCheckpointCommitted();
+    return result.currentRevision;
   },
   async close() {
     await autosave.flush();

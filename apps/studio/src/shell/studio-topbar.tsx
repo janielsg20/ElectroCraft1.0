@@ -34,6 +34,7 @@ export interface StudioTopbarCopy {
   readonly breakpointLabels: Readonly<Record<StudioViewportBreakpoint, string>>;
   readonly undoLabel: string;
   readonly redoLabel: string;
+  readonly historyLabel: string;
   readonly historyUnavailable: string;
   readonly zoomLabel: string;
   readonly toolsLabel: string;
@@ -128,6 +129,9 @@ function TopbarToolCluster({
         <BreakpointIcon aria-hidden="true" />
         <span>{copy.breakpointLabels[breakpoint]}</span>
       </span>
+      <Button variant="ghost" size="sm" asChild>
+        <a href="/history">{copy.historyLabel}</a>
+      </Button>
       <Button variant="ghost" size="icon" disabled aria-label={copy.undoLabel} title={copy.historyUnavailable}>
         <UndoIcon aria-hidden="true" />
       </Button>

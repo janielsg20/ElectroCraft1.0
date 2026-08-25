@@ -11,6 +11,7 @@ import {
   M04_3_MIGRATION_CHECKSUM,
   M04_4_MIGRATION_CHECKSUM,
   M04_6_REFERENTIAL_INTEGRITY_CHECKSUM,
+  M04_8_REVISION_STORE_CHECKSUM,
   STUDIO_STORAGE_TABLES,
   applyStudioStorageMigrations,
   createDrizzleProjectRepository,
@@ -71,6 +72,7 @@ describe('M04.1 PGlite + Drizzle persistence', () => {
         { schema_version: 2, checksum: M04_3_MIGRATION_CHECKSUM },
         { schema_version: 3, checksum: M04_4_MIGRATION_CHECKSUM },
         { schema_version: 4, checksum: M04_6_REFERENTIAL_INTEGRITY_CHECKSUM },
+        { schema_version: 5, checksum: M04_8_REVISION_STORE_CHECKSUM },
       ]);
 
       await client.query('UPDATE storage_migration_journal SET checksum = $1 WHERE schema_version = $2', [
