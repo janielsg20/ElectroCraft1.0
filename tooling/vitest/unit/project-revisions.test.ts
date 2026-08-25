@@ -38,7 +38,9 @@ describe('M04.8 project revision semantics', () => {
   it('maps checkpoint reasons to stable revision sources', () => {
     expect(inferProjectRevisionSource('manual')).toBe('manual');
     expect(inferProjectRevisionSource('interval')).toBe('automatic');
+    expect(inferProjectRevisionSource('autosave-interval')).toBe('automatic');
     expect(inferProjectRevisionSource('pre-import')).toBe('pre-import');
+    expect(inferProjectRevisionSource('pre-import-safety')).toBe('pre-import');
     expect(inferProjectRevisionSource('pre-migration')).toBe('pre-migration');
     expect(inferProjectRevisionSource('pre-publish')).toBe('publish');
     expect(inferProjectRevisionSource('pre-export')).toBe('export');

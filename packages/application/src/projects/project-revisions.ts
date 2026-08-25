@@ -72,11 +72,11 @@ function requireNonEmpty(value: string, field: string) {
 export function inferProjectRevisionSource(reason: string): ProjectRevisionSource {
   if (reason === 'initial') return 'initial';
   if (reason === 'manual') return 'manual';
-  if (reason === 'automatic' || reason === 'interval') return 'automatic';
-  if (reason === 'pre-import') return 'pre-import';
-  if (reason === 'pre-migration') return 'pre-migration';
-  if (reason === 'pre-publish' || reason === 'publish') return 'publish';
-  if (reason === 'pre-export' || reason === 'export') return 'export';
+  if (reason === 'automatic' || reason === 'interval' || reason === 'autosave-interval') return 'automatic';
+  if (reason.startsWith('pre-import')) return 'pre-import';
+  if (reason.startsWith('pre-migration')) return 'pre-migration';
+  if (reason.startsWith('pre-publish') || reason === 'publish') return 'publish';
+  if (reason.startsWith('pre-export') || reason === 'export') return 'export';
   if (reason === 'restore' || reason.startsWith('restore:')) return 'restore';
   if (reason.includes('recovery') || reason.includes('safety')) return 'recovery';
   return 'manual';
