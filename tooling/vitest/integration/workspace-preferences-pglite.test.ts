@@ -24,7 +24,7 @@ const readyDiagnostics: ProjectStorageDiagnostics = Object.freeze({
   durable: false,
   usageBytes: null,
   quotaBytes: null,
-  migrationVersion: 4,
+  migrationVersion: 5,
   repairSupported: false,
   message: 'PGlite de prueba listo.',
 });
