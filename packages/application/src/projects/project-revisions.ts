@@ -60,6 +60,13 @@ export interface ProjectRevisionPort {
   restoreRevision(projectId: string, revisionId: string): Promise<ProjectRevisionRestoreResult>;
 }
 
+interface ProjectRevisionDiffCounts {
+  added: number;
+  changed: number;
+  removed: number;
+  unchanged: number;
+}
+
 function requireNonEmpty(value: string, field: string) {
   const normalized = value.trim();
   if (!normalized) throw new TypeError(`${field} must not be empty`);
@@ -87,20 +94,24 @@ function revisionIdentity(entry: ProjectRevisionManifestEntry) {
   return `${entry.schemaVersion}:${entry.checksum}`;
 }
 
+function emptyDiffCounts(): ProjectRevisionDiffCounts {
+  return { added: 0, changed: 0, removed: 0, unchanged: 0 };
+}
+
 export function summarizeProjectRevisionDiff(
   previous: readonly ProjectRevisionManifestEntry[],
   next: readonly ProjectRevisionManifestEntry[],
 ): ProjectRevisionDiffSummary {
   const before = new Map(previous.map((entry) => [entry.objectId, entry]));
   const after = new Map(next.map((entry) => [entry.objectId, entry]));
-  const kinds = new Map<string, { added: number; changed: number; removed: number; unchanged: number }>();
+  const kinds = new Map<string, ProjectRevisionDiffCounts>();
   let added = 0;
   let changed = 0;
   let removed = 0;
   let unchanged = 0;
 
   function bucket(kind: string) {
-    const current = kinds.get(kind) ?? { added: 0, changed: 0, removed: 0, unchanged: 0 };
+    const current = kinds.get(kind) ?? emptyDiffCounts();
     kinds.set(kind, current);
     return current;
   }
@@ -108,16 +119,19 @@ export function summarizeProjectRevisionDiff(
   for (const [objectId, entry] of after) {
     const previousEntry = before.get(objectId);
     const kindBucket = bucket(entry.kind);
+
     if (!previousEntry) {
       added += 1;
       kindBucket.added += 1;
       continue;
     }
+
     if (revisionIdentity(previousEntry) === revisionIdentity(entry)) {
       unchanged += 1;
       kindBucket.unchanged += 1;
       continue;
     }
+
     changed += 1;
     kindBucket.changed += 1;
   }
@@ -128,35 +142,38 @@ export function summarizeProjectRevisionDiff(
     bucket(entry.kind).removed += 1;
   }
 
+  const byKind = [...kinds.entries()]
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([kind, counts]) => Object.freeze({ kind, ...counts }));
+
   return Object.freeze({
     added,
     changed,
     removed,
     unchanged,
-    byKind: Object.freeze(
-      [...kinds.entries()]
-        .sort(([left], [right]) => left.localeCompare(right))
-        .map(([kind, counts]) => Object.freeze({ kind, ...counts })),
-    ),
+    byKind: Object.freeze(byKind),
   });
 }
 
 export function createProjectRevisionService(port: ProjectRevisionPort) {
   return Object.freeze({
     list(projectId: string) {
-      return port.listRevisionHistory(requireNonEmpty(projectId, 'projectId'));
+      const normalizedProjectId = requireNonEmpty(projectId, 'projectId');
+      return port.listRevisionHistory(normalizedProjectId);
     },
     checkpoint(projectId: string, reason: string) {
-      return port.createCheckpoint(requireNonEmpty(projectId, 'projectId'), requireNonEmpty(reason, 'reason'));
+      const normalizedProjectId = requireNonEmpty(projectId, 'projectId');
+      const normalizedReason = requireNonEmpty(reason, 'reason');
+      return port.createCheckpoint(normalizedProjectId, normalizedReason);
     },
     saveRevision(projectId: string) {
-      return port.createCheckpoint(requireNonEmpty(projectId, 'projectId'), 'manual');
+      const normalizedProjectId = requireNonEmpty(projectId, 'projectId');
+      return port.createCheckpoint(normalizedProjectId, 'manual');
     },
     restore(projectId: string, revisionId: string) {
-      return port.restoreRevision(
-        requireNonEmpty(projectId, 'projectId'),
-        requireNonEmpty(revisionId, 'revisionId'),
-      );
+      const normalizedProjectId = requireNonEmpty(projectId, 'projectId');
+      const normalizedRevisionId = requireNonEmpty(revisionId, 'revisionId');
+      return port.restoreRevision(normalizedProjectId, normalizedRevisionId);
     },
   });
 }
