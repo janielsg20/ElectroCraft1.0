@@ -51,3 +51,4 @@
 49. React multi-component work gets React best-practices audit.
 50. Current dependency/model/platform APIs are reverified before pinning.
 51. DONE requires evidence.
+52. Development validation is container/local-first. Run formatting, lint, typecheck, targeted unit/integration tests, build and browser tests locally when available. GitHub Actions is reserved for validations that are truly necessary for the final candidate/closure, not for every intermediate edit. Batch related file changes into coherent commits before pushing so CI is not retriggered per file.
