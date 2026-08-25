@@ -51,9 +51,9 @@
   --ec-control-lg: 2.25rem;
   --ec-sidebar-compact: 16rem;
   --ec-inspector-compact: 18.5rem;
-  --ec-shell-sidebar-width: 256px;
-  --ec-shell-topbar-height: 56px;
-  --ec-shell-statusbar-height: 24px;
+  --ec-shell-sidebar-width: 240px;
+  --ec-shell-topbar-height: 52px;
+  --ec-shell-statusbar-height: 26px;
   --ec-shell-gutter: 8px;
 
   --ec-font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;

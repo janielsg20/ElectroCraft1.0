@@ -6,7 +6,7 @@ test.describe('M03.4 Topbar global + Settings', () => {
     await page.goto('/editor');
 
     const topbar = page.locator('.ec-app-shell-topbar');
-    expect((await topbar.boundingBox())?.height).toBe(56);
+    expect((await topbar.boundingBox())?.height).toBe(52);
     await expect(page.locator('.ec-topbar-left')).toContainText('Studio');
     await expect(page.locator('.ec-topbar-left')).toContainText('Editor');
     await expect(page.locator('[data-topbar-tool="platform"]')).toContainText('Web');
@@ -26,7 +26,7 @@ test.describe('M03.4 Topbar global + Settings', () => {
     await settings.click();
     const dialog = page.getByRole('dialog', { name: 'Configuración' });
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByText('Espacio de trabajo')).toBeVisible();
+    await expect(dialog.getByRole('heading', { name: 'Espacio de trabajo' })).toBeVisible();
 
     await dialog.getByRole('button', { name: 'Contraer' }).click();
     await expect(page.locator('.ec-app-shell')).toHaveAttribute('data-sidebar-collapsed', 'true');

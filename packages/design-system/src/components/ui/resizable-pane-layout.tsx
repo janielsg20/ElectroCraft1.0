@@ -24,6 +24,10 @@ export interface ResizableTriPaneProps {
   readonly rightLabel: string;
   readonly leftConstraint: ResizablePaneConstraint;
   readonly rightConstraint: ResizablePaneConstraint;
+  readonly leftSize?: number;
+  readonly rightSize?: number;
+  readonly onLeftSizeChange?: (value: number) => void;
+  readonly onRightSizeChange?: (value: number) => void;
   readonly className?: string;
 }
 
@@ -112,10 +116,37 @@ export function ResizableTriPane({
   rightLabel,
   leftConstraint,
   rightConstraint,
+  leftSize: controlledLeftSize,
+  rightSize: controlledRightSize,
+  onLeftSizeChange,
+  onRightSizeChange,
   className,
 }: ResizableTriPaneProps) {
-  const [leftSize, setLeftSize] = useState(() => clampPaneSize(leftConstraint.defaultSize, leftConstraint));
-  const [rightSize, setRightSize] = useState(() => clampPaneSize(rightConstraint.defaultSize, rightConstraint));
+  const [uncontrolledLeftSize, setUncontrolledLeftSize] = useState(() =>
+    clampPaneSize(leftConstraint.defaultSize, leftConstraint),
+  );
+  const [uncontrolledRightSize, setUncontrolledRightSize] = useState(() =>
+    clampPaneSize(rightConstraint.defaultSize, rightConstraint),
+  );
+  const leftSize = clampPaneSize(controlledLeftSize ?? uncontrolledLeftSize, leftConstraint);
+  const rightSize = clampPaneSize(controlledRightSize ?? uncontrolledRightSize, rightConstraint);
+
+  const setLeftSize = useCallback(
+    (value: number) => {
+      const next = clampPaneSize(value, leftConstraint);
+      if (controlledLeftSize === undefined) setUncontrolledLeftSize(next);
+      onLeftSizeChange?.(next);
+    },
+    [controlledLeftSize, leftConstraint, onLeftSizeChange],
+  );
+  const setRightSize = useCallback(
+    (value: number) => {
+      const next = clampPaneSize(value, rightConstraint);
+      if (controlledRightSize === undefined) setUncontrolledRightSize(next);
+      onRightSizeChange?.(next);
+    },
+    [controlledRightSize, onRightSizeChange, rightConstraint],
+  );
 
   const style = {
     '--ec-resizable-left': `${leftSize}px`,

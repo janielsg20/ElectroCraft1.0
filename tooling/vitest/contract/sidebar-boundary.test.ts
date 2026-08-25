@@ -17,17 +17,24 @@ describe('M03.3 Sidebar boundaries', () => {
     expect(navigation).not.toContain('@electrocraft/design-system/');
   });
 
-  it('uses the real AppShell contract for active state, Radix tooltips and workspace preferences', () => {
+  it('uses the real AppShell contract for active state, Radix tooltips and persistent workspace preferences', () => {
     const shell = read('apps/studio/src/shell/app-shell.tsx');
     const preferences = read('apps/studio/src/shell/workspace-preferences.ts');
     const route = read('apps/studio/src/shell/app-shell-route.tsx');
+    const runtime = read('apps/studio/src/features/projects/workspace-preferences-runtime.ts');
+    const projectStorageRuntime = read('apps/studio/src/features/projects/project-storage-runtime.ts');
+    const browserStorage = read('packages/data-web/src/browser.ts');
 
     expect(shell).toContain('aria-current');
     expect(shell).toContain('TooltipTrigger');
     expect(shell).toContain('useSyncExternalStore');
     expect(shell).toContain('data-sidebar-collapsed');
     expect(preferences).toContain('export interface WorkspacePreferencesPort');
-    expect(route).toContain('createMemoryWorkspacePreferencesPort');
+    expect(route).toContain('workspacePreferencesPort');
+    expect(runtime).toContain('workspacePreferencesStoragePort');
+    expect(runtime).toContain('BroadcastChannel');
+    expect(projectStorageRuntime).toContain('port.workspacePreferences');
+    expect(browserStorage).toContain('workspacePreferencesRepository');
     expect(preferences).not.toContain('localStorage');
     expect(preferences).not.toContain('PGlite');
   });

@@ -7,16 +7,17 @@ test.describe('M03.10 Spanish-first typed i18n', () => {
 
     await page.getByRole('button', { name: 'Configuración' }).click();
     const dialog = page.getByRole('dialog', { name: 'Configuración' });
+    const general = dialog.getByLabel('Configuración general');
     await expect(dialog.getByText('Configuración general')).toBeVisible();
-    await expect(dialog.getByText('Idioma', { exact: true })).toBeVisible();
+    await expect(general.getByText('Idioma', { exact: true })).toBeVisible();
 
-    const selector = dialog.getByRole('button', { name: 'Idioma' });
+    const selector = general.getByRole('button', { name: 'Idioma' });
     await expect(selector).toContainText('Español');
     await selector.click();
     await page.getByRole('menuitem', { name: 'Español' }).click();
 
-    await dialog.getByRole('button', { name: 'Guardar' }).click();
-    await expect(dialog.getByText('Idioma guardado', { exact: true })).toBeVisible();
+    await general.getByRole('button', { name: 'Guardar' }).click();
+    await expect(general.getByText('Idioma guardado', { exact: true })).toBeVisible();
     await expect.poll(() => page.evaluate(() => window.localStorage.getItem('electrocraft.studio.locale'))).toBe('es');
 
     await page.reload();
@@ -54,8 +55,9 @@ test.describe('M03.10 Spanish-first typed i18n', () => {
     await page.goto('/editor');
     await page.getByRole('button', { name: 'Configuración' }).click();
     const dialog = page.getByRole('dialog', { name: 'Configuración' });
-    await expect(dialog.getByRole('button', { name: 'Idioma' })).toBeVisible();
-    await expect(dialog.getByRole('button', { name: 'Guardar' })).toBeVisible();
+    const general = dialog.getByLabel('Configuración general');
+    await expect(general.getByRole('button', { name: 'Idioma' })).toBeVisible();
+    await expect(general.getByRole('button', { name: 'Guardar' })).toBeVisible();
     const metrics = await page.evaluate(() => ({
       scrollWidth: document.documentElement.scrollWidth,
       clientWidth: document.documentElement.clientWidth,

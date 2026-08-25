@@ -14,7 +14,7 @@ import {
   TooltipTrigger,
   getStudioIcon,
 } from '@electrocraft/design-system';
-import { useSyncExternalStore, type ReactNode } from 'react';
+import { useMemo, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
 import type { SidebarNavigationGroup, SidebarNavigationItem, SidebarNavigationItemId } from './sidebar-navigation';
 import type { WorkspacePreferencesPort } from './workspace-preferences';
 
@@ -115,6 +115,20 @@ function SidebarNavigation({
   );
 }
 
+function orderNavigationGroups(
+  groups: readonly SidebarNavigationGroup[],
+  preferredOrder: readonly string[] | undefined,
+): readonly SidebarNavigationGroup[] {
+  if (!preferredOrder?.length) return groups;
+  const rank = new Map(preferredOrder.map((id, index) => [id, index]));
+  return [...groups].sort((left, right) => {
+    const leftRank = rank.get(left.id) ?? Number.MAX_SAFE_INTEGER;
+    const rightRank = rank.get(right.id) ?? Number.MAX_SAFE_INTEGER;
+    if (leftRank !== rightRank) return leftRank - rightRank;
+    return groups.indexOf(left) - groups.indexOf(right);
+  });
+}
+
 export function AppShell({
   copy,
   navigationGroups,
@@ -131,16 +145,29 @@ export function AppShell({
     preferencesPort.getSnapshot,
   );
   const sidebarCollapsed = preferences.sidebarCollapsed;
+  const sidebarSide = preferences.sidebarSide ?? 'left';
+  const sidebarDisplay = preferences.sidebarDisplay ?? 'icons+text';
+  const sidebarWidth = sidebarCollapsed ? 64 : (preferences.sidebarWidth ?? 240);
+  const statusVisible = preferences.visiblePanels?.includes('status') ?? true;
+  const orderedNavigationGroups = useMemo(
+    () => orderNavigationGroups(navigationGroups, preferences.sidebarGroupOrder),
+    [navigationGroups, preferences.sidebarGroupOrder],
+  );
   const SidebarToggleIcon = sidebarCollapsed ? ExpandIcon : CollapseIcon;
   const sidebarToggleLabel = sidebarCollapsed ? copy.expandSidebarLabel : copy.collapseSidebarLabel;
+  const shellStyle = { '--ec-shell-sidebar-width': `${sidebarWidth}px` } as CSSProperties;
 
   return (
     <TooltipProvider>
       <div
         className="ec-design-system ec-app-shell"
+        style={shellStyle}
         data-help-id={helpId}
         data-status={status}
+        data-status-visible={statusVisible ? 'true' : 'false'}
         data-sidebar-collapsed={sidebarCollapsed ? 'true' : 'false'}
+        data-sidebar-side={sidebarSide}
+        data-sidebar-display={sidebarDisplay}
       >
         <a className="ec-skip-link" href="#ec-studio-workspace">
           Ir al área de trabajo
@@ -153,7 +180,11 @@ export function AppShell({
             <strong className="ec-app-shell-brand-label">{copy.title}</strong>
           </div>
           <ScrollArea label={copy.navigationLabel} className="ec-app-shell-nav-scroll">
-            <SidebarNavigation groups={navigationGroups} activeItemId={activeItemId} ariaLabel={copy.navigationLabel} />
+            <SidebarNavigation
+              groups={orderedNavigationGroups}
+              activeItemId={activeItemId}
+              ariaLabel={copy.navigationLabel}
+            />
           </ScrollArea>
           <div className="ec-app-shell-sidebar-footer">
             <Tooltip>
@@ -196,7 +227,7 @@ export function AppShell({
               </SheetHeader>
               <ScrollArea label={copy.navigationLabel} className="ec-app-shell-mobile-nav-scroll">
                 <SidebarNavigation
-                  groups={navigationGroups}
+                  groups={orderedNavigationGroups}
                   activeItemId={activeItemId}
                   ariaLabel={copy.navigationLabel}
                 />
@@ -220,12 +251,14 @@ export function AppShell({
           )}
         </main>
 
-        <footer className="ec-app-shell-statusbar" aria-label={copy.statusLabel}>
-          <span className="ec-app-shell-status-dot" aria-hidden="true" />
-          <span role="status" aria-live="polite">
-            {copy.statusLabels[status]}
-          </span>
-        </footer>
+        {statusVisible ? (
+          <footer className="ec-app-shell-statusbar" aria-label={copy.statusLabel}>
+            <span className="ec-app-shell-status-dot" aria-hidden="true" />
+            <span role="status" aria-live="polite">
+              {copy.statusLabels[status]}
+            </span>
+          </footer>
+        ) : null}
       </div>
     </TooltipProvider>
   );

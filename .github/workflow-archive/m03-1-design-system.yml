@@ -1,0 +1,204 @@
+name: M03.1 Design System Gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'packages/design-system/**'
+      - 'apps/studio/**'
+      - 'tooling/vitest/**/design-system-*.test.ts'
+      - 'tooling/playwright/m03-1-design-system.spec.ts'
+      - 'tooling/scripts/verify-m03-1-design-system.mjs'
+      - 'playwright.config.ts'
+      - 'tsconfig.base.json'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/m03-1-design-system.yml'
+      - '.github/workflows/ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'packages/design-system/**'
+      - 'apps/studio/**'
+      - 'tooling/vitest/**/design-system-*.test.ts'
+      - 'tooling/playwright/m03-1-design-system.spec.ts'
+      - 'tooling/scripts/verify-m03-1-design-system.mjs'
+      - 'playwright.config.ts'
+      - 'tsconfig.base.json'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/m03-1-design-system.yml'
+      - '.github/workflows/ci.yml'
+
+permissions:
+  contents: read
+  statuses: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  m03-1:
+    name: M03.1 Radix Lucide tokens
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Publish pending status
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: 'pending',
+              context: 'electrocraft/M03.1',
+              description: 'M03.1 design-system gate running',
+              target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Verify locked toolchain
+        run: |
+          test "$(node --version)" = 'v22.16.0'
+          test "$(npm --version)" = '10.9.2'
+          test "$(npm config get legacy-peer-deps)" = 'true'
+
+      - name: Prepare reproducible M03.1 lock candidate
+        id: lock
+        run: |
+          cp package-lock.json "$RUNNER_TEMP/package-lock.before.json"
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+          cp package-lock.json m03-1-package-lock.candidate.json
+          if cmp -s "$RUNNER_TEMP/package-lock.before.json" package-lock.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            : > m03-1-package-lock.patch
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git diff -- package-lock.json > m03-1-package-lock.patch
+          fi
+
+      - name: Verify M03.1 closure inputs and structure
+        run: node tooling/scripts/verify-m03-1-design-system.mjs
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Verify installed engine pins
+        run: |
+          node -e "const p=require('./node_modules/radix-ui/package.json'); if(p.version!=='1.6.7') throw new Error('expected radix-ui 1.6.7, got '+p.version)"
+          node -e "const p=require('./node_modules/lucide-react/package.json'); if(p.version!=='1.31.0') throw new Error('expected lucide-react 1.31.0, got '+p.version)"
+          node -e "const p=require('./node_modules/tailwindcss/package.json'); if(p.version!=='4.3.3') throw new Error('expected tailwindcss 4.3.3, got '+p.version)"
+
+      - name: Prepare reproducible formatting candidate
+        id: format
+        run: |
+          npm run format
+          git diff -- . ':(exclude)package-lock.json' > m03-1-format.patch
+          git diff --name-only -- . ':(exclude)package-lock.json' > m03-1-format-files.txt
+          if [ -s m03-1-format-files.txt ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            tar -czf m03-1-format-files.tar.gz -T m03-1-format-files.txt
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            tar -czf m03-1-format-files.tar.gz --files-from /dev/null
+          fi
+
+      - name: Execute dedicated M03.1 suite
+        run: npm run test:m03-1
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Execute repository gate
+        run: npm run check | tee m03-1-check.log
+
+      - name: Emit execution marker
+        run: |
+          if [ "${{ steps.lock.outputs.changed }}" = "true" ]; then
+            echo M03_1_LOCKFILE_CANDIDATE_READY | tee m03-1-closure.log
+          elif [ "${{ steps.format.outputs.changed }}" = "true" ]; then
+            echo M03_1_FORMAT_CANDIDATE_READY | tee m03-1-closure.log
+          else
+            echo PASS_M03_1_DESIGN_SYSTEM | tee m03-1-closure.log
+          fi
+
+      - name: Upload lockfile candidate
+        if: always() && steps.lock.outputs.changed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: m03-1-lockfile-candidate
+          path: |
+            package-lock.json
+            m03-1-package-lock.candidate.json
+            m03-1-package-lock.patch
+          if-no-files-found: error
+
+      - name: Upload formatting candidate
+        if: always() && steps.format.outputs.changed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: m03-1-formatting-candidate
+          path: |
+            m03-1-format.patch
+            m03-1-format-files.txt
+            m03-1-format-files.tar.gz
+          if-no-files-found: error
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m03-1-design-system-evidence
+          path: |
+            m03-1-check.log
+            m03-1-closure.log
+            m03-1-package-lock.candidate.json
+            m03-1-package-lock.patch
+            m03-1-format.patch
+            m03-1-format-files.txt
+            test-results/**
+            .ai/evidence/F03/M03.1/**
+            tooling/dist/m03-1-design-system-report.json
+          if-no-files-found: error
+
+      - name: Require committed lockfile synchronization
+        if: steps.lock.outputs.changed == 'true'
+        run: |
+          echo "::error::M03.1 generated a reproducible package-lock.json candidate. Commit the uploaded candidate before declaring the microphase closed."
+          exit 1
+
+      - name: Require committed formatting synchronization
+        if: always() && steps.format.outputs.changed == 'true'
+        run: |
+          echo "::error::M03.1 generated a reproducible Prettier formatting candidate. Apply the uploaded formatting candidate before declaring the microphase closed."
+          exit 1
+
+      - name: Publish final commit status
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: '${{ job.status }}' === 'success' ? 'success' : 'failure',
+              context: 'electrocraft/M03.1',
+              description: 'M03.1 design-system gate',
+              target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });

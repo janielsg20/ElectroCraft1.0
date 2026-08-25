@@ -7,6 +7,7 @@ import {
   type ListProjectsRequest,
   type ProjectLifecycleStatus,
   type DuplicateProjectRequest,
+  type WorkspacePreferencesStoragePort,
 } from '@electrocraft/application';
 import type { PGlite } from '@electric-sql/pglite';
 import { PGliteWorker } from '@electric-sql/pglite/worker';
@@ -16,6 +17,7 @@ import { createDrizzleProjectRepository } from './repository';
 import * as schema from './schema';
 import { STUDIO_STORAGE_SCHEMA_VERSION } from './schema-contract';
 import { verifyStudioStorageHealth } from './storage-health';
+import { createDrizzleWorkspacePreferencesRepository } from './workspace-preferences-repository';
 
 export const DEFAULT_BROWSER_STORAGE_BACKEND = 'indexeddb' as const;
 export const DEFAULT_BROWSER_DATABASE_NAME = 'electrocraft-studio-storage' as const;
@@ -26,6 +28,10 @@ const LEADER_ACTIVE = 'electrocraft-storage-leader-active' as const;
 export interface BrowserProjectStorageOptions {
   readonly preferredBackend?: 'indexeddb' | 'opfs-ahp';
   readonly databaseName?: string;
+}
+
+export interface BrowserProjectStoragePort extends ProjectStoragePort {
+  readonly workspacePreferences: WorkspacePreferencesStoragePort;
 }
 
 interface BrowserStorageClient {
@@ -146,10 +152,11 @@ async function storageEstimate() {
   } as const;
 }
 
-export function createBrowserProjectStoragePort(options: BrowserProjectStorageOptions = {}): ProjectStoragePort {
+export function createBrowserProjectStoragePort(options: BrowserProjectStorageOptions = {}): BrowserProjectStoragePort {
   const clientId = createStorageClientId();
   let runtime: BrowserStorageClient | null = null;
   let repository: ReturnType<typeof createDrizzleProjectRepository> | null = null;
+  let workspacePreferencesRepository: ReturnType<typeof createDrizzleWorkspacePreferencesRepository> | null = null;
   let initializePromise: Promise<ProjectStorageDiagnostics> | null = null;
   let unsubscribeLeaderChange: (() => void) | null = null;
   let leaderChannel: BroadcastChannel | null = null;
@@ -244,7 +251,7 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
   }
 
   async function initialize() {
-    if (runtime && repository) return getDiagnostics();
+    if (runtime && repository && workspacePreferencesRepository) return getDiagnostics();
     if (initializePromise) return initializePromise;
 
     initializePromise = (async () => {
@@ -278,7 +285,9 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
           message: 'Comprobando almacenamiento local…',
         });
         await verifyStudioStorageHealth(runtime.client);
-        repository = createDrizzleProjectRepository(createWorkerDrizzleDatabase(runtime.client));
+        const db = createWorkerDrizzleDatabase(runtime.client);
+        repository = createDrizzleProjectRepository(db);
+        workspacePreferencesRepository = createDrizzleWorkspacePreferencesRepository(db);
 
         unsubscribeLeaderChange = runtime.client.onLeaderChange(() => {
           if (runtime) void revalidateAfterLeaderChange(runtime.client);
@@ -310,6 +319,7 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
         const failedRuntime = runtime;
         runtime = null;
         repository = null;
+        workspacePreferencesRepository = null;
         await failedRuntime?.client.close().catch(() => undefined);
         closeLeaderSignalChannel();
         diagnostics = Object.freeze({
@@ -333,6 +343,12 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
     if (!repository) await initialize();
     if (!repository) throw new Error(diagnostics.message);
     return repository;
+  }
+
+  async function ensureWorkspacePreferencesRepository() {
+    if (!workspacePreferencesRepository) await initialize();
+    if (!workspacePreferencesRepository) throw new Error(diagnostics.message);
+    return workspacePreferencesRepository;
   }
 
   async function getDiagnostics() {
@@ -373,7 +389,21 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
     }
   }
 
+  const workspacePreferences: WorkspacePreferencesStoragePort = Object.freeze({
+    async read(workspaceId: string, key: string) {
+      return (await ensureWorkspacePreferencesRepository()).read(workspaceId, key);
+    },
+    async write(
+      workspaceId: string,
+      key: string,
+      value: Parameters<WorkspacePreferencesStoragePort['write']>[2],
+    ) {
+      return (await ensureWorkspacePreferencesRepository()).write(workspaceId, key, value);
+    },
+  });
+
   return Object.freeze({
+    workspacePreferences,
     initialize,
     saveProject: (request: NormalizedSaveProjectRequest) => persistOperation((repo) => repo.saveProject(request)),
     saveProjectIncremental: (request: NormalizedIncrementalSaveProjectRequest) =>
@@ -433,6 +463,7 @@ export function createBrowserProjectStoragePort(options: BrowserProjectStorageOp
       await runtime?.client.close();
       runtime = null;
       repository = null;
+      workspacePreferencesRepository = null;
       closeLeaderSignalChannel();
       diagnostics = Object.freeze({
         ...diagnostics,

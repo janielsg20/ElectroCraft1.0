@@ -1,0 +1,80 @@
+name: M04.7 Workspace Preferences Gate
+
+on:
+  pull_request:
+    paths:
+      - 'packages/application/src/projects/**'
+      - 'packages/data-web/src/**'
+      - 'packages/design-system/src/components/ui/resizable-pane-layout.tsx'
+      - 'apps/studio/src/App.tsx'
+      - 'apps/studio/src/features/projects/**'
+      - 'apps/studio/src/shell/**'
+      - 'tooling/vitest/unit/workspace-preferences.test.ts'
+      - 'tooling/vitest/integration/workspace-preferences-pglite.test.ts'
+      - 'tooling/playwright/m04-7-workspace-preferences.spec.ts'
+      - '.github/workflows/m04-7-workspace-preferences.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'packages/application/src/projects/**'
+      - 'packages/data-web/src/**'
+      - 'packages/design-system/src/components/ui/resizable-pane-layout.tsx'
+      - 'apps/studio/src/App.tsx'
+      - 'apps/studio/src/features/projects/**'
+      - 'apps/studio/src/shell/**'
+      - 'tooling/vitest/unit/workspace-preferences.test.ts'
+      - 'tooling/vitest/integration/workspace-preferences-pglite.test.ts'
+      - 'tooling/playwright/m04-7-workspace-preferences.spec.ts'
+      - '.github/workflows/m04-7-workspace-preferences.yml'
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  verify:
+    name: M04.7 preferences persistence and multi-tab
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Verify formatting
+        run: npm run format:check
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Workspace preference contract and PGlite round-trip
+        run: >-
+          npx vitest run --config vitest.config.ts
+          tooling/vitest/unit/workspace-preferences.test.ts
+          tooling/vitest/integration/workspace-preferences-pglite.test.ts
+      - name: Build Studio
+        run: npm run build:studio
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Browser persistence responsive and multi-tab
+        run: npx playwright test --config playwright.config.ts tooling/playwright/m04-7-workspace-preferences.spec.ts
+      - name: Emit closure candidate
+        run: echo PASS_M04_7_WORKSPACE_PREFERENCES | tee m04-7-closure.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m04-7-workspace-preferences-evidence
+          path: |
+            m04-7-closure.log
+            test-results
+            playwright-report
+          if-no-files-found: ignore

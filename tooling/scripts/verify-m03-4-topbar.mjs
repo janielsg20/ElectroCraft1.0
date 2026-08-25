@@ -43,9 +43,9 @@ const m034ClosurePath = path.join(root, '.ai/evidence/F03/M03.4/CLOSURE_2026-08-
 if (!appCss.includes('height: var(--ec-shell-topbar-height)')) {
   throw new Error('M03.4 AppShell must consume the shared Topbar height token');
 }
-if (!layout.includes('topbarPx: 56')) throw new Error('M03.4 layout contract must preserve current Topbar height 56px');
-if (!tokens.includes('--ec-shell-topbar-height: 56px;')) {
-  throw new Error('M03.4 design-system tokens must preserve current Topbar height 56px');
+if (!layout.includes('topbarPx: 52')) throw new Error('M03.4 layout contract must preserve current Topbar height 52px');
+if (!tokens.includes('--ec-shell-topbar-height: 52px;')) {
+  throw new Error('M03.4 design-system tokens must preserve current Topbar height 52px');
 }
 for (const token of [
   'ec-topbar-left',
@@ -53,10 +53,15 @@ for (const token of [
   'ec-topbar-right',
   'data-topbar-settings-trigger',
   'data-topbar-settings-sheet',
-  'preferencesPort.toggleSidebar',
+  'preferencesPort.subscribe',
+  'preferencesPort.getSnapshot',
+  'WorkspaceSettings',
   'useSyncExternalStore',
 ]) {
   if (!topbar.includes(token)) throw new Error(`M03.4 Topbar behavior missing: ${token}`);
+}
+if (topbar.includes('@electric-sql/pglite') || topbar.includes('drizzle-orm')) {
+  throw new Error('M03.4 Topbar must not own workspace preference persistence');
 }
 if (topbar.lastIndexOf('data-topbar-settings-trigger') <= topbar.lastIndexOf('ec-topbar-help-trigger')) {
   throw new Error('M03.4 Settings gear must be the final right-side action');
@@ -126,7 +131,7 @@ const report = {
   mode: complete ? 'post-closure-regression' : 'active-gate',
   engine: 'shadcn/ui Radix + AppShell',
   baseCommit: '5d6e5d341222b924c3f8eb40567ab15dc1628ff8',
-  topbar: { heightPx: 56, regions: ['left', 'center', 'right'], settingsLast: true },
+  topbar: { heightPx: 52, regions: ['left', 'center', 'right'], settingsLast: true },
   responsive: ['desktop-full', 'laptop-tools-sheet', 'tablet-tools-sheet', 'mobile-icon-actions'],
   settings: { surface: 'Radix Sheet', restoreFocus: 'default', preferencePort: 'WorkspacePreferencesPort' },
   helpId: 'help.studio.shell',
