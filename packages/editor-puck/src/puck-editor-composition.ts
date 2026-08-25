@@ -29,14 +29,18 @@ export const electroCraftPuckIframeConfig = Object.freeze({
  * Public Puck composition surface owned by the editor-puck adapter.
  * Studio never imports @puckeditor/core directly.
  */
-export function PuckEditorRoot({ iframe, ...props }: ComponentProps<typeof Puck>) {
-  return createElement(Puck, {
-    ...props,
-    iframe: {
-      ...electroCraftPuckIframeConfig,
-      ...iframe,
+export function PuckEditorRoot({ iframe, children, ...props }: ComponentProps<typeof Puck>) {
+  return createElement(
+    Puck,
+    {
+      ...props,
+      iframe: {
+        ...electroCraftPuckIframeConfig,
+        ...iframe,
+      },
     },
-  });
+    children,
+  );
 }
 
 export const PuckEditorComponents = Puck.Components;
