@@ -141,7 +141,8 @@ export function WorkspaceSettings() {
             <HelpTrigger helpId="help.projects" />
           </div>
           <p>
-            Personaliza el panel lateral, el editor y los diseños reutilizables. Los cambios se guardan en este navegador.
+            Personaliza el panel lateral, el editor y los diseños reutilizables. Los cambios se guardan en este
+            navegador.
           </p>
         </div>
         <span
