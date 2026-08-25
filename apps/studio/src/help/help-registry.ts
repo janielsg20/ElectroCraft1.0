@@ -6,7 +6,7 @@ import { studioSidebarNavigation, type SidebarNavigationItemId } from '../shell/
 // M03.6 continuity: tablet conserva un rail global de 56px; móvil usa navegación inferior, Sheets inferiores y Más abre Capas/Outline a altura completa.
 // M03.7 continuity: Progressive Disclosure clasifica información como primary, contextual, advanced o diagnostic; los diagnósticos críticos permanecen fuera de Advanced.
 // M03.10 continuity: ElectroCraft se entrega en español. La infraestructura de idiomas permite añadir traducciones futuras sin cambiar la lógica de la aplicación.
-// F04 continuity: almacenamiento, autosave, checkpoints, recovery y preferencias del workspace comparten help.projects.
+// F04 continuity: almacenamiento, autosave, revisiones persistentes, recovery y preferencias del workspace comparten help.projects.
 
 type HelpMessageKey = ElectroCraftResourceKey<'help'>;
 
@@ -102,7 +102,7 @@ const studioDefinitions = Object.freeze([
   },
   {
     id: 'help.projects',
-    sectionId: 'settings-projects-workspace',
+    sectionId: 'projects-storage-history',
     titleKey: 'help.projects.title',
     shortKey: 'help.projects.short',
     longKey: 'help.projects.long',
@@ -118,7 +118,18 @@ const studioDefinitions = Object.freeze([
       'persistencia',
       'autosave',
       'checkpoint',
+      'checkpoints',
+      'historial',
+      'historial de versiones',
+      'versiones',
+      'revisión',
+      'revisiones',
+      'diff',
+      'object versions',
+      'deduplicación',
       'restaurar',
+      'restauración',
+      'recovery',
       'reparar',
       'workspace',
       'espacio de trabajo',
@@ -129,7 +140,7 @@ const studioDefinitions = Object.freeze([
       'sidebar',
       'multi-tab',
     ],
-    learnMoreRef: '.ai/microphases/M04_7.md',
+    learnMoreRef: '.ai/microphases/M04_8.md',
   },
 ] as const satisfies readonly HelpDefinition[]);
 
