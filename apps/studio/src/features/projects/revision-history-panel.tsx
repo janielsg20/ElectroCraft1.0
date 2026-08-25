@@ -52,7 +52,9 @@ export function RevisionHistoryPanel({
     try {
       const next = await projectStorageRuntime.listRevisionHistory(projectId);
       setEntries(next);
-      setSelectedId((current) => (current && next.some((entry) => entry.revisionId === current) ? current : next[0]?.revisionId ?? null));
+      setSelectedId((current) =>
+        current && next.some((entry) => entry.revisionId === current) ? current : next[0]?.revisionId ?? null,
+      );
       setState('ready');
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'No se pudo cargar el historial de versiones.');
@@ -63,6 +65,7 @@ export function RevisionHistoryPanel({
   useEffect(() => void reload(), [reload]);
 
   const selected = entries.find((entry) => entry.revisionId === selectedId) ?? null;
+  const restoreBlocked = Boolean(selected && !selected.restorable);
 
   async function saveRevision() {
     setAction('saving');
@@ -78,7 +81,7 @@ export function RevisionHistoryPanel({
   }
 
   async function restoreRevision() {
-    if (!selected) return;
+    if (!selected?.restorable) return;
     setAction('restoring');
     setError('');
     try {
@@ -93,7 +96,13 @@ export function RevisionHistoryPanel({
   }
 
   return (
-    <section className="ec-revision-history" data-revision-history data-state={state} aria-busy={state === 'loading'}>
+    <section
+      className="ec-revision-history"
+      data-revision-history
+      data-state={state}
+      data-restore-state={restoreBlocked ? 'blocked' : action}
+      aria-busy={state === 'loading'}
+    >
       <header className="ec-revision-history-header">
         <div>
           <div className="ec-revision-history-title">
@@ -146,12 +155,14 @@ export function RevisionHistoryPanel({
                   aria-selected={selectedEntry}
                   className="ec-revision-list-item"
                   data-selected={selectedEntry ? 'true' : 'false'}
+                  data-restorable={entry.restorable ? 'true' : 'false'}
                   onClick={() => setSelectedId(entry.revisionId)}
                 >
                   <strong>{reasonLabel(entry)}</strong>
                   <span>{new Date(entry.timestamp).toLocaleString('es')}</span>
                   <small>
                     {entry.objectCount} objetos · {entry.actor === 'user' ? 'Usuario' : 'Sistema'}
+                    {entry.restorable ? '' : ' · Restauración bloqueada'}
                   </small>
                 </button>
               );
@@ -169,8 +180,12 @@ export function RevisionHistoryPanel({
                   </div>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button variant="destructive" disabled={action !== 'idle'}>
-                        {action === 'restoring' ? 'Restaurando…' : 'Restaurar'}
+                      <Button variant="destructive" disabled={action !== 'idle' || !selected.restorable}>
+                        {action === 'restoring'
+                          ? 'Restaurando…'
+                          : selected.restorable
+                            ? 'Restaurar'
+                            : 'Restauración bloqueada'}
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
@@ -186,6 +201,19 @@ export function RevisionHistoryPanel({
                     </AlertDialogContent>
                   </AlertDialog>
                 </div>
+
+                {selected.diagnostic ? (
+                  <div className="ec-revision-history-error" role="alert" data-revision-diagnostic>
+                    <strong>Esta revisión no se puede restaurar.</strong>
+                    <p>
+                      {selected.diagnostic.code} · {selected.diagnostic.location}
+                    </p>
+                    <p>{selected.diagnostic.cause}</p>
+                    <p>
+                      <strong>Acción sugerida:</strong> {selected.diagnostic.action}
+                    </p>
+                  </div>
+                ) : null}
 
                 <div className="ec-revision-diff-summary" aria-label="Resumen de cambios">
                   <div>

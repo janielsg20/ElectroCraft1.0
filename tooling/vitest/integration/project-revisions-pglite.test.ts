@@ -77,7 +77,11 @@ describe('M04.8 project revisions with real PGlite', () => {
 
       const historyBeforeRestore = await revisions.list(PROJECT_ID);
       const second = historyBeforeRestore.find((entry) => entry.revisionId === secondManual.id);
-      expect(second?.diff).toMatchObject({ changed: 1, added: 0, removed: 0, unchanged: 1 });
+      expect(second).toMatchObject({
+        restorable: true,
+        diagnostic: null,
+        diff: { changed: 1, added: 0, removed: 0, unchanged: 1 },
+      });
 
       const recovery = await revisions.recoveryCandidate(PROJECT_ID);
       expect(recovery).toMatchObject({
@@ -97,6 +101,7 @@ describe('M04.8 project revisions with real PGlite', () => {
 
       const historyAfterRestore = await revisions.list(PROJECT_ID);
       expect(historyAfterRestore[0]?.source).toBe('restore');
+      expect(historyAfterRestore[0]?.restorable).toBe(true);
       expect(historyAfterRestore.some((entry) => entry.revisionId === restored.safetyRevisionId)).toBe(true);
       expect(historyAfterRestore.some((entry) => entry.revisionId === firstManual.id)).toBe(true);
       expect(historyAfterRestore.some((entry) => entry.revisionId === secondManual.id)).toBe(true);
@@ -111,7 +116,7 @@ describe('M04.8 project revisions with real PGlite', () => {
     }
   });
 
-  it('skips a broken newest revision and returns the next restorable checkpoint', async () => {
+  it('marks a broken newest revision as blocked and returns the next restorable checkpoint', async () => {
     const client = await PGlite.create('memory://');
     try {
       await applyStudioStorageMigrations(client);
@@ -148,6 +153,16 @@ describe('M04.8 project revisions with real PGlite', () => {
         refs.rows[0]!.version_id,
       ]);
 
+      const history = await revisions.list(PROJECT_ID);
+      const blocked = history.find((entry) => entry.revisionId === broken.id);
+      expect(blocked).toMatchObject({
+        restorable: false,
+        diagnostic: {
+          code: 'REVISION_NOT_RESTORABLE',
+          location: `project_revisions/${broken.id}`,
+        },
+      });
+      expect(blocked?.diagnostic?.cause).toContain('project object version not found');
       await expect(revisions.recoveryCandidate(PROJECT_ID)).resolves.toMatchObject({
         revisionId: stable.id,
         objectCount: 2,

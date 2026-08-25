@@ -3,7 +3,6 @@ import {
   inferProjectRevisionSource,
   summarizeProjectRevisionDiff,
   type ProjectObjectVersionReference,
-  type ProjectRecoveryCandidate,
   type ProjectRevisionActor,
   type ProjectRevisionHistoryEntry,
   type ProjectRevisionPort,
@@ -134,6 +133,15 @@ function parseRevision(row: RevisionRow): ParsedRevision {
     source,
     timestamp,
     payloads,
+  });
+}
+
+function createRevisionDiagnostic(row: RevisionRow, cause: unknown) {
+  return Object.freeze({
+    code: 'REVISION_NOT_RESTORABLE' as const,
+    location: `project_revisions/${row.id}`,
+    cause: cause instanceof Error ? cause.message : 'Fallo de integridad desconocido en la revisión.',
+    action: 'Conserva esta revisión como evidencia y restaura otra versión válida. Revisa Almacenamiento si el problema se repite.',
   });
 }
 
@@ -303,47 +311,70 @@ export function createDrizzleProjectRevisionRepository(db: StudioProjectDatabase
         .from(schema.projectRevisions)
         .where(eq(schema.projectRevisions.projectId, projectId))
         .orderBy(desc(schema.projectRevisions.createdAt), desc(schema.projectRevisions.id));
-      const parsed = rows.map(parseRevision);
-      return Object.freeze(
-        parsed.map((current, index) => {
-          const previous = parsed[index + 1];
-          return Object.freeze({
-            revisionId: current.revision.id,
-            projectId,
-            timestamp: current.timestamp,
-            reason: current.revision.reason,
-            actor: current.actor,
-            source: current.source,
-            objectCount: current.entries.length,
-            diff: summarizeProjectRevisionDiff(previous?.entries ?? [], current.entries),
-          });
-        }),
-      );
-    },
 
-    async findRecoveryCandidate(projectId: string): Promise<ProjectRecoveryCandidate | null> {
-      const rows = await db
-        .select()
-        .from(schema.projectRevisions)
-        .where(eq(schema.projectRevisions.projectId, projectId))
-        .orderBy(desc(schema.projectRevisions.createdAt), desc(schema.projectRevisions.id));
-
-      for (const row of rows) {
+      const parsed = rows.map((row) => {
         try {
-          const parsed = parseRevision(row);
-          await db.transaction((tx) => hydrateRevisionObjects(tx, parsed));
-          return Object.freeze({
-            projectId,
-            revisionId: parsed.revision.id,
-            reason: parsed.revision.reason,
-            createdAt: parsed.timestamp,
-            objectCount: parsed.entries.length,
-          });
-        } catch {
-          // Skip corrupt or incomplete revisions and keep searching for the newest restorable checkpoint.
+          return Object.freeze({ revision: parseRevision(row), error: null as unknown });
+        } catch (error) {
+          return Object.freeze({ revision: null, error });
         }
+      });
+      const previousEntries: Array<readonly ProjectObjectVersionReference[]> = new Array(rows.length);
+      let olderEntries: readonly ProjectObjectVersionReference[] = [];
+      for (let index = rows.length - 1; index >= 0; index -= 1) {
+        previousEntries[index] = olderEntries;
+        const current = parsed[index]?.revision;
+        if (current) olderEntries = current.entries;
       }
-      return null;
+
+      const history: ProjectRevisionHistoryEntry[] = [];
+      for (let index = 0; index < rows.length; index += 1) {
+        const row = rows[index]!;
+        const current = parsed[index]!;
+        if (!current.revision) {
+          const source = inferProjectRevisionSource(row.reason);
+          history.push(
+            Object.freeze({
+              revisionId: row.id,
+              projectId,
+              timestamp: row.createdAt.toISOString(),
+              reason: row.reason,
+              actor: inferProjectRevisionActor(source),
+              source,
+              objectCount: 0,
+              diff: summarizeProjectRevisionDiff([], []),
+              restorable: false,
+              diagnostic: createRevisionDiagnostic(row, current.error),
+            }),
+          );
+          continue;
+        }
+
+        let diagnostic: ProjectRevisionHistoryEntry['diagnostic'] = null;
+        try {
+          await db.transaction(async (tx) => {
+            await hydrateRevisionObjects(tx, current.revision!);
+          });
+        } catch (cause) {
+          diagnostic = createRevisionDiagnostic(row, cause);
+        }
+
+        history.push(
+          Object.freeze({
+            revisionId: current.revision.revision.id,
+            projectId,
+            timestamp: current.revision.timestamp,
+            reason: current.revision.revision.reason,
+            actor: current.revision.actor,
+            source: current.revision.source,
+            objectCount: current.revision.entries.length,
+            diff: summarizeProjectRevisionDiff(previousEntries[index] ?? [], current.revision.entries),
+            restorable: diagnostic === null,
+            diagnostic,
+          }),
+        );
+      }
+      return Object.freeze(history);
     },
 
     async restoreRevision(projectId: string, revisionId: string): Promise<ProjectRevisionRestoreResult> {
