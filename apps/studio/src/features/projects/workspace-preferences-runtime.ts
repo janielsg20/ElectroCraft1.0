@@ -47,7 +47,7 @@ function hasPendingInitializationPatch() {
   return Object.keys(pendingInitializationPatch).length > 0;
 }
 
-async function loadInitialPreferences() {
+async function loadInitialPreferences(): Promise<WorkspacePreferences> {
   const loaded = await service.load();
   const next = hasPendingInitializationPatch()
     ? Object.freeze({
@@ -68,7 +68,7 @@ async function loadInitialPreferences() {
   return next;
 }
 
-async function reload() {
+async function reload(): Promise<WorkspacePreferences> {
   ensureCrossTabSync();
   if (!initialized) {
     if (initializePromise || pendingMutations > 0) deferredReload = true;
@@ -111,13 +111,13 @@ function ensureCrossTabSync() {
   }
 }
 
-async function initialize() {
+async function initialize(): Promise<WorkspacePreferences> {
   ensureCrossTabSync();
   if (initialized) return snapshot;
   if (!initializePromise) {
     if (pendingMutations === 0) setPersistenceState('loading');
     initializePromise = loadInitialPreferences()
-      .catch((error) => {
+      .catch((error: unknown) => {
         setPersistenceState('error');
         throw error;
       })
