@@ -35,8 +35,8 @@ export function PuckEditorRoot({ iframe, children, ...props }: ComponentProps<ty
     {
       ...props,
       iframe: {
-        ...electroCraftPuckIframeConfig,
         ...iframe,
+        ...electroCraftPuckIframeConfig,
       },
     },
     children,
