@@ -1,9 +1,5 @@
+import { electroCraftPuckIframeConfig, structuralPuckConfig, structuralPuckData } from '@electrocraft/editor-puck';
 import { describe, expect, it } from 'vitest';
-import {
-  electroCraftPuckIframeConfig,
-  structuralPuckConfig,
-  structuralPuckData,
-} from '@electrocraft/editor-puck';
 
 describe('M05.2 Puck composition policy', () => {
   it('isolates Preview from host styles while preserving Puck iframe styles', () => {
