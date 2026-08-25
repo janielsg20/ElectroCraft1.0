@@ -1,0 +1,133 @@
+name: M02.6 Serializer Migration Registry Gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'packages/domain/**'
+      - 'packages/application/**'
+      - 'packages/export-ir/**'
+      - 'tooling/fixtures/canonical-model/**'
+      - 'tooling/vitest/unit/serializer-migration-registry.test.ts'
+      - 'tooling/vitest/contract/serializer-migration-registry-boundary.test.ts'
+      - 'tooling/vitest/integration/serializer-migration-import-runtime.test.ts'
+      - '.github/workflows/m02-6-serializer-migration-registry.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'packages/domain/**'
+      - 'packages/application/**'
+      - 'packages/export-ir/**'
+      - 'tooling/fixtures/canonical-model/**'
+      - 'tooling/vitest/unit/serializer-migration-registry.test.ts'
+      - 'tooling/vitest/contract/serializer-migration-registry-boundary.test.ts'
+      - 'tooling/vitest/integration/serializer-migration-import-runtime.test.ts'
+      - '.github/workflows/m02-6-serializer-migration-registry.yml'
+
+permissions:
+  contents: read
+  statuses: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  m02-6:
+    name: M02.6 serializer/migration/import
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Publish pending status
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: 'pending',
+              context: 'electrocraft/M02.6',
+              description: 'M02.6 serializer/migration/import gate running',
+              target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Verify locked toolchain
+        run: |
+          test "$(node --version)" = 'v22.16.0'
+          test "$(npm --version)" = '10.9.2'
+          test "$(npm config get legacy-peer-deps)" = 'true'
+          node -e "const p=require('./node_modules/zod/package.json'); console.log('zod lock will be checked after npm ci')" || true
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Verify Zod boundary and owner package count
+        run: |
+          node -e "const p=require('./node_modules/zod/package.json'); if(p.version!=='4.4.3') throw new Error('expected zod@4.4.3, got '+p.version); console.log('zod@'+p.version)"
+          node -e "const p=require('./tooling/package-boundaries.json'); const expected=p.invariants.expectedStablePackageCount; const actual=Object.keys(p.packages).length; if(actual!==expected) throw new Error('owner package count drift: expected '+expected+', got '+actual); console.log('ownerPackages='+actual)"
+
+      - name: Execute M02.6 unit contract integration tests with generated evidence
+        run: |
+          mkdir -p .evidence/m02-6
+          ELECTROCRAFT_EVIDENCE_DIR=.evidence/m02-6 npx --no-install vitest run --config vitest.config.ts \
+            tooling/vitest/unit/serializer-migration-registry.test.ts \
+            tooling/vitest/contract/serializer-migration-registry-boundary.test.ts \
+            tooling/vitest/integration/serializer-migration-import-runtime.test.ts | tee m02-6-tests.log
+
+      - name: Execute full repository pipeline
+        run: npm run check | tee m02-6-check.log
+
+      - name: Verify generated M02.6 evidence
+        run: |
+          test -f .evidence/m02-6/m02-6-snapshot-report.json
+          test -f .evidence/m02-6/m02-6-import-diagnostics.json
+          test -f .evidence/m02-6/m02-6-migration-report.json
+          node -e "const e=require('./tooling/fixtures/canonical-model/canonical-snapshot-checksum-v1.json'); const r=require('./.evidence/m02-6/m02-6-snapshot-report.json'); if(r.checksum!==e.expectedChecksum) throw new Error('canonical snapshot checksum drift'); console.log('checksum='+r.checksum)"
+          node -e "const r=require('./.evidence/m02-6/m02-6-import-diagnostics.json'); if(!r.storageUnchanged) throw new Error('invalid import mutated storage'); const c=r.checksumResult.diagnostics?.map((d)=>d.code)||[]; const s=r.schemaResult.diagnostics?.map((d)=>d.code)||[]; if(!c.includes('CHECKSUM_MISMATCH') || !s.includes('INVALID_SCHEMA')) throw new Error('reparable diagnostics incomplete'); console.log('invalidImportStorageMutation=false')"
+          node -e "const r=require('./.evidence/m02-6/m02-6-migration-report.json'); if(!r.storageRewritten || r.v3.toVersion!==3 || r.v3.appliedStepIds.length!==2) throw new Error('migration registry evidence incomplete'); console.log('migrationSteps='+r.v3.appliedStepIds.join(','))"
+
+      - name: Emit M02.6 closure candidate marker
+        run: echo PASS_M02_6_SERIALIZER_MIGRATION_REGISTRY | tee m02-6-closure.log
+
+      - name: Upload M02.6 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: m02-6-serializer-migration-registry-evidence
+          path: |
+            m02-6-tests.log
+            m02-6-check.log
+            m02-6-closure.log
+            .evidence/m02-6/*.json
+            tooling/fixtures/canonical-model/project-migration-v1-to-v2-expected.json
+            tooling/fixtures/canonical-model/canonical-snapshot-checksum-v1.json
+          if-no-files-found: error
+
+      - name: Publish final commit status
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: '${{ job.status }}' === 'success' ? 'success' : 'failure',
+              context: 'electrocraft/M02.6',
+              description: 'M02.6 serializer/migration/import gate',
+              target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });

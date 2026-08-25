@@ -1,0 +1,123 @@
+name: M03.2 AppShell Gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'packages/design-system/**'
+      - 'apps/studio/**'
+      - 'tooling/vitest/**/app-shell-*.test.ts'
+      - 'tooling/playwright/m03-2-app-shell.spec.ts'
+      - 'tooling/scripts/verify-m03-2-app-shell.mjs'
+      - '.ai/evidence/F03/M03.1/**'
+      - '.ai/evidence/F03/M03.2/**'
+      - '.ai/STATE.md'
+      - '.ai/TRACKING.md'
+      - '.ai/HANDOFF.md'
+      - 'package.json'
+      - '.github/workflows/m03-2-app-shell.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'packages/design-system/**'
+      - 'apps/studio/**'
+      - 'tooling/vitest/**/app-shell-*.test.ts'
+      - 'tooling/playwright/m03-2-app-shell.spec.ts'
+      - 'tooling/scripts/verify-m03-2-app-shell.mjs'
+      - '.ai/evidence/F03/M03.1/**'
+      - '.ai/evidence/F03/M03.2/**'
+      - '.ai/STATE.md'
+      - '.ai/TRACKING.md'
+      - '.ai/HANDOFF.md'
+      - 'package.json'
+      - '.github/workflows/m03-2-app-shell.yml'
+
+permissions:
+  contents: read
+  statuses: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  m03-2:
+    name: M03.2 AppShell desktop
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Publish pending status
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createCommitStatus({ owner: context.repo.owner, repo: context.repo.repo, sha: context.sha, state: 'pending', context: 'electrocraft/M03.2', description: 'M03.2 AppShell gate running', target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}` });
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Verify locked toolchain
+        run: |
+          test "$(node --version)" = 'v22.16.0'
+          test "$(npm --version)" = '10.9.2'
+          test "$(npm config get legacy-peer-deps)" = 'true'
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Prepare reproducible formatting candidate
+        id: format
+        run: |
+          npm run format
+          git diff > m03-2-format.patch
+          git diff --name-only > m03-2-format-files.txt
+          if [ -s m03-2-format-files.txt ]; then echo "changed=true" >> "$GITHUB_OUTPUT"; tar -czf m03-2-format-files.tar.gz -T m03-2-format-files.txt; else echo "changed=false" >> "$GITHUB_OUTPUT"; tar -czf m03-2-format-files.tar.gz --files-from /dev/null; fi
+      - name: Execute dedicated M03.2 suite
+        run: npm run test:m03-2
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium
+      - name: Execute repository gate
+        run: npm run check | tee m03-2-check.log
+      - name: Emit execution marker
+        run: |
+          if [ "${{ steps.format.outputs.changed }}" = "true" ]; then echo M03_2_FORMAT_CANDIDATE_READY | tee m03-2-closure.log; else echo PASS_M03_2_APP_SHELL | tee m03-2-closure.log; fi
+      - name: Upload formatting candidate
+        if: always() && steps.format.outputs.changed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: m03-2-formatting-candidate
+          path: |
+            m03-2-format.patch
+            m03-2-format-files.txt
+            m03-2-format-files.tar.gz
+          if-no-files-found: error
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m03-2-app-shell-evidence
+          path: |
+            m03-2-check.log
+            m03-2-closure.log
+            m03-2-format.patch
+            m03-2-format-files.txt
+            test-results/**
+            .ai/evidence/F03/M03.2/**
+            tooling/dist/m03-2-app-shell-report.json
+          if-no-files-found: error
+      - name: Require committed formatting synchronization
+        if: always() && steps.format.outputs.changed == 'true'
+        run: |
+          echo "::error::M03.2 generated a reproducible Prettier formatting candidate. Apply the uploaded candidate before declaring the microphase closed."
+          exit 1
+      - name: Publish final commit status
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.createCommitStatus({ owner: context.repo.owner, repo: context.repo.repo, sha: context.sha, state: '${{ job.status }}' === 'success' ? 'success' : 'failure', context: 'electrocraft/M03.2', description: 'M03.2 AppShell gate', target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}` });
