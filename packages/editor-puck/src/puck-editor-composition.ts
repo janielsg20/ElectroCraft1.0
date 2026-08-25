@@ -1,5 +1,8 @@
 import { Puck, createUsePuck, type Config, type Data } from '@puckeditor/core';
 
+export type PuckEditorConfig = Config;
+export type PuckEditorOnChange = (data: Data) => void;
+
 export const structuralPuckConfig: Config = {
   components: {},
   root: { fields: {} },
@@ -9,6 +12,17 @@ export const structuralPuckData: Data = {
   content: [],
   root: { props: {} },
 };
+
+/**
+ * Puck 0.22 iframe policy for ElectroCraft Studio.
+ * Project preview styles stay isolated from the Studio shell while Puck keeps
+ * its own iframe interaction styles and waits for them before rendering.
+ */
+export const electroCraftPuckIframeConfig = Object.freeze({
+  enabled: true,
+  waitForStyles: true,
+  syncHostStyles: false,
+});
 
 /**
  * Public Puck composition surface owned by the editor-puck adapter.
