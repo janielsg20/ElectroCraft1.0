@@ -61,7 +61,7 @@ export interface ProjectRevisionRestoreResult {
 export interface ProjectRevisionPort {
   createCheckpoint(projectId: string, reason: string): Promise<ProjectStorageRevision>;
   listRevisionHistory(projectId: string): Promise<readonly ProjectRevisionHistoryEntry[]>;
-  findRecoveryCandidate(projectId: string): Promise<ProjectRecoveryCandidate | null>;
+  findRecoveryCandidate?(projectId: string): Promise<ProjectRecoveryCandidate | null>;
   restoreRevision(projectId: string, revisionId: string): Promise<ProjectRevisionRestoreResult>;
 }
 
@@ -155,6 +155,7 @@ export function createProjectRevisionService(port: ProjectRevisionPort) {
       return port.createCheckpoint(requireNonEmpty(projectId, 'projectId'), requireNonEmpty(reason, 'reason'));
     },
     recoveryCandidate(projectId: string) {
+      if (!port.findRecoveryCandidate) throw new Error('project revision recovery is not available');
       return port.findRecoveryCandidate(requireNonEmpty(projectId, 'projectId'));
     },
     saveRevision(projectId: string) {
