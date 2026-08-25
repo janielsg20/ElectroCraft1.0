@@ -1,4 +1,10 @@
-import { summarizeProjectRevisionDiff, inferProjectRevisionSource } from '@electrocraft/application';
+import {
+  createProjectRevisionService,
+  createProjectStorageRevision,
+  inferProjectRevisionSource,
+  summarizeProjectRevisionDiff,
+  type ProjectRevisionPort,
+} from '@electrocraft/application';
 import { createElectroCraftCanonicalSnapshotChecksum } from '@electrocraft/domain';
 import { describe, expect, it } from 'vitest';
 
@@ -44,5 +50,39 @@ describe('M04.8 project revision semantics', () => {
     expect(inferProjectRevisionSource('pre-export')).toBe('export');
     expect(inferProjectRevisionSource('restore:abc')).toBe('restore');
     expect(inferProjectRevisionSource('pre-restore-safety')).toBe('recovery');
+  });
+
+  it('keeps a persistent restore independent from the session Undo history', async () => {
+    const sessionHistory = { undoDepth: 3, redoDepth: 1 };
+    const currentRevision = createProjectStorageRevision(
+      'project-undo-independent',
+      [],
+      'restore:revision-old',
+      'revision-current',
+      '2026-08-24T20:30:00.000Z',
+    );
+    const port: ProjectRevisionPort = Object.freeze({
+      async createCheckpoint() {
+        return currentRevision;
+      },
+      async listRevisionHistory() {
+        return Object.freeze([]);
+      },
+      async restoreRevision(projectId, revisionId) {
+        expect(projectId).toBe('project-undo-independent');
+        expect(revisionId).toBe('revision-old');
+        expect(sessionHistory).toEqual({ undoDepth: 3, redoDepth: 1 });
+        return Object.freeze({
+          projectId,
+          restoredFromRevisionId: revisionId,
+          safetyRevisionId: 'revision-safety',
+          currentRevision,
+        });
+      },
+    });
+
+    await createProjectRevisionService(port).restore('project-undo-independent', 'revision-old');
+
+    expect(sessionHistory).toEqual({ undoDepth: 3, redoDepth: 1 });
   });
 });

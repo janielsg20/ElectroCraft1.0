@@ -13,7 +13,9 @@ import { createProjectAutosaveController } from './project-storage-autosave';
 const port = createBrowserProjectStoragePort();
 const service = createProjectStorageService(port);
 const revisionService = createProjectRevisionService(port.revisions);
-const backupService = createProjectBackupService(service);
+const backupService = createProjectBackupService(service, {
+  checkpointBeforeReplace: (projectId) => revisionService.checkpoint(projectId, 'pre-import'),
+});
 const listeners = new Set<() => void>();
 
 export const workspacePreferencesStoragePort = port.workspacePreferences;
@@ -126,14 +128,14 @@ export const projectStorageRuntime = Object.freeze({
   },
   async saveRevision(projectId: string) {
     await autosave.flush();
-    const revision = await revisionService.saveRevision(projectId);
+    const revision = await runPersistence(() => revisionService.saveRevision(projectId));
     currentProjectId = projectId;
     autosave.noteCheckpointCommitted();
     return revision;
   },
   async restoreRevisionFromHistory(projectId: string, revisionId: string) {
     await autosave.flush();
-    const result = await revisionService.restore(projectId, revisionId);
+    const result = await runPersistence(() => revisionService.restore(projectId, revisionId));
     currentProjectId = projectId;
     autosave.noteCheckpointCommitted();
     return result;
@@ -160,15 +162,16 @@ export const projectStorageRuntime = Object.freeze({
     const integrity = await service.verifyProject(projectId);
     return Object.freeze({
       integrity,
-      recovery: integrity.coherent ? null : await service.recoveryCandidate(projectId),
+      recovery: integrity.coherent ? null : await revisionService.recoveryCandidate(projectId),
     });
   },
-  recoveryCandidate: service.recoveryCandidate,
+  recoveryCandidate: revisionService.recoveryCandidate,
   async restoreRevision(projectId: string, revisionId: string) {
     await autosave.flush();
-    const revision = await runPersistence(() => service.restoreRevision(projectId, revisionId));
+    const result = await runPersistence(() => revisionService.restore(projectId, revisionId));
     currentProjectId = projectId;
-    return revision;
+    autosave.noteCheckpointCommitted();
+    return result.currentRevision;
   },
   async close() {
     await autosave.flush();

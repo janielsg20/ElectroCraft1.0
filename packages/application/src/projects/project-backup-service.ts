@@ -8,11 +8,22 @@ import {
 } from './project-backup';
 import type { ProjectStorageService, StoredProjectObjectInput } from './project-storage';
 
+export interface ProjectBackupServiceOptions {
+  readonly checkpointBeforeReplace?: (projectId: string) => Promise<unknown>;
+}
+
 function importedName(name: string, copied: boolean) {
   return copied ? `${name} — copia importada` : name;
 }
 
-export function createProjectBackupService(storage: ProjectStorageService) {
+export function createProjectBackupService(
+  storage: ProjectStorageService,
+  options: ProjectBackupServiceOptions = {},
+) {
+  const checkpointBeforeReplace =
+    options.checkpointBeforeReplace ??
+    ((projectId: string) => storage.createCheckpoint(projectId, 'pre-import-safety'));
+
   return Object.freeze({
     async backupProject(projectId: string): Promise<string> {
       const opened = await storage.openProject(projectId);
@@ -37,7 +48,7 @@ export function createProjectBackupService(storage: ProjectStorageService) {
       const copied = Boolean(existing && collisionStrategy === 'copy');
       const projectId = copied ? globalThis.crypto.randomUUID() : backup.project.id;
       if (existing && collisionStrategy === 'replace') {
-        await storage.createCheckpoint(existing.project.id, 'pre-import-safety');
+        await checkpointBeforeReplace(existing.project.id);
       }
 
       const objects: readonly StoredProjectObjectInput[] = backup.objects.map((object) => ({
