@@ -41,7 +41,12 @@ jobs:
       - name: Verify documentation conventions
         run: npm run test:docs
       - name: Lint
-        run: npm run lint
+        run: |
+          npm run lint || {
+            npx prettier --write packages/editor-puck/src/puck-document-adapter.ts tooling/playwright/m05-1-puck-adapter.spec.ts
+            git diff -- packages/editor-puck/src/puck-document-adapter.ts tooling/playwright/m05-1-puck-adapter.spec.ts
+            exit 1
+          }
       - name: Typecheck
         run: npm run typecheck
       - name: Test
