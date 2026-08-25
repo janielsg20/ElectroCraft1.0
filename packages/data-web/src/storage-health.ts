@@ -3,6 +3,7 @@ import {
   M04_3_MIGRATION_CHECKSUM,
   M04_4_MIGRATION_CHECKSUM,
   M04_6_REFERENTIAL_INTEGRITY_CHECKSUM,
+  M04_8_REVISION_STORE_CHECKSUM,
 } from './migration';
 import { STUDIO_STORAGE_SCHEMA_VERSION } from './schema-contract';
 
@@ -25,6 +26,7 @@ export async function verifyStudioStorageHealth(client: StudioStorageHealthClien
     M04_3_MIGRATION_CHECKSUM,
     M04_4_MIGRATION_CHECKSUM,
     M04_6_REFERENTIAL_INTEGRITY_CHECKSUM,
+    M04_8_REVISION_STORE_CHECKSUM,
   ];
   const valid = expected.every(
     (checksum, index) => result.rows[index]?.schema_version === index + 1 && result.rows[index]?.checksum === checksum,
