@@ -41,10 +41,7 @@ jobs:
       - name: Verify documentation conventions
         run: npm run test:docs
       - name: Lint
-        run: |
-          npx prettier --write packages/application/src/projects/project-revisions.ts
-          git diff -- packages/application/src/projects/project-revisions.ts
-          npm run lint
+        run: npm run lint
       - name: Typecheck
         run: npm run typecheck
       - name: Test

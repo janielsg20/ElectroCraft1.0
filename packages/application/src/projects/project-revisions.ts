@@ -2,15 +2,7 @@ import type { ProjectRevisionManifestEntry, ProjectStorageRevision } from './pro
 
 export type ProjectRevisionActor = 'user' | 'system';
 export type ProjectRevisionSource =
-  | 'initial'
-  | 'manual'
-  | 'automatic'
-  | 'pre-import'
-  | 'pre-migration'
-  | 'publish'
-  | 'export'
-  | 'restore'
-  | 'recovery';
+  'initial' | 'manual' | 'automatic' | 'pre-import' | 'pre-migration' | 'publish' | 'export' | 'restore' | 'recovery';
 
 export interface ProjectObjectVersionReference {
   readonly objectId: string;
