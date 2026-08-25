@@ -12,9 +12,9 @@ describe('Studio neutral administrative console style boundary', () => {
     expect(tokens).toContain('--ec-control-sm: 1.75rem;');
     expect(tokens).toContain('--ec-control-md: 2rem;');
     expect(tokens).toContain('--ec-control-lg: 2.25rem;');
-    expect(tokens).toContain('--ec-shell-sidebar-width: 256px;');
-    expect(tokens).toContain('--ec-shell-topbar-height: 56px;');
-    expect(tokens).toContain('--ec-shell-statusbar-height: 24px;');
+    expect(tokens).toContain('--ec-shell-sidebar-width: 240px;');
+    expect(tokens).toContain('--ec-shell-topbar-height: 52px;');
+    expect(tokens).toContain('--ec-shell-statusbar-height: 26px;');
     expect(tokens).not.toContain('Inter,');
   });
 
@@ -71,11 +71,11 @@ describe('Studio neutral administrative console style boundary', () => {
   it('keeps the responsive geometry aligned with the same console baseline', () => {
     const layout = read('apps/studio/src/shell/app-shell-layout.ts');
     const responsive = read('apps/studio/src/shell/responsive-shell.css');
-    expect(layout).toContain('sidebarExpandedPx: 256');
+    expect(layout).toContain('sidebarExpandedPx: 240');
     expect(layout).toContain('sidebarCollapsedPx: 64');
     expect(layout).toContain('tabletRailPx: 56');
-    expect(layout).toContain('topbarPx: 56');
-    expect(layout).toContain('statusbarPx: 24');
+    expect(layout).toContain('topbarPx: 52');
+    expect(layout).toContain('statusbarPx: 26');
     expect(responsive).toContain('grid-template-columns: 56px minmax(0, 1fr)');
     expect(responsive).toContain('min-height: 44px');
   });

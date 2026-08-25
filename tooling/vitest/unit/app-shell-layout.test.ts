@@ -5,10 +5,10 @@ describe('M03.2 AppShell layout contract', () => {
   it('keeps the current administrative-console structural dimensions', () => {
     expect(appShellLayout).toMatchObject({
       rootHeight: '100dvh',
-      sidebarExpandedPx: 256,
+      sidebarExpandedPx: 240,
       sidebarCollapsedPx: 64,
-      topbarPx: 56,
-      statusbarPx: 24,
+      topbarPx: 52,
+      statusbarPx: 26,
     });
   });
 

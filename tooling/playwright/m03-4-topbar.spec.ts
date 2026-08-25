@@ -6,7 +6,7 @@ test.describe('M03.4 Topbar global + Settings', () => {
     await page.goto('/editor');
 
     const topbar = page.locator('.ec-app-shell-topbar');
-    expect((await topbar.boundingBox())?.height).toBe(56);
+    expect((await topbar.boundingBox())?.height).toBe(52);
     await expect(page.locator('.ec-topbar-left')).toContainText('Studio');
     await expect(page.locator('.ec-topbar-left')).toContainText('Editor');
     await expect(page.locator('[data-topbar-tool="platform"]')).toContainText('Web');
