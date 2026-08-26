@@ -51,10 +51,13 @@
 
 .ec-resizable-pane-handle::before {
   width: 2px;
-  height: 32px;
+  height: 28px;
   border-radius: 999px;
   content: '';
-  background: var(--border);
+  background: transparent;
+  transition:
+    width var(--ec-fast) ease,
+    background-color var(--ec-fast) ease;
 }
 
 .ec-resizable-pane-handle:hover::before,
@@ -65,22 +68,22 @@
 
 .ec-resizable-pane-handle:focus-visible {
   border-radius: 999px;
-  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ring) 28%, transparent);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ring) 22%, transparent);
 }
 
 .ec-resizable-pane-grip {
   position: absolute;
   width: 3px;
-  height: 28px;
+  height: 26px;
   border-radius: 999px;
-  background: var(--muted-foreground);
+  background: var(--primary);
   opacity: 0;
   transition: opacity var(--ec-fast) ease;
 }
 
 .ec-resizable-pane-handle:hover .ec-resizable-pane-grip,
 .ec-resizable-pane-handle:focus-visible .ec-resizable-pane-grip {
-  opacity: 0.35;
+  opacity: 0.3;
 }
 
 .ec-editor-region {
@@ -89,10 +92,10 @@
   display: grid;
   grid-template-rows: 36px minmax(0, 1fr);
   overflow: hidden;
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--ec-radius-panel);
   background: var(--surface);
-  box-shadow: var(--ec-shadow-sm);
+  box-shadow: none;
 }
 
 .ec-editor-region[data-editor-region='canvas'] {
@@ -104,8 +107,8 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  border-bottom: 1px solid var(--border);
-  padding: 0 10px;
+  border: 0;
+  padding: 0 12px;
   background: var(--surface);
   color: var(--foreground);
   font-size: var(--ec-text-xs);
@@ -125,10 +128,10 @@
 }
 
 .ec-editor-region-actions span {
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: 7px;
-  padding: 1px 6px;
-  background: var(--background);
+  padding: 2px 6px;
+  background: color-mix(in srgb, var(--muted) 62%, transparent);
 }
 
 .ec-editor-region-header svg {
@@ -148,8 +151,8 @@
 
 .ec-editor-structural-notice {
   margin: 0;
-  border-bottom: 1px solid var(--border);
-  padding: 7px 10px;
+  border: 0;
+  padding: 7px 12px 8px;
   color: var(--muted-foreground);
   font-size: var(--ec-text-2xs);
   line-height: 1.45;
@@ -157,7 +160,7 @@
 
 .ec-editor-puck-slot {
   min-width: 0;
-  border-bottom: 1px solid var(--border);
+  border: 0;
 }
 
 .ec-editor-canvas-stage {
@@ -187,11 +190,11 @@
   width: min(100%, 1120px);
   min-height: calc(100% - 4px);
   margin-inline: auto;
-  border: 1px solid var(--border);
+  overflow: hidden;
+  border: 0;
   border-radius: 12px;
   background: var(--surface);
-  box-shadow: var(--ec-shadow-sm);
-  overflow: hidden;
+  box-shadow: none;
 }
 
 .ec-editor-panel-tabs {
@@ -200,8 +203,8 @@
   grid-auto-flow: column;
   grid-auto-columns: minmax(0, 1fr);
   align-items: stretch;
-  border-bottom: 1px solid var(--border);
-  padding: 3px 4px;
+  border: 0;
+  padding: 4px 8px 5px;
   background: var(--surface);
 }
 
@@ -214,7 +217,7 @@
   align-items: center;
   justify-content: center;
   gap: 5px;
-  padding: 4px 5px;
+  padding: 4px 6px;
   overflow: hidden;
   background: transparent;
   color: var(--muted-foreground);
@@ -226,7 +229,7 @@
 }
 
 .ec-editor-panel-tab:hover {
-  background: var(--muted);
+  background: color-mix(in srgb, var(--muted) 76%, transparent);
   color: var(--foreground);
 }
 
@@ -256,15 +259,23 @@
   overflow: auto;
 }
 
+.ec-editor-region[data-editor-region='inspector'] .ec-editor-tab-panel {
+  padding: 10px 12px 14px;
+}
+
+.ec-editor-region[data-editor-region='inspector'] .ec-editor-puck-slot {
+  margin-top: 2px;
+}
+
 .ec-editor-panel-empty {
   display: grid;
   justify-items: start;
   gap: 8px;
-  margin: 10px;
-  border: 1px solid var(--border);
+  margin: 10px 12px;
+  border: 0;
   border-radius: 10px;
   padding: 12px;
-  background: var(--background);
+  background: color-mix(in srgb, var(--muted) 52%, transparent);
   font-size: var(--ec-text-xs);
 }
 
@@ -304,11 +315,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: 12px;
-  padding: 4px 8px;
+  padding: 4px 10px;
   background: var(--surface);
-  box-shadow: var(--ec-shadow-sm);
+  box-shadow: none;
 }
 
 .ec-editor-responsive-mode-label {
@@ -334,7 +345,7 @@
 }
 
 .ec-editor-laptop-content > .ec-editor-region[data-editor-region='context'] {
-  border-right: 1px solid var(--border);
+  border: 0;
 }
 
 .ec-editor-tool-sheet {
@@ -349,8 +360,8 @@
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
   gap: 8px;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 10px;
+  border: 0;
+  padding: 2px 2px 6px;
 }
 
 .ec-editor-tool-sheet-body {
@@ -359,7 +370,7 @@
 }
 
 .ec-editor-tool-sheet-body > .ec-editor-region {
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--ec-radius-panel);
 }
 
@@ -378,7 +389,7 @@
   .ec-editor-responsive-toolbar {
     gap: 6px;
     border-radius: 10px;
-    padding-inline: 6px;
+    padding-inline: 8px;
   }
 
   .ec-editor-responsive-toolbar .ec-button-label-optional {

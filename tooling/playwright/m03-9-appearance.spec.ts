@@ -24,7 +24,7 @@ test.describe('M03.9 single Studio theme', () => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await resetTheme(page);
 
-    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecTheme)).toBe('light');
+    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecTheme)).toBe('dark');
     const sheet = await openDesktopAppearance(page);
 
     const choices = sheet.locator('[data-appearance-value]');
@@ -34,14 +34,14 @@ test.describe('M03.9 single Studio theme', () => {
     await expect(sheet).not.toContainText('Presets');
     await expect(sheet).not.toContainText('framework');
 
-    await sheet.locator('[data-appearance-value="dark"]').click();
-    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecTheme)).toBe('dark');
-    await expect.poll(() => page.evaluate(() => document.documentElement.classList.contains('dark'))).toBe(true);
-    expect(await page.evaluate((key) => window.localStorage.getItem(key), THEME_KEY)).toBe(JSON.stringify('dark'));
+    await sheet.locator('[data-appearance-value="light"]').click();
+    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecTheme)).toBe('light');
+    await expect.poll(() => page.evaluate(() => document.documentElement.classList.contains('dark'))).toBe(false);
+    expect(await page.evaluate((key) => window.localStorage.getItem(key), THEME_KEY)).toBe(JSON.stringify('light'));
 
     await page.reload();
-    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecTheme)).toBe('dark');
-    await expect.poll(() => page.evaluate(() => document.documentElement.classList.contains('dark'))).toBe(true);
+    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecTheme)).toBe('light');
+    await expect.poll(() => page.evaluate(() => document.documentElement.classList.contains('dark'))).toBe(false);
   });
 
   test('cleans legacy appearance and preset storage after a new mode selection', async ({ page }) => {

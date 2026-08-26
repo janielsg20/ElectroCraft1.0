@@ -16,7 +16,7 @@
 }
 
 .ec-topbar-left {
-  gap: 6px;
+  gap: 7px;
   overflow: hidden;
 }
 
@@ -35,7 +35,7 @@
   overflow: hidden;
   color: var(--foreground);
   font-size: var(--ec-text-sm);
-  font-weight: 650;
+  font-weight: 600;
   text-overflow: ellipsis;
 }
 
@@ -49,7 +49,7 @@
   gap: 5px;
   border: 0;
   border-radius: 9px;
-  padding: 4px 8px;
+  padding: 4px 9px;
   background: transparent;
   color: var(--muted-foreground);
   font-size: var(--ec-text-xs);
@@ -57,8 +57,7 @@
 }
 
 .ec-topbar-project {
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface-raised) 72%, transparent);
+  background: color-mix(in srgb, var(--surface-raised) 62%, transparent);
   color: var(--foreground);
 }
 
@@ -85,19 +84,18 @@
 
 .ec-topbar-tool-cluster {
   gap: 2px;
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: 10px;
   padding: 2px;
-  background: color-mix(in srgb, var(--background) 76%, var(--surface));
+  background: color-mix(in srgb, var(--muted) 58%, transparent);
 }
 
 .ec-topbar-tool-cluster .ec-topbar-tool {
-  border-color: transparent;
   background: transparent;
 }
 
 .ec-topbar-tool-cluster .ec-topbar-tool:hover {
-  background: var(--muted);
+  background: var(--surface-raised);
   color: var(--foreground);
 }
 
@@ -115,9 +113,9 @@
 }
 
 .ec-topbar-preview {
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: 8px;
-  background: color-mix(in srgb, var(--surface-raised) 72%, transparent);
+  background: color-mix(in srgb, var(--surface-raised) 62%, transparent);
   color: var(--foreground);
 }
 
@@ -126,11 +124,11 @@
 }
 
 .ec-topbar-export {
-  border-color: var(--primary) !important;
+  border: 0 !important;
   border-radius: 8px;
   background: var(--primary) !important;
   color: var(--primary-foreground) !important;
-  box-shadow: 0 1px 3px color-mix(in srgb, var(--primary) 24%, transparent);
+  box-shadow: none;
 }
 
 .ec-topbar-export:hover {
@@ -144,9 +142,9 @@
 }
 
 .ec-topbar-local {
-  border: 1px solid color-mix(in srgb, var(--success) 20%, var(--border));
+  border: 0;
   background: color-mix(in srgb, var(--success) 7%, transparent);
-  padding-inline: 7px;
+  padding-inline: 8px;
 }
 
 .ec-topbar-local-dot {
@@ -168,7 +166,7 @@
   align-content: start;
   gap: 12px;
   overflow: auto;
-  padding-top: 4px;
+  padding: 4px 2px 2px;
 }
 
 .ec-topbar-sheet .ec-topbar-tool-cluster {
@@ -176,24 +174,23 @@
   grid-template-columns: 1fr 1fr;
   gap: 6px;
   padding: 0;
-  border: 0;
   background: transparent;
 }
 
 .ec-topbar-sheet .ec-topbar-tool {
   min-height: 38px;
   justify-content: flex-start;
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: 10px;
-  padding-inline: 10px;
-  background: var(--background);
+  padding-inline: 11px;
+  background: color-mix(in srgb, var(--muted) 64%, transparent);
 }
 
 .ec-topbar-help-list {
   display: grid;
   gap: 8px;
   margin: 0;
-  padding-left: 18px;
+  padding: 2px 6px 2px 20px;
   color: var(--muted-foreground);
   font-size: var(--ec-text-xs);
   line-height: 1.5;
@@ -213,6 +210,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  padding-inline: 6px;
   font-size: var(--ec-text-sm);
   font-weight: 600;
 }
@@ -230,11 +228,14 @@
   justify-content: space-between;
   gap: 12px;
   border: 0;
-  border-bottom: 1px solid var(--border);
-  border-radius: 0;
-  padding: 9px 0 10px;
+  border-radius: 9px;
+  padding: 9px 8px 10px;
   background: transparent;
   font-size: var(--ec-text-xs);
+}
+
+.ec-topbar-setting-row:hover {
+  background: color-mix(in srgb, var(--muted) 46%, transparent);
 }
 
 .ec-topbar-setting-row p {
@@ -260,7 +261,7 @@
 
 @media (max-width: 1023px) {
   .ec-app-shell-topbar {
-    padding-inline: 8px;
+    padding-inline: 10px;
   }
 
   .ec-topbar-preview,
@@ -278,7 +279,7 @@
 @media (max-width: 767px) {
   .ec-app-shell-topbar {
     gap: 4px;
-    padding-inline: 6px;
+    padding-inline: 8px;
   }
 
   .ec-topbar {

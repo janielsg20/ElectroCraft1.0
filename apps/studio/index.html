@@ -27,14 +27,13 @@
       #ec-boot-shell {
         --boot-bg: #f8fafd;
         --boot-surface: #ffffff;
-        --boot-border: #d7dce1;
         --boot-muted: #e7eaee;
         height: 100dvh;
         display: grid;
         grid-template-columns: 224px minmax(0, 1fr);
         grid-template-rows: 48px minmax(0, 1fr) 24px;
         overflow: hidden;
-        background: var(--boot-bg);
+        background: var(--boot-surface);
         color: #0f172a;
         font-family:
           system-ui,
@@ -46,14 +45,13 @@
       html[data-ec-theme='dark'] #ec-boot-shell {
         --boot-bg: #131314;
         --boot-surface: #1e1f20;
-        --boot-border: #37393d;
         --boot-muted: #2b2d30;
         color: #e8eaed;
       }
       .ec-boot-sidebar {
         grid-row: 1 / 4;
-        padding: 12px;
-        border-right: 1px solid var(--boot-border);
+        padding: 14px;
+        border: 0;
         background: var(--boot-surface);
       }
       .ec-boot-topbar,
@@ -62,12 +60,8 @@
         align-items: center;
         gap: 10px;
         padding-inline: 14px;
-        border-bottom: 1px solid var(--boot-border);
+        border: 0;
         background: var(--boot-surface);
-      }
-      .ec-boot-statusbar {
-        border-top: 1px solid var(--boot-border);
-        border-bottom: 0;
       }
       .ec-boot-workspace {
         display: grid;
@@ -76,14 +70,16 @@
         margin: 0 8px 8px 0;
         padding: 18px;
         overflow: hidden;
-        border: 1px solid var(--boot-border);
+        border: 0;
         border-radius: 18px;
         background: var(--boot-bg);
       }
       .ec-boot-line,
       .ec-boot-card {
+        border: 0;
         border-radius: 6px;
         background: var(--boot-muted);
+        box-shadow: none;
       }
       .ec-boot-line {
         height: 12px;
@@ -113,9 +109,10 @@
       }
       .ec-boot-toolbar {
         height: 40px;
-        border: 1px solid var(--boot-border);
+        border: 0;
         border-radius: 8px;
         background: var(--boot-surface);
+        box-shadow: none;
       }
       .ec-boot-grid {
         display: grid;
@@ -124,7 +121,6 @@
       }
       .ec-boot-card {
         min-height: 148px;
-        border: 1px solid var(--boot-border);
         background: var(--boot-surface);
       }
       .ec-boot-sr {

@@ -34,7 +34,31 @@
 }
 
 [data-slot='skeleton'] {
-  background: var(--skeleton);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 0;
+  background: color-mix(in srgb, var(--skeleton) 88%, var(--surface));
+  box-shadow: none;
+  animation: none;
+}
+
+[data-slot='skeleton']::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  content: '';
+  transform: translateX(-115%);
+  background: linear-gradient(
+    100deg,
+    transparent 12%,
+    color-mix(in srgb, var(--foreground) 5%, transparent) 42%,
+    color-mix(in srgb, var(--foreground) 9%, transparent) 50%,
+    color-mix(in srgb, var(--foreground) 5%, transparent) 58%,
+    transparent 88%
+  );
+  animation: ec-skeleton-shimmer 1.45s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  pointer-events: none;
 }
 
 .ec-design-system {
@@ -77,6 +101,12 @@
   from {
     opacity: 0;
     transform: translate(-50%, -48%) scale(0.98);
+  }
+}
+
+@keyframes ec-skeleton-shimmer {
+  to {
+    transform: translateX(115%);
   }
 }
 
@@ -301,6 +331,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  [data-slot='skeleton']::after {
+    transform: none;
+    background: color-mix(in srgb, var(--foreground) 4%, transparent);
+    animation: none;
+  }
+
   .ec-design-system *,
   .ec-design-system *::before,
   .ec-design-system *::after {
