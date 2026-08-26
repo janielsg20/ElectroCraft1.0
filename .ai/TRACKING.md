@@ -52,8 +52,13 @@ API/engine utilizado:
 - Puck `migrate(data, config)` para DropZone legacy -> Slot.
 - Puck `walkTree(data, config, callback)` para recorrido slot-aware posterior a migración.
 
+Continuidad de `main`:
+- La mejora visual independiente PR `#54` quedó fusionada a `main` en `c1240c33d4e38c911b1f0b5b33c9351955bcddd3`.
+- `ElectroCraft Base CI` #665 (`33012604339`) cerró GREEN para esa revisión visual.
+- No modifica ownership, persistencia ni APIs de M05.3; el gate de PR `#52` valida la combinación contra el `main` actual.
+
 Blockers funcionales P0/P1 conocidos: `0` antes del gate final.
 
 ## Próxima microfase exacta
 
-Completar y validar `M05.3 — Nested Slots, permissions y Puck data migration`; solo después activar la siguiente microfase F05 indicada por `PHASES.md`.
+Completar y validar `M05.3 — Nested Slots, permissions y Puck data migration`; solo después activar `M05.4 — Sincronizar Puck actions con ElectroCraftDocument`.
