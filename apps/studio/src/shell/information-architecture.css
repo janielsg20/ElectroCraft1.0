@@ -2,8 +2,8 @@
   width: 100%;
   min-height: 34px;
   justify-content: flex-start;
-  border-radius: 0;
-  padding-inline: 0;
+  border-radius: 8px;
+  padding-inline: 4px;
   text-align: left;
 }
 
@@ -16,9 +16,10 @@
 
 .ec-ia-disclosure-badge {
   flex: 0 0 auto;
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: 999px;
   padding: 2px 6px;
+  background: color-mix(in srgb, var(--muted) 70%, transparent);
   color: var(--muted-foreground);
   font-size: 10px;
   line-height: 1.2;
@@ -37,23 +38,24 @@
 }
 
 .ec-ia-disclosure-summary {
-  margin: -2px 0 0;
+  margin: -1px 4px 0;
   color: var(--muted-foreground);
   font-size: 11px;
   line-height: 1.45;
 }
 
 .ec-ia-disclosure-content {
-  margin-top: 8px;
-  border-top: 1px solid var(--border);
-  padding-top: 10px;
+  margin-top: 6px;
+  border: 0;
+  padding: 4px 4px 0;
 }
 
 .ec-ia-diagnostic-alert {
   display: grid;
   gap: 3px;
-  border-left: 3px solid var(--destructive);
-  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  padding: 9px 10px;
   background: color-mix(in oklab, var(--destructive) 7%, transparent);
 }
 
@@ -73,7 +75,7 @@
 .ec-ia-setting-detail,
 .ec-ia-inspector-section {
   display: grid;
-  gap: 8px;
+  gap: 9px;
 }
 
 .ec-ia-setting-detail-row {
@@ -81,13 +83,14 @@
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
   gap: 12px;
+  padding-inline: 2px;
 }
 
 .ec-ia-setting-detail-row strong,
 .ec-ia-inspector-section h3 {
   margin: 0;
   font-size: 12px;
-  font-weight: 650;
+  font-weight: 600;
 }
 
 .ec-ia-setting-detail-value {
@@ -109,8 +112,8 @@
   min-height: 54px;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid var(--border);
-  padding: 8px 14px;
+  border: 0;
+  padding: 10px 16px;
   background: var(--surface);
 }
 
@@ -125,7 +128,7 @@
   margin: 0 0 3px;
   color: var(--muted-foreground);
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -135,7 +138,9 @@
   min-height: 0;
   display: grid;
   grid-template-columns: minmax(240px, 34%) minmax(0, 1fr);
+  gap: 8px;
   overflow: hidden;
+  padding: 0 8px 8px;
 }
 
 .ec-ia-list-region,
@@ -145,16 +150,24 @@
   min-height: 0;
   overflow: auto;
   overscroll-behavior: contain;
-  padding: 12px 14px;
+  border-radius: 10px;
+  padding: 14px 16px;
 }
 
 .ec-ia-list-region {
-  border-right: 1px solid var(--border);
+  border: 0;
+  background: color-mix(in srgb, var(--surface) 96%, var(--background));
+}
+
+.ec-ia-detail-region,
+.ec-ia-module-empty {
+  background: var(--background);
 }
 
 .ec-ia-list-region h2 {
   margin: 0;
   font-size: 12px;
+  font-weight: 600;
 }
 
 .ec-ia-module-empty {
@@ -171,18 +184,19 @@
   .ec-ia-list-detail {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: minmax(180px, 42%) minmax(0, 1fr);
+    gap: 6px;
+    padding: 0 6px 6px;
   }
 
   .ec-ia-list-region {
-    border-right: 0;
-    border-bottom: 1px solid var(--border);
+    border: 0;
   }
 
   .ec-ia-route-header,
   .ec-ia-list-region,
   .ec-ia-detail-region,
   .ec-ia-module-empty {
-    padding-inline: 12px;
+    padding-inline: 14px;
   }
 }
 
