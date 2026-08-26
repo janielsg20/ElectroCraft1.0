@@ -1,6 +1,6 @@
 # TRACKING — ElectroCraft current position
 
-Date: 2026-08-25.
+Date: 2026-08-26.
 
 | Scope              | Estado             | Evidencia                                      |
 | ------------------ | ------------------ | ---------------------------------------------- |
@@ -10,7 +10,7 @@ Date: 2026-08-25.
 | F03 / M03.1–M03.12 | COMPLETADA / GREEN | `.ai/evidence/F03/CLOSURE_2026-08-20.md`       |
 | F04 / M04.1–M04.8  | COMPLETADA / GREEN | `.ai/evidence/F04/CLOSURE_2026-08-25.md`       |
 | F05 / M05.1        | COMPLETADA / GREEN | PR `#49`; Base CI `32868029914`                |
-| F05 / M05.2        | ACTIVE             | `.ai/microphases/M05_2.md`                     |
+| F05 / M05.2        | ACTIVE             | PR `#50`; head corregido `9321356994e5cc4`     |
 
 ## Cierre F04 / M04.8
 
@@ -55,8 +55,18 @@ API/engine utilizado:
 - iframe Puck con `enabled`, `waitForStyles` y `syncHostStyles: false`;
 - CSS custom properties oficiales `--puck-*`; sin `overrides` para styling y sin Puck AI.
 
-Blockers conocidos: `0` funcionales antes del gate final.
+Validación y adaptación 2026-08-26:
+- Base CI `32879821898` (#660) completó documentación, lint, typecheck, tests y build antes del gate Playwright.
+- Suite Vitest del run: `99` archivos / `353` tests GREEN.
+- Playwright llegó a `90/91` tests GREEN; el único fallo estaba en `m05-2-puck-composition.spec.ts`.
+- Causa confirmada: el test cambiaba de `Componentes` a `Capas`, desmontaba correctamente `StudioPalette` y después buscaba `data-studio-palette`.
+- Corrección aplicada en `9321356994e5cc48748f1d406c920e28b8c9b141`: la aserción del Config activo se ejecuta mientras `Componentes` sigue montado y después se valida `Puck.Outline` en `Capas`.
+- No se añadió workflow dedicado. Se abrió PR de validación `#51` sobre el mismo SHA porque el actor de la integración no emitió un nuevo evento `pull_request`; hasta ahora GitHub no ha creado un run para ese PR.
+- Se intentó reutilizar el artifact `m01-5-base-ci-evidence` para E2E local sin consumir Actions, pero el Chromium disponible en este entorno bloquea navegación por política administrativa; no se registra como gate válido.
+
+Blockers funcionales P0/P1 conocidos: `0`.
+Blocker de cierre: obtener un gate ejecutable sobre el head corregido `9321356994e5cc48748f1d406c920e28b8c9b141`. M05.2 no se declara COMPLETADA hasta disponer de esa evidencia.
 
 ## Próxima microfase exacta
 
-Completar y validar `M05.2 — Componer Components/Outline/Preview/Fields`; solo después activar `M05.3 — Nested Slots, permissions y Puck data migration`.
+Completar el gate de `M05.2 — Componer Components/Outline/Preview/Fields`; solo después activar `M05.3 — Nested Slots, permissions y Puck data migration`.
