@@ -6,8 +6,9 @@ test.describe('M05.3 nested Slots and migration browser contract', () => {
 
     const result = await page.evaluate(async () => {
       const { createStudioPuckDocumentSession } = await import('/src/features/editor/puck-document-session.ts');
-      const { createStudioPuckDocumentPersistenceBridge } =
-        await import('/src/features/editor/puck-document-persistence.ts');
+      const { createStudioPuckDocumentPersistenceBridge } = await import(
+        '/src/features/editor/puck-document-persistence.ts'
+      );
       const { projectStorageRuntime } = await import('/src/features/projects/project-storage-runtime.ts');
 
       const projectId = crypto.randomUUID();
@@ -75,7 +76,14 @@ test.describe('M05.3 nested Slots and migration browser contract', () => {
         category: 'Basic',
         fields: [],
         defaultProps: {},
-        layout: { mode: 'flow' as const, gap: null, align: 'stretch' as const, justify: 'start' as const, wrap: false, columns: null },
+        layout: {
+          mode: 'flow' as const,
+          gap: null,
+          align: 'stretch' as const,
+          justify: 'start' as const,
+          wrap: false,
+          columns: null,
+        },
         style: emptyStyle,
         references: { componentRefs: [], assetRefs: [], actionRefs: [] },
         metadata: {},
@@ -111,9 +119,7 @@ test.describe('M05.3 nested Slots and migration browser contract', () => {
         content: [{ type: 'Container', props: { id: containerId } }],
         root: { props: { label: 'Inicio' } },
         zones: {
-          [`${containerId}:children`]: [
-            { type: 'Text', props: { id: textId, text: 'Contenido migrado' } },
-          ],
+          [`${containerId}:children`]: [{ type: 'Text', props: { id: textId, text: 'Contenido migrado' } }],
         },
       } as Parameters<typeof persistence.apply>[0];
 
