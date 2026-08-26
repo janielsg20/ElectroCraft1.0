@@ -1,4 +1,4 @@
-import type { ComponentData, Data } from '@puckeditor/core';
+import { migrate, walkTree, type ComponentData, type Config, type Data } from '@puckeditor/core';
 import {
   electroCraftDocumentNodeSchema,
   electroCraftDocumentSchema,
@@ -40,6 +40,7 @@ export interface PuckDocumentReconstruction {
 export interface PuckDocumentAdapterOptions {
   readonly knownComponentRefs: readonly string[];
   readonly slotByComponentRef?: Readonly<Record<string, string>>;
+  readonly migrationConfig?: Config;
 }
 
 export interface PuckDocumentAdapter {
@@ -47,7 +48,12 @@ export interface PuckDocumentAdapter {
   fromPuck(data: PuckEditorData, baseDocument: ElectroCraftDocument): PuckDocumentReconstruction;
 }
 
-const defaultSlots: Readonly<Record<string, string>> = Object.freeze({ Container: ELECTROCRAFT_PUCK_CHILDREN_SLOT });
+const defaultSlots: Readonly<Record<string, string>> = Object.freeze({
+  Container: ELECTROCRAFT_PUCK_CHILDREN_SLOT,
+  Section: ELECTROCRAFT_PUCK_CHILDREN_SLOT,
+  Tabs: ELECTROCRAFT_PUCK_CHILDREN_SLOT,
+  Accordion: ELECTROCRAFT_PUCK_CHILDREN_SLOT,
+});
 
 function cloneCanonicalProps(props: Readonly<Record<string, JsonValue>>): Record<string, JsonValue> {
   return structuredClone(props);
@@ -77,6 +83,29 @@ function diagnosticMessage(code: PuckDocumentDiagnosticCode, componentRef: strin
 function hasLegacyZoneContent(data: PuckEditorData) {
   if (!data.zones) return false;
   return Object.values(data.zones).some((zone) => zone.length > 0);
+}
+
+/**
+ * Uses Puck's public migration and tree utilities rather than maintaining an
+ * ElectroCraft copy of the engine's DropZone -> Slot traversal rules.
+ */
+export function migrateLegacyPuckDataToSlots(data: PuckEditorData, config: Config): PuckEditorData {
+  const migrated = migrate(structuredClone(data), config);
+
+  // Exercise Puck's slot-aware traversal after migration so malformed nested
+  // slot content fails at the engine boundary before canonical reconstruction.
+  walkTree(migrated, config, (content) => {
+    if (!Array.isArray(content)) {
+      throw new TypeError('Puck migrated slot content must be an array');
+    }
+    return content;
+  });
+
+  if (hasLegacyZoneContent(migrated)) {
+    throw new TypeError('Puck legacy zones remain after Slot migration; migration config does not cover all content');
+  }
+
+  return migrated;
 }
 
 function currentRootProps(data: PuckEditorData): Record<string, unknown> {
@@ -258,20 +287,25 @@ export function createPuckDocumentAdapter(options: PuckDocumentAdapterOptions): 
       });
     },
     fromPuck(data: PuckEditorData, baseDocument: ElectroCraftDocument): PuckDocumentReconstruction {
-      if (hasLegacyZoneContent(data)) {
-        throw new TypeError('Puck legacy zones with content are not supported by the canonical Slot adapter');
-      }
-      if (!Array.isArray(data.content)) {
+      const currentData = hasLegacyZoneContent(data)
+        ? options.migrationConfig
+          ? migrateLegacyPuckDataToSlots(data, options.migrationConfig)
+          : (() => {
+              throw new TypeError('Puck legacy zones require a Slot migration config before canonical reconstruction');
+            })()
+        : data;
+
+      if (!Array.isArray(currentData.content)) {
         throw new TypeError('Puck data content must be an array');
       }
 
       const base = electroCraftDocumentSchema.parse(baseDocument);
       const diagnostics: PuckDocumentDiagnostic[] = [];
       const seenIds = new Set<string>([base.root.id]);
-      const children = data.content.map((component) => reconstructNode(component, diagnostics, seenIds));
+      const children = currentData.content.map((component) => reconstructNode(component, diagnostics, seenIds));
       const root = electroCraftDocumentNodeSchema.parse({
         ...base.root,
-        props: structuredClone(currentRootProps(data)),
+        props: structuredClone(currentRootProps(currentData)),
         children,
       });
       const document = electroCraftDocumentSchema.parse({ ...base, root });
