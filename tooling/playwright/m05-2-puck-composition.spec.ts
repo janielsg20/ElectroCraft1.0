@@ -12,11 +12,11 @@ test.describe('M05.2 public Puck composition', () => {
     await expect(page.locator('[data-puck-composition="preview"]')).toBeVisible();
     await expect(page.locator('[data-puck-composition="fields"]')).toBeAttached();
 
-    await page.getByRole('tab', { name: 'Capas' }).click();
-    await expect(page.locator('[data-puck-composition="outline"]')).toBeVisible();
-
     const palette = page.locator('[data-studio-palette]').first();
     await expect(palette).toHaveAttribute('data-puck-active-components', '0');
+
+    await page.getByRole('tab', { name: 'Capas' }).click();
+    await expect(page.locator('[data-puck-composition="outline"]')).toBeVisible();
   });
 
   test('maps Studio tokens to Puck while keeping the Preview iframe isolated from host styles', async ({ page }) => {
