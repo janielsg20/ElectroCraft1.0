@@ -21,14 +21,37 @@ export interface PuckSlotMapping {
   readonly disallow?: readonly string[];
 }
 
+/**
+ * Owner-neutral editor policy translated at the Puck boundary. The canonical
+ * model does not persist Puck permissions; callers may supply lock/editability
+ * policy when that capability exists in their owner.
+ */
+export interface ElectroCraftEditorPolicy {
+  readonly locked?: boolean;
+  readonly editable?: boolean;
+  readonly insertable?: boolean;
+}
+
 export interface PuckConfigOptions {
   readonly slots?: Readonly<Record<string, PuckSlotMapping>>;
+  readonly editorPolicies?: Readonly<Record<string, ElectroCraftEditorPolicy>>;
   readonly diagnosticRenderer?: PuckCanonicalRenderer;
   readonly diagnosticLabel?: string;
 }
 
+const childrenSlot = (label: string): PuckSlotMapping =>
+  Object.freeze({ field: ELECTROCRAFT_PUCK_CHILDREN_SLOT, label });
+
+/**
+ * Stable single-child-collection mappings for canonical recursive nodes.
+ * Presets such as Section may resolve to Container before reaching this map;
+ * explicit keys remain available for registries that own those definitions.
+ */
 export const electroCraftCorePuckSlots = Object.freeze({
-  Container: Object.freeze({ field: ELECTROCRAFT_PUCK_CHILDREN_SLOT, label: 'Contenido' }),
+  Container: childrenSlot('Contenido'),
+  Section: childrenSlot('Contenido de la sección'),
+  Tabs: childrenSlot('Contenido de las pestañas'),
+  Accordion: childrenSlot('Contenido del acordeón'),
 } satisfies Readonly<Record<string, PuckSlotMapping>>);
 
 const fallbackPuckLabelResolver: PuckLabelResolver = Object.freeze({
@@ -81,11 +104,22 @@ function toSlotField(slot: PuckSlotMapping): Field {
   };
 }
 
+function toPuckPermissions(policy?: ElectroCraftEditorPolicy) {
+  if (!policy) return undefined;
+  const permissions = {
+    ...(policy.locked === true ? { drag: false, delete: false, duplicate: false } : {}),
+    ...(policy.editable === false ? { edit: false } : {}),
+    ...(policy.insertable === false ? { insert: false } : {}),
+  };
+  return Object.keys(permissions).length > 0 ? permissions : undefined;
+}
+
 export function createPuckComponentConfig(
   definition: ElectroCraftComponentDefinition,
   renderer: PuckCanonicalRenderer,
   labels: PuckLabelResolver = fallbackPuckLabelResolver,
   slot?: PuckSlotMapping,
+  editorPolicy?: ElectroCraftEditorPolicy,
 ): PuckCanonicalComponentConfig {
   const fields: Record<string, Field> = {};
   for (const field of definition.fields) {
@@ -100,6 +134,8 @@ export function createPuckComponentConfig(
     fields[slotField] = toSlotField(slot);
   }
 
+  const permissions = toPuckPermissions(editorPolicy);
+
   return {
     label: labels.component(definition),
     fields,
@@ -110,6 +146,7 @@ export function createPuckComponentConfig(
       electrocraftLayout: definition.layout,
       electrocraftStyle: definition.style,
     },
+    ...(permissions ? { permissions } : {}),
     render: renderer,
   };
 }
@@ -139,6 +176,7 @@ export function createPuckConfig(
       renderer,
       labels,
       options.slots?.[definition.key],
+      options.editorPolicies?.[definition.key],
     );
   }
 

@@ -1,3 +1,4 @@
+import type { Config } from '@puckeditor/core';
 import { describe, expect, it } from 'vitest';
 import {
   createDeterministicObjectId,
@@ -16,6 +17,21 @@ const containerId = createDeterministicObjectId('node', 'm05.1-layout-container'
 const titleId = createDeterministicObjectId('node', 'm05.1-title-home');
 const legacyId = createDeterministicObjectId('node', 'm05.1-legacy-widget');
 const nestedId = createDeterministicObjectId('node', 'm05.1-nested-text');
+
+const slotMigrationConfig = {
+  components: {
+    Container: {
+      fields: { children: { type: 'slot' } },
+      defaultProps: { children: [] },
+      render: () => null,
+    },
+    Text: {
+      fields: {},
+      defaultProps: {},
+      render: () => null,
+    },
+  },
+} as unknown as Config;
 
 function documentFixture(): ElectroCraftDocument {
   return electroCraftDocumentSchema.parse({
@@ -51,7 +67,7 @@ function documentFixture(): ElectroCraftDocument {
   });
 }
 
-describe('M05.1 ElectroCraftDocument <-> Puck Data adapter', () => {
+describe('M05.1/M05.3 ElectroCraftDocument <-> Puck Data adapter', () => {
   it('maps core.root to the Puck root envelope and round-trips stable ids through public Slots', () => {
     const document = documentFixture();
     const adapter = createPuckDocumentAdapter({ knownComponentRefs: ['Container', 'Text'] });
@@ -122,7 +138,40 @@ describe('M05.1 ElectroCraftDocument <-> Puck Data adapter', () => {
     expect(() => adapter.fromPuck({ content: [], root: {} }, document)).toThrow(/current root.props shape/);
   });
 
-  it('fails closed instead of discarding legacy Puck zones with content', () => {
+  it('uses the official Puck migration to convert legacy zones into inline Slots before reconstruction', () => {
+    const document = documentFixture();
+    const adapter = createPuckDocumentAdapter({
+      knownComponentRefs: ['Container', 'Text'],
+      migrationConfig: slotMigrationConfig,
+    });
+
+    const reconstructed = adapter.fromPuck(
+      {
+        content: [
+          {
+            type: 'Container',
+            props: { id: containerId, gap: 16, semanticElement: 'main' },
+          },
+        ],
+        root: { props: { label: 'Inicio' } },
+        zones: {
+          [`${containerId}:children`]: [
+            {
+              type: 'Text',
+              props: { id: titleId, text: 'Hola ElectroCraft' },
+            },
+          ],
+        },
+      },
+      document,
+    );
+
+    expect(reconstructed.diagnostics).toEqual([]);
+    expect(reconstructed.document).toEqual(document);
+    expect(JSON.stringify(reconstructed.document)).not.toContain('zones');
+  });
+
+  it('fails closed when legacy zones arrive without the Slot migration config', () => {
     const document = documentFixture();
     const adapter = createPuckDocumentAdapter({ knownComponentRefs: ['Container', 'Text'] });
     const projection = adapter.toPuck(document);
@@ -130,11 +179,30 @@ describe('M05.1 ElectroCraftDocument <-> Puck Data adapter', () => {
       adapter.fromPuck(
         {
           ...projection.data,
-          zones: { 'legacy-zone': [projection.data.content[0]!] },
+          zones: { [`${containerId}:children`]: [projection.data.content[0]!] },
         },
         document,
       ),
-    ).toThrow(/legacy zones with content are not supported/);
+    ).toThrow(/require a Slot migration config/);
+  });
+
+  it('fails closed when the official migration cannot map every legacy zone', () => {
+    const document = documentFixture();
+    const adapter = createPuckDocumentAdapter({
+      knownComponentRefs: ['Container', 'Text'],
+      migrationConfig: slotMigrationConfig,
+    });
+    const projection = adapter.toPuck(document);
+
+    expect(() =>
+      adapter.fromPuck(
+        {
+          ...projection.data,
+          zones: { 'unmapped-zone': [projection.data.content[0]!] },
+        },
+        document,
+      ),
+    ).toThrow(/legacy zones remain after Slot migration/);
   });
 
   it('keeps Puck selection and editor history outside the reconstructed canonical document', () => {

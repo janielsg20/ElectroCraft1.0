@@ -10,20 +10,8 @@ Date: 2026-08-26.
 | F03 / M03.1–M03.12 | COMPLETADA / GREEN | `.ai/evidence/F03/CLOSURE_2026-08-20.md`       |
 | F04 / M04.1–M04.8  | COMPLETADA / GREEN | `.ai/evidence/F04/CLOSURE_2026-08-25.md`       |
 | F05 / M05.1        | COMPLETADA / GREEN | PR `#49`; Base CI `32868029914`                |
-| F05 / M05.2        | ACTIVE             | PR `#50`; head corregido `9321356994e5cc4`     |
-
-## Cierre F04 / M04.8
-
-- Head funcional M04.8: `1df11b22fcd3bee7ea37846a459e28374271fc85`.
-- PR `#48`; squash merge a `main`: `ad64c0e5468b13a3fa3a712adb6621fa33d22fd0`.
-- `ElectroCraft Base CI` run `32859794266`: `success`.
-- Base CI verificó documentación, lint/Prettier, typecheck, tests, build, Playwright repository gate, empty-repo y artifacts base.
-- El E2E heredado M04.3 de autosave/recovery volvió a GREEN después de unificar Studio recovery/restore sobre `ProjectRevisionService`.
-- `project_object_versions` deduplica payloads por versión/checksum; manifests de revisión usan refs y conservan compatibilidad con manifests legacy embebidos.
-- Restore crea checkpoint de seguridad y una nueva revisión restaurada; no borra historial ni mueve destructivamente un pointer.
-- `RevisionHistoryPanel` usa design-system/Radix, español, diff summary, estados loading/error/empty y confirmación accesible.
-- Workflow dedicado M04.7 archivado tras el cierre de F04 para evitar duplicar GitHub Actions; Base CI queda como gate transversal.
-- Blockers P0/P1: `0`.
+| F05 / M05.2        | COMPLETADA / GREEN | PR `#50`; Base CI `32990513971` (#661)         |
+| F05 / M05.3        | ACTIVE             | `codex/m05-3-nested-slots-permissions`         |
 
 ## Cierre M05.1
 
@@ -33,40 +21,44 @@ Date: 2026-08-26.
 - Puck queda encapsulado por `@electrocraft/editor-puck`; Studio no importa `@puckeditor/core` para el adapter.
 - `ElectroCraftDocument.root` se conserva como envelope canónico y sus hijos se proyectan a `Data.content`.
 - Slots públicos preservan IDs/nesting; unknown components generan diagnostics visibles y recuperables.
-- `zones` legacy con contenido falla cerrado para impedir pérdida silenciosa.
 - Puck Data vuelve al documento canónico y al autosave sin persistir selección, DnD o historial del engine.
 
-## M05.2 en curso
+## Cierre M05.2
 
-Rama de implementación: `codex/m05-2-puck-composition`.
+- Head funcional validado: `9321356994e5cc48748f1d406c920e28b8c9b141`.
+- PR de implementación `#50`; squash merge a `main`: `fadc2ecb64764c120c75cb5e4c7b154d3cc4ade6`.
+- PR `#51` fue únicamente de validación y se cerró sin merge para no duplicar cambios.
+- `ElectroCraft Base CI` run `32990513971` (#661): `success`.
+- Composition pública integrada: `Puck.Components`, `Puck.Outline`, `Puck.Preview`, `Puck.Fields`.
+- Palette resuelve disponibilidad desde el `Config` Puck activo; no existe segundo ComponentRegistry.
+- Preview usa iframe con `enabled`, `waitForStyles` y `syncHostStyles: false`.
+- Tema Studio se mapea a variables oficiales `--puck-*`; no se añadió Puck AI ni workflow dedicado.
 
-Archivos/áreas modificadas:
-- `packages/editor-puck/src/puck-editor-composition.ts`: Composition pública, active Config hook e iframe aislado;
-- `apps/studio/src/features/editor/puck-composition.css`: tokens Electro Studio -> variables oficiales `--puck-*`;
-- `apps/studio/src/shell/palette-panel.tsx`: click-to-insert resuelve disponibilidad desde el Config Puck activo;
-- `apps/studio/src/i18n/editor.es.ts`: explicación visible en español de Components/Preview/Fields;
-- `tooling/vitest/contract/puck-composition-boundary.test.ts`;
-- `tooling/vitest/unit/puck-composition.test.ts`;
-- `tooling/playwright/m05-2-puck-composition.spec.ts`.
+## M05.3 en curso
+
+Rama: `codex/m05-3-nested-slots-permissions`.
+
+Implementado hasta ahora:
+- `packages/editor-puck/src/puck-component-adapter.ts`: slots estables para `Container`, `Section`, `Tabs` y `Accordion`; `allow/disallow`; política tipada `locked/editable/insertable` traducida a permisos públicos Puck sin persistir internals.
+- `packages/editor-puck/src/puck-document-adapter.ts`: `migrate()` oficial para `zones -> slots`, validación con `walkTree()` y fallo cerrado si queda contenido legacy sin mapear.
+- `apps/studio/src/features/editor/puck-document-session.ts`: la reconstrucción recibe el mismo `Config` activo usado por Puck como config de migración.
+- `tooling/vitest/unit/puck-document-adapter.test.ts`: nesting, migración legacy, fallo sin config y zona no mapeable.
+- `tooling/vitest/integration/component-layout-style-puck.test.ts`: restricciones de Slot, permisos y mappings recursivos.
+- `tooling/playwright/m05-3-nested-slots.spec.ts`: round-trip browser/storage desde `zones` legacy hasta `ElectroCraftDocument` canónico sin persistir `zones`.
 
 API/engine utilizado:
-- Puck Composition pública: `Puck.Components`, `Puck.Outline`, `Puck.Preview`, `Puck.Fields`;
-- `createUsePuck` para leer el `Config` activo y despachar inserción sin duplicar state;
-- iframe Puck con `enabled`, `waitForStyles` y `syncHostStyles: false`;
-- CSS custom properties oficiales `--puck-*`; sin `overrides` para styling y sin Puck AI.
+- Puck `field: { type: "slot" }` con `allow/disallow`.
+- Puck component `permissions` para drag/delete/duplicate/edit/insert.
+- Puck `migrate(data, config)` para DropZone legacy -> Slot.
+- Puck `walkTree(data, config, callback)` para recorrido slot-aware posterior a migración.
 
-Validación y adaptación 2026-08-26:
-- Base CI `32879821898` (#660) completó documentación, lint, typecheck, tests y build antes del gate Playwright.
-- Suite Vitest del run: `99` archivos / `353` tests GREEN.
-- Playwright llegó a `90/91` tests GREEN; el único fallo estaba en `m05-2-puck-composition.spec.ts`.
-- Causa confirmada: el test cambiaba de `Componentes` a `Capas`, desmontaba correctamente `StudioPalette` y después buscaba `data-studio-palette`.
-- Corrección aplicada en `9321356994e5cc48748f1d406c920e28b8c9b141`: la aserción del Config activo se ejecuta mientras `Componentes` sigue montado y después se valida `Puck.Outline` en `Capas`.
-- No se añadió workflow dedicado. Se abrió PR de validación `#51` sobre el mismo SHA porque el actor de la integración no emitió un nuevo evento `pull_request`; hasta ahora GitHub no ha creado un run para ese PR.
-- Se intentó reutilizar el artifact `m01-5-base-ci-evidence` para E2E local sin consumir Actions, pero el Chromium disponible en este entorno bloquea navegación por política administrativa; no se registra como gate válido.
+Continuidad de `main`:
+- La mejora visual independiente PR `#54` quedó fusionada a `main` en `c1240c33d4e38c911b1f0b5b33c9351955bcddd3`.
+- `ElectroCraft Base CI` #665 (`33012604339`) cerró GREEN para esa revisión visual.
+- No modifica ownership, persistencia ni APIs de M05.3; el gate de PR `#52` valida la combinación contra el `main` actual.
 
-Blockers funcionales P0/P1 conocidos: `0`.
-Blocker de cierre: obtener un gate ejecutable sobre el head corregido `9321356994e5cc48748f1d406c920e28b8c9b141`. M05.2 no se declara COMPLETADA hasta disponer de esa evidencia.
+Blockers funcionales P0/P1 conocidos: `0` antes del gate final.
 
 ## Próxima microfase exacta
 
-Completar el gate de `M05.2 — Componer Components/Outline/Preview/Fields`; solo después activar `M05.3 — Nested Slots, permissions y Puck data migration`.
+Completar y validar `M05.3 — Nested Slots, permissions y Puck data migration`; solo después activar `M05.4 — Sincronizar Puck actions con ElectroCraftDocument`.

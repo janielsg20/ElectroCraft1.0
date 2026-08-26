@@ -6,7 +6,7 @@ function source(path: string) {
   return readFileSync(resolve(path), 'utf8');
 }
 
-describe('M05.1 Puck adapter boundary', () => {
+describe('M05.1/M05.3 Puck adapter boundary', () => {
   it('keeps Studio feature code behind @electrocraft/editor-puck', () => {
     const session = source('apps/studio/src/features/editor/puck-document-session.ts');
     const diagnostic = source('apps/studio/src/features/editor/puck-diagnostic-renderer.ts');
@@ -29,7 +29,9 @@ describe('M05.1 Puck adapter boundary', () => {
     expect(adapter).toContain('canonical.root.children.map');
     expect(adapter).toContain('root: { props: cloneCanonicalProps(canonical.root.props) }');
     expect(adapter).toContain('hasLegacyZoneContent');
-    expect(adapter).toContain('legacy zones with content are not supported');
+    expect(adapter).toContain('migrateLegacyPuckDataToSlots');
+    expect(adapter).toContain('migrate(structuredClone(data), config)');
+    expect(adapter).toContain('legacy zones remain after Slot migration');
     expect(adapter).not.toContain('selectedItem');
     expect(adapter).not.toContain('draggedItem');
   });

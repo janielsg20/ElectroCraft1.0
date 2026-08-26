@@ -14,15 +14,16 @@ export function createStudioPuckDocumentSession(
   definitions: readonly ElectroCraftComponentDefinition[],
   renderers: PuckRendererRegistry,
 ) {
-  const adapter = createPuckDocumentAdapter({
-    knownComponentRefs: definitions.map((definition) => definition.key),
-  });
-  const projection = adapter.toPuck(document);
   const config = createPuckConfig(definitions, renderers, undefined, {
     slots: electroCraftCorePuckSlots,
     diagnosticRenderer: studioPuckDiagnosticRenderer,
     diagnosticLabel: 'Componente no disponible',
   });
+  const adapter = createPuckDocumentAdapter({
+    knownComponentRefs: definitions.map((definition) => definition.key),
+    migrationConfig: config,
+  });
+  const projection = adapter.toPuck(document);
 
   return Object.freeze({
     config,
