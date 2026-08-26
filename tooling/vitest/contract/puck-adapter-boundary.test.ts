@@ -40,7 +40,10 @@ describe('M05.1 Puck adapter boundary', () => {
     expect(composition).toContain('export const PuckEditorOutline = Puck.Outline');
     expect(composition).toContain('export const PuckEditorPreview = Puck.Preview');
     expect(composition).toContain('export const PuckEditorFields = Puck.Fields');
-    expect(composition).toContain('export const PuckEditorRoot = Puck');
+    expect(composition).toContain('export function PuckEditorRoot');
+    expect(composition).toContain('createElement(');
+    expect(composition).toContain('Puck,');
+    expect(composition).toContain('...electroCraftPuckIframeConfig');
   });
 
   it('persists only reconstructed canonical document data through project autosave', () => {

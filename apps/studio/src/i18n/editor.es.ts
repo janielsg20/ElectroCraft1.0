@@ -23,11 +23,11 @@ export const editorMessagesEs = Object.freeze({
   'studio.editor.canvas.viewportLabel': 'Vista adaptable',
   'studio.editor.canvas.zoomLabel': 'Zoom del lienzo al 100 %',
   'studio.editor.contextStructural':
-    'Palette ElectroCraft sobre Puck: catálogo descubrible sin duplicar ComponentDefinitions. La inserción solo se habilita cuando el mapping propietario existe.',
+    'Componentes combina la Palette ElectroCraft con Puck.Components. Arrastra o inserta con teclado o clic cuando existe un mapping canónico.',
   'studio.editor.canvasStructural':
-    'Lienzo Puck integrado. Esta microfase valida la estructura del editor sin inventar contenido demo.',
+    'Lienzo usa Puck.Preview en un iframe aislado del tema del Studio; el frontend del proyecto conserva sus propios estilos.',
   'studio.editor.inspectorStructural':
-    'Inspector Puck integrado. Los campos aparecerán cuando exista una selección real del documento.',
+    'Contenido usa Puck.Fields para la selección actual. Puck conserva selección, arrastre e historial del editor.',
   'studio.editor.toolsLabel': 'Herramientas del editor',
   'studio.editor.openContextLabel': 'Contexto',
   'studio.editor.openInspectorLabel': 'Inspector',

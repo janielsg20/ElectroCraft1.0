@@ -1,0 +1,21 @@
+.ec-editor-workspace {
+  --puck-color-surface: var(--surface);
+  --puck-color-surface-muted: var(--muted);
+  --puck-color-surface-subtle: var(--background);
+  --puck-color-border: var(--border);
+  --puck-color-text: var(--foreground);
+  --puck-color-text-secondary: var(--muted-foreground);
+  --puck-color-text-muted: var(--muted-foreground);
+  --puck-color-interactive: var(--primary);
+  --puck-color-focus-ring: var(--ring);
+}
+
+.ec-editor-puck-slot,
+.ec-editor-puck-preview {
+  color: var(--puck-color-text);
+}
+
+.ec-editor-puck-slot :focus-visible,
+.ec-editor-puck-preview :focus-visible {
+  outline-color: var(--puck-color-focus-ring);
+}
