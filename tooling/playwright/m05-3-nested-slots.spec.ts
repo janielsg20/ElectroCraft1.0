@@ -6,9 +6,8 @@ test.describe('M05.3 nested Slots and migration browser contract', () => {
 
     const result = await page.evaluate(async () => {
       const { createStudioPuckDocumentSession } = await import('/src/features/editor/puck-document-session.ts');
-      const { createStudioPuckDocumentPersistenceBridge } = await import(
-        '/src/features/editor/puck-document-persistence.ts',
-      );
+      const { createStudioPuckDocumentPersistenceBridge } =
+        await import('/src/features/editor/puck-document-persistence.ts');
       const { projectStorageRuntime } = await import('/src/features/projects/project-storage-runtime.ts');
 
       const projectId = crypto.randomUUID();
