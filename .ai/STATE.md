@@ -29,7 +29,8 @@
 - M04.8 — Project Revision Checkpoints y Restore: `COMPLETADA`; Gate `GREEN`.
 - F05 — Screen Composer con Puck: `IN_PROGRESS`.
 - M05.1 — Crear PuckAdapter y component mapping: `COMPLETADA`; Gate `GREEN`.
-- M05.2 — Componer Components/Outline/Preview/Fields: `ACTIVE`.
+- M05.2 — Componer Components/Outline/Preview/Fields: `COMPLETADA`; Gate `GREEN`.
+- M05.3 — Nested Slots, permissions y Puck data migration: `ACTIVE`.
 - Blockers P0/P1 funcionales conocidos: `0`.
 
 ## Cierre F04 / M04.8
@@ -46,8 +47,12 @@ M05.1 cerró sobre head `9aa330dbf44b39485516ee0d3dc181a9aee4196b` y PR `#49`. `
 
 La PR `#49` fue fusionada mediante squash a `main` en `733abdc44f21d16b56b4624c7bec61f0131bd3f1` (`feat(f05): add canonical Puck adapter and component mapping`). El adapter canónico preserva IDs/nesting, mantiene diagnostics recuperables, rechaza internals legacy no portables y mantiene el historial del editor separado de Project Revisions.
 
+## Cierre F05 / M05.2
+
+M05.2 cerró con head funcional corregido `9321356994e5cc48748f1d406c920e28b8c9b141`. `ElectroCraft Base CI` run `32990513971` (#661) terminó `success`. La implementación se fusionó mediante squash por PR `#50` a `main` en `fadc2ecb64764c120c75cb5e4c7b154d3cc4ade6` (`feat(f05): compose Puck editor surfaces`). La PR de validación `#51` se cerró sin merge para evitar duplicar el mismo contenido validado.
+
 ## Microfase activa
 
-`M05.2` — Componer Components/Outline/Preview/Fields.
+`M05.3` — Nested Slots, permissions y Puck data migration.
 
-Referencias: `.ai/microphases/M05_2.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
+Referencias: `.ai/microphases/M05_3.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
