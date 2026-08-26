@@ -92,18 +92,19 @@ function hasLegacyZoneContent(data: PuckEditorData) {
 export function migrateLegacyPuckDataToSlots(data: PuckEditorData, config: Config): PuckEditorData {
   const migrated = migrate(structuredClone(data), config);
 
-  // Exercise Puck's slot-aware traversal after migration so malformed nested
-  // slot content fails at the engine boundary before canonical reconstruction.
+  if (hasLegacyZoneContent(migrated)) {
+    throw new TypeError('Puck legacy zones remain after Slot migration; migration config does not cover all content');
+  }
+
+  // Exercise Puck's slot-aware traversal only after every legacy zone has
+  // migrated, so incomplete configs fail closed with an ElectroCraft error
+  // instead of leaking an internal walkTree exception.
   walkTree(migrated, config, (content) => {
     if (!Array.isArray(content)) {
       throw new TypeError('Puck migrated slot content must be an array');
     }
     return content;
   });
-
-  if (hasLegacyZoneContent(migrated)) {
-    throw new TypeError('Puck legacy zones remain after Slot migration; migration config does not cover all content');
-  }
 
   return migrated;
 }
