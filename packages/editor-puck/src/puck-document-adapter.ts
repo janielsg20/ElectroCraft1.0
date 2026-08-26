@@ -90,7 +90,12 @@ function hasLegacyZoneContent(data: PuckEditorData) {
  * ElectroCraft copy of the engine's DropZone -> Slot traversal rules.
  */
 export function migrateLegacyPuckDataToSlots(data: PuckEditorData, config: Config): PuckEditorData {
-  const migrated = migrate(structuredClone(data), config);
+  let migrated: PuckEditorData;
+  try {
+    migrated = migrate(structuredClone(data), config);
+  } catch {
+    throw new TypeError('Puck legacy zones remain after Slot migration; migration config does not cover all content');
+  }
 
   if (hasLegacyZoneContent(migrated)) {
     throw new TypeError('Puck legacy zones remain after Slot migration; migration config does not cover all content');
