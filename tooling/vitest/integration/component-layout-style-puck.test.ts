@@ -10,11 +10,7 @@ import {
   type CanonicalComponentDefinitionRecord,
   type CanonicalComponentDefinitionRepository,
 } from '@electrocraft/application';
-import {
-  createPuckConfig,
-  electroCraftCorePuckSlots,
-  type PuckCanonicalRenderer,
-} from '@electrocraft/editor-puck';
+import { createPuckConfig, electroCraftCorePuckSlots, type PuckCanonicalRenderer } from '@electrocraft/editor-puck';
 
 function fixture(name: string): unknown {
   return JSON.parse(readFileSync(resolve(`tooling/fixtures/canonical-model/${name}.json`), 'utf8')) as unknown;
