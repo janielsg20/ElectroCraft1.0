@@ -9,11 +9,17 @@ import {
   AlertDialogTrigger,
   Button,
   Loader,
+  getStudioIcon,
 } from '@electrocraft/design-system';
 import { useCallback, useEffect, useState } from 'react';
 import { HelpTrigger } from '../../help/help-ui';
 import { projectStorageRuntime } from './project-storage-runtime';
 import './revision-history-panel.css';
+
+const HistoryIcon = getStudioIcon('studio.history');
+const SaveIcon = getStudioIcon('action.confirm');
+const RefreshIcon = getStudioIcon('action.refresh');
+const RestoreIcon = getStudioIcon('action.restore');
 
 function sourceLabel(source: ProjectRevisionHistoryEntry['source']) {
   if (source === 'manual') return 'Guardado manual';
@@ -99,12 +105,14 @@ export function RevisionHistoryPanel({
       <header className="ec-revision-history-header">
         <div>
           <div className="ec-revision-history-title">
+            <HistoryIcon aria-hidden="true" />
             <h2>Historial de versiones</h2>
             <HelpTrigger helpId="help.projects" />
           </div>
           <p>Las revisiones son puntos persistentes entre sesiones y son independientes del Undo del editor.</p>
         </div>
         <Button disabled={action !== 'idle'} onClick={() => void saveRevision()}>
+          <SaveIcon aria-hidden="true" />
           {action === 'saving' ? 'Guardando…' : 'Guardar revisión'}
         </Button>
       </header>
@@ -114,6 +122,7 @@ export function RevisionHistoryPanel({
           <strong>No se pudo completar la operación.</strong>
           <p>{error}</p>
           <Button variant="outline" size="sm" onClick={() => void reload()}>
+            <RefreshIcon aria-hidden="true" />
             Reintentar
           </Button>
         </div>
@@ -130,6 +139,7 @@ export function RevisionHistoryPanel({
           <h3>Aún no hay revisiones</h3>
           <p>Guarda una revisión para crear el primer punto de restauración persistente.</p>
           <Button disabled={action !== 'idle'} onClick={() => void saveRevision()}>
+            <SaveIcon aria-hidden="true" />
             Guardar primera revisión
           </Button>
         </div>
@@ -172,6 +182,7 @@ export function RevisionHistoryPanel({
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button variant="destructive" disabled={action !== 'idle'}>
+                        <RestoreIcon aria-hidden="true" />
                         {action === 'restoring' ? 'Restaurando…' : 'Restaurar'}
                       </Button>
                     </AlertDialogTrigger>
@@ -183,7 +194,10 @@ export function RevisionHistoryPanel({
                       </AlertDialogDescription>
                       <div className="flex justify-end gap-2">
                         <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => void restoreRevision()}>Restaurar versión</AlertDialogAction>
+                        <AlertDialogAction onClick={() => void restoreRevision()}>
+                          <RestoreIcon aria-hidden="true" />
+                          Restaurar versión
+                        </AlertDialogAction>
                       </div>
                     </AlertDialogContent>
                   </AlertDialog>

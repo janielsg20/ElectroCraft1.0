@@ -85,6 +85,7 @@ const ExportIcon = getStudioIcon('studio.sidebar.export');
 const SettingsIcon = getStudioIcon('studio.settings');
 const AppearanceIcon = getStudioIcon('studio.theme');
 const CloseIcon = getStudioIcon('window.close');
+const HistoryIcon = getStudioIcon('studio.history');
 
 function subscribeViewport(listener: () => void) {
   if (typeof window === 'undefined') return () => undefined;
@@ -130,7 +131,10 @@ function TopbarToolCluster({
         <span>{copy.breakpointLabels[breakpoint]}</span>
       </span>
       <Button variant="ghost" size="sm" asChild>
-        <a href="/history">{copy.historyLabel}</a>
+        <a href="/history">
+          <HistoryIcon aria-hidden="true" />
+          {copy.historyLabel}
+        </a>
       </Button>
       <Button variant="ghost" size="icon" disabled aria-label={copy.undoLabel} title={copy.historyUnavailable}>
         <UndoIcon aria-hidden="true" />

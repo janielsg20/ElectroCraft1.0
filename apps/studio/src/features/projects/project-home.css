@@ -1,17 +1,17 @@
 .ec-project-home {
-  width: min(100%, 1280px);
+  width: min(100%, 1440px);
   min-width: 0;
   margin-inline: auto;
   overflow: auto;
-  padding: 24px 28px 36px;
+  padding: 18px 22px 28px;
 }
 
 .ec-project-home > header {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding-bottom: 16px;
+  padding-bottom: 12px;
 }
 
 .ec-project-home > header p {
@@ -19,7 +19,7 @@
   margin: 0;
   color: var(--muted-foreground);
   font-size: var(--ec-text-xs);
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .ec-project-title {
@@ -29,19 +29,20 @@
 }
 
 .ec-project-title-icon {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   display: grid;
   place-items: center;
   border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface);
+  border-color: color-mix(in srgb, var(--primary) 28%, var(--border));
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--primary) 13%, var(--surface));
   color: var(--primary);
 }
 
 .ec-project-title-icon svg {
-  width: 16px;
-  height: 16px;
+  width: 17px;
+  height: 17px;
 }
 
 .ec-project-title h1 {
@@ -52,15 +53,16 @@
 }
 
 .ec-project-toolbar {
-  min-height: 44px;
+  min-height: 42px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   border: 1px solid var(--border);
-  border-radius: var(--ec-radius-panel);
-  padding: 5px;
-  background: var(--surface);
-  box-shadow: var(--ec-shadow-sm);
+  border-radius: 13px;
+  padding: 6px;
+  background: color-mix(in srgb, var(--surface) 94%, var(--background));
+  box-shadow: 0 2px 10px rgb(0 0 0 / 0.08);
 }
 
 .ec-project-toolbar input {
@@ -70,6 +72,10 @@
 .ec-project-search {
   position: relative;
   width: min(320px, 100%);
+}
+
+.ec-project-toolbar > [data-slot='select-trigger'] {
+  min-width: 126px;
 }
 
 .ec-project-search > svg {
@@ -108,8 +114,8 @@
 
 .ec-project-collection {
   display: grid;
-  gap: 12px;
-  margin-top: 16px;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 .ec-project-collection--grid {
@@ -120,15 +126,15 @@
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--ec-radius-panel);
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 96%, var(--background));
   transition:
     border-color var(--ec-fast) ease,
     box-shadow var(--ec-fast) ease;
 }
 
 .ec-project-card:hover {
-  border-color: color-mix(in srgb, var(--primary) 42%, var(--border));
-  box-shadow: var(--ec-shadow-sm);
+  border-color: color-mix(in srgb, var(--primary) 52%, var(--border));
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
 }
 
 .ec-project-card:focus-within {
@@ -140,8 +146,8 @@
   width: 100%;
   border: 0;
   display: grid;
-  gap: 10px;
-  padding: 14px;
+  gap: 8px;
+  padding: 12px;
   background: transparent;
   color: inherit;
   text-align: left;
@@ -153,7 +159,7 @@
   place-items: center;
   border: 1px solid var(--border);
   border-radius: 10px;
-  background-color: var(--background);
+  background-color: color-mix(in srgb, var(--primary) 5%, var(--background));
   background-image: radial-gradient(
     color-mix(in srgb, var(--muted-foreground) 14%, transparent) 0.65px,
     transparent 0.65px
@@ -162,6 +168,15 @@
   color: var(--primary);
   font-size: 1rem;
   font-weight: 700;
+}
+
+.ec-project-open > span > svg {
+  width: 28px;
+  height: 28px;
+  padding: 5px;
+  border: 1px solid color-mix(in srgb, var(--primary) 30%, var(--border));
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
 }
 
 .ec-project-open strong {
@@ -174,27 +189,37 @@
 
 .ec-project-card > div {
   border-top: 1px solid var(--border);
-  padding: 5px;
+  padding: 4px;
 }
 
 .ec-project-card-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 2px;
+  gap: 3px;
+  background: color-mix(in srgb, var(--background) 42%, transparent);
 }
 
 .ec-project-card-actions button {
-  min-height: 28px;
+  min-height: 26px;
   font-size: var(--ec-text-2xs);
+}
+
+.ec-project-card-actions button svg {
+  color: var(--muted-foreground);
+}
+
+.ec-project-card-actions button:hover svg {
+  color: var(--primary);
 }
 
 .ec-project-empty {
   width: min(100%, 520px);
-  margin: 56px auto;
+  margin: 40px auto;
   border: 1px solid var(--border);
   border-radius: var(--ec-radius-window);
-  padding: 28px;
-  background: var(--surface);
+  padding: 22px;
+  background: color-mix(in srgb, var(--surface) 96%, var(--background));
+  box-shadow: 0 12px 40px rgb(0 0 0 / 0.1);
   text-align: center;
 }
 
@@ -226,7 +251,7 @@
   border: 1px solid var(--border);
   border-radius: var(--ec-radius-window);
   background: var(--surface);
-  padding: 20px;
+  padding: 16px;
   box-shadow: var(--ec-shadow);
 }
 
@@ -263,11 +288,11 @@
 }
 
 .ec-project-wizard-body {
-  min-height: 220px;
+  min-height: 200px;
   display: grid;
   align-content: start;
   gap: 12px;
-  padding: 20px 0;
+  padding: 16px 0;
 }
 
 .ec-project-wizard fieldset {
@@ -361,5 +386,15 @@
   .ec-project-collection--list .ec-project-card,
   .ec-project-collection--list .ec-project-open {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .ec-project-search {
+    width: min(260px, 100%);
+  }
+
+  .ec-project-view button {
+    padding-inline: 7px;
   }
 }

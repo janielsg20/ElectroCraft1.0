@@ -55,7 +55,7 @@ a:focus-visible {
   grid-template-columns: var(--ec-shell-sidebar-width) minmax(0, 1fr);
   grid-template-rows: var(--ec-shell-topbar-height) minmax(0, 1fr) var(--ec-shell-statusbar-height);
   overflow: hidden;
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 92%, var(--background));
 }
 
 .ec-skip-link {
@@ -86,7 +86,8 @@ a:focus-visible {
   grid-row: 1 / 4;
   overflow: hidden;
   border-right: 0;
-  background: var(--surface);
+  border-right: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+  background: color-mix(in srgb, var(--surface) 96%, var(--background));
 }
 
 .ec-app-shell-brand {
@@ -94,8 +95,8 @@ a:focus-visible {
   display: flex;
   align-items: center;
   gap: 10px;
-  border-bottom: 0;
-  padding: 0 14px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 56%, transparent);
+  padding: 0 12px;
 }
 
 .ec-app-shell-brand-mark {
@@ -105,13 +106,30 @@ a:focus-visible {
   flex: 0 0 30px;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface-raised);
+  border: 1px solid color-mix(in srgb, var(--primary) 34%, var(--border));
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--primary) 13%, var(--surface-raised));
   color: var(--primary);
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: -0.02em;
+}
+
+.ec-app-shell-brand-mark svg {
+  width: 17px;
+  height: 17px;
+}
+
+.ec-app-shell-brand-copy {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+
+.ec-app-shell-brand-edition {
+  color: var(--muted-foreground);
+  font-size: var(--ec-text-2xs);
+  line-height: 1;
 }
 
 .ec-app-shell-brand-label,
@@ -159,9 +177,9 @@ a:focus-visible {
   grid-row: 1;
   align-items: center;
   gap: 8px;
-  border-bottom: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 48%, transparent);
   padding: 0 12px;
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 96%, var(--background));
 }
 
 .ec-app-shell-menu-trigger {
@@ -181,10 +199,10 @@ a:focus-visible {
   margin: 0 var(--ec-shell-gutter) var(--ec-shell-gutter) 0;
   overflow: auto;
   overscroll-behavior: contain;
-  border: 1px solid var(--border);
+  border: 1px solid color-mix(in srgb, var(--border) 88%, var(--primary));
   border-radius: var(--ec-radius-window);
   background: var(--background);
-  box-shadow: var(--ec-shadow-sm);
+  box-shadow: 0 8px 28px rgb(0 0 0 / 0.14);
 }
 
 .ec-app-shell-empty {
@@ -207,7 +225,7 @@ a:focus-visible {
   border-top: 0;
   padding: 0 12px;
   overflow: hidden;
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 96%, var(--background));
   color: var(--muted-foreground);
   font-size: var(--ec-text-2xs);
   white-space: nowrap;
@@ -257,7 +275,7 @@ a:focus-visible {
   width: min(100%, 840px);
   min-width: 0;
   margin: 0 auto;
-  padding: clamp(24px, 3vw, 40px);
+  padding: clamp(18px, 2vw, 28px);
 }
 
 .development-kicker,
@@ -274,6 +292,20 @@ h1,
 h2,
 p {
   margin-top: 0;
+}
+
+.ec-app-shell h1,
+.ec-app-shell h2,
+.ec-app-shell h3 {
+  text-wrap: balance;
+}
+
+.ec-app-shell p,
+.ec-app-shell [data-slot='dialog-description'],
+.ec-app-shell [data-slot='sheet-description'],
+.ec-app-shell [data-slot='alert-dialog-description'] {
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
 }
 
 h1 {
@@ -295,7 +327,7 @@ h2 {
 .project-home p,
 .architecture-help p {
   color: var(--muted-foreground);
-  line-height: 1.55;
+  line-height: 1.45;
 }
 
 .development-status,

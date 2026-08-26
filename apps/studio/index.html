@@ -1,21 +1,23 @@
 <!doctype html>
-<html lang="es" data-ec-theme="light" data-ec-theme-preference="light" data-ec-density="high">
+<html lang="es" class="dark" data-ec-theme="dark" data-ec-theme-preference="dark" data-ec-density="high">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f8fafc" />
+    <meta name="theme-color" content="#131314" />
+    <link rel="icon" href="/electrocraft-dev.svg" type="image/svg+xml" />
     <meta name="description" content="Bootstrap técnico de ElectroCraft Studio durante la fase de desarrollo." />
     <script>
       try {
-        const stored = JSON.parse(localStorage.getItem('electrocraft.studio.theme.v2') || '"light"');
-        const theme = stored === 'dark' ? 'dark' : 'light';
+        const stored = JSON.parse(localStorage.getItem('electrocraft.studio.theme.v2') || '"dark"');
+        const theme = stored === 'light' ? 'light' : 'dark';
         const root = document.documentElement;
         root.dataset.ecTheme = theme;
         root.dataset.ecThemePreference = theme;
         root.classList.toggle('dark', theme === 'dark');
-        document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#111827' : '#f8fafc';
+        document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#131314' : '#f8fafd';
       } catch {
-        document.documentElement.dataset.ecTheme = 'light';
+        document.documentElement.dataset.ecTheme = 'dark';
+        document.documentElement.classList.add('dark');
       }
     </script>
     <style>
@@ -23,10 +25,10 @@
         margin: 0;
       }
       #ec-boot-shell {
-        --boot-bg: #f8fafc;
+        --boot-bg: #f8fafd;
         --boot-surface: #ffffff;
-        --boot-border: #e2e8f0;
-        --boot-muted: #e8edf3;
+        --boot-border: #d7dce1;
+        --boot-muted: #e7eaee;
         height: 100dvh;
         display: grid;
         grid-template-columns: 224px minmax(0, 1fr);
@@ -42,11 +44,11 @@
           sans-serif;
       }
       html[data-ec-theme='dark'] #ec-boot-shell {
-        --boot-bg: #111827;
-        --boot-surface: #172033;
-        --boot-border: #2b364a;
-        --boot-muted: #263247;
-        color: #f8fafc;
+        --boot-bg: #131314;
+        --boot-surface: #1e1f20;
+        --boot-border: #37393d;
+        --boot-muted: #2b2d30;
+        color: #e8eaed;
       }
       .ec-boot-sidebar {
         grid-row: 1 / 4;
@@ -71,7 +73,12 @@
         display: grid;
         align-content: start;
         gap: 12px;
+        margin: 0 8px 8px 0;
         padding: 18px;
+        overflow: hidden;
+        border: 1px solid var(--boot-border);
+        border-radius: 18px;
+        background: var(--boot-bg);
       }
       .ec-boot-line,
       .ec-boot-card {
@@ -139,6 +146,7 @@
           display: none;
         }
         .ec-boot-workspace {
+          margin: 0 6px 6px;
           padding: 12px;
         }
         .ec-boot-grid {

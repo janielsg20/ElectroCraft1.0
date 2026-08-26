@@ -4,6 +4,7 @@
   margin-inline: auto;
   padding: 16px 20px 28px;
   contain: layout paint;
+  background: var(--background);
 }
 
 .ec-route-skeleton-heading,
@@ -32,7 +33,7 @@
   padding: 5px;
   border: 1px solid var(--border);
   border-radius: var(--ec-radius-md);
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 95%, var(--background));
 }
 
 .ec-route-skeleton-project-grid {
@@ -48,7 +49,7 @@
   padding: 12px;
   border: 1px solid var(--border);
   border-radius: var(--ec-radius-md);
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 96%, var(--background));
 }
 
 .ec-route-skeleton--editor {
@@ -57,7 +58,7 @@
   grid-template-columns: minmax(180px, 240px) minmax(0, 1fr) minmax(190px, 260px);
   gap: 1px;
   padding: 0;
-  background: var(--border);
+  background: color-mix(in srgb, var(--border) 80%, var(--primary));
 }
 
 .ec-route-skeleton-editor-panel,

@@ -51,6 +51,7 @@ const MenuIcon = getStudioIcon('studio.menu');
 const CloseIcon = getStudioIcon('window.close');
 const CollapseIcon = getStudioIcon('studio.sidebar.collapse');
 const ExpandIcon = getStudioIcon('studio.sidebar.expand');
+const BrandIcon = getStudioIcon('studio.brand');
 
 function NavigationLink({
   item,
@@ -175,9 +176,12 @@ export function AppShell({
         <aside className="ec-app-shell-sidebar" aria-label={copy.sidebarLabel}>
           <div className="ec-app-shell-brand" aria-label={copy.title}>
             <span className="ec-app-shell-brand-mark" aria-hidden="true">
-              EC
+              <BrandIcon />
             </span>
-            <strong className="ec-app-shell-brand-label">{copy.title}</strong>
+            <span className="ec-app-shell-brand-copy">
+              <strong className="ec-app-shell-brand-label">ElectroCraft</strong>
+              <span className="ec-app-shell-brand-edition">Studio</span>
+            </span>
           </div>
           <ScrollArea label={copy.navigationLabel} className="ec-app-shell-nav-scroll">
             <SidebarNavigation

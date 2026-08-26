@@ -10,12 +10,21 @@ import {
   Loader,
   RadioGroup,
   RadioGroupItem,
+  getStudioIcon,
 } from '@electrocraft/design-system';
 import { useState } from 'react';
 import { projectStorageRuntime } from './project-storage-runtime';
 import './project-choice.css';
 
 const steps = ['Tipo', 'Diseño', 'Demo', 'Revisar'] as const;
+const CloseIcon = getStudioIcon('action.cancel');
+const BackIcon = getStudioIcon('action.back');
+const NextIcon = getStudioIcon('action.next');
+const CreateIcon = getStudioIcon('action.add');
+const BlankIcon = getStudioIcon('action.open');
+const BlueprintIcon = getStudioIcon('studio.sidebar.templates');
+const DesignIcon = getStudioIcon('studio.theme');
+const DemoIcon = getStudioIcon('studio.sidebar.aiGenerate');
 export function NewProjectWizard({
   open,
   onClose,
@@ -63,6 +72,7 @@ export function NewProjectWizard({
           </div>
           <DialogClose asChild>
             <Button variant="ghost" aria-label="Cerrar asistente">
+              <CloseIcon aria-hidden="true" />
               Cerrar
             </Button>
           </DialogClose>
@@ -84,10 +94,12 @@ export function NewProjectWizard({
                 <RadioGroup value={type} onValueChange={setType} aria-label="Tipo de proyecto">
                   <label className="ec-project-choice" htmlFor="project-type-blank">
                     <RadioGroupItem id="project-type-blank" value="blank" />
+                    <BlankIcon aria-hidden="true" />
                     <span>Básico en blanco</span>
                   </label>
                   <label className="ec-project-choice" htmlFor="project-type-blueprint">
                     <RadioGroupItem id="project-type-blueprint" value="blueprint" />
+                    <BlueprintIcon aria-hidden="true" />
                     <span>Blueprint</span>
                   </label>
                 </RadioGroup>
@@ -100,10 +112,12 @@ export function NewProjectWizard({
               <RadioGroup value={design} onValueChange={setDesign} aria-label="Diseño inicial">
                 <label className="ec-project-choice" htmlFor="project-design-system">
                   <RadioGroupItem id="project-design-system" value="system" />
+                  <DesignIcon aria-hidden="true" />
                   <span>Sistema</span>
                 </label>
                 <label className="ec-project-choice" htmlFor="project-design-minimal">
                   <RadioGroupItem id="project-design-minimal" value="minimal" />
+                  <DesignIcon aria-hidden="true" />
                   <span>Minimalista</span>
                 </label>
               </RadioGroup>
@@ -118,6 +132,7 @@ export function NewProjectWizard({
                   checked={demo}
                   onCheckedChange={(checked) => setDemo(checked === true)}
                 />
+                <DemoIcon aria-hidden="true" />
                 <span>Incluir preferencia de contenido demo</span>
               </label>
               <p>La selección se registra como configuración; no crea datos permanentes ocultos.</p>
@@ -142,15 +157,18 @@ export function NewProjectWizard({
         </div>
         <footer>
           <Button variant="ghost" disabled={step === 0 || saving} onClick={() => setStep(step - 1)}>
+            <BackIcon aria-hidden="true" />
             Anterior
           </Button>
           {step < 3 ? (
             <Button disabled={!name.trim()} onClick={() => setStep(step + 1)}>
               Siguiente
+              <NextIcon aria-hidden="true" />
             </Button>
           ) : (
             <Button disabled={!name.trim() || saving} onClick={() => void create()}>
               {saving ? <Loader label="Guardando proyecto" announce={false} size="xs" /> : null}
+              {!saving ? <CreateIcon aria-hidden="true" /> : null}
               {saving ? 'Guardando…' : 'Crear proyecto'}
             </Button>
           )}

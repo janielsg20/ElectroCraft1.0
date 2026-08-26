@@ -27,9 +27,14 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-overlay: var(--overlay);
+  --color-skeleton: var(--skeleton);
   --radius-sm: calc(var(--radius) - 2px);
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) + 4px);
+}
+
+[data-slot='skeleton'] {
+  background: var(--skeleton);
 }
 
 .ec-design-system {

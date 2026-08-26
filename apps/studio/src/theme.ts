@@ -12,7 +12,7 @@ export interface StudioThemeStorage {
   readonly remove: () => void;
 }
 
-export const DEFAULT_STUDIO_THEME: StudioTheme = 'light';
+export const DEFAULT_STUDIO_THEME: StudioTheme = 'dark';
 
 export function normalizeStudioTheme(value: unknown): StudioTheme {
   if (value === 'dark') return 'dark';

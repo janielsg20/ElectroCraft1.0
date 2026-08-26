@@ -3,12 +3,12 @@
   width: min(1180px, 100%);
   min-width: 0;
   margin: 0 auto;
-  padding: 18px;
+  padding: 14px 16px;
 }
 
 .ec-project-history-route {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .ec-project-history-route > nav a,
@@ -47,7 +47,7 @@
 .ec-revision-history {
   min-width: 0;
   display: grid;
-  gap: 14px;
+  gap: 10px;
 }
 
 .ec-revision-history-header {
@@ -55,7 +55,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
 }
 
 .ec-revision-history-header > div {
@@ -90,7 +90,7 @@
 .ec-revision-history-loading {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 14px;
+  padding: 12px;
   background: var(--card);
 }
 
@@ -133,7 +133,7 @@
   gap: 4px;
   border: 0;
   border-bottom: 1px solid var(--border);
-  padding: 11px 12px;
+  padding: 9px 10px;
   color: inherit;
   background: transparent;
   text-align: left;
@@ -169,8 +169,8 @@
   min-width: 0;
   display: grid;
   align-content: start;
-  gap: 16px;
-  padding: 16px;
+  gap: 12px;
+  padding: 12px;
 }
 
 .ec-revision-detail-heading {
@@ -203,7 +203,7 @@
   gap: 2px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 9px;
+  padding: 8px;
   background: var(--background);
 }
 

@@ -40,7 +40,20 @@ const NewProjectWizard = lazy(() =>
 const SearchIcon = getStudioIcon('studio.sidebar.queries');
 const GridIcon = getStudioIcon('studio.view.grid');
 const ListIcon = getStudioIcon('studio.view.list');
-const NewProjectIcon = getStudioIcon('studio.sidebar.aiGenerate');
+const ProjectIcon = getStudioIcon('studio.projects');
+const NewProjectIcon = getStudioIcon('action.add');
+const ImportIcon = getStudioIcon('action.import');
+const RefreshIcon = getStudioIcon('action.refresh');
+const RenameIcon = getStudioIcon('action.rename');
+const DuplicateIcon = getStudioIcon('action.duplicate');
+const DownloadIcon = getStudioIcon('action.download');
+const ArchiveIcon = getStudioIcon('action.archive');
+const RestoreIcon = getStudioIcon('action.restore');
+const DeleteIcon = getStudioIcon('action.delete');
+const OpenIcon = getStudioIcon('action.open');
+const ConfirmIcon = getStudioIcon('action.confirm');
+const CancelIcon = getStudioIcon('action.cancel');
+const SortIcon = getStudioIcon('action.sort');
 
 function downloadProjectBackup(name: string, serialized: string) {
   const blob = new Blob([serialized], { type: 'application/json' });
@@ -201,7 +214,7 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
         <header>
           <div className="ec-project-title">
             <span className="ec-project-title-icon" aria-hidden="true">
-              <GridIcon />
+              <ProjectIcon />
             </span>
             <h1>Proyectos</h1>
             <HelpTrigger helpId="help.projects" />
@@ -220,6 +233,7 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
           </label>
           <Select value={status} onValueChange={(value) => setStatus(value as typeof status)}>
             <SelectTrigger aria-label="Estado de proyectos">
+              <ProjectIcon aria-hidden="true" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -231,6 +245,7 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
           </Select>
           <Select value={sort} onValueChange={(value) => setSort(value as ProjectListSort)}>
             <SelectTrigger aria-label="Ordenar proyectos">
+              <SortIcon aria-hidden="true" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -268,6 +283,7 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
             }}
           />
           <Button variant="outline" disabled={initialLoading} onClick={() => importInputRef.current?.click()}>
+            <ImportIcon aria-hidden="true" />
             Importar copia
           </Button>
           <Button className="ec-project-new" disabled={initialLoading} onClick={() => setWizardOpen(true)}>
@@ -279,7 +295,10 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
           <div role="alert">
             <strong>No se pudo cargar Project Home.</strong>
             <p>{error}</p>
-            <Button onClick={() => void reload()}>Reintentar</Button>
+            <Button onClick={() => void reload()}>
+              <RefreshIcon aria-hidden="true" />
+              Reintentar
+            </Button>
           </div>
         ) : null}
         {actionError ? <p role="alert">{actionError}</p> : null}
@@ -290,9 +309,13 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
             <p>Crea un proyecto o importa una copia existente.</p>
             <div className="flex justify-center gap-2">
               <Button variant="outline" onClick={() => importInputRef.current?.click()}>
+                <ImportIcon aria-hidden="true" />
                 Importar copia
               </Button>
-              <Button onClick={() => setWizardOpen(true)}>Nuevo proyecto</Button>
+              <Button onClick={() => setWizardOpen(true)}>
+                <NewProjectIcon aria-hidden="true" />
+                Nuevo proyecto
+              </Button>
             </div>
           </section>
         ) : null}
@@ -309,7 +332,7 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
                 <article className="ec-project-card" key={p.id} data-pending={pending ? 'true' : 'false'}>
                   <button className="ec-project-open" disabled={pending} onClick={() => void openProject(p.id)}>
                     <span aria-hidden={pending ? undefined : 'true'}>
-                      {pending ? <Loader label={`Abriendo ${p.name}`} announce size="sm" /> : 'EC'}
+                      {pending ? <Loader label={`Abriendo ${p.name}`} announce size="sm" /> : <OpenIcon />}
                     </span>
                     <strong>{p.name}</strong>
                     <small>
@@ -325,6 +348,7 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
                         setRenameValue(p.name);
                       }}
                     >
+                      <RenameIcon aria-hidden="true" />
                       Renombrar
                     </Button>
                     <Button
@@ -336,17 +360,21 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
                         )
                       }
                     >
+                      <DuplicateIcon aria-hidden="true" />
                       Duplicar
                     </Button>
                     <Button variant="ghost" disabled={pending} onClick={() => void exportBackup(p)}>
+                      <DownloadIcon aria-hidden="true" />
                       Descargar copia
                     </Button>
                     {p.status === 'active' ? (
                       <Button variant="ghost" disabled={pending} onClick={() => void change(p.id, 'archived')}>
+                        <ArchiveIcon aria-hidden="true" />
                         Archivar
                       </Button>
                     ) : (
                       <Button variant="ghost" disabled={pending} onClick={() => void change(p.id, 'active')}>
+                        <RestoreIcon aria-hidden="true" />
                         Restaurar
                       </Button>
                     )}
@@ -354,6 +382,7 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button variant="ghost" disabled={pending}>
+                            <DeleteIcon aria-hidden="true" />
                             Eliminar permanentemente
                           </Button>
                         </AlertDialogTrigger>
@@ -365,7 +394,10 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
                           </AlertDialogDescription>
                           <div className="flex justify-end gap-2">
                             <AlertDialogCancel asChild>
-                              <Button variant="outline">Cancelar</Button>
+                              <Button variant="outline">
+                                <CancelIcon aria-hidden="true" />
+                                Cancelar
+                              </Button>
                             </AlertDialogCancel>
                             <AlertDialogAction asChild>
                               <Button
@@ -376,6 +408,7 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
                                   )
                                 }
                               >
+                                <DeleteIcon aria-hidden="true" />
                                 Eliminar definitivamente
                               </Button>
                             </AlertDialogAction>
@@ -385,6 +418,7 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
                     ) : null}
                     {p.status !== 'trashed' ? (
                       <Button variant="ghost" disabled={pending} onClick={() => void change(p.id, 'trashed')}>
+                        <DeleteIcon aria-hidden="true" />
                         Mover a papelera
                       </Button>
                     ) : null}
@@ -432,12 +466,14 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
           ) : null}
           <div className="mt-4 flex justify-end gap-2">
             <Button variant="outline" onClick={() => setImportOpen(false)}>
+              <CancelIcon aria-hidden="true" />
               Cancelar
             </Button>
             <Button disabled={!importPreview || pendingProjectId !== null} onClick={() => void importBackup()}>
               {pendingProjectId === importPreview?.project.id ? (
                 <Loader label="Importando copia" announce={false} size="xs" />
               ) : null}
+              <ImportIcon aria-hidden="true" />
               Importar
             </Button>
           </div>
@@ -457,6 +493,7 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
           />
           <div className="mt-4 flex justify-end gap-2">
             <Button variant="outline" onClick={() => setRenameProject(null)}>
+              <CancelIcon aria-hidden="true" />
               Cancelar
             </Button>
             <Button
@@ -474,6 +511,7 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
               {pendingProjectId === renameProject?.id ? (
                 <Loader label="Guardando nombre" announce={false} size="xs" />
               ) : null}
+              <ConfirmIcon aria-hidden="true" />
               Guardar nombre
             </Button>
           </div>

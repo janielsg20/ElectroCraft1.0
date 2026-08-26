@@ -24,12 +24,12 @@ function memoryStorage(initial: string | null = null): StudioThemeStorage & { cu
 }
 
 describe('M03.9 single Studio theme preference', () => {
-  it('uses light as the deterministic default and fails closed for invalid values', () => {
-    expect(DEFAULT_STUDIO_THEME).toBe('light');
-    expect(loadStudioTheme(memoryStorage())).toBe('light');
-    expect(loadStudioTheme(memoryStorage('{broken'))).toBe('light');
-    expect(deserializeStudioTheme(JSON.stringify('system'))).toBe('light');
-    expect(deserializeStudioTheme(JSON.stringify('unknown'))).toBe('light');
+  it('uses dark as the deterministic default and fails closed for invalid values', () => {
+    expect(DEFAULT_STUDIO_THEME).toBe('dark');
+    expect(loadStudioTheme(memoryStorage())).toBe('dark');
+    expect(loadStudioTheme(memoryStorage('{broken'))).toBe('dark');
+    expect(deserializeStudioTheme(JSON.stringify('system'))).toBe('dark');
+    expect(deserializeStudioTheme(JSON.stringify('unknown'))).toBe('dark');
   });
 
   it('accepts only light and dark modes', () => {
@@ -49,9 +49,9 @@ describe('M03.9 single Studio theme preference', () => {
     expect(loadStudioTheme(storage)).toBe('dark');
   });
 
-  it('resets to the single light baseline', () => {
+  it('resets to the single dark baseline', () => {
     const storage = memoryStorage(JSON.stringify('dark'));
-    expect(resetStudioTheme(storage)).toBe('light');
+    expect(resetStudioTheme(storage)).toBe('dark');
     expect(storage.current()).toBeNull();
   });
 
@@ -68,7 +68,7 @@ describe('M03.9 single Studio theme preference', () => {
       },
     };
 
-    expect(loadStudioTheme(broken)).toBe('light');
+    expect(loadStudioTheme(broken)).toBe('dark');
     expect(() => persistStudioTheme(broken, 'dark')).not.toThrow();
     expect(() => resetStudioTheme(broken)).not.toThrow();
   });

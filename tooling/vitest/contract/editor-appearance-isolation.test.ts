@@ -49,7 +49,7 @@ describe('M03.9 Studio theme isolation contract', () => {
     expect(JSON.stringify(source.theme)).toBe(projectThemeBefore);
     expect(JSON.stringify(source)).toBe(sourceBefore);
     expect(serializeElectroCraftExportIR(buildElectroCraftExportIR(source).ir)).toBe(exportBefore);
-    expect(DEFAULT_STUDIO_THEME).toBe('light');
+    expect(DEFAULT_STUDIO_THEME).toBe('dark');
   });
 
   it('wires appearance through Settings and the six-slot mobile dock without replacing editor destinations', () => {

@@ -8,20 +8,20 @@
 }
 
 .ec-app-shell-navigation {
-  padding: 8px 10px;
+  padding: 10px 9px 16px;
 }
 
 .ec-app-shell-navigation-group + .ec-app-shell-navigation-group {
-  margin-top: 12px;
+  margin-top: 14px;
 }
 
 .ec-app-shell-navigation-group-label {
   margin: 0 0 4px;
   padding: 0 10px;
   overflow: hidden;
-  color: var(--muted-foreground);
+  color: color-mix(in srgb, var(--muted-foreground) 88%, var(--foreground));
   font-size: 0.625rem;
-  font-weight: 500;
+  font-weight: 650;
   letter-spacing: 0.07em;
   line-height: 20px;
   text-overflow: ellipsis;
@@ -42,13 +42,13 @@
 .ec-app-shell-navigation-link {
   width: 100%;
   min-width: 0;
-  min-height: 34px;
+  min-height: 36px;
   display: flex;
   align-items: center;
   gap: 9px;
   border: 1px solid transparent;
-  border-radius: 10px;
-  padding: 6px 10px;
+  border-radius: 11px;
+  padding: 5px 8px;
   color: var(--foreground);
   font-size: var(--ec-text-sm);
   font-weight: 500;
@@ -61,7 +61,8 @@
 }
 
 .ec-app-shell-navigation-link:hover {
-  background: var(--muted);
+  border-color: color-mix(in srgb, var(--border) 64%, transparent);
+  background: color-mix(in srgb, var(--muted) 84%, transparent);
 }
 
 .ec-app-shell-navigation-link:focus-visible {
@@ -70,8 +71,8 @@
 }
 
 .ec-app-shell-navigation-link[aria-current='page'] {
-  border-color: transparent;
-  background: var(--accent);
+  border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
+  background: color-mix(in srgb, var(--primary) 14%, var(--surface-raised));
   color: var(--accent-foreground);
   font-weight: 600;
 }
@@ -83,7 +84,11 @@
 .ec-app-shell-navigation-icon {
   width: 16px;
   height: 16px;
-  flex: 0 0 16px;
+  flex: 0 0 auto;
+  box-sizing: content-box;
+  border-radius: 7px;
+  padding: 5px;
+  background: color-mix(in srgb, var(--surface-raised) 88%, transparent);
   color: var(--muted-foreground);
 }
 
@@ -92,13 +97,14 @@
 }
 
 .ec-app-shell-navigation-link[aria-current='page'] .ec-app-shell-navigation-icon {
+  background: color-mix(in srgb, var(--primary) 18%, var(--surface-raised));
   color: var(--primary);
 }
 
 .ec-app-shell-sidebar-footer {
   display: flex;
   align-items: center;
-  border-top: 0;
+  border-top: 1px solid color-mix(in srgb, var(--border) 56%, transparent);
   padding: 4px 10px 6px;
 }
 
@@ -148,11 +154,11 @@
     padding-inline: 0;
   }
 
-  .ec-app-shell[data-sidebar-collapsed='true'] .ec-app-shell-brand-label,
+  .ec-app-shell[data-sidebar-collapsed='true'] .ec-app-shell-brand-copy,
   .ec-app-shell[data-sidebar-collapsed='true'] .ec-app-shell-navigation-group-label,
   .ec-app-shell[data-sidebar-collapsed='true'] .ec-app-shell-navigation-label,
   .ec-app-shell[data-sidebar-collapsed='true'] .ec-app-shell-collapse-label,
-  .ec-app-shell[data-sidebar-display='icons'] .ec-app-shell-brand-label,
+  .ec-app-shell[data-sidebar-display='icons'] .ec-app-shell-brand-copy,
   .ec-app-shell[data-sidebar-display='icons'] .ec-app-shell-navigation-group-label,
   .ec-app-shell[data-sidebar-display='icons'] .ec-app-shell-navigation-label,
   .ec-app-shell[data-sidebar-display='icons'] .ec-app-shell-collapse-label {
