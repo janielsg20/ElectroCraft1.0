@@ -55,7 +55,7 @@ a:focus-visible {
   grid-template-columns: var(--ec-shell-sidebar-width) minmax(0, 1fr);
   grid-template-rows: var(--ec-shell-topbar-height) minmax(0, 1fr) var(--ec-shell-statusbar-height);
   overflow: hidden;
-  background: color-mix(in srgb, var(--surface) 92%, var(--background));
+  background: var(--surface);
 }
 
 .ec-skip-link {
@@ -85,9 +85,8 @@ a:focus-visible {
   grid-column: 1;
   grid-row: 1 / 4;
   overflow: hidden;
-  border-right: 0;
-  border-right: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
-  background: color-mix(in srgb, var(--surface) 96%, var(--background));
+  border: 0;
+  background: var(--surface);
 }
 
 .ec-app-shell-brand {
@@ -95,8 +94,8 @@ a:focus-visible {
   display: flex;
   align-items: center;
   gap: 10px;
-  border-bottom: 1px solid color-mix(in srgb, var(--border) 56%, transparent);
-  padding: 0 12px;
+  border: 0;
+  padding: 0 14px;
 }
 
 .ec-app-shell-brand-mark {
@@ -106,9 +105,9 @@ a:focus-visible {
   flex: 0 0 30px;
   align-items: center;
   justify-content: center;
-  border: 1px solid color-mix(in srgb, var(--primary) 34%, var(--border));
+  border: 0;
   border-radius: 9px;
-  background: color-mix(in srgb, var(--primary) 13%, var(--surface-raised));
+  background: color-mix(in srgb, var(--primary) 13%, var(--surface));
   color: var(--primary);
   font-size: 0.7rem;
   font-weight: 700;
@@ -177,9 +176,9 @@ a:focus-visible {
   grid-row: 1;
   align-items: center;
   gap: 8px;
-  border-bottom: 1px solid color-mix(in srgb, var(--border) 48%, transparent);
-  padding: 0 12px;
-  background: color-mix(in srgb, var(--surface) 96%, var(--background));
+  border: 0;
+  padding: 0 14px;
+  background: var(--surface);
 }
 
 .ec-app-shell-menu-trigger {
@@ -199,10 +198,10 @@ a:focus-visible {
   margin: 0 var(--ec-shell-gutter) var(--ec-shell-gutter) 0;
   overflow: auto;
   overscroll-behavior: contain;
-  border: 1px solid color-mix(in srgb, var(--border) 88%, var(--primary));
+  border: 0;
   border-radius: var(--ec-radius-window);
   background: var(--background);
-  box-shadow: 0 8px 28px rgb(0 0 0 / 0.14);
+  box-shadow: none;
 }
 
 .ec-app-shell-empty {
@@ -222,10 +221,10 @@ a:focus-visible {
   grid-row: 3;
   align-items: center;
   gap: 7px;
-  border-top: 0;
-  padding: 0 12px;
+  border: 0;
+  padding: 0 14px;
   overflow: hidden;
-  background: color-mix(in srgb, var(--surface) 96%, var(--background));
+  background: var(--surface);
   color: var(--muted-foreground);
   font-size: var(--ec-text-2xs);
   white-space: nowrap;
@@ -252,7 +251,7 @@ a:focus-visible {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   gap: 12px;
-  padding: 12px;
+  padding: 14px;
 }
 
 .ec-app-shell-mobile-sheet-header {
@@ -260,8 +259,8 @@ a:focus-visible {
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 10px;
+  border: 0;
+  padding-bottom: 4px;
 }
 
 .ec-app-shell-mobile-nav-scroll {
@@ -418,7 +417,7 @@ h2 {
 
 @media (max-width: 767px) {
   .ec-app-shell-topbar {
-    padding-inline: 6px;
+    padding-inline: 8px;
   }
 
   .ec-app-shell-workspace {
