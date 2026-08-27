@@ -32,7 +32,8 @@
 - M05.2 — Componer Components/Outline/Preview/Fields: `COMPLETADA`; Gate `GREEN`.
 - M05.3 — Nested Slots, permissions y Puck data migration: `COMPLETADA`; Gate `GREEN`.
 - M05.4 — Sincronizar Puck actions con ElectroCraftDocument: `COMPLETADA`; Gate `GREEN`.
-- M05.5 — Usar Puck visual history: `ACTIVE`.
+- M05.5 — Usar Puck visual history: `COMPLETADA`; Gate `GREEN`.
+- M05.6 — Text/RichText inline editing: `ACTIVE`.
 - Blockers P0/P1 funcionales conocidos: `0`.
 
 ## Cierre F04 / M04.8
@@ -65,8 +66,14 @@ M05.4 cerró sobre head `a56575ab62660eb94d70ae08aaf0df6c5cd6a010`. `ElectroCraf
 
 La PR `#56` fue fusionada mediante squash a `main` en `98b51b7ad35b3204f0b67899b4fd2392d1c100e7` (`feat(M05.4): sync Puck actions with canonical documents`). Puck `onAction(action, appState, prevAppState)` sincroniza únicamente cambios authoring reales hacia `ElectroCraftDocument`, reutiliza el autosave incremental F04 y mantiene selection/ui/history del engine fuera del payload canónico y separado de Project Revisions.
 
+## Cierre F05 / M05.5
+
+M05.5 cerró sobre head `9d61c1e3f9976893594b518e952320e723b59f81`. `ElectroCraft Base CI` run `33081006606` (#702) terminó `success`: documentación, lint/Prettier, typecheck, 381 tests Vitest, build, Playwright repository gate, empty repository fixture y artifacts base quedaron GREEN.
+
+La PR `#57` fue fusionada mediante squash a `main` en `7aeaf701b077781f5b6ca0d659be2726dec7412b` (`feat(M05.5): use Puck visual history`). Deshacer/Rehacer del Topbar delega en la history pública de Puck, `visualHistoryLimit` queda local al Studio con rango seguro y el stack visual permanece session-only y separado de Project Revisions.
+
 ## Microfase activa
 
-`M05.5` — Usar Puck visual history.
+`M05.6` — Text/RichText inline editing.
 
-Referencias: `.ai/microphases/M05_5.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
+Referencias: `.ai/microphases/M05_6.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
