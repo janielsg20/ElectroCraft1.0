@@ -14,7 +14,8 @@ Date: 2026-08-27.
 | F05 / M05.3        | COMPLETADA / GREEN | PR `#52`; Base CI `33016557679` (#674)         |
 | F05 / M05.4        | COMPLETADA / GREEN | PR `#56`; Base CI `33035570789` (#692)         |
 | F05 / M05.5        | COMPLETADA / GREEN | PR `#57`; Base CI `33081006606` (#702)         |
-| F05 / M05.6        | ACTIVE             | `codex/m05-6-inline-richtext`                  |
+| F05 / M05.6        | COMPLETADA / GREEN | PR `#58`; Base CI `33086731332` (#707)         |
+| F05 / M05.7        | ACTIVE             | `codex/m05-7-palette-outline-extensions`       |
 
 ## Cierre M05.1
 
@@ -66,20 +67,31 @@ Date: 2026-08-27.
 - `visualHistoryLimit` queda en preferencias locales del Studio con default `50` y rango `1–100`.
 - Undo/redo continúa por el bridge M05.4 y autosave F04; `history/ui` no se serializa en el proyecto.
 
-## M05.6 en curso
+## Cierre M05.6
 
-Rama: `codex/m05-6-inline-richtext`.
+- Head funcional validado: `96145da4e74d856c1368f9a0418379acfcff0b2a`.
+- PR `#58`; squash merge a `main`: `459d07d73f08fb8b2a826f54787124011f7c7ca8`.
+- `ElectroCraft Base CI` run `33086731332` (#707): `success`.
+- `Text` usa field Puck `text` con `contentEditable: true`; Heading/Párrafo heredan al resolver al mismo `componentRef`.
+- `RichText` usa `richtext + contentEditable` y Puck/Tiptap permanece engine owner.
+- El valor transportable sigue siendo string HTML canónico y no persiste selection/ui/history/Tiptap internals.
+- El action bridge M05.4, autosave F04 e history M05.5 se reutilizan sin segundo pipeline.
+
+## M05.7 en curso
+
+Rama: `codex/m05-7-palette-outline-extensions`.
 
 Implementación actual:
-- `packages/editor-puck/src/puck-component-adapter.ts` traduce `Text` a Puck `text + contentEditable` y `RichText` a `richtext + contentEditable`.
-- `RichText` conserva string HTML como valor canónico; Tiptap/Puck permanece engine owner y no se añade un segundo formato richtext.
-- `apps/studio/src/features/editor/puck-document-session.ts` activa la política inline en la única sesión Puck canónica.
-- El Canvas aplica focus/outline sutil y `prefers-reduced-motion` sin crear direct-edit UI propia.
-- Unit/contract/integration/Playwright cubren mapping, configuración inválida, round-trip, aislamiento de internals y persistencia browser/storage.
-- No se añadió workflow dedicado; gate final previsto: `ElectroCraft Base CI`.
+- `createPuckCategories()` proyecta `ComponentDefinition.category` al API público `Config.categories` consumido por `Puck.Components`.
+- El componente diagnóstico recuperable queda en categoría oculta y con `insert: false`, evitando que aparezca como pieza insertable.
+- `locked` mapea `edit/drag/delete/duplicate = false` mediante permisos públicos Puck; no se añade lock store paralelo.
+- `StudioPalette` conserva búsqueda/categorías/favoritos/recientes alrededor de `Puck.Components` y expone un modo `puck-base` para probar que las extensiones Electro son opcionales.
+- Favoritos/recientes siguen siendo preferencias workspace/user locales (`electrocraft.workspace.palette.v1`), nunca `ComponentDefinitions` ni parte de `ElectroCraftDocument`.
+- `Puck.Outline` permanece directo, sin overrides/plugins experimentales; hidden/visibility no se inventa en el adapter mientras no exista owner canónico correspondiente.
+- Unit/contract/Playwright cubren categorías, lock, diagnóstico no insertable, fallback Puck base, búsqueda/preferencias y ausencia de internals de Outline en canonical data.
 
 Blockers funcionales P0/P1 conocidos: `0`.
 
 ## Próxima microfase exacta
 
-Completar y validar `M05.6 — Text/RichText inline editing`; solo después activar `M05.7 — Extensiones de palette y outline solo necesarias` según `.ai/microphases/M05_7.md`.
+Completar y validar `M05.7 — Extensiones de palette y outline solo necesarias`; solo después activar `M05.8 — Editor core E2E` según `.ai/microphases/M05_8.md`.
