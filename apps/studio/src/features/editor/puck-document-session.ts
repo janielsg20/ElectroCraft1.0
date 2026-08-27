@@ -2,6 +2,7 @@ import type { ElectroCraftComponentDefinition, ElectroCraftDocument } from '@ele
 import {
   createPuckConfig,
   createPuckDocumentAdapter,
+  electroCraftCorePuckInlineEditing,
   electroCraftCorePuckSlots,
   type PuckDocumentReconstruction,
   type PuckEditorData,
@@ -16,6 +17,7 @@ export function createStudioPuckDocumentSession(
 ) {
   const config = createPuckConfig(definitions, renderers, undefined, {
     slots: electroCraftCorePuckSlots,
+    inlineEditing: electroCraftCorePuckInlineEditing,
     diagnosticRenderer: studioPuckDiagnosticRenderer,
     diagnosticLabel: 'Componente no disponible',
   });
