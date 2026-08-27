@@ -52,22 +52,20 @@ describe('M03.9 Studio theme isolation contract', () => {
     expect(DEFAULT_STUDIO_THEME).toBe('dark');
   });
 
-  it('wires appearance through Settings and the six-slot mobile dock without replacing editor destinations', () => {
+  it('wires appearance through Settings while preserving the five canonical mobile editor destinations', () => {
     const topbar = read('apps/studio/src/shell/studio-topbar.tsx');
     const workspace = read('apps/studio/src/shell/editor-workspace.tsx');
     const responsive = read('apps/studio/src/shell/responsive-shell.css');
-    const mobileAppearanceTrigger = '<AppearancePanelTrigger presentation="mobile" />';
 
     expect(topbar).toContain('data-settings-destination="appearance"');
     expect(topbar).toContain('<AppearancePanelTrigger />');
-    expect(workspace).toContain(mobileAppearanceTrigger);
-    expect(workspace.split(mobileAppearanceTrigger)).toHaveLength(2);
+    expect(workspace).not.toContain('<AppearancePanelTrigger presentation="mobile" />');
     expect(workspace).toContain('data-mobile-destination="components"');
     expect(workspace).toContain('data-mobile-destination="screens"');
     expect(workspace).toContain('data-mobile-destination="canvas"');
     expect(workspace).toContain('data-mobile-destination="properties"');
     expect(workspace).toContain('data-mobile-destination="more"');
-    expect(responsive).toContain('grid-template-columns: repeat(6, minmax(0, 1fr));');
+    expect(responsive).toContain('grid-template-columns: repeat(5, minmax(0, 1fr));');
   });
 
   it('keeps visual values in one design-system token layer with no framework or preset selectors', () => {
