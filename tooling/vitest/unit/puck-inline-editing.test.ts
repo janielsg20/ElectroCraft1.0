@@ -23,6 +23,8 @@ const emptyStyle = {
   platform: {},
 };
 
+type InlineFieldShape = { type?: string; contentEditable?: boolean };
+
 function definition(key: string, fieldKey: string) {
   return electroCraftComponentDefinitionSchema.parse({
     schemaVersion: 1,
@@ -48,9 +50,8 @@ function definition(key: string, fieldKey: string) {
 }
 
 function fieldShape(config: ReturnType<typeof createPuckConfig>, componentKey: string, fieldKey: string) {
-  return config.components[componentKey]?.fields?.[fieldKey] as
-    | { type?: string; contentEditable?: boolean }
-    | undefined;
+  const fields = config.components[componentKey]?.fields as Record<string, unknown> | undefined;
+  return fields?.[fieldKey] as InlineFieldShape | undefined;
 }
 
 describe('M05.6 Puck inline editing projection', () => {
