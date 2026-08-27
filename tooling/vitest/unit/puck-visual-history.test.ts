@@ -1,5 +1,9 @@
 import { VISUAL_HISTORY_LIMITS, normalizeVisualHistoryLimit } from '@electrocraft/application';
-import { puckEditorHistoryControls, resolvePuckHistoryWindow } from '@electrocraft/editor-puck';
+import {
+  applyPuckHistoryPolicy,
+  puckEditorHistoryControls,
+  resolvePuckHistoryWindow,
+} from '@electrocraft/editor-puck';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 afterEach(() => {
@@ -49,6 +53,40 @@ describe('M05.5 Puck visual history policy', () => {
       histories: ['edit-a', 'edit-b'],
       index: 1,
     });
+  });
+
+  it('applies the bounded window through both public Puck setters without changing the tip', () => {
+    const setHistories = vi.fn();
+    const setHistoryIndex = vi.fn();
+    const plan = applyPuckHistoryPolicy(
+      {
+        histories: ['initial', 'edit', 'drag', 'delete'],
+        index: 3,
+        setHistories,
+        setHistoryIndex,
+      },
+      2,
+    );
+
+    expect(plan).toEqual({ histories: ['edit', 'drag', 'delete'], index: 2 });
+    expect(setHistories).toHaveBeenCalledWith(['edit', 'drag', 'delete']);
+    expect(setHistoryIndex).toHaveBeenCalledWith(2);
+
+    setHistories.mockClear();
+    setHistoryIndex.mockClear();
+    expect(
+      applyPuckHistoryPolicy(
+        {
+          histories: ['initial', 'edit', 'drag', 'delete'],
+          index: 1,
+          setHistories,
+          setHistoryIndex,
+        },
+        2,
+      ),
+    ).toBeNull();
+    expect(setHistories).not.toHaveBeenCalled();
+    expect(setHistoryIndex).not.toHaveBeenCalled();
   });
 
   it('delegates undo and redo without owning a second history stack', () => {
