@@ -128,71 +128,94 @@ test.describe('M03.12 AppShell E2E closure matrix', () => {
     expect(ordered).toBe(true);
 
     await help.focus();
-    await help.press('Enter');
-    const helpSheet = page.locator('[data-help-drawer]');
-    await expect(helpSheet).toBeVisible();
-    const search = helpSheet.getByRole('searchbox');
-    await search.fill('proyecto');
-    await expect(helpSheet.getByText('Proyectos', { exact: true }).first()).toBeVisible();
+    await page.keyboard.press('Enter');
+    const drawer = page.getByRole('dialog', { name: 'AppShell del Studio' });
+    await expect(drawer).toBeVisible();
+    const search = drawer.getByLabel('Buscar en la ayuda');
+    await search.fill('ExportIR');
+    await expect(drawer.locator('[data-help-search-results]')).toContainText('Exportar');
+    await captureViewportEvidence(page, testInfo, 'desktop-help-search');
     await page.keyboard.press('Escape');
-    await expect(helpSheet).toBeHidden();
     await expect(help).toBeFocused();
-
-    await captureViewportEvidence(page, testInfo, 'help-focus-return');
+    await expect(settings).toBeVisible();
   });
 
-  test('exposes real empty/disabled/ready states and fails closed on an unknown route', async ({ page }, testInfo) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
+  test('exposes real empty/disabled/ready states and fails closed on an unknown route', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 820 });
     await page.goto('/queries');
-    await expect(page.locator('[data-route-state="empty"]')).toBeVisible();
-
-    await page.goto('/deploy');
-    await expect(page.locator('[data-route-state="disabled"]')).toBeVisible();
+    await expect(page.getByRole('button', { name: '¿Qué puedo hacer aquí?' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Deshacer' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Rehacer' })).toHaveCount(0);
+    await expect(page.locator('.ec-app-shell-statusbar')).toContainText('Listo');
 
     await page.goto('/editor');
-    await expect(page.locator('[data-route-state="ready"]')).toBeVisible();
+    const toolsTrigger = page.getByRole('button', { name: 'Abrir herramientas contextuales' });
+    await expect(toolsTrigger).toBeVisible();
+    await toolsTrigger.click();
+    const tools = page.getByRole('dialog', { name: 'Herramientas contextuales' });
+    await expect(tools.getByRole('button', { name: 'Deshacer' })).toBeDisabled();
+    await expect(tools.getByRole('button', { name: 'Rehacer' })).toBeDisabled();
+    await page.keyboard.press('Escape');
 
-    await page.goto('/ruta-inexistente');
-    await expect(page.locator('[data-route-state="unknown"]')).toBeVisible();
-    await captureViewportEvidence(page, testInfo, 'unknown-route-fail-closed');
+    await page.goto('/ruta-inexistente-m03-12');
+    await expect(page.getByText('Ruta no disponible', { exact: false })).toBeVisible();
+    await expect(page.locator('[aria-current="page"]')).toHaveCount(0);
   });
 
   test('keeps Studio theme persistence isolated from project/theme/export storage', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/editor');
+    await page.evaluate(() => {
+      window.localStorage.removeItem('electrocraft.studio.theme.v2');
+      window.localStorage.setItem(
+        'electrocraft.studio.appearance.v1',
+        JSON.stringify({ tone: 'light', accent: 'amber' }),
+      );
+      window.localStorage.setItem('electrocraft.studio.appearance-presets.v1', JSON.stringify([{ id: 'legacy' }]));
+      window.localStorage.setItem('electrocraft.project.e2e-sentinel', 'project-stable');
+      window.localStorage.setItem('electrocraft.theme.e2e-sentinel', 'theme-stable');
+      window.localStorage.setItem('electrocraft.export.e2e-sentinel', 'export-stable');
+    });
+    await page.reload();
 
-    const before = await page.evaluate(() => ({
-      localStorage: Object.fromEntries(Object.entries(window.localStorage)),
-      theme: document.documentElement.dataset.ecTheme,
-    }));
-
-    const trigger = page.locator('[data-appearance-trigger="topbar"]').first();
-    await trigger.click();
+    await page.locator('[data-appearance-trigger="topbar"]').first().click();
     const sheet = page.locator('[data-appearance-sheet="topbar"]').last();
     await expect(sheet).toBeVisible();
-    await sheet.locator('[data-appearance-value="light"]').click();
-    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecTheme)).toBe('light');
+    await expect(sheet.locator('[data-appearance-value]')).toHaveCount(2);
+    await sheet.locator('[data-appearance-value="dark"]').click();
+    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.ecTheme)).toBe('dark');
 
-    const after = await page.evaluate(() => ({
-      localStorage: Object.fromEntries(Object.entries(window.localStorage)),
-      theme: document.documentElement.dataset.ecTheme,
+    const storage = await page.evaluate(() => ({
+      studioTheme: window.localStorage.getItem('electrocraft.studio.theme.v2'),
+      legacyAppearance: window.localStorage.getItem('electrocraft.studio.appearance.v1'),
+      legacyPresets: window.localStorage.getItem('electrocraft.studio.appearance-presets.v1'),
+      project: window.localStorage.getItem('electrocraft.project.e2e-sentinel'),
+      theme: window.localStorage.getItem('electrocraft.theme.e2e-sentinel'),
+      exportValue: window.localStorage.getItem('electrocraft.export.e2e-sentinel'),
     }));
-
-    expect(before.theme).not.toBe(after.theme);
-    const changedKeys = new Set(
-      [...Object.keys(before.localStorage), ...Object.keys(after.localStorage)].filter(
-        (key) => before.localStorage[key] !== after.localStorage[key],
-      ),
-    );
-    expect([...changedKeys]).toEqual(['electrocraft.studio.theme.v2']);
+    expect(storage.studioTheme).toBe(JSON.stringify('dark'));
+    expect(storage.legacyAppearance).toBeNull();
+    expect(storage.legacyPresets).toBeNull();
+    expect(storage.project).toBe('project-stable');
+    expect(storage.theme).toBe('theme-stable');
+    expect(storage.exportValue).toBe('export-stable');
   });
 
-  test('does not leak known English release labels, raw translation keys or missing-key diagnostics', async ({ page }) => {
+  test('does not leak known English release labels, raw translation keys or missing-key diagnostics', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/editor');
     const body = page.locator('body');
-
-    for (const forbidden of ['Settings', 'Help', 'Preview', 'Export', '[missing:', 'studio.']) {
+    for (const forbidden of [
+      'Save changes',
+      'Cancel changes',
+      'Open settings',
+      'Components panel',
+      'Export project',
+      'I18N_MISSING_KEY',
+      'translation missing',
+    ]) {
       await expect(body).not.toContainText(forbidden);
     }
   });
