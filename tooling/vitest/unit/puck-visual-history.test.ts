@@ -29,19 +29,19 @@ describe('M05.5 Puck visual history policy', () => {
   });
 
   it('keeps the default and maximum windows bounded at the current tip', () => {
-    const defaultHistories = Array.from({ length: VISUAL_HISTORY_LIMITS.defaultValue + 8 }, (_, index) => index);
-    const defaultPlan = resolvePuckHistoryWindow(
-      defaultHistories,
-      defaultHistories.length - 1,
-      VISUAL_HISTORY_LIMITS.defaultValue,
-    );
-    expect(defaultPlan?.histories).toHaveLength(VISUAL_HISTORY_LIMITS.defaultValue + 1);
+    const defaultLimit = VISUAL_HISTORY_LIMITS.defaultValue;
+    const defaultLength = defaultLimit + 8;
+    const defaultHistories = Array.from({ length: defaultLength }, (_, index) => index);
+    const defaultPlan = resolvePuckHistoryWindow(defaultHistories, defaultLength - 1, defaultLimit);
+    expect(defaultPlan?.histories).toHaveLength(defaultLimit + 1);
     expect(defaultPlan?.histories.at(-1)).toBe(defaultHistories.at(-1));
 
-    const maxHistories = Array.from({ length: VISUAL_HISTORY_LIMITS.max + 4 }, (_, index) => index);
-    const maxPlan = resolvePuckHistoryWindow(maxHistories, maxHistories.length - 1, VISUAL_HISTORY_LIMITS.max);
-    expect(maxPlan?.histories).toHaveLength(VISUAL_HISTORY_LIMITS.max + 1);
-    expect(maxPlan?.index).toBe(VISUAL_HISTORY_LIMITS.max);
+    const maxLimit = VISUAL_HISTORY_LIMITS.max;
+    const maxLength = maxLimit + 4;
+    const maxHistories = Array.from({ length: maxLength }, (_, index) => index);
+    const maxPlan = resolvePuckHistoryWindow(maxHistories, maxLength - 1, maxLimit);
+    expect(maxPlan?.histories).toHaveLength(maxLimit + 1);
+    expect(maxPlan?.index).toBe(maxLimit);
   });
 
   it('defers trimming while positioned before the tip so redo and branching stay intact', () => {
