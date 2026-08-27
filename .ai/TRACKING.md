@@ -13,7 +13,8 @@ Date: 2026-08-27.
 | F05 / M05.2        | COMPLETADA / GREEN | PR `#50`; Base CI `32990513971` (#661)         |
 | F05 / M05.3        | COMPLETADA / GREEN | PR `#52`; Base CI `33016557679` (#674)         |
 | F05 / M05.4        | COMPLETADA / GREEN | PR `#56`; Base CI `33035570789` (#692)         |
-| F05 / M05.5        | ACTIVE             | `codex/m05-5-puck-visual-history`               |
+| F05 / M05.5        | COMPLETADA / GREEN | PR `#57`; Base CI `33081006606` (#702)         |
+| F05 / M05.6        | ACTIVE             | `codex/m05-6-inline-richtext`                  |
 
 ## Cierre M05.1
 
@@ -51,24 +52,34 @@ Date: 2026-08-27.
 - PR `#56`; squash merge a `main`: `98b51b7ad35b3204f0b67899b4fd2392d1c100e7`.
 - `ElectroCraft Base CI` run `33035570789` (#692): `success`.
 - `packages/editor-puck/src/puck-action-sync.ts` consume `onAction(action, appState, prevAppState)` y persiste solo cambios reales en `Data.content/root/zones`.
-- Studio reconstruye `ElectroCraftDocument` mediante el adapter canónico y reutiliza `projectStorageRuntime.queueAutosave()`; no existe debounce paralelo.
+- Studio reconstruye `ElectroCraftDocument` mediante el adapter canónico y reutiliza el autosave F04; no existe debounce paralelo.
 - El editor visible usa `config/data/onAction` de la sesión canónica real y mantiene fail-closed visible ante errores de reconstrucción.
 - Selección, DnD, `ui` e history Puck permanecen session-only; Project Revisions sigue siendo historial durable separado.
-- Unit/integration/contract/Playwright cubren edit/reorder/duplicate/remove, selección ignorada, payload sin internals y round-trip browser/storage real.
 
-## M05.5 en curso
+## Cierre M05.5
 
-Rama: `codex/m05-5-puck-visual-history`.
+- Head funcional validado: `9d61c1e3f9976893594b518e952320e723b59f81`.
+- PR `#57`; squash merge a `main`: `7aeaf701b077781f5b6ca0d659be2726dec7412b`.
+- `ElectroCraft Base CI` run `33081006606` (#702): `success`.
+- Topbar Deshacer/Rehacer delega en `history.back/forward/hasPast/hasFuture` público de Puck.
+- La ventana visual se limita mediante `setHistories/setHistoryIndex` sin mantener un stack paralelo.
+- `visualHistoryLimit` queda en preferencias locales del Studio con default `50` y rango `1–100`.
+- Undo/redo continúa por el bridge M05.4 y autosave F04; `history/ui` no se serializa en el proyecto.
 
-Objetivo:
-- conectar Deshacer/Rehacer del Topbar a la history pública de Puck;
-- mantener el history visual session-only y separado de Project Revisions;
-- sincronizar cada undo/redo de vuelta a `ElectroCraftDocument` y al autosave F04;
-- exponer `visualHistoryLimit` con rango seguro en Configuración > Editor;
-- recortar la ventana de history solo con API pública Puck, sin serializar AppState/history en el proyecto.
+## M05.6 en curso
 
-Blockers funcionales P0/P1 conocidos: `0` al activar M05.5.
+Rama: `codex/m05-6-inline-richtext`.
+
+Implementación actual:
+- `packages/editor-puck/src/puck-component-adapter.ts` traduce `Text` a Puck `text + contentEditable` y `RichText` a `richtext + contentEditable`.
+- `RichText` conserva string HTML como valor canónico; Tiptap/Puck permanece engine owner y no se añade un segundo formato richtext.
+- `apps/studio/src/features/editor/puck-document-session.ts` activa la política inline en la única sesión Puck canónica.
+- El Canvas aplica focus/outline sutil y `prefers-reduced-motion` sin crear direct-edit UI propia.
+- Unit/contract/integration/Playwright cubren mapping, configuración inválida, round-trip, aislamiento de internals y persistencia browser/storage.
+- No se añadió workflow dedicado; gate final previsto: `ElectroCraft Base CI`.
+
+Blockers funcionales P0/P1 conocidos: `0`.
 
 ## Próxima microfase exacta
 
-Completar y validar `M05.5 — Usar Puck visual history`; solo después activar `M05.6` según `.ai/microphases/M05_6.md`.
+Completar y validar `M05.6 — Text/RichText inline editing`; solo después activar `M05.7 — Extensiones de palette y outline solo necesarias` según `.ai/microphases/M05_7.md`.
