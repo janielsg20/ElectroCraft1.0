@@ -38,8 +38,12 @@
   isolation: isolate;
   overflow: hidden;
   border: 0;
+  border-color: transparent;
+  outline: 0;
+  outline-color: transparent;
   background: color-mix(in srgb, var(--skeleton) 88%, var(--surface));
   box-shadow: none;
+  backface-visibility: hidden;
   animation: ec-skeleton-neutral-pulse 1.35s ease-in-out infinite;
 }
 

@@ -54,8 +54,8 @@
 
 .ec-project-toolbar {
   min-height: 42px;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px;
   border: 1px solid var(--border);
@@ -65,17 +65,28 @@
   box-shadow: 0 2px 10px rgb(0 0 0 / 0.08);
 }
 
-.ec-project-toolbar input {
-  max-width: 320px;
+.ec-project-toolbar-filters,
+.ec-project-toolbar-actions {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ec-project-toolbar-actions {
+  justify-content: flex-end;
 }
 
 .ec-project-search {
   position: relative;
-  width: min(320px, 100%);
+  min-width: 160px;
+  max-width: 320px;
+  flex: 1 1 240px;
 }
 
-.ec-project-toolbar > [data-slot='select-trigger'] {
+.ec-project-toolbar-filters > [data-slot='select-trigger'] {
   min-width: 126px;
+  flex: 0 0 auto;
 }
 
 .ec-project-search > svg {
@@ -109,7 +120,7 @@
 }
 
 .ec-project-new {
-  margin-left: auto;
+  flex: 0 0 auto;
 }
 
 .ec-project-collection {
@@ -341,16 +352,24 @@
   }
 
   .ec-project-toolbar {
+    grid-template-columns: 1fr;
     align-items: stretch;
-    flex-direction: column;
     padding: 8px;
   }
 
-  .ec-project-toolbar input {
-    max-width: none;
+  .ec-project-toolbar-filters,
+  .ec-project-toolbar-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .ec-project-toolbar-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .ec-project-search {
+    min-width: 0;
+    max-width: none;
     width: 100%;
   }
 
@@ -360,7 +379,12 @@
 
   .ec-project-new {
     min-height: 44px;
-    margin-left: 0;
+  }
+
+  .ec-project-toolbar-actions > button {
+    min-width: 0;
+    width: 100%;
+    padding-inline: 8px;
   }
 
   .ec-project-collection--grid {
@@ -391,11 +415,21 @@
 
 @media (min-width: 768px) and (max-width: 1199px) {
   .ec-project-search {
-    width: min(220px, 100%);
+    flex-basis: 180px;
   }
 
   .ec-project-view button {
     padding-inline: 7px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 899px) {
+  .ec-project-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .ec-project-toolbar-actions {
+    justify-content: flex-end;
   }
 }
 
@@ -412,6 +446,6 @@
 
 @media (min-width: 1200px) and (max-width: 1399px) {
   .ec-project-search {
-    width: min(240px, 100%);
+    flex-basis: 210px;
   }
 }

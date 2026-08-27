@@ -39,6 +39,8 @@ describe('flat Studio shell and loading contract', () => {
     const informationArchitecture = read('apps/studio/src/shell/information-architecture.css');
 
     expect(globals).toContain("[data-slot='skeleton']::after");
+    expect(globals).toContain('border-color: transparent');
+    expect(globals).toContain('outline-color: transparent');
     expect(globals).toContain('animation: ec-skeleton-neutral-pulse');
     expect(globals).toContain('@keyframes ec-skeleton-neutral-pulse');
     expect(globals).toContain('display: none;');

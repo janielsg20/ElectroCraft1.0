@@ -222,56 +222,51 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
           <p>Abre y organiza los proyectos de este espacio de trabajo.</p>
         </header>
         <div className="ec-project-toolbar" aria-label="Herramientas de proyectos">
-          <label className="ec-project-search">
-            <SearchIcon aria-hidden="true" />
-            <Input
-              aria-label="Buscar proyectos"
-              placeholder="Buscar proyectos"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </label>
-          <Select value={status} onValueChange={(value) => setStatus(value as typeof status)}>
-            <SelectTrigger aria-label="Estado de proyectos">
-              <ProjectIcon aria-hidden="true" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="active">Activos</SelectItem>
-              <SelectItem value="archived">Archivados</SelectItem>
-              <SelectItem value="trashed">Papelera</SelectItem>
-              <SelectItem value="all">Todos</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={sort} onValueChange={(value) => setSort(value as ProjectListSort)}>
-            <SelectTrigger aria-label="Ordenar proyectos">
-              <SortIcon aria-hidden="true" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="updated-desc">Recientes</SelectItem>
-              <SelectItem value="updated-asc">Más antiguos</SelectItem>
-              <SelectItem value="name-asc">Nombre A–Z</SelectItem>
-              <SelectItem value="name-desc">Nombre Z–A</SelectItem>
-            </SelectContent>
-          </Select>
-          <div className="ec-project-view" role="group" aria-label="Vista">
-            <Button variant="ghost" aria-pressed={view === 'grid'} onClick={() => setView('grid')}>
-              <GridIcon aria-hidden="true" />
-              <span>Cuadrícula</span>
-            </Button>
-            <Button variant="ghost" aria-pressed={view === 'list'} onClick={() => setView('list')}>
-              <ListIcon aria-hidden="true" />
-              <span>Lista</span>
-            </Button>
+          <div className="ec-project-toolbar-filters">
+            <label className="ec-project-search">
+              <SearchIcon aria-hidden="true" />
+              <Input
+                aria-label="Buscar proyectos"
+                placeholder="Buscar proyectos"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </label>
+            <Select value={status} onValueChange={(value) => setStatus(value as typeof status)}>
+              <SelectTrigger aria-label="Estado de proyectos">
+                <ProjectIcon aria-hidden="true" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Activos</SelectItem>
+                <SelectItem value="archived">Archivados</SelectItem>
+                <SelectItem value="trashed">Papelera</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={sort} onValueChange={(value) => setSort(value as ProjectListSort)}>
+              <SelectTrigger aria-label="Ordenar proyectos">
+                <SortIcon aria-hidden="true" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="updated-desc">Recientes</SelectItem>
+                <SelectItem value="updated-asc">Más antiguos</SelectItem>
+                <SelectItem value="name-asc">Nombre A–Z</SelectItem>
+                <SelectItem value="name-desc">Nombre Z–A</SelectItem>
+              </SelectContent>
+            </Select>
+            <div className="ec-project-view" role="group" aria-label="Vista">
+              <Button variant="ghost" aria-pressed={view === 'grid'} onClick={() => setView('grid')}>
+                <GridIcon aria-hidden="true" />
+                <span>Cuadrícula</span>
+              </Button>
+              <Button variant="ghost" aria-pressed={view === 'list'} onClick={() => setView('list')}>
+                <ListIcon aria-hidden="true" />
+                <span>Lista</span>
+              </Button>
+            </div>
           </div>
-          {state === 'loading' ? (
-            <Loader
-              className="ec-project-loading-indicator"
-              label={initialLoading ? 'Cargando proyectos' : 'Actualizando proyectos'}
-              showLabel={refreshing}
-            />
-          ) : null}
           <input
             ref={importInputRef}
             hidden
@@ -282,14 +277,19 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
               if (file) void readImportFile(file);
             }}
           />
-          <Button variant="outline" disabled={initialLoading} onClick={() => importInputRef.current?.click()}>
-            <ImportIcon aria-hidden="true" />
-            Importar copia
-          </Button>
-          <Button className="ec-project-new" disabled={initialLoading} onClick={() => setWizardOpen(true)}>
-            <NewProjectIcon aria-hidden="true" />
-            Nuevo proyecto
-          </Button>
+          <div className="ec-project-toolbar-actions">
+            {refreshing ? (
+              <Loader className="ec-project-loading-indicator" label="Actualizando proyectos" showLabel />
+            ) : null}
+            <Button variant="outline" disabled={initialLoading} onClick={() => importInputRef.current?.click()}>
+              <ImportIcon aria-hidden="true" />
+              Importar copia
+            </Button>
+            <Button className="ec-project-new" disabled={initialLoading} onClick={() => setWizardOpen(true)}>
+              <NewProjectIcon aria-hidden="true" />
+              Nuevo proyecto
+            </Button>
+          </div>
         </div>
         {state === 'error' ? (
           <div role="alert">

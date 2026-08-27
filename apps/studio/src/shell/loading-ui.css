@@ -219,8 +219,19 @@
   opacity: 0.72;
 }
 
-.ec-project-card-skeleton {
+.ec-project-card.ec-project-card-skeleton {
   pointer-events: none;
+  border-color: transparent;
+  outline: 0;
+  outline-color: transparent;
+  background: color-mix(in srgb, var(--surface) 96%, var(--background));
+  box-shadow: none;
+  transition: none;
+}
+
+.ec-project-card-skeleton .ec-project-open > span,
+.ec-project-card-skeleton > div {
+  border-color: transparent;
 }
 
 .ec-project-skeleton-preview {
