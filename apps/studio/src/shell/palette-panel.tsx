@@ -141,9 +141,14 @@ function PaletteDiagnosticNotice({
 
 export interface StudioPaletteProps {
   readonly availableComponentTypes?: ReadonlySet<string>;
+  /**
+   * M05.7 escape hatch used to prove Electro discovery layers are optional.
+   * Puck.Components remains fully functional when disabled.
+   */
+  readonly extensionsEnabled?: boolean;
 }
 
-export function StudioPalette({ availableComponentTypes }: StudioPaletteProps = {}) {
+export function StudioPalette({ availableComponentTypes, extensionsEnabled = true }: StudioPaletteProps = {}) {
   const [query, setQuery] = useState('');
   const [diagnostic, setDiagnostic] = useState<PaletteDiagnostic | null>(null);
   const activePuckConfig = usePuckEditorConfig();
@@ -164,6 +169,22 @@ export function StudioPalette({ availableComponentTypes }: StudioPaletteProps = 
     () => preferences.recent.map(getPaletteItemById).filter((value): value is PaletteItemDescriptor => Boolean(value)),
     [preferences.recent],
   );
+
+  if (!extensionsEnabled) {
+    return (
+      <section
+        className="ec-palette ec-palette--puck-base"
+        aria-label={paletteT('studio.palette.title')}
+        data-studio-palette
+        data-palette-extension-mode="puck-base"
+        data-puck-active-components={effectiveComponentTypes.size}
+      >
+        <div className="ec-palette-puck-source" aria-label={paletteT('studio.palette.dragSource')}>
+          <PuckEditorComponents />
+        </div>
+      </section>
+    );
+  }
 
   const insert = (descriptor: PaletteItemDescriptor) => {
     const resolution = resolvePaletteInsert(descriptor, effectiveComponentTypes);
@@ -205,6 +226,7 @@ export function StudioPalette({ availableComponentTypes }: StudioPaletteProps = 
       className="ec-palette"
       aria-label={paletteT('studio.palette.title')}
       data-studio-palette
+      data-palette-extension-mode="electro"
       data-puck-active-components={effectiveComponentTypes.size}
       onKeyDown={onPanelKeyDown}
     >
