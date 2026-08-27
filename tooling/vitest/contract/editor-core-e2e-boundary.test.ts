@@ -35,6 +35,9 @@ describe('M05.8 editor core ownership boundary', () => {
     expect(runtime).toContain('createStudioPuckDocumentPersistenceBridge');
     expect(composition).toContain('puckEditorHistoryControls');
     expect(composition).toContain('puckEditorCommandControls.connect(dispatch)');
+    expect(composition).toContain("createDeterministicObjectId(\n      'node'");
+    expect(composition).toContain('globalThis.crypto.randomUUID()');
+    expect(composition).toContain('destinationZone: \'root:default-zone\',\n      id,');
     expect(commands).toContain('let activeDispatch');
     expect(commands).not.toContain('activeData');
     expect(commands).not.toContain('activeState');
