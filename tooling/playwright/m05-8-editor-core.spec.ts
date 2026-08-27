@@ -37,6 +37,11 @@ async function readPersistedDocument(page: Page, projectId: string) {
   }, projectId);
 }
 
+async function readRootChildren(page: Page, projectId: string): Promise<StoredNode[]> {
+  const payload = (await readPersistedDocument(page, projectId)) as StoredDocument | null;
+  return payload?.root?.children ?? [];
+}
+
 async function dispatchPuckAction(page: Page, action: Record<string, unknown>) {
   await page.evaluate(async (nextAction) => {
     const { studioPuckEditorCommands } = await import('/src/features/editor/puck-editor-runtime.ts');
@@ -71,16 +76,9 @@ test.describe('M05.8 Editor core E2E', () => {
     const undo = page.locator('[data-puck-history-action="undo"]').first();
     const redo = page.locator('[data-puck-history-action="redo"]').first();
     await expect(undo).toBeEnabled();
+    await expect.poll(async () => (await readRootChildren(page, projectId)).length).toBe(4);
 
-    await expect
-      .poll(
-        async () =>
-          ((await readPersistedDocument(page, projectId)) as StoredDocument | null)?.root?.children?.length,
-      )
-      .toBe(4);
-
-    const inserted = (await readPersistedDocument(page, projectId)) as StoredDocument | null;
-    const insertedChildren = inserted?.root?.children ?? [];
+    const insertedChildren = await readRootChildren(page, projectId);
     expect(insertedChildren.map((node) => node.componentRef)).toEqual(['Button', 'Image', 'Text', 'Container']);
 
     const textIndex = insertedChildren.findIndex((node) => node.componentRef === 'Text');
@@ -98,15 +96,16 @@ test.describe('M05.8 Editor core E2E', () => {
       destinationZone: `${containerId}:children`,
     });
 
-    await expect.poll(async () => {
-      const payload = (await readPersistedDocument(page, projectId)) as StoredDocument | null;
-      const container = payload?.root?.children?.find((node) => node.componentRef === 'Container');
-      return container?.children?.[0]?.componentRef;
-    }).toBe('Text');
+    await expect
+      .poll(async () => {
+        const children = await readRootChildren(page, projectId);
+        const container = children.find((node) => node.componentRef === 'Container');
+        return container?.children?.[0]?.componentRef;
+      })
+      .toBe('Text');
 
-    const afterMove = (await readPersistedDocument(page, projectId)) as StoredDocument | null;
-    const containerIndexAfterMove =
-      afterMove?.root?.children?.findIndex((node) => node.componentRef === 'Container') ?? -1;
+    const afterMove = await readRootChildren(page, projectId);
+    const containerIndexAfterMove = afterMove.findIndex((node) => node.componentRef === 'Container');
     expect(containerIndexAfterMove).toBeGreaterThanOrEqual(0);
 
     await dispatchPuckAction(page, {
@@ -116,10 +115,9 @@ test.describe('M05.8 Editor core E2E', () => {
       destinationZone: 'root:default-zone',
     });
 
-    await expect.poll(async () => {
-      const payload = (await readPersistedDocument(page, projectId)) as StoredDocument | null;
-      return payload?.root?.children?.map((node) => node.componentRef);
-    }).toEqual(['Container', 'Button', 'Image']);
+    await expect
+      .poll(async () => (await readRootChildren(page, projectId)).map((node) => node.componentRef))
+      .toEqual(['Container', 'Button', 'Image']);
 
     await page.getByRole('tab', { name: 'Capas' }).click();
     const outline = page.locator('[data-puck-composition="outline"]');
@@ -130,26 +128,32 @@ test.describe('M05.8 Editor core E2E', () => {
     await expect(textField).toBeVisible();
     await textField.fill('Texto editado E2E');
 
-    await expect.poll(async () => {
-      const payload = (await readPersistedDocument(page, projectId)) as StoredDocument | null;
-      const container = payload?.root?.children?.find((node) => node.componentRef === 'Container');
-      return container?.children?.[0]?.props?.text;
-    }).toBe('Texto editado E2E');
+    await expect
+      .poll(async () => {
+        const children = await readRootChildren(page, projectId);
+        const container = children.find((node) => node.componentRef === 'Container');
+        return container?.children?.[0]?.props?.text;
+      })
+      .toBe('Texto editado E2E');
 
     await undo.click();
     await expect(redo).toBeEnabled();
-    await expect.poll(async () => {
-      const payload = (await readPersistedDocument(page, projectId)) as StoredDocument | null;
-      const container = payload?.root?.children?.find((node) => node.componentRef === 'Container');
-      return container?.children?.[0]?.props?.text;
-    }).toBe('Texto');
+    await expect
+      .poll(async () => {
+        const children = await readRootChildren(page, projectId);
+        const container = children.find((node) => node.componentRef === 'Container');
+        return container?.children?.[0]?.props?.text;
+      })
+      .toBe('Texto');
 
     await redo.click();
-    await expect.poll(async () => {
-      const payload = (await readPersistedDocument(page, projectId)) as StoredDocument | null;
-      const container = payload?.root?.children?.find((node) => node.componentRef === 'Container');
-      return container?.children?.[0]?.props?.text;
-    }).toBe('Texto editado E2E');
+    await expect
+      .poll(async () => {
+        const children = await readRootChildren(page, projectId);
+        const container = children.find((node) => node.componentRef === 'Container');
+        return container?.children?.[0]?.props?.text;
+      })
+      .toBe('Texto editado E2E');
 
     await page.reload();
     await expect(workspace).toHaveAttribute('data-editor-sync-state', 'ready');
