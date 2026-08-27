@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('M05.6 Text/RichText inline editing', () => {
-  test('projects public Puck inline fields and persists their edits through the canonical action bridge', async ({ page }) => {
+  test('persists inline Text/RichText through the canonical action bridge', async ({ page }) => {
     await page.goto('/');
 
     const result = await page.evaluate(async () => {
@@ -112,9 +112,10 @@ test.describe('M05.6 Text/RichText inline editing', () => {
 
       type SyncAction = Parameters<typeof runtime.actionSync.applyAction>[0];
       type SyncState = Parameters<typeof runtime.actionSync.applyAction>[1];
-      runtime.actionSync.applyAction({ type: 'setData' } as SyncAction, { data: edited } as SyncState, {
-        data: initial,
-      } as SyncState);
+      const action = { type: 'setData' } as SyncAction;
+      const editedState = { data: edited } as SyncState;
+      const initialState = { data: initial } as SyncState;
+      runtime.actionSync.applyAction(action, editedState, initialState);
       await projectStorageRuntime.flushAutosave();
       const saved = (await projectStorageRuntime.openProject(projectId))?.objects.find(
         (object) => object.objectId === document.id,
