@@ -1,9 +1,5 @@
 import { VISUAL_HISTORY_LIMITS, normalizeVisualHistoryLimit } from '@electrocraft/application';
-import {
-  applyPuckHistoryPolicy,
-  puckEditorHistoryControls,
-  resolvePuckHistoryWindow,
-} from '@electrocraft/editor-puck';
+import { applyPuckHistoryPolicy, puckEditorHistoryControls, resolvePuckHistoryWindow } from '@electrocraft/editor-puck';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 afterEach(() => {
