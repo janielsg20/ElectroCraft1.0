@@ -21,6 +21,15 @@ export interface PuckSlotMapping {
   readonly disallow?: readonly string[];
 }
 
+export type PuckInlineFieldMode = 'text' | 'richtext';
+
+export interface PuckInlineEditingMapping {
+  readonly mode: PuckInlineFieldMode;
+  readonly fieldKeys?: readonly string[];
+}
+
+export type PuckInlineEditingRegistry = Readonly<Record<string, PuckInlineEditingMapping>>;
+
 /**
  * Owner-neutral editor policy translated at the Puck boundary. The canonical
  * model does not persist Puck permissions; callers may supply lock/editability
@@ -34,6 +43,7 @@ export interface ElectroCraftEditorPolicy {
 
 export interface PuckConfigOptions {
   readonly slots?: Readonly<Record<string, PuckSlotMapping>>;
+  readonly inlineEditing?: PuckInlineEditingRegistry;
   readonly editorPolicies?: Readonly<Record<string, ElectroCraftEditorPolicy>>;
   readonly diagnosticRenderer?: PuckCanonicalRenderer;
   readonly diagnosticLabel?: string;
@@ -54,16 +64,36 @@ export const electroCraftCorePuckSlots = Object.freeze({
   Accordion: childrenSlot('Contenido del acordeón'),
 } satisfies Readonly<Record<string, PuckSlotMapping>>);
 
+/**
+ * Puck owns inline authoring. ElectroCraft only declares which canonical
+ * component projections should opt into the public Puck field transforms.
+ * Heading/paragraph presets resolve through Text and inherit this capability.
+ */
+export const electroCraftCorePuckInlineEditing = Object.freeze({
+  Text: Object.freeze({ mode: 'text' as const }),
+  RichText: Object.freeze({ mode: 'richtext' as const }),
+} satisfies PuckInlineEditingRegistry);
+
 const fallbackPuckLabelResolver: PuckLabelResolver = Object.freeze({
   component: (definition: ElectroCraftComponentDefinition) => definition.label,
   field: (_definition: ElectroCraftComponentDefinition, field: ElectroCraftComponentField) => field.label,
   booleanOption: (value: boolean) => (value ? 'Sí' : 'No'),
 });
 
+function resolveInlineFieldMode(
+  field: ElectroCraftComponentField,
+  inlineEditing?: PuckInlineEditingMapping,
+): PuckInlineFieldMode | undefined {
+  if (!inlineEditing || field.kind !== 'text') return undefined;
+  if (inlineEditing.fieldKeys && !inlineEditing.fieldKeys.includes(field.key)) return undefined;
+  return inlineEditing.mode;
+}
+
 function toPuckField(
   definition: ElectroCraftComponentDefinition,
   field: ElectroCraftComponentField,
   labels: PuckLabelResolver,
+  inlineMode?: PuckInlineFieldMode,
 ): Field {
   const base = {
     label: labels.field(definition, field),
@@ -74,7 +104,10 @@ function toPuckField(
 
   switch (field.kind) {
     case 'text':
-      return { ...base, type: 'text' };
+      if (inlineMode === 'richtext') {
+        return { ...base, type: 'richtext', contentEditable: true };
+      }
+      return { ...base, type: 'text', ...(inlineMode === 'text' ? { contentEditable: true } : {}) };
     case 'number':
       return { ...base, type: 'number' };
     case 'boolean':
@@ -114,16 +147,31 @@ function toPuckPermissions(policy?: ElectroCraftEditorPolicy) {
   return Object.keys(permissions).length > 0 ? permissions : undefined;
 }
 
+function validateInlineEditingMapping(
+  definition: ElectroCraftComponentDefinition,
+  inlineEditing?: PuckInlineEditingMapping,
+) {
+  if (!inlineEditing?.fieldKeys) return;
+  const fieldKeys = new Set(definition.fields.map((field) => field.key));
+  for (const fieldKey of inlineEditing.fieldKeys) {
+    if (!fieldKeys.has(fieldKey)) {
+      throw new TypeError(`Puck inline field is not canonical: ${definition.key}.${fieldKey}`);
+    }
+  }
+}
+
 export function createPuckComponentConfig(
   definition: ElectroCraftComponentDefinition,
   renderer: PuckCanonicalRenderer,
   labels: PuckLabelResolver = fallbackPuckLabelResolver,
   slot?: PuckSlotMapping,
   editorPolicy?: ElectroCraftEditorPolicy,
+  inlineEditing?: PuckInlineEditingMapping,
 ): PuckCanonicalComponentConfig {
+  validateInlineEditingMapping(definition, inlineEditing);
   const fields: Record<string, Field> = {};
   for (const field of definition.fields) {
-    fields[field.key] = toPuckField(definition, field, labels);
+    fields[field.key] = toPuckField(definition, field, labels, resolveInlineFieldMode(field, inlineEditing));
   }
 
   const slotField = slot?.field ?? ELECTROCRAFT_PUCK_CHILDREN_SLOT;
@@ -177,6 +225,7 @@ export function createPuckConfig(
       labels,
       options.slots?.[definition.key],
       options.editorPolicies?.[definition.key],
+      options.inlineEditing?.[definition.key],
     );
   }
 
