@@ -42,7 +42,7 @@ describe('M02.1 canonical model boundaries', () => {
   });
 
   it('rejects Puck/AppState internals as canonical document keys', () => {
-    const document = fixture('screen-v3') as Record<string, unknown>;
+    const document = fixture('screen-v4') as Record<string, unknown>;
     const result = electroCraftDocumentSchema.safeParse({
       ...document,
       appState: { content: [] },

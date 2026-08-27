@@ -1,9 +1,16 @@
 import { Puck, createUsePuck, type Config, type Data } from '@puckeditor/core';
 import { createDeterministicObjectId } from '@electrocraft/domain';
-import { Fragment, createElement, useEffect, useSyncExternalStore, type ComponentProps } from 'react';
+import {
+  electroCraftLayoutSchema,
+  electroCraftStyleSchema,
+  type ElectroCraftLayout,
+  type ElectroCraftStyle,
+} from '@electrocraft/domain';
+import { Fragment, createElement, useEffect, useMemo, useSyncExternalStore, type ComponentProps } from 'react';
 import { puckEditorCommandControls } from './puck-command-controls';
 import { puckEditorHistoryControls } from './puck-history-controls';
 import { applyPuckHistoryPolicy } from './puck-history-policy';
+import { parsePuckNodePresentation, projectPuckNodePresentation } from './puck-layout-style';
 
 export type PuckEditorConfig = Config;
 export type PuckEditorOnChange = (data: Data) => void;
@@ -113,6 +120,98 @@ export function usePuckEditorDispatch() {
  */
 export function usePuckEditorHasContent() {
   return useElectroCraftPuck((api) => api.appState.data.content.length > 0);
+}
+
+export type PuckEditorPresentationState =
+  | Readonly<{ status: 'empty'; message: string }>
+  | Readonly<{ status: 'blocked'; message: string }>
+  | Readonly<{
+      status: 'ready';
+      componentId: string;
+      componentType: string;
+      layout: ElectroCraftLayout;
+      style: ElectroCraftStyle;
+      layoutInherited: boolean;
+      styleInherited: boolean;
+      setLayout: (layout: ElectroCraftLayout) => void;
+      setStyle: (style: ElectroCraftStyle) => void;
+      resetLayout: () => void;
+      resetStyle: () => void;
+    }>;
+
+/**
+ * Fine Puck extension for the advanced ElectroCraft inspector. Selection,
+ * replacement and history stay in Puck; this hook only validates canonical
+ * presentation metadata and dispatches the public replace action.
+ */
+export function usePuckEditorPresentation(): PuckEditorPresentationState {
+  const selectedItem = useElectroCraftPuck((api) => api.selectedItem);
+  const config = useElectroCraftPuck((api) => api.config);
+  const dispatch = usePuckEditorDispatch();
+  const getSelectorForId = useElectroCraftPuck((api) => api.getSelectorForId);
+
+  return useMemo(() => {
+    if (!selectedItem) return Object.freeze({ status: 'empty', message: 'Selecciona un componente en el lienzo.' });
+
+    const componentId = typeof selectedItem.props.id === 'string' ? selectedItem.props.id : '';
+    if (!componentId) {
+      return Object.freeze({ status: 'blocked', message: 'La selección no tiene un identificador canónico estable.' });
+    }
+
+    const componentType = String(selectedItem.type);
+    const metadata = config.components[componentType]?.metadata;
+    const metadataRecord = metadata && typeof metadata === 'object' ? (metadata as Record<string, unknown>) : {};
+    const defaultLayout = electroCraftLayoutSchema.safeParse(metadataRecord.electrocraftLayout);
+    const defaultStyle = electroCraftStyleSchema.safeParse(metadataRecord.electrocraftStyle);
+    if (!defaultLayout.success || !defaultStyle.success) {
+      return Object.freeze({
+        status: 'blocked',
+        message: `El componente ${componentType} no expone Layout/Style canónico válido.`,
+      });
+    }
+
+    let presentation;
+    try {
+      presentation = parsePuckNodePresentation(selectedItem.props);
+    } catch {
+      return Object.freeze({
+        status: 'blocked',
+        message: `La presentación de ${componentType} no cumple el contrato canónico.`,
+      });
+    }
+
+    const replacePresentation = (layout: ElectroCraftLayout | null, style: ElectroCraftStyle | null) => {
+      const selector = getSelectorForId(componentId);
+      if (!selector) throw new Error(`Puck no pudo resolver la selección ${componentId}.`);
+      const props = projectPuckNodePresentation(selectedItem.props, { layout, style });
+      props.id = componentId;
+      dispatch({
+        type: 'replace',
+        destinationIndex: selector.index,
+        destinationZone: selector.zone,
+        data: {
+          ...selectedItem,
+          props: props as typeof selectedItem.props,
+        },
+      });
+    };
+
+    return Object.freeze({
+      status: 'ready' as const,
+      componentId,
+      componentType,
+      layout: presentation.layout ?? defaultLayout.data,
+      style: presentation.style ?? defaultStyle.data,
+      layoutInherited: presentation.layout === null,
+      styleInherited: presentation.style === null,
+      setLayout: (layout: ElectroCraftLayout) =>
+        replacePresentation(electroCraftLayoutSchema.parse(layout), presentation.style),
+      setStyle: (style: ElectroCraftStyle) =>
+        replacePresentation(presentation.layout, electroCraftStyleSchema.parse(style)),
+      resetLayout: () => replacePresentation(null, presentation.style),
+      resetStyle: () => replacePresentation(presentation.layout, null),
+    });
+  }, [config.components, dispatch, getSelectorForId, selectedItem]);
 }
 
 /**

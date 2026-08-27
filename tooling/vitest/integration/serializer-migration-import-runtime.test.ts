@@ -24,7 +24,7 @@ function fixture<T = unknown>(name: string): T {
 }
 
 function canonicalDocuments(): unknown[] {
-  return [fixture('screen-v3'), fixture('form-v3'), fixture('template-v3')];
+  return [fixture('screen-v4'), fixture('form-v4'), fixture('template-v4')];
 }
 
 function evidence(name: string, value: unknown): void {
@@ -99,7 +99,7 @@ describe('M02.6 snapshot import and migration against real storage', () => {
       projectId: envelope.snapshot.project.id,
       projectSchemaVersion: 3,
       documentCount: 3,
-      documentSchemaVersions: [3],
+      documentSchemaVersions: [4],
       checksum: envelope.checksum,
     });
 

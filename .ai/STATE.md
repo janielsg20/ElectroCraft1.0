@@ -27,7 +27,7 @@
 - M04.6 — Import/Backup/Restore: `COMPLETADA`; Gate `GREEN`.
 - M04.7 — Workspace preferences: `COMPLETADA`; Gate `GREEN`.
 - M04.8 — Project Revision Checkpoints y Restore: `COMPLETADA`; Gate `GREEN`.
-- F05 — Screen Composer con Puck: `IN_PROGRESS`.
+- F05 — Screen Composer con Puck: `COMPLETADA`; Gate `GREEN`.
 - M05.1 — Crear PuckAdapter y component mapping: `COMPLETADA`; Gate `GREEN`.
 - M05.2 — Componer Components/Outline/Preview/Fields: `COMPLETADA`; Gate `GREEN`.
 - M05.3 — Nested Slots, permissions y Puck data migration: `COMPLETADA`; Gate `GREEN`.
@@ -35,7 +35,10 @@
 - M05.5 — Usar Puck visual history: `COMPLETADA`; Gate `GREEN`.
 - M05.6 — Text/RichText inline editing: `COMPLETADA`; Gate `GREEN`.
 - M05.7 — Extensiones de palette y outline solo necesarias: `COMPLETADA`; Gate `GREEN`.
-- M05.8 — Editor core E2E: `ACTIVE`.
+- M05.8 — Editor core E2E: `COMPLETADA`; Gate `GREEN`.
+- F06 — Layout, responsive y edición avanzada: `IN_PROGRESS`.
+- M06.1 — ElectroCraftLayout/Style inspector: `COMPLETADA`; Gate `GREEN`.
+- M06.2 — Responsive inheritance y reset: `ACTIVE`.
 - Blockers P0/P1 funcionales conocidos: `0`.
 
 ## Cierre F04 / M04.8
@@ -86,8 +89,20 @@ M05.7 cerró sobre head `f07d6ddcffbf98f1e53ad7d9ff1a19478c99bffc`. `ElectroCraf
 
 La PR `#59` fue fusionada mediante squash a `main` en `f75dcb85ca73b05008c982958f442f6f6031fd40` (`feat(M05.7): keep palette and outline extensions engine-owned`). `Config.categories`, `Puck.Components` y `Puck.Outline` siguen siendo engine-owned; búsqueda/favoritos/recientes permanecen discovery local y los permisos lock se traducen al API público Puck sin stores paralelos.
 
+## Cierre F05 / M05.8
+
+M05.8 cerró sobre head funcional `b6b3aab`. `ElectroCraft Base CI` run `33101434587` (#742) terminó `success` en 13m 30s con el job transversal de documentación, lint/Prettier, typecheck, tests, build, Playwright repository gate y artifacts base en GREEN.
+
+La PR `#60` fue fusionada mediante squash a `main` en `a81ca149c17391b9fe77aaaf57b125d229320173` (`feat(M05.8): validate the real editor core end to end`). F05 queda cerrada con un único runtime Puck, kit core canónico, nesting/reorder/edit/history/autosave/reopen E2E y ausencia contractual de un segundo editor/store. El despliegue Cloudflare asociado falló, pero no pertenece al único gate de release definido para M05.8 y no invalida el Base CI GREEN.
+
 ## Microfase activa
 
-`M05.8` — Editor core E2E.
+`M06.2` — Responsive inheritance y reset.
 
-Referencias: `.ai/microphases/M05_8.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
+## Cierre F06 / M06.1
+
+M06.1 cerró localmente en la rama `codex/m06-1-layout-style-inspector` con modelo documental v4, migración v3 → v4, transporte Layout/Style encapsulado por `@electrocraft/editor-puck` y un Inspector funcional en español sobre la selección y el dispatch públicos de Puck. La UI aplica presets semánticos y tokens al Canvas, conserva ayuda persistente y Progressive Disclosure, y no persiste internals de Puck ni CSS crudo.
+
+Gate local `GREEN`: lint/Prettier, typecheck, 41 tests Node, 415 tests Vitest en 116 archivos, build Studio/PWA y Playwright M06.1 real con insert/edit/history/autosave/reopen. Evidencia: `.ai/evidence/F06/M06.1/CLOSURE_2026-08-27.md`.
+
+Referencias: `.ai/microphases/M06_2.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.

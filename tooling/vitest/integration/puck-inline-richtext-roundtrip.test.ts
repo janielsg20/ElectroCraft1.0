@@ -38,7 +38,7 @@ describe('M05.6 Studio inline RichText round-trip', () => {
     const nodeId = createDeterministicObjectId('node', 'm05.6-richtext-node');
     const initialHtml = '<p>Hola <strong>ElectroCraft</strong></p>';
     const document = electroCraftDocumentSchema.parse({
-      schemaVersion: 3,
+      schemaVersion: 4,
       id: createDeterministicObjectId('document', 'm05.6-richtext-screen'),
       version: 1,
       name: 'RichText inline',
@@ -90,7 +90,7 @@ describe('M05.6 Studio inline RichText round-trip', () => {
   it('keeps canonical richtext inert when a target renders the transported string as text', () => {
     const unsafeHtml = '<p>Visible</p><script>window.__m056 = true</script>';
     const document = electroCraftDocumentSchema.parse({
-      schemaVersion: 3,
+      schemaVersion: 4,
       id: createDeterministicObjectId('document', 'm05.6-richtext-security'),
       version: 1,
       name: 'RichText security',

@@ -13,6 +13,13 @@ import {
   ELECTROCRAFT_PUCK_DIAGNOSTIC_PROPS_PROP,
   ELECTROCRAFT_PUCK_DIAGNOSTIC_REF_PROP,
 } from './puck-adapter-contract';
+import {
+  ELECTROCRAFT_PUCK_LAYOUT_PROP,
+  ELECTROCRAFT_PUCK_STYLE_PROP,
+  parsePuckNodePresentation,
+  projectPuckNodePresentation,
+  stripPuckNodePresentation,
+} from './puck-layout-style';
 
 export type PuckEditorData = Data;
 export type PuckDocumentDiagnosticCode =
@@ -156,6 +163,7 @@ export function createPuckDocumentAdapter(options: PuckDocumentAdapterOptions): 
         [ELECTROCRAFT_PUCK_DIAGNOSTIC_REF_PROP]: node.componentRef,
         [ELECTROCRAFT_PUCK_DIAGNOSTIC_PROPS_PROP]: cloneCanonicalProps(node.props),
         [ELECTROCRAFT_PUCK_CHILDREN_SLOT]: children,
+        ...projectPuckNodePresentation({}, node),
       },
     };
   }
@@ -178,7 +186,12 @@ export function createPuckDocumentAdapter(options: PuckDocumentAdapterOptions): 
       diagnosticCode = 'unknown-component';
     } else if (node.children.length > 0 && !slot) {
       diagnosticCode = 'unsupported-children';
-    } else if ('id' in node.props || (slot ? slot in node.props : false)) {
+    } else if (
+      'id' in node.props ||
+      ELECTROCRAFT_PUCK_LAYOUT_PROP in node.props ||
+      ELECTROCRAFT_PUCK_STYLE_PROP in node.props ||
+      (slot ? slot in node.props : false)
+    ) {
       diagnosticCode = 'reserved-prop';
     }
 
@@ -187,7 +200,11 @@ export function createPuckDocumentAdapter(options: PuckDocumentAdapterOptions): 
       return diagnosticComponent(node, diagnosticCode, children);
     }
 
-    const props: ComponentData['props'] = { id: node.id, ...cloneCanonicalProps(node.props) };
+    const props: ComponentData['props'] = {
+      id: node.id,
+      ...cloneCanonicalProps(node.props),
+      ...projectPuckNodePresentation({}, node),
+    };
     if (slot) props[slot] = children;
     return { type: node.componentRef, props };
   }
@@ -214,11 +231,13 @@ export function createPuckDocumentAdapter(options: PuckDocumentAdapterOptions): 
 
     pushDiagnostic(diagnostics, code, id, componentRef);
     const children = rawChildren.map((child) => reconstructNode(child as ComponentData, diagnostics, seenIds));
+    const presentation = parsePuckNodePresentation(props);
 
     return electroCraftDocumentNodeSchema.parse({
       id,
       componentRef,
       props: structuredClone(originalProps),
+      ...presentation,
       children,
     });
   }
@@ -265,17 +284,20 @@ export function createPuckDocumentAdapter(options: PuckDocumentAdapterOptions): 
     const canonicalProps: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(props)) {
       if (key === 'id') continue;
+      if (key === ELECTROCRAFT_PUCK_LAYOUT_PROP || key === ELECTROCRAFT_PUCK_STYLE_PROP) continue;
       if (slot && key === slot) continue;
       if (unknownComponent && key === ELECTROCRAFT_PUCK_CHILDREN_SLOT) continue;
       canonicalProps[key] = structuredClone(value);
     }
 
     const children = (rawChildren ?? []).map((child) => reconstructNode(child as ComponentData, diagnostics, seenIds));
+    const presentation = parsePuckNodePresentation(props);
 
     return electroCraftDocumentNodeSchema.parse({
       id,
       componentRef,
       props: canonicalProps,
+      ...presentation,
       children,
     });
   }
@@ -288,7 +310,10 @@ export function createPuckDocumentAdapter(options: PuckDocumentAdapterOptions): 
       const content = canonical.root.children.map((child) => projectNode(child, diagnostics, seenIds));
 
       return Object.freeze({
-        data: { content, root: { props: cloneCanonicalProps(canonical.root.props) } },
+        data: {
+          content,
+          root: { props: projectPuckNodePresentation(cloneCanonicalProps(canonical.root.props), canonical.root) },
+        },
         diagnostics: Object.freeze(diagnostics),
       });
     },
@@ -311,7 +336,8 @@ export function createPuckDocumentAdapter(options: PuckDocumentAdapterOptions): 
       const children = currentData.content.map((component) => reconstructNode(component, diagnostics, seenIds));
       const root = electroCraftDocumentNodeSchema.parse({
         ...base.root,
-        props: structuredClone(currentRootProps(currentData)),
+        props: stripPuckNodePresentation(currentRootProps(currentData)),
+        ...parsePuckNodePresentation(currentRootProps(currentData)),
         children,
       });
       const document = electroCraftDocumentSchema.parse({ ...base, root });

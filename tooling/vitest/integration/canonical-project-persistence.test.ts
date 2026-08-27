@@ -53,7 +53,7 @@ function repository(): FileProjectObjectRepository {
 }
 
 function singleDocumentFixture() {
-  const document = electroCraftDocumentSchema.parse(fixture('screen-v3'));
+  const document = electroCraftDocumentSchema.parse(fixture('screen-v4'));
   const project = electroCraftProjectDefinitionSchema.parse(fixture('project-v3'));
   return { document, project: { ...project, documentRefs: [document.id] } };
 }
@@ -97,7 +97,8 @@ describe('M02.1 canonical persistence/reopen/recovery', () => {
     await new ProjectDocumentService(repo).save(project, [document]);
 
     const { formMeta: _formMeta, templateMeta: _templateMeta, ...legacyBase } = document;
-    const legacyPage = { ...legacyBase, schemaVersion: 0, kind: 'page' };
+    const { layout: _layout, style: _style, ...legacyRoot } = legacyBase.root;
+    const legacyPage = { ...legacyBase, root: legacyRoot, schemaVersion: 0, kind: 'page' };
     const record: CanonicalProjectObjectRecord = {
       kind: 'document',
       id: document.id,
@@ -110,7 +111,7 @@ describe('M02.1 canonical persistence/reopen/recovery', () => {
     expect(reopened.status).toBe('ready');
     if (reopened.status === 'ready') {
       expect(reopened.documents[0]?.kind).toBe('screen');
-      expect(reopened.documents[0]?.schemaVersion).toBe(3);
+      expect(reopened.documents[0]?.schemaVersion).toBe(4);
       expect(reopened.migratedDocumentIds).toEqual([document.id]);
     }
   });

@@ -10,9 +10,9 @@ export function canonicalExportIrSource(): ElectroCraftExportIRSource {
   return {
     project: canonicalModelFixture('project-v3'),
     documents: [
-      canonicalModelFixture('template-v3'),
-      canonicalModelFixture('screen-v3'),
-      canonicalModelFixture('form-v3'),
+      canonicalModelFixture('template-v4'),
+      canonicalModelFixture('screen-v4'),
+      canonicalModelFixture('form-v4'),
     ],
     routes: [canonicalModelFixture('route-v1')],
     navigations: [canonicalModelFixture('navigation-v1')],

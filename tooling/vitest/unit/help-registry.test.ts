@@ -12,6 +12,7 @@ const studioScopedHelpIds = [
   'help.studio.appearance',
   'help.studio.language',
   'help.projects',
+  'help.editor.advanced',
 ] as const;
 
 describe('M03.11 typed HelpRegistry', () => {

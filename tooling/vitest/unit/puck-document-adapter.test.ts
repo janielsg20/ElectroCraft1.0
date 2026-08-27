@@ -35,7 +35,7 @@ const slotMigrationConfig = {
 
 function documentFixture(): ElectroCraftDocument {
   return electroCraftDocumentSchema.parse({
-    schemaVersion: 3,
+    schemaVersion: 4,
     id: documentId,
     version: 7,
     name: 'Inicio',
@@ -103,6 +103,8 @@ describe('M05.1/M05.3 ElectroCraftDocument <-> Puck Data adapter', () => {
       id: legacyId,
       componentRef: 'LegacyWidget',
       props: { legacy: true, label: 'Conservarme' },
+      layout: null,
+      style: null,
       children: [],
     });
     const adapter = createPuckDocumentAdapter({ knownComponentRefs: ['Container', 'Text'] });
@@ -121,6 +123,8 @@ describe('M05.1/M05.3 ElectroCraftDocument <-> Puck Data adapter', () => {
       id: nestedId,
       componentRef: 'Text',
       props: { text: 'Anidado' },
+      layout: null,
+      style: null,
       children: [],
     });
     const adapter = createPuckDocumentAdapter({ knownComponentRefs: ['Container', 'Text'] });

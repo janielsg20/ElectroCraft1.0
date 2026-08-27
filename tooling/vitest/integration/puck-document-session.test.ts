@@ -37,7 +37,7 @@ const textRenderer: PuckCanonicalRenderer = ({ text }) => createElement('p', nul
 describe('M05.1 Studio Puck document session', () => {
   it('uses real Puck Render with core.root envelope, public Slot mapping and visible diagnostics', () => {
     const document = electroCraftDocumentSchema.parse({
-      schemaVersion: 3,
+      schemaVersion: 4,
       id: createDeterministicObjectId('document', 'm05.1-screen-home'),
       version: 1,
       name: 'Inicio',

@@ -24,7 +24,7 @@ function fixture(name: string): unknown {
 describe('M02.5 theme/blueprint/registry/capability contracts', () => {
   it('round-trips all persisted M02.5 shapes as portable canonical data', () => {
     const project = electroCraftProjectDefinitionSchema.parse(fixture('project-v3'));
-    const template = electroCraftDocumentSchema.parse(fixture('template-v3'));
+    const template = electroCraftDocumentSchema.parse(fixture('template-v4'));
     const theme = electroCraftThemeSchema.parse(fixture('theme-v1'));
     const blueprint = electroCraftBlueprintPackageSchema.parse(fixture('blueprint-package-v1'));
     const definition = electroCraftRegistryDefinitionSchema.parse(fixture('registry-definition-user-v1'));
@@ -37,8 +37,8 @@ describe('M02.5 theme/blueprint/registry/capability contracts', () => {
   });
 
   it('keeps template inside ElectroCraftDocument and requires templateMeta only for template', () => {
-    const template = electroCraftDocumentSchema.parse(fixture('template-v3'));
-    const screen = electroCraftDocumentSchema.parse(fixture('screen-v3'));
+    const template = electroCraftDocumentSchema.parse(fixture('template-v4'));
+    const screen = electroCraftDocumentSchema.parse(fixture('screen-v4'));
 
     expect(template.kind).toBe('template');
     expect(template.templateMeta?.displayConditions).toHaveLength(1);
@@ -73,7 +73,7 @@ describe('M02.5 theme/blueprint/registry/capability contracts', () => {
       userRegistryDefinitionRefs: [],
     });
     expect(document.migratedFrom).toBe(2);
-    expect(document.document).toMatchObject({ schemaVersion: 3, templateMeta: null });
+    expect(document.document).toMatchObject({ schemaVersion: 4, templateMeta: null });
   });
 
   it('fails semantic validation when a target override is not a project requirement', () => {

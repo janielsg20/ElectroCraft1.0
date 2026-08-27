@@ -1,0 +1,73 @@
+.ec-presentation-inspector,
+.ec-presentation-group {
+  display: grid;
+  gap: var(--ec-space-3);
+}
+
+.ec-presentation-tabs {
+  width: 100%;
+}
+
+.ec-presentation-group {
+  padding-block: var(--ec-space-2);
+}
+
+.ec-presentation-group-heading,
+.ec-presentation-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ec-space-2);
+}
+
+.ec-presentation-group-heading h4,
+.ec-presentation-help strong {
+  margin: 0;
+  font-size: var(--ec-text-sm);
+}
+
+.ec-presentation-group-heading span,
+.ec-presentation-help p,
+.ec-presentation-state {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--ec-text-xs);
+}
+
+.ec-presentation-field > span {
+  min-width: 5rem;
+  font-size: var(--ec-text-sm);
+  font-weight: 500;
+}
+
+.ec-presentation-field > input,
+.ec-presentation-field > button {
+  width: 9rem;
+}
+
+.ec-layout-presets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ec-space-2);
+}
+
+.ec-presentation-help,
+.ec-presentation-state {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--muted);
+  padding: var(--ec-space-3);
+}
+
+.ec-presentation-state--blocked {
+  border-color: var(--destructive);
+  color: var(--destructive);
+}
+
+@media (max-width: 767px) {
+  .ec-layout-presets button,
+  .ec-presentation-field > input,
+  .ec-presentation-field > button {
+    min-height: 44px;
+  }
+}

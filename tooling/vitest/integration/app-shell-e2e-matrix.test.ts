@@ -15,7 +15,7 @@ const matrix = [
   [320, 'mobile'],
 ] as const;
 
-const studioScopedHelpCount = 4;
+const studioScopedHelpCount = 5;
 
 describe('M03.12 observable AppShell matrix', () => {
   it('maps every required width to the canonical responsive mode', () => {

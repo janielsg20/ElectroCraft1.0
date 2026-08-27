@@ -17,7 +17,7 @@ describe('M02.5 theme/blueprint/registry/capability boundaries', () => {
     ]
       .map(read)
       .join('\n');
-    const template = JSON.parse(read('tooling/fixtures/canonical-model/template-v3.json')) as unknown;
+    const template = JSON.parse(read('tooling/fixtures/canonical-model/template-v4.json')) as unknown;
 
     expect(electroCraftDocumentSchema.parse(template).kind).toBe('template');
     expect(domain).not.toMatch(/class ElectroTemplate|interface ElectroTemplate|type ElectroTemplate\s*=/);
