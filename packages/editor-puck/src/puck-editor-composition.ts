@@ -164,10 +164,7 @@ export function usePuckPaletteInsert() {
   const dispatch = usePuckEditorDispatch();
 
   return (componentType: string) => {
-    const id = createDeterministicObjectId(
-      'node',
-      `puck-insert:${componentType}:${globalThis.crypto.randomUUID()}`,
-    );
+    const id = createDeterministicObjectId('node', `puck-insert:${componentType}:${globalThis.crypto.randomUUID()}`);
 
     dispatch({
       type: 'insert',
