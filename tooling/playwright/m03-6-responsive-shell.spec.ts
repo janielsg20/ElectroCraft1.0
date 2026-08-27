@@ -87,9 +87,14 @@ test.describe('M03.6 responsive AppShell and editor', () => {
 
     for (let index = 0; index < 5; index += 1) {
       const box = await destinations.nth(index).boundingBox();
-      expect(box?.height ?? 0).toBeGreaterThanOrEqual(58);
+      expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
       expect(box?.width ?? 0).toBeGreaterThanOrEqual(44);
     }
+
+    const statusbar = page.locator('.ec-app-shell-statusbar');
+    const statusbarBox = await statusbar.boundingBox();
+    expect(statusbarBox?.height ?? 0).toBeLessThanOrEqual(8);
+    expect(statusbarBox?.y ?? 999).toBeLessThan(52);
 
     const properties = dock.locator('[data-mobile-destination="properties"]');
     await properties.click();

@@ -40,25 +40,11 @@
   border: 0;
   background: color-mix(in srgb, var(--skeleton) 88%, var(--surface));
   box-shadow: none;
-  animation: none;
+  animation: ec-skeleton-neutral-pulse 1.35s ease-in-out infinite;
 }
 
 [data-slot='skeleton']::after {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  content: '';
-  transform: translateX(-115%);
-  background: linear-gradient(
-    100deg,
-    transparent 12%,
-    color-mix(in srgb, var(--foreground) 5%, transparent) 42%,
-    color-mix(in srgb, var(--foreground) 9%, transparent) 50%,
-    color-mix(in srgb, var(--foreground) 5%, transparent) 58%,
-    transparent 88%
-  );
-  animation: ec-skeleton-shimmer 1.45s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  pointer-events: none;
+  display: none;
 }
 
 .ec-design-system {
@@ -104,9 +90,9 @@
   }
 }
 
-@keyframes ec-skeleton-shimmer {
-  to {
-    transform: translateX(115%);
+@keyframes ec-skeleton-neutral-pulse {
+  50% {
+    opacity: 0.72;
   }
 }
 

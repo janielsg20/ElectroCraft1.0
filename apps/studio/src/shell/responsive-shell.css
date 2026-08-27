@@ -21,6 +21,7 @@
     padding-inline: 0;
   }
 
+  .ec-app-shell-sidebar .ec-app-shell-brand-copy,
   .ec-app-shell-sidebar .ec-app-shell-brand-label,
   .ec-app-shell-sidebar .ec-app-shell-navigation-group-label,
   .ec-app-shell-sidebar .ec-app-shell-navigation-label,
@@ -72,7 +73,7 @@
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-rows: minmax(0, 1fr) 58px;
+  grid-template-rows: minmax(0, 1fr) 64px;
   overflow: hidden;
 }
 
@@ -83,23 +84,28 @@
 .ec-editor-mobile-dock {
   height: 58px;
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   align-items: stretch;
-  border: 0;
-  background: var(--surface);
+  gap: 2px;
+  margin: 3px 6px;
+  border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+  border-radius: 13px;
+  padding: 3px;
+  background: color-mix(in srgb, var(--surface-raised) 96%, var(--surface));
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.16);
 }
 
 .ec-editor-mobile-action {
   position: relative;
   min-width: 0;
-  min-height: 58px;
+  min-height: 50px;
   display: grid;
   grid-template-rows: 22px auto;
   align-content: center;
   justify-items: center;
   gap: 2px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 9px;
   padding: 4px 2px;
   background: transparent;
   color: var(--muted-foreground);
@@ -118,6 +124,11 @@
 .ec-editor-mobile-action[aria-pressed='true'] {
   background: var(--accent);
   color: var(--accent-foreground);
+}
+
+.ec-editor-mobile-action[aria-current='page'],
+.ec-editor-mobile-action[aria-pressed='true'] {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 22%, transparent);
 }
 
 .ec-editor-mobile-action[aria-current='page']::before,
@@ -195,8 +206,39 @@
 }
 
 @media (max-width: 767px) {
+  .ec-app-shell {
+    grid-template-rows: var(--ec-shell-topbar-height) minmax(0, 1fr) 0;
+  }
+
   .ec-app-shell-topbar {
     padding-inline: 8px;
+  }
+
+  .ec-app-shell-statusbar {
+    position: fixed;
+    z-index: 30;
+    top: 34px;
+    left: 36px;
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    overflow: visible;
+    background: transparent;
+    pointer-events: none;
+  }
+
+  .ec-app-shell-statusbar > [role='status'] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    clip-path: inset(50%);
+  }
+
+  .ec-app-shell-status-dot {
+    box-shadow: 0 0 0 2px var(--surface);
   }
 
   .ec-editor-responsive-toolbar {

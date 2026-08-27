@@ -112,9 +112,31 @@
   min-height: 54px;
   display: flex;
   align-items: center;
+  gap: 10px;
   border: 0;
   padding: 10px 16px;
   background: var(--surface);
+}
+
+.ec-ia-route-icon {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  flex: 0 0 30px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--muted) 74%, transparent);
+  color: var(--foreground);
+}
+
+.ec-ia-route-icon svg {
+  width: 15px;
+  height: 15px;
+}
+
+.ec-ia-route-heading-copy {
+  min-width: 0;
 }
 
 .ec-ia-route-header h1,
@@ -155,12 +177,13 @@
 }
 
 .ec-ia-list-region {
-  border: 0;
+  border: 1px solid color-mix(in srgb, var(--border) 68%, transparent);
   background: color-mix(in srgb, var(--surface) 96%, var(--background));
 }
 
 .ec-ia-detail-region,
 .ec-ia-module-empty {
+  border: 1px solid color-mix(in srgb, var(--border) 58%, transparent);
   background: var(--background);
 }
 
@@ -189,7 +212,7 @@
   }
 
   .ec-ia-list-region {
-    border: 0;
+    border-color: color-mix(in srgb, var(--border) 58%, transparent);
   }
 
   .ec-ia-route-header,

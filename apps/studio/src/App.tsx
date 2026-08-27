@@ -3,6 +3,7 @@ import {
   resolveResponsiveWorkspaceLayout,
   type WorkspacePanelId,
 } from '@electrocraft/application';
+import { getStudioIcon } from '@electrocraft/design-system';
 import {
   lazy,
   Suspense,
@@ -23,7 +24,7 @@ import { studioWorkspaceDescriptor } from './index';
 import { studioT } from './i18n/studio-shell.es';
 import { StudioAppShellRoute } from './shell/app-shell-route';
 import { StudioRouteSkeleton } from './shell/loading-ui';
-import { resolveSidebarActiveItem } from './shell/sidebar-navigation';
+import { getStudioSidebarNavigationItem, resolveSidebarActiveItem } from './shell/sidebar-navigation';
 import './styles.css';
 import './shell/sidebar.css';
 import './shell/topbar.css';
@@ -229,14 +230,23 @@ function StudioWorkspaceBootstrap({
   const isProjectHome = pathname === projectHomeRoute.pathname;
   const activeItemId = resolveSidebarActiveItem(pathname);
   const helpId = activeItemId ? getHelpIdForNavigationItem(activeItemId) : 'help.studio.shell';
+  const navigationItem = activeItemId ? getStudioSidebarNavigationItem(activeItemId) : null;
+  const WorkspaceIcon = getStudioIcon(navigationItem?.iconId ?? 'studio.brand');
 
   return (
     <section className="workspace-bootstrap" data-help-id={studioWorkspaceDescriptor.helpId}>
-      <p className="development-kicker">{studioT('studio.bootstrap.m03Kicker')}</p>
-      <div className="flex items-center gap-2">
-        <h1 id="development-title">{studioT('studio.bootstrap.title')}</h1>
-        <HelpTrigger helpId={helpId} />
-      </div>
+      <header className="workspace-bootstrap-header">
+        <span className="workspace-bootstrap-icon" aria-hidden="true">
+          <WorkspaceIcon />
+        </span>
+        <div className="workspace-bootstrap-heading">
+          <p className="development-kicker">{studioT('studio.bootstrap.m03Kicker')}</p>
+          <div className="flex items-center gap-2">
+            <h1 id="development-title">{navigationItem?.label ?? studioT('studio.bootstrap.title')}</h1>
+            <HelpTrigger helpId={helpId} />
+          </div>
+        </div>
+      </header>
       <p className="development-summary">{studioT('studio.bootstrap.foundationSummary')}</p>
 
       <div className="development-status" data-state={health.state}>

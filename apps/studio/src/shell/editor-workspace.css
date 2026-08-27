@@ -1,4 +1,5 @@
 .ec-editor-workspace,
+.ec-editor-puck-root,
 .ec-editor-desktop-layout,
 .ec-editor-responsive-layout,
 .ec-editor-responsive-canvas,
@@ -11,7 +12,21 @@
   min-height: 0;
 }
 
+.ec-editor-puck-root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.ec-editor-puck-root > .Puck {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .ec-editor-workspace {
+  position: relative;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -92,7 +107,7 @@
   display: grid;
   grid-template-rows: 36px minmax(0, 1fr);
   overflow: hidden;
-  border: 0;
+  border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
   border-radius: var(--ec-radius-panel);
   background: var(--surface);
   box-shadow: none;
@@ -108,12 +123,35 @@
   align-items: center;
   gap: 7px;
   border: 0;
-  padding: 0 12px;
+  padding: 0 8px;
   background: var(--surface);
   color: var(--foreground);
   font-size: var(--ec-text-xs);
   font-weight: 600;
   letter-spacing: 0;
+}
+
+.ec-editor-region-icon {
+  width: 23px;
+  height: 23px;
+  display: grid;
+  flex: 0 0 23px;
+  place-items: center;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--muted) 76%, transparent);
+  color: var(--muted-foreground);
+}
+
+.ec-editor-region-icon svg {
+  width: 13px;
+  height: 13px;
+}
+
+.ec-editor-region-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .ec-editor-region-actions {
@@ -134,10 +172,104 @@
   background: color-mix(in srgb, var(--muted) 62%, transparent);
 }
 
-.ec-editor-region-header svg {
-  width: 15px;
-  height: 15px;
+.ec-editor-window-controls {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 1px;
+  margin-left: auto;
+  padding-left: 3px;
+  border-left: 1px solid color-mix(in srgb, var(--border) 68%, transparent);
+}
+
+.ec-editor-region-actions + .ec-editor-window-controls {
+  margin-left: 2px;
+}
+
+.ec-editor-window-action {
+  width: 24px;
+  min-width: 24px;
+  height: 24px;
+  min-height: 24px;
+  border-radius: 7px;
+  padding: 0;
   color: var(--muted-foreground);
+}
+
+.ec-editor-window-action:hover {
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+.ec-editor-window-action svg {
+  width: 13px;
+  height: 13px;
+}
+
+.ec-editor-region[data-collapsed='true'] {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.ec-editor-region[data-collapsed='true'] .ec-editor-region-header {
+  height: 100%;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 6px;
+}
+
+.ec-editor-region[data-collapsed='true'] .ec-editor-region-icon,
+.ec-editor-region[data-collapsed='true'] .ec-editor-region-title,
+.ec-editor-region[data-collapsed='true'] .ec-editor-region-actions,
+.ec-editor-region[data-collapsed='true'] .ec-editor-region-body {
+  display: none;
+}
+
+.ec-editor-region[data-collapsed='true'] .ec-editor-window-action {
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  min-height: 30px;
+}
+
+.ec-editor-workspace[data-expanded-region='context'] .ec-resizable-tri-pane,
+.ec-editor-workspace[data-expanded-region='canvas'] .ec-resizable-tri-pane,
+.ec-editor-workspace[data-expanded-region='inspector'] .ec-resizable-tri-pane {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.ec-editor-workspace[data-expanded-region='context'] .ec-resizable-pane-handle,
+.ec-editor-workspace[data-expanded-region='context'] .ec-resizable-tri-pane-center,
+.ec-editor-workspace[data-expanded-region='context'] .ec-resizable-tri-pane-right,
+.ec-editor-workspace[data-expanded-region='canvas'] .ec-resizable-tri-pane-left,
+.ec-editor-workspace[data-expanded-region='canvas'] .ec-resizable-pane-handle,
+.ec-editor-workspace[data-expanded-region='canvas'] .ec-resizable-tri-pane-right,
+.ec-editor-workspace[data-expanded-region='inspector'] .ec-resizable-tri-pane-left,
+.ec-editor-workspace[data-expanded-region='inspector'] .ec-resizable-tri-pane-center,
+.ec-editor-workspace[data-expanded-region='inspector'] .ec-resizable-pane-handle {
+  display: none;
+}
+
+.ec-editor-minimized-restore {
+  position: absolute;
+  z-index: 8;
+  top: 50%;
+  width: 32px;
+  height: 44px;
+  border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
+  background: color-mix(in srgb, var(--surface-raised) 96%, transparent);
+  color: var(--foreground);
+  box-shadow: var(--ec-shadow-panel);
+  transform: translateY(-50%);
+}
+
+.ec-editor-minimized-restore--context {
+  left: 10px;
+  border-radius: 0 10px 10px 0;
+}
+
+.ec-editor-minimized-restore--inspector {
+  right: 10px;
+  border-radius: 10px 0 0 10px;
 }
 
 .ec-editor-region-body {
@@ -178,6 +310,24 @@
   background-size: 16px 16px;
 }
 
+.ec-editor-canvas-empty,
+.ec-editor-puck-preview {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.ec-editor-canvas-empty {
+  z-index: 1;
+  width: min(calc(100% - 32px), 420px);
+  align-self: center;
+  justify-self: center;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  background: color-mix(in srgb, var(--surface) 96%, var(--background));
+  box-shadow: var(--ec-shadow-panel);
+}
+
 .ec-editor-puck-preview {
   width: 100%;
   height: 100%;
@@ -191,7 +341,7 @@
   min-height: calc(100% - 4px);
   margin-inline: auto;
   overflow: hidden;
-  border: 0;
+  border: 1px solid color-mix(in srgb, var(--border) 58%, transparent);
   border-radius: 12px;
   background: var(--surface);
   box-shadow: none;
@@ -199,9 +349,7 @@
 
 .ec-editor-panel-tabs {
   min-height: 36px;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
+  display: flex;
   align-items: stretch;
   border: 0;
   padding: 4px 8px 5px;
@@ -211,6 +359,7 @@
 .ec-editor-panel-tab {
   position: relative;
   min-width: 0;
+  flex: 1 1 auto;
   border: 0;
   border-radius: 8px;
   display: inline-flex;
@@ -257,6 +406,17 @@
 .ec-editor-tab-panel {
   min-height: 0;
   overflow: auto;
+}
+
+.ec-editor-components-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.ec-editor-puck-slot[data-puck-composition='components'] {
+  height: 100%;
+  overflow: hidden;
 }
 
 .ec-editor-region[data-editor-region='inspector'] .ec-editor-tab-panel {

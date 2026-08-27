@@ -33,14 +33,16 @@ describe('flat Studio shell and loading contract', () => {
     expect(loadingCss).toContain('@media (prefers-reduced-motion: reduce)');
   });
 
-  it('uses a borderless shimmer primitive and adds breathing room inside Inspector', () => {
+  it('uses a borderless neutral pulse without white shimmer and adds breathing room inside Inspector', () => {
     const globals = read('packages/design-system/src/styles/globals.css');
     const editor = read('apps/studio/src/shell/editor-workspace.css');
     const informationArchitecture = read('apps/studio/src/shell/information-architecture.css');
 
     expect(globals).toContain("[data-slot='skeleton']::after");
-    expect(globals).toContain('animation: ec-skeleton-shimmer');
-    expect(globals).toContain('@keyframes ec-skeleton-shimmer');
+    expect(globals).toContain('animation: ec-skeleton-neutral-pulse');
+    expect(globals).toContain('@keyframes ec-skeleton-neutral-pulse');
+    expect(globals).toContain('display: none;');
+    expect(globals).not.toContain('ec-skeleton-shimmer');
     expect(editor).toContain(".ec-editor-region[data-editor-region='inspector'] .ec-editor-tab-panel");
     expect(editor).toContain('padding: 10px 12px 14px;');
     expect(informationArchitecture).toContain('font-weight: 600;');

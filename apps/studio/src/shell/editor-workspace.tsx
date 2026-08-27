@@ -23,11 +23,10 @@ import {
   structuralPuckConfig,
   structuralPuckData,
 } from '@electrocraft/editor-puck';
-import { useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from 'react';
+import { useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode, type RefObject } from 'react';
 import { workspacePreferencesRuntime } from '../features/projects/workspace-preferences-runtime';
 import { editorT } from '../i18n/editor.es';
 import { iaT } from '../i18n/information-architecture.es';
-import { AppearancePanelTrigger } from './appearance-panel';
 import {
   editorPaneContract,
   resolveEditorLayoutMode,
@@ -44,6 +43,13 @@ const ContextIcon = getStudioIcon('studio.sidebar.components');
 const CanvasIcon = getStudioIcon('studio.sidebar.editor');
 const InspectorIcon = getStudioIcon('studio.inspector');
 const CloseIcon = getStudioIcon('window.close');
+const MinimizeIcon = getStudioIcon('window.minimize');
+const MaximizeIcon = getStudioIcon('window.maximize');
+const RestoreIcon = getStudioIcon('window.restore');
+const CollapseLeftIcon = getStudioIcon('studio.panel.collapseLeft');
+const ExpandLeftIcon = getStudioIcon('studio.panel.expandLeft');
+const CollapseRightIcon = getStudioIcon('studio.panel.collapseRight');
+const ExpandRightIcon = getStudioIcon('studio.panel.expandRight');
 const MobileComponentsIcon = getStudioIcon('studio.mobile.components');
 const MobileScreensIcon = getStudioIcon('studio.mobile.screens');
 const MobileCanvasIcon = getStudioIcon('studio.mobile.canvas');
@@ -62,6 +68,8 @@ type SecondaryTool = 'context' | 'inspector';
 type MobileTool = 'components' | 'properties' | 'outline';
 type ContextTab = 'components' | 'screens' | 'layers';
 type InspectorTab = 'content' | 'design' | 'actions';
+type DesktopRegion = 'context' | 'canvas' | 'inspector';
+type CollapsibleDesktopRegion = Exclude<DesktopRegion, 'canvas'>;
 
 const contextTabs = ['components', 'screens', 'layers'] as const;
 const inspectorTabs = ['content', 'design', 'actions'] as const;
@@ -86,20 +94,112 @@ function persistWorkspaceTab(slot: 'context' | 'inspector', value: string) {
 }
 
 interface EditorRegionProps {
-  readonly region: 'context' | 'canvas' | 'inspector';
+  readonly region: DesktopRegion;
   readonly title: string;
   readonly icon: typeof ContextIcon;
   readonly children: ReactNode;
   readonly headerActions?: ReactNode;
+  readonly controls?: EditorRegionControls;
 }
 
-function EditorRegion({ region, title, icon: Icon, children, headerActions }: EditorRegionProps) {
+interface EditorRegionControls {
+  readonly collapsed?: boolean;
+  readonly expanded: boolean;
+  readonly onCollapse?: () => void;
+  readonly onMinimize?: () => void;
+  readonly onExpand: () => void;
+}
+
+function EditorPanelControls({
+  region,
+  controls,
+}: {
+  readonly region: DesktopRegion;
+  readonly controls: EditorRegionControls;
+}) {
+  if (controls.collapsed) {
+    const ExpandPanelIcon = region === 'inspector' ? ExpandRightIcon : ExpandLeftIcon;
+    return (
+      <Button
+        className="ec-editor-window-action"
+        variant="ghost"
+        size="icon"
+        aria-label={editorT('studio.editor.panel.expand')}
+        title={editorT('studio.editor.panel.expand')}
+        onClick={controls.onCollapse}
+      >
+        <ExpandPanelIcon aria-hidden="true" />
+      </Button>
+    );
+  }
+
+  const CollapsePanelIcon = region === 'inspector' ? CollapseRightIcon : CollapseLeftIcon;
+  const ExpandWindowIcon = controls.expanded ? RestoreIcon : MaximizeIcon;
+  const regionLabel =
+    region === 'context'
+      ? editorT('studio.editor.contextTitle')
+      : region === 'canvas'
+        ? editorT('studio.editor.canvasTitle')
+        : editorT('studio.editor.inspectorTitle');
+
   return (
-    <section className="ec-editor-region" data-editor-region={region} aria-label={title}>
+    <div className="ec-editor-window-controls" aria-label={`Controles del panel ${regionLabel}`}>
+      {controls.onCollapse ? (
+        <Button
+          className="ec-editor-window-action"
+          variant="ghost"
+          size="icon"
+          aria-label={editorT('studio.editor.panel.collapse')}
+          title={editorT('studio.editor.panel.collapse')}
+          onClick={controls.onCollapse}
+        >
+          <CollapsePanelIcon aria-hidden="true" />
+        </Button>
+      ) : null}
+      {controls.onMinimize ? (
+        <Button
+          className="ec-editor-window-action"
+          variant="ghost"
+          size="icon"
+          aria-label={editorT('studio.editor.panel.minimize')}
+          title={editorT('studio.editor.panel.minimize')}
+          onClick={controls.onMinimize}
+        >
+          <MinimizeIcon aria-hidden="true" />
+        </Button>
+      ) : null}
+      <Button
+        className="ec-editor-window-action"
+        variant="ghost"
+        size="icon"
+        aria-label={
+          controls.expanded ? editorT('studio.editor.panel.restore') : editorT('studio.editor.panel.maximize')
+        }
+        title={controls.expanded ? editorT('studio.editor.panel.restore') : editorT('studio.editor.panel.maximize')}
+        onClick={controls.onExpand}
+      >
+        <ExpandWindowIcon aria-hidden="true" />
+      </Button>
+    </div>
+  );
+}
+
+function EditorRegion({ region, title, icon: Icon, children, headerActions, controls }: EditorRegionProps) {
+  return (
+    <section
+      className="ec-editor-region"
+      data-editor-region={region}
+      data-collapsed={controls?.collapsed ? 'true' : 'false'}
+      data-expanded={controls?.expanded ? 'true' : 'false'}
+      aria-label={title}
+    >
       <header className="ec-editor-region-header">
-        <Icon aria-hidden="true" />
-        <span>{title}</span>
+        <span className="ec-editor-region-icon" aria-hidden="true">
+          <Icon />
+        </span>
+        <span className="ec-editor-region-title">{title}</span>
         {headerActions ? <div className="ec-editor-region-actions">{headerActions}</div> : null}
+        {controls ? <EditorPanelControls region={region} controls={controls} /> : null}
       </header>
       <div className="ec-editor-region-body">{children}</div>
     </section>
@@ -205,7 +305,7 @@ function InspectorContent() {
   );
 }
 
-function ContextRegion() {
+function ContextRegion({ controls }: { readonly controls?: EditorRegionControls }) {
   const preferences = useSyncExternalStore(
     workspacePreferencesRuntime.subscribe,
     workspacePreferencesRuntime.getSnapshot,
@@ -214,7 +314,7 @@ function ContextRegion() {
   const tab = resolveWorkspaceTab<ContextTab>(preferences.layout.lastTabs, 'context', contextTabs, 'components');
 
   return (
-    <EditorRegion region="context" title={editorT('studio.editor.contextTitle')} icon={ContextIcon}>
+    <EditorRegion region="context" title={editorT('studio.editor.contextTitle')} icon={ContextIcon} controls={controls}>
       <Tabs
         className="ec-editor-context-tabs"
         value={tab}
@@ -234,7 +334,7 @@ function ContextRegion() {
             {editorT('studio.editor.context.layersTab')}
           </TabsTrigger>
         </TabsList>
-        <TabsContent className="ec-editor-tab-panel" value="components">
+        <TabsContent className="ec-editor-tab-panel ec-editor-components-panel" value="components">
           <>
             <StructuralNotice>{editorT('studio.editor.contextStructural')}</StructuralNotice>
             <ComponentsContent />
@@ -257,12 +357,19 @@ function ContextRegion() {
   );
 }
 
-function CanvasRegion({ stageRef }: { readonly stageRef?: RefObject<HTMLDivElement | null> }) {
+function CanvasRegion({
+  stageRef,
+  controls,
+}: {
+  readonly stageRef?: RefObject<HTMLDivElement | null>;
+  readonly controls?: EditorRegionControls;
+}) {
   return (
     <EditorRegion
       region="canvas"
       title={editorT('studio.editor.canvasTitle')}
       icon={CanvasIcon}
+      controls={controls}
       headerActions={
         <>
           <span>{editorT('studio.editor.canvas.viewportLabel')}</span>
@@ -281,9 +388,14 @@ function CanvasRegion({ stageRef }: { readonly stageRef?: RefObject<HTMLDivEleme
   );
 }
 
-function InspectorRegion() {
+function InspectorRegion({ controls }: { readonly controls?: EditorRegionControls }) {
   return (
-    <EditorRegion region="inspector" title={editorT('studio.editor.inspectorTitle')} icon={InspectorIcon}>
+    <EditorRegion
+      region="inspector"
+      title={editorT('studio.editor.inspectorTitle')}
+      icon={InspectorIcon}
+      controls={controls}
+    >
       <StructuralNotice>{editorT('studio.editor.inspectorStructural')}</StructuralNotice>
       <InspectorContent />
     </EditorRegion>
@@ -496,8 +608,6 @@ function MobileEditorLayout() {
           </SheetContent>
         </Sheet>
 
-        <AppearancePanelTrigger presentation="mobile" />
-
         <Sheet open={activeTool === 'outline'} onOpenChange={(open) => setMobileTool('outline', open)}>
           <SheetTrigger asChild>
             <button
@@ -537,31 +647,124 @@ function MobileEditorLayout() {
 export function StudioEditorWorkspace() {
   const viewportWidth = useEditorViewportWidth();
   const mode = resolveEditorLayoutMode(viewportWidth);
+  const preferences = useSyncExternalStore(
+    workspacePreferencesRuntime.subscribe,
+    workspacePreferencesRuntime.getSnapshot,
+    workspacePreferencesRuntime.getSnapshot,
+  );
+  const [collapsedRegions, setCollapsedRegions] = useState<Record<CollapsibleDesktopRegion, boolean>>({
+    context: false,
+    inspector: false,
+  });
+  const [expandedRegion, setExpandedRegion] = useState<DesktopRegion | null>(null);
+  const visiblePanels = preferences.layout.visiblePanels;
+  const contextVisible = visiblePanels.includes('context');
+  const inspectorVisible = visiblePanels.includes('inspector');
+  const editorStyle = {
+    ...(collapsedRegions.context ? { '--ec-workspace-context-width': '44px' } : {}),
+    ...(collapsedRegions.inspector ? { '--ec-workspace-inspector-width': '44px' } : {}),
+  } as CSSProperties;
+
+  function toggleCollapsed(region: CollapsibleDesktopRegion) {
+    setExpandedRegion(null);
+    setCollapsedRegions((current) => ({ ...current, [region]: !current[region] }));
+  }
+
+  function toggleExpanded(region: DesktopRegion) {
+    setExpandedRegion((current) => (current === region ? null : region));
+  }
+
+  function setPanelVisible(region: CollapsibleDesktopRegion, visible: boolean) {
+    setExpandedRegion(null);
+    setCollapsedRegions((current) => ({ ...current, [region]: false }));
+    const next = visible ? [...new Set([...visiblePanels, region])] : visiblePanels.filter((panel) => panel !== region);
+    void workspacePreferencesRuntime.patchLayout({ visiblePanels: next });
+  }
+
+  const contextControls: EditorRegionControls | undefined =
+    mode === 'desktop'
+      ? {
+          collapsed: collapsedRegions.context,
+          expanded: expandedRegion === 'context',
+          onCollapse: () => toggleCollapsed('context'),
+          onMinimize: () => setPanelVisible('context', false),
+          onExpand: () => toggleExpanded('context'),
+        }
+      : undefined;
+  const canvasControls: EditorRegionControls | undefined =
+    mode === 'desktop'
+      ? {
+          expanded: expandedRegion === 'canvas',
+          onExpand: () => toggleExpanded('canvas'),
+        }
+      : undefined;
+  const inspectorControls: EditorRegionControls | undefined =
+    mode === 'desktop'
+      ? {
+          collapsed: collapsedRegions.inspector,
+          expanded: expandedRegion === 'inspector',
+          onCollapse: () => toggleCollapsed('inspector'),
+          onMinimize: () => setPanelVisible('inspector', false),
+          onExpand: () => toggleExpanded('inspector'),
+        }
+      : undefined;
 
   return (
-    <PuckEditorRoot config={structuralPuckConfig} data={structuralPuckData}>
-      <section
-        className="ec-editor-workspace"
-        data-editor-layout={mode}
-        aria-label={editorT('studio.editor.workspaceLabel')}
-      >
-        {mode === 'desktop' ? (
-          <ResizableTriPane
-            className="ec-editor-desktop-layout"
-            left={<ContextRegion />}
-            center={<CanvasRegion />}
-            right={<InspectorRegion />}
-            leftLabel={editorT('studio.editor.resizeContextLabel')}
-            rightLabel={editorT('studio.editor.resizeInspectorLabel')}
-            leftConstraint={editorPaneContract.context}
-            rightConstraint={editorPaneContract.inspector}
-          />
-        ) : mode === 'mobile' ? (
-          <MobileEditorLayout />
-        ) : (
-          <ResponsiveEditorLayout mode={mode} viewportWidth={viewportWidth} />
-        )}
-      </section>
-    </PuckEditorRoot>
+    <div className="ec-editor-puck-root">
+      <PuckEditorRoot config={structuralPuckConfig} data={structuralPuckData}>
+        <section
+          className="ec-editor-workspace"
+          style={editorStyle}
+          data-editor-layout={mode}
+          data-expanded-region={expandedRegion ?? 'none'}
+          data-context-collapsed={collapsedRegions.context ? 'true' : 'false'}
+          data-inspector-collapsed={collapsedRegions.inspector ? 'true' : 'false'}
+          aria-label={editorT('studio.editor.workspaceLabel')}
+        >
+          {mode === 'desktop' ? (
+            <>
+              <ResizableTriPane
+                className="ec-editor-desktop-layout"
+                left={<ContextRegion controls={contextControls} />}
+                center={<CanvasRegion controls={canvasControls} />}
+                right={<InspectorRegion controls={inspectorControls} />}
+                leftLabel={editorT('studio.editor.resizeContextLabel')}
+                rightLabel={editorT('studio.editor.resizeInspectorLabel')}
+                leftConstraint={editorPaneContract.context}
+                rightConstraint={editorPaneContract.inspector}
+              />
+              {!contextVisible ? (
+                <Button
+                  className="ec-editor-minimized-restore ec-editor-minimized-restore--context"
+                  variant="secondary"
+                  size="icon"
+                  aria-label={editorT('studio.editor.panel.restoreContext')}
+                  title={editorT('studio.editor.panel.restoreContext')}
+                  onClick={() => setPanelVisible('context', true)}
+                >
+                  <ExpandLeftIcon aria-hidden="true" />
+                </Button>
+              ) : null}
+              {!inspectorVisible ? (
+                <Button
+                  className="ec-editor-minimized-restore ec-editor-minimized-restore--inspector"
+                  variant="secondary"
+                  size="icon"
+                  aria-label={editorT('studio.editor.panel.restoreInspector')}
+                  title={editorT('studio.editor.panel.restoreInspector')}
+                  onClick={() => setPanelVisible('inspector', true)}
+                >
+                  <ExpandRightIcon aria-hidden="true" />
+                </Button>
+              ) : null}
+            </>
+          ) : mode === 'mobile' ? (
+            <MobileEditorLayout />
+          ) : (
+            <ResponsiveEditorLayout mode={mode} viewportWidth={viewportWidth} />
+          )}
+        </section>
+      </PuckEditorRoot>
+    </div>
   );
 }

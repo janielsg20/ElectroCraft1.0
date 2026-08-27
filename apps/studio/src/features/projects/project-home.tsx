@@ -258,11 +258,11 @@ export function ProjectHome({ onOpen }: { readonly onOpen: (id: string) => void 
           <div className="ec-project-view" role="group" aria-label="Vista">
             <Button variant="ghost" aria-pressed={view === 'grid'} onClick={() => setView('grid')}>
               <GridIcon aria-hidden="true" />
-              Cuadrícula
+              <span>Cuadrícula</span>
             </Button>
             <Button variant="ghost" aria-pressed={view === 'list'} onClick={() => setView('list')}>
               <ListIcon aria-hidden="true" />
-              Lista
+              <span>Lista</span>
             </Button>
           </div>
           {state === 'loading' ? (

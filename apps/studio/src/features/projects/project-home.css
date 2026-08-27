@@ -391,10 +391,27 @@
 
 @media (min-width: 768px) and (max-width: 1199px) {
   .ec-project-search {
-    width: min(260px, 100%);
+    width: min(220px, 100%);
   }
 
   .ec-project-view button {
     padding-inline: 7px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1399px) {
+  .ec-project-view button {
+    width: var(--ec-control-md);
+    padding-inline: 0;
+  }
+
+  .ec-project-view button span {
+    display: none;
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1399px) {
+  .ec-project-search {
+    width: min(240px, 100%);
   }
 }

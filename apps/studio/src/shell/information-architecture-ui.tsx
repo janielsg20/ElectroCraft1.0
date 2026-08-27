@@ -20,6 +20,7 @@ import { getStudioSidebarNavigationItem, resolveSidebarActiveItem } from './side
 
 const DisclosureIcon = getStudioIcon('navigation.chevron-down');
 const EmptyIcon = getStudioIcon('studio.help');
+const RecordsIcon = getStudioIcon('studio.sidebar.records');
 
 const emptyStateHelpIds: Readonly<Record<EmptyStateDescriptor['id'], StudioHelpId>> = Object.freeze({
   'project-home': 'help.studio.shell',
@@ -94,7 +95,10 @@ export function StudioContentListDetailRoute() {
   return (
     <section className="ec-ia-route" aria-labelledby="content-route-title" data-ia-route="content-list-detail">
       <header className="ec-ia-route-header">
-        <div>
+        <span className="ec-ia-route-icon" aria-hidden="true">
+          <RecordsIcon />
+        </span>
+        <div className="ec-ia-route-heading-copy">
           <p className="ec-ia-route-kicker">
             {iaT('studio.ia.listDetail.listLabel')} / {iaT('studio.ia.listDetail.detailLabel')}
           </p>
@@ -129,11 +133,15 @@ export function StudioModuleEmptyStateRoute({ pathname }: { readonly pathname: s
   if (!activeItemId) return null;
   const navigationItem = getStudioSidebarNavigationItem(activeItemId);
   const helpId = getHelpIdForNavigationItem(activeItemId);
+  const ModuleIcon = getStudioIcon(navigationItem.iconId);
 
   return (
     <section className="ec-ia-route" aria-labelledby="module-empty-title" data-ia-route="module-empty-state">
       <header className="ec-ia-route-header">
-        <div className="flex items-center gap-2">
+        <span className="ec-ia-route-icon" aria-hidden="true">
+          <ModuleIcon />
+        </span>
+        <div className="ec-ia-route-heading-copy flex items-center gap-2">
           <h1 id="module-empty-title">{navigationItem.label}</h1>
           <HelpTrigger helpId={helpId} />
         </div>

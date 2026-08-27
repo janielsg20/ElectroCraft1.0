@@ -243,7 +243,7 @@
   color: var(--muted-foreground);
 }
 
-@media (max-width: 1439px) {
+@media (max-width: 1535px) {
   .ec-topbar-center {
     display: none;
   }
