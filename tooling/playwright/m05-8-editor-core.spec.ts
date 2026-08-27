@@ -22,8 +22,7 @@ async function readPersistedDocument(page: Page, projectId: string) {
     const { projectStorageRuntime } = await import('/src/features/projects/project-storage-runtime.ts');
     await projectStorageRuntime.flushAutosave();
     const opened = await projectStorageRuntime.openProject(id);
-    const stored = opened?.objects.find((object) => object.kind === 'document');
-    return stored?.payload ?? null;
+    return opened?.objects.find((object) => object.kind === 'document')?.payload ?? null;
   }, projectId);
 }
 
@@ -68,15 +67,15 @@ test.describe('M05.8 Editor core E2E', () => {
     const outline = page.locator('[data-puck-composition="outline"]');
     await outline.getByText('Texto', { exact: true }).first().click();
 
-    const contentField = page.locator('[data-puck-composition="fields"]').getByLabel('Contenido', { exact: true });
-    await expect(contentField).toBeVisible();
-    await contentField.fill('Texto editado E2E');
+    const textField = page.locator('[data-puck-composition="fields"]').getByLabel('Texto', { exact: true });
+    await expect(textField).toBeVisible();
+    await textField.fill('Texto editado E2E');
 
     await expect.poll(async () => {
       const payload = (await readPersistedDocument(page, projectId)) as {
         root?: { children?: Array<{ componentRef?: string; props?: Record<string, unknown> }> };
       } | null;
-      return payload?.root?.children?.find((node) => node.componentRef === 'Text')?.props?.content;
+      return payload?.root?.children?.find((node) => node.componentRef === 'Text')?.props?.text;
     }).toBe('Texto editado E2E');
 
     await undo.click();
@@ -85,7 +84,7 @@ test.describe('M05.8 Editor core E2E', () => {
       const payload = (await readPersistedDocument(page, projectId)) as {
         root?: { children?: Array<{ componentRef?: string; props?: Record<string, unknown> }> };
       } | null;
-      return payload?.root?.children?.find((node) => node.componentRef === 'Text')?.props?.content;
+      return payload?.root?.children?.find((node) => node.componentRef === 'Text')?.props?.text;
     }).toBe('Texto');
 
     await redo.click();
@@ -93,7 +92,7 @@ test.describe('M05.8 Editor core E2E', () => {
       const payload = (await readPersistedDocument(page, projectId)) as {
         root?: { children?: Array<{ componentRef?: string; props?: Record<string, unknown> }> };
       } | null;
-      return payload?.root?.children?.find((node) => node.componentRef === 'Text')?.props?.content;
+      return payload?.root?.children?.find((node) => node.componentRef === 'Text')?.props?.text;
     }).toBe('Texto editado E2E');
 
     await page.reload();
@@ -107,14 +106,14 @@ test.describe('M05.8 Editor core E2E', () => {
     expect(reopened).not.toContain('"zones"');
   });
 
-  test('round-trips nested/reordered core data through the same browser autosave bridge', async ({ page }) => {
+  test('round-trips nested/reordered core data through the browser autosave bridge', async ({ page }) => {
     test.setTimeout(90_000);
     await page.goto('/');
     const result = await page.evaluate(async () => {
       const { projectStorageRuntime } = await import('/src/features/projects/project-storage-runtime.ts');
       const { loadStudioPuckEditor } = await import('/src/features/editor/puck-editor-runtime.ts');
-      const { studioCoreComponentDefinitions, studioCorePuckRenderers } = await import(
-        '/src/features/editor/studio-core-components.ts'
+      const { studioCoreEditorDefinitions, studioCoreEditorRenderers } = await import(
+        '/src/features/editor/puck-core-components.tsx'
       );
 
       const projectId = `m05-8-nested-${Date.now()}`;
@@ -126,8 +125,8 @@ test.describe('M05.8 Editor core E2E', () => {
       });
       const runtime = await loadStudioPuckEditor({
         projectId,
-        definitions: studioCoreComponentDefinitions,
-        renderers: studioCorePuckRenderers,
+        definitions: studioCoreEditorDefinitions,
+        renderers: studioCoreEditorRenderers,
       });
       const data = structuredClone(runtime.session.data);
       const component = (type: string, id: string, props: Record<string, unknown>) => ({
@@ -136,7 +135,7 @@ test.describe('M05.8 Editor core E2E', () => {
       });
       data.content = [
         component('Container', 'ec_node_0000000000580', {
-          children: [component('Text', 'ec_node_0000000000581', { content: 'Anidado' })],
+          children: [component('Text', 'ec_node_0000000000581', { text: 'Anidado' })],
         }),
         component('Button', 'ec_node_0000000000582', { label: 'Acción' }),
         component('Image', 'ec_node_0000000000583', { src: '', alt: 'Imagen nested' }),
@@ -152,10 +151,7 @@ test.describe('M05.8 Editor core E2E', () => {
     expect(result.payload).toMatchObject({
       root: {
         children: [
-          {
-            componentRef: 'Container',
-            children: [{ componentRef: 'Text', props: { content: 'Anidado' } }],
-          },
+          { componentRef: 'Container', children: [{ componentRef: 'Text', props: { text: 'Anidado' } }] },
           { componentRef: 'Button', props: { label: 'Acción' } },
           { componentRef: 'Image', props: { alt: 'Imagen nested' } },
         ],
