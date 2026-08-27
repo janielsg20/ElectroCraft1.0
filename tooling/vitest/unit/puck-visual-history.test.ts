@@ -29,7 +29,10 @@ describe('M05.5 Puck visual history policy', () => {
   });
 
   it('keeps the default and maximum windows bounded at the current tip', () => {
-    const defaultHistories = Array.from({ length: VISUAL_HISTORY_LIMITS.defaultValue + 8 }, (_, index) => index);
+    const defaultHistories = Array.from(
+      { length: VISUAL_HISTORY_LIMITS.defaultValue + 8 },
+      (_, index) => index,
+    );
     const defaultPlan = resolvePuckHistoryWindow(
       defaultHistories,
       defaultHistories.length - 1,
@@ -39,7 +42,11 @@ describe('M05.5 Puck visual history policy', () => {
     expect(defaultPlan?.histories.at(-1)).toBe(defaultHistories.at(-1));
 
     const maxHistories = Array.from({ length: VISUAL_HISTORY_LIMITS.max + 4 }, (_, index) => index);
-    const maxPlan = resolvePuckHistoryWindow(maxHistories, maxHistories.length - 1, VISUAL_HISTORY_LIMITS.max);
+    const maxPlan = resolvePuckHistoryWindow(
+      maxHistories,
+      maxHistories.length - 1,
+      VISUAL_HISTORY_LIMITS.max,
+    );
     expect(maxPlan?.histories).toHaveLength(VISUAL_HISTORY_LIMITS.max + 1);
     expect(maxPlan?.index).toBe(VISUAL_HISTORY_LIMITS.max);
   });
@@ -96,7 +103,11 @@ describe('M05.5 Puck visual history policy', () => {
     const disconnect = puckEditorHistoryControls.connect({ undo, redo });
 
     puckEditorHistoryControls.updateAvailability(true, false);
-    expect(puckEditorHistoryControls.getSnapshot()).toEqual({ canUndo: true, canRedo: false, visualHistoryLimit: 12 });
+    expect(puckEditorHistoryControls.getSnapshot()).toEqual({
+      canUndo: true,
+      canRedo: false,
+      visualHistoryLimit: 12,
+    });
     expect(puckEditorHistoryControls.undo()).toBe(true);
     expect(puckEditorHistoryControls.redo()).toBe(false);
     expect(undo).toHaveBeenCalledTimes(1);
@@ -107,6 +118,10 @@ describe('M05.5 Puck visual history policy', () => {
     expect(redo).toHaveBeenCalledTimes(1);
 
     disconnect();
-    expect(puckEditorHistoryControls.getSnapshot()).toEqual({ canUndo: false, canRedo: false, visualHistoryLimit: 12 });
+    expect(puckEditorHistoryControls.getSnapshot()).toEqual({
+      canUndo: false,
+      canRedo: false,
+      visualHistoryLimit: 12,
+    });
   });
 });
