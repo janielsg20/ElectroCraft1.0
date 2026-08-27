@@ -6,25 +6,27 @@ const root = process.cwd();
 const read = (file: string) => fs.readFileSync(path.join(root, file), 'utf8');
 
 describe('M05.8 editor core ownership boundary', () => {
-  it('loads one canonical core registry into the existing Studio Puck runtime', () => {
-    const hook = read('apps/studio/src/features/editor/use-puck-editor-runtime.ts');
-    const registry = read('apps/studio/src/features/editor/studio-core-components.ts');
+  it('loads one canonical core kit into the existing Studio Puck runtime', () => {
+    const runtime = read('apps/studio/src/features/editor/puck-editor-runtime.ts');
+    const kit = read('apps/studio/src/features/editor/puck-core-components.tsx');
 
-    expect(hook).toContain('definitions: studioCoreComponentDefinitions');
-    expect(hook).toContain('renderers: studioCorePuckRenderers');
-    expect(registry).toContain('electroCraftComponentDefinitionSchema.parse');
+    expect(runtime).toContain('studioCoreEditorDefinitions');
+    expect(runtime).toContain('studioCoreEditorRenderers');
+    expect(runtime).toContain('options.definitions ?? studioCoreEditorDefinitions');
+    expect(runtime).toContain('options.renderers ?? studioCoreEditorRenderers');
+    expect(kit).toContain('electroCraftComponentDefinitionSchema.parse');
     for (const component of ['Container', 'Text', 'Image', 'Button']) {
-      expect(registry).toContain(`'${component}'`);
+      expect(kit).toContain(`'${component}'`);
     }
-    expect(registry).not.toContain("from '@puckeditor/core'");
-    expect(registry).not.toContain('AppState');
-    expect(registry).not.toContain('ProjectRevision');
+    expect(kit).not.toContain("from '@puckeditor/core'");
+    expect(kit).not.toContain('dangerouslySetInnerHTML');
   });
 
-  it('keeps public Puck composition and existing history/autosave bridges as owners', () => {
+  it('keeps public Puck composition, command, history and autosave bridges as owners', () => {
     const workspace = read('apps/studio/src/shell/editor-workspace.tsx');
     const runtime = read('apps/studio/src/features/editor/puck-editor-runtime.ts');
     const composition = read('packages/editor-puck/src/puck-editor-composition.ts');
+    const commands = read('packages/editor-puck/src/puck-command-controls.ts');
 
     expect(workspace).toContain('<PuckEditorOutline />');
     expect(workspace).toContain('<PuckEditorPreview id="electrocraft-editor-preview" />');
@@ -32,8 +34,11 @@ describe('M05.8 editor core ownership boundary', () => {
     expect(runtime).toContain('createStudioPuckActionSync');
     expect(runtime).toContain('createStudioPuckDocumentPersistenceBridge');
     expect(composition).toContain('puckEditorHistoryControls');
-    expect(composition).toContain('api.history.back');
-    expect(composition).toContain('api.history.forward');
+    expect(composition).toContain('puckEditorCommandControls.connect(dispatch)');
+    expect(commands).toContain('let activeDispatch');
+    expect(commands).not.toContain('activeData');
+    expect(commands).not.toContain('activeState');
+    expect(commands).not.toContain('histories');
   });
 
   it('requires the repository E2E to cover insert/edit/history/save-reopen plus canonical nesting', () => {
@@ -43,6 +48,7 @@ describe('M05.8 editor core ownership boundary', () => {
     expect(e2e).toContain('palette.basic.text');
     expect(e2e).toContain('palette.basic.image');
     expect(e2e).toContain('palette.basic.button');
+    expect(e2e).toContain('studioPuckEditorCommands.dispatch');
     expect(e2e).toContain('data-puck-history-action');
     expect(e2e).toContain('flushAutosave');
     expect(e2e).toContain('page.reload()');
