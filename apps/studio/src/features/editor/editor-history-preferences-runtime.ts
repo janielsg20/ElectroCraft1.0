@@ -27,8 +27,7 @@ function readStoredLimit() {
   if (typeof window === 'undefined') return VISUAL_HISTORY_LIMITS.defaultValue;
   const raw = window.localStorage.getItem(EDITOR_VISUAL_HISTORY_STORAGE_KEY);
   if (raw === null) return VISUAL_HISTORY_LIMITS.defaultValue;
-  const parsed = Number(raw);
-  return normalizeVisualHistoryLimit(parsed);
+  return normalizeVisualHistoryLimit(Number(raw));
 }
 
 function ensureInitialized() {
@@ -46,6 +45,15 @@ function ensureInitialized() {
   }
 }
 
+function setVisualHistoryLimit(value: unknown) {
+  ensureInitialized();
+  const next = publish(value);
+  if (typeof window !== 'undefined') {
+    window.localStorage.setItem(EDITOR_VISUAL_HISTORY_STORAGE_KEY, String(next.visualHistoryLimit));
+  }
+  return next;
+}
+
 export const editorHistoryPreferencesRuntime = Object.freeze({
   subscribe(listener: () => void) {
     ensureInitialized();
@@ -56,15 +64,8 @@ export const editorHistoryPreferencesRuntime = Object.freeze({
     ensureInitialized();
     return snapshot;
   },
-  setVisualHistoryLimit(value: unknown) {
-    ensureInitialized();
-    const next = publish(value);
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem(EDITOR_VISUAL_HISTORY_STORAGE_KEY, String(next.visualHistoryLimit));
-    }
-    return next;
-  },
+  setVisualHistoryLimit,
   restoreDefault() {
-    return this.setVisualHistoryLimit(VISUAL_HISTORY_LIMITS.defaultValue);
+    return setVisualHistoryLimit(VISUAL_HISTORY_LIMITS.defaultValue);
   },
 });
