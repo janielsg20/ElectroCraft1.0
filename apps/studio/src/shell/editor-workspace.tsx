@@ -24,6 +24,7 @@ import {
 } from '@electrocraft/editor-puck';
 import { useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode, type RefObject } from 'react';
 import '../features/editor/puck-action-sync.css';
+import { LayoutStyleInspector } from '../features/editor/advanced/layout-style-inspector';
 import { useStudioPuckEditorRuntime } from '../features/editor/use-puck-editor-runtime';
 import { workspacePreferencesRuntime } from '../features/projects/workspace-preferences-runtime';
 import { editorT } from '../i18n/editor.es';
@@ -290,10 +291,9 @@ function InspectorContent() {
             id="inspector-advanced"
             title={iaT('studio.ia.inspector.advancedTitle')}
             summary={iaT('studio.ia.inspector.advancedSummary')}
+            defaultOpen
           >
-            <div className="ec-ia-inspector-section" data-inspector-advanced-placeholder>
-              <p>{iaT('studio.ia.disclosure.advancedSummary')}</p>
-            </div>
+            <LayoutStyleInspector />
           </ProgressiveDisclosure>
         </section>
       </TabsContent>

@@ -18,7 +18,7 @@ function fixture<T = unknown>(name: string): T {
 }
 
 function canonicalDocuments(): unknown[] {
-  return [fixture('screen-v3'), fixture('form-v3'), fixture('template-v3')];
+  return [fixture('screen-v4'), fixture('form-v4'), fixture('template-v4')];
 }
 
 describe('M02.6 deterministic serializer and MigrationRegistry', () => {

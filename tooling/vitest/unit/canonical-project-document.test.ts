@@ -31,7 +31,7 @@ describe('M02.1 canonical project/document model', () => {
 
   it('validates and round-trips the current canonical fixtures', () => {
     const project = electroCraftProjectDefinitionSchema.parse(fixture('project-v3'));
-    const document = electroCraftDocumentSchema.parse(fixture('screen-v3'));
+    const document = electroCraftDocumentSchema.parse(fixture('screen-v4'));
 
     expect(validateProjectDefinitionSemantics(project)).toEqual([]);
     expect(canonicalProjectRoundTrip(project)).toEqual(project);
@@ -51,14 +51,14 @@ describe('M02.1 canonical project/document model', () => {
     expect(result.success).toBe(false);
   });
 
-  it('keeps page out of canonical kinds but migrates legacy imports to screen v3', () => {
+  it('keeps page out of canonical kinds but migrates legacy imports to screen v4', () => {
     const legacy = fixture('legacy-page-v0');
     expect(electroCraftDocumentSchema.safeParse(legacy).success).toBe(false);
 
     const imported = importElectroCraftDocument(legacy);
     expect(imported.migratedFrom).toBe('page');
     expect(imported.document.kind).toBe('screen');
-    expect(imported.document.schemaVersion).toBe(3);
+    expect(imported.document.schemaVersion).toBe(4);
     expect(imported.document.formMeta).toBeNull();
     expect(imported.document.templateMeta).toBeNull();
   });
@@ -75,14 +75,18 @@ describe('M02.1 canonical project/document model', () => {
     expect(imported.project.userRegistryDefinitionRefs).toEqual([]);
   });
 
-  it('migrates ProjectDefinition and Document v2 explicitly into v3', () => {
+  it('migrates ProjectDefinition v2 and Document v2/v3 explicitly into current versions', () => {
     const project = importElectroCraftProjectDefinition(fixture('project-v2'));
     const document = importElectroCraftDocument(fixture('screen-v2'));
 
     expect(project).toMatchObject({ migratedFrom: 2, project: { schemaVersion: 3 } });
     expect(document).toMatchObject({
       migratedFrom: 2,
-      document: { schemaVersion: 3, formMeta: null, templateMeta: null },
+      document: { schemaVersion: 4, formMeta: null, templateMeta: null },
+    });
+    expect(importElectroCraftDocument(fixture('screen-v3'))).toMatchObject({
+      migratedFrom: 3,
+      document: { schemaVersion: 4, root: { layout: null, style: null } },
     });
   });
 

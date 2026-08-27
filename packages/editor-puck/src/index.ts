@@ -9,6 +9,7 @@ export * from './puck-document-adapter';
 export * from './puck-editor-composition';
 export * from './puck-history-controls';
 export * from './puck-history-policy';
+export * from './puck-layout-style';
 
 export const packageDescriptor = Object.freeze({
   name: '@electrocraft/editor-puck',

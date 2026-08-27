@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 4,
+  "id": "ec_document_000000000000q",
+  "version": 2,
+  "name": "Plantilla principal",
+  "kind": "template",
+  "root": {
+    "id": "ec_node_000000000000s",
+    "componentRef": "core.root",
+    "props": { "label": "Plantilla" },
+    "layout": null,
+    "style": null,
+    "children": []
+  },
+  "references": { "documentRefs": [] },
+  "metadata": { "fixture": "m06.1" },
+  "formMeta": null,
+  "templateMeta": {
+    "slot": "page",
+    "priority": 10,
+    "displayConditions": [{ "subject": "route", "operator": "equals", "value": "ec_route_0000000000005" }]
+  }
+}

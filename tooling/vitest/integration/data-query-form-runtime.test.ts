@@ -125,7 +125,7 @@ describe('M02.3 portable query/runtime integration', () => {
     expect(reopened.migratedProject).toBe(true);
     expect(reopened.migratedDocumentIds).toEqual([documentId]);
     expect(reopened.project.schemaVersion).toBe(3);
-    expect(reopened.documents[0]).toMatchObject({ schemaVersion: 3, formMeta: null, templateMeta: null });
+    expect(reopened.documents[0]).toMatchObject({ schemaVersion: 4, formMeta: null, templateMeta: null });
 
     const storedProject = await repository.get('project', projectId);
     const storedDocument = await repository.get('document', documentId);
@@ -138,7 +138,7 @@ describe('M02.3 portable query/runtime integration', () => {
       userRegistryDefinitionRefs: [],
     });
     expect(JSON.parse(storedDocument?.payload ?? '{}')).toMatchObject({
-      schemaVersion: 3,
+      schemaVersion: 4,
       formMeta: null,
       templateMeta: null,
     });

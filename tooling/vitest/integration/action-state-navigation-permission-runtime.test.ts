@@ -48,7 +48,7 @@ describe('M02.4 runtime adapters and reference integration', () => {
   });
 
   it('validates stable refs and evaluates canonical permission policies fail-closed', () => {
-    const screen = electroCraftDocumentSchema.parse(fixture('screen-v3'));
+    const screen = electroCraftDocumentSchema.parse(fixture('screen-v4'));
     const route = electroCraftRouteDefinitionSchema.parse(fixture('route-v1'));
     const navigation = electroCraftNavigationDefinitionSchema.parse(fixture('navigation-v1'));
     const action = electroCraftActionGraphSchema.parse(fixture('action-graph-v1'));

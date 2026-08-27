@@ -8,7 +8,7 @@ import {
 
 function emptyDocument() {
   return electroCraftDocumentSchema.parse({
-    schemaVersion: 3,
+    schemaVersion: 4,
     id: createDeterministicObjectId('document', 'm05.8-core-kit'),
     version: 1,
     name: 'Editor core',

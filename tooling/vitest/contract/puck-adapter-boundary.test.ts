@@ -27,7 +27,7 @@ describe('M05.1/M05.3 Puck adapter boundary', () => {
     expect(adapter).toContain('Data');
     expect(config).toContain("type: 'slot'");
     expect(adapter).toContain('canonical.root.children.map');
-    expect(adapter).toContain('root: { props: cloneCanonicalProps(canonical.root.props) }');
+    expect(adapter).toContain('projectPuckNodePresentation(cloneCanonicalProps(canonical.root.props), canonical.root)');
     expect(adapter).toContain('hasLegacyZoneContent');
     expect(adapter).toContain('migrateLegacyPuckDataToSlots');
     expect(adapter).toContain('migrate(structuredClone(data), config)');

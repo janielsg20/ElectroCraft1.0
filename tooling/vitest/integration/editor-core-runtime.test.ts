@@ -12,7 +12,7 @@ import {
 
 function documentFixture(): ElectroCraftDocument {
   return electroCraftDocumentSchema.parse({
-    schemaVersion: 3,
+    schemaVersion: 4,
     id: createDeterministicObjectId('document', 'm05.8-editor-core'),
     version: 1,
     name: 'Editor core M05.8',

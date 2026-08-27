@@ -15,6 +15,7 @@ export type StudioHelpId =
   | 'help.studio.appearance'
   | 'help.studio.language'
   | 'help.projects'
+  | 'help.editor.advanced'
   | `help.section.${SidebarNavigationItemId}`;
 
 export interface HelpDescriptor {
@@ -130,6 +131,18 @@ const studioDefinitions = Object.freeze([
       'multi-tab',
     ],
     learnMoreRef: '.ai/microphases/M04_7.md',
+  },
+  {
+    id: 'help.editor.advanced',
+    sectionId: 'editor-advanced',
+    navigationItemId: 'editor',
+    titleKey: 'help.editor.advanced.title',
+    shortKey: 'help.editor.advanced.short',
+    longKey: 'help.editor.advanced.long',
+    exampleKeys: ['help.editor.advanced.example'],
+    relatedIds: ['help.section.editor', 'help.section.tokens'],
+    keywords: ['layout', 'diseño', 'estilo', 'fila', 'columna', 'cuadrícula', 'tokens', 'restablecer', 'heredado'],
+    learnMoreRef: '.ai/microphases/M06_1.md',
   },
 ] as const satisfies readonly HelpDefinition[]);
 

@@ -16,7 +16,9 @@ Date: 2026-08-27.
 | F05 / M05.5        | COMPLETADA / GREEN | PR `#57`; Base CI `33081006606` (#702)         |
 | F05 / M05.6        | COMPLETADA / GREEN | PR `#58`; Base CI `33086731332` (#707)         |
 | F05 / M05.7        | COMPLETADA / GREEN | PR `#59`; Base CI `33089363788` (#709)         |
-| F05 / M05.8        | ACTIVE             | `codex/m05-8-editor-core-e2e`                  |
+| F05 / M05.8        | COMPLETADA / GREEN | PR `#60`; Base CI `33101434587` (#742)         |
+| F06 / M06.1        | COMPLETADA / GREEN | `.ai/evidence/F06/M06.1/CLOSURE_2026-08-27.md` |
+| F06 / M06.2        | ACTIVE             | Responsive inheritance y reset                 |
 
 ## Cierres M05.1–M05.6
 
@@ -39,11 +41,14 @@ Date: 2026-08-27.
 - Lock se traduce a permisos públicos `edit/drag/delete/duplicate = false`; no existe lock store paralelo.
 - Diagnostics recuperables permanecen ocultos/no insertables en la Palette.
 
-## M05.8 en curso
+## Cierre M05.8 / F05
 
-Rama: `codex/m05-8-editor-core-e2e`.
+- Head funcional validado: `b6b3aab`.
+- PR `#60`; squash merge a `main`: `a81ca149c17391b9fe77aaaf57b125d229320173`.
+- `ElectroCraft Base CI` run `33101434587` (#742): `success` en 13m 30s; 2 artifacts publicados.
+- El check de despliegue Cloudflare falló fuera del gate canónico M05.8; Base CI fue el único release gate prescrito.
 
-Implementación actual:
+Implementación cerrada:
 - `apps/studio/src/features/editor/puck-core-components.tsx` es el único kit core del Studio para `Container`, `Text`, `Image` y `Button`, con IDs deterministas, fields canónicos y renderers Puck.
 - `loadStudioPuckEditor()` usa ese kit por defecto para proyectos reales; `useStudioPuckEditorRuntime()` delega al runtime sin mantener un segundo registry.
 - `Container` usa el Slot público ya mapeado por M05.3; `Text` hereda `contentEditable` de M05.6.
@@ -52,10 +57,22 @@ Implementación actual:
 - Integration cubre registry/config real, nesting, reorder, edits, fail-closed por renderer ausente y canonical round-trip sin `history/ui/zones`.
 - Playwright cubre proyecto real, inserción desde Palette, nesting/move y reorder mediante dispatch Puck, selección desde `Puck.Outline`, edición desde `Puck.Fields`, Undo/Redo del Topbar, autosave F04 y reload/reopen.
 - Contract test bloquea cualquier segundo editor/store y exige reutilizar Composition, command delegation, history y persistence existentes.
-- Gate final: únicamente `ElectroCraft Base CI` en PR `#60`.
+- F05 queda `COMPLETADA / GREEN` sin owner/editor/store paralelo.
 
 Blockers funcionales P0/P1 conocidos: `0`.
 
-## Próxima microfase exacta
+## Cierre M06.1
 
-Completar y validar `M05.8 — Editor core E2E`; después cerrar F05 o activar la microfase siguiente definida por el plan canónico si existe.
+- Rama local: `codex/m06-1-layout-style-inspector`.
+- Modelo: `ElectroCraftDocument` v4 incorpora `layout/style` por nodo; import v3 migra recursivamente y los schemas estrictos rechazan payloads/CSS no canónicos.
+- Engine/API: `api.selectedItem`, `getSelectorForId` y dispatch público `replace` de Puck; los props `__electrocraftLayout/__electrocraftStyle` son transporte del adapter y se eliminan del payload canónico.
+- UI: `Inspector > Diseño > Avanzado` contiene Diseño/Estilo, presets Columna/Fila/Cuadrícula/Envolver, gap/alineación/columnas, tokens de relleno/fondo, opacidad, reset/herencia y `help.editor.advanced`.
+- Canvas: los renderers core traducen semántica portable a estilos de preview sin convertir CSS en source of truth.
+- Tests exactos nuevos: `layout-style-inspector.test.ts`, `layout-style-inspector-boundary.test.ts`, `layout-style-puck-roundtrip.test.ts` y `m06-1-layout-style-inspector.spec.ts`.
+- Gate: lint/Prettier GREEN; typecheck GREEN; Node `41/41`; Vitest serial `415/415` en `116/116` archivos; build Studio/PWA GREEN; Playwright M06.1 `1/1` GREEN con insert/edit/history/autosave/reopen.
+- Adaptación: el primer Vitest paralelo agotó timeouts de PGlite por contención local; los casos afectados y después la suite completa pasaron en aislamiento serial. `agent-browser` no logró iniciar tras su instalación local, por lo que la verificación observable se respaldó con Chromium/Playwright real.
+- Blockers funcionales P0/P1 conocidos: `0`.
+
+## M06.2 activo
+
+Implementar `Responsive inheritance y reset`: presets/viewports públicos Puck, base + overrides canónicos, origen Base/Heredado/Anulado y reset por propiedad sin crear overrides al cambiar solo el viewport.

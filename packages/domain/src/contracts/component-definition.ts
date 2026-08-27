@@ -75,6 +75,29 @@ export const electroCraftStyleSchema = z.strictObject({
 });
 export type ElectroCraftStyle = z.infer<typeof electroCraftStyleSchema>;
 
+export function createDefaultElectroCraftStyle(): ElectroCraftStyle {
+  return electroCraftStyleSchema.parse({
+    schemaVersion: 1,
+    base: {
+      width: null,
+      height: null,
+      minWidth: null,
+      maxWidth: null,
+      gap: null,
+      padding: null,
+      margin: null,
+      fontSize: null,
+      fontWeight: null,
+      textAlign: null,
+      foreground: null,
+      background: null,
+      opacity: null,
+    },
+    responsive: {},
+    platform: {},
+  });
+}
+
 export const electroCraftLayoutSchema = z
   .strictObject({
     mode: electroCraftLayoutModeSchema,
@@ -101,6 +124,17 @@ export const electroCraftLayoutSchema = z
     }
   });
 export type ElectroCraftLayout = z.infer<typeof electroCraftLayoutSchema>;
+
+export function createDefaultElectroCraftLayout(): ElectroCraftLayout {
+  return electroCraftLayoutSchema.parse({
+    mode: 'flow',
+    gap: null,
+    align: 'stretch',
+    justify: 'start',
+    wrap: false,
+    columns: null,
+  });
+}
 
 export const electroCraftComponentFieldKindSchema = z.enum(['text', 'number', 'boolean', 'select']);
 

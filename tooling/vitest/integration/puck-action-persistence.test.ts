@@ -47,7 +47,7 @@ function appState(data: PuckEditorData): PuckEditorAppState {
 describe('M05.4 Puck action -> canonical persistence integration', () => {
   it('synchronizes edit/reorder/duplicate/remove and ignores selection-only state', async () => {
     const document = electroCraftDocumentSchema.parse({
-      schemaVersion: 3,
+      schemaVersion: 4,
       id: createDeterministicObjectId('document', 'm05.4-screen'),
       version: 1,
       name: 'Inicio',
@@ -149,7 +149,7 @@ describe('M05.4 Puck action -> canonical persistence integration', () => {
         expect.objectContaining({
           objectId: document.id,
           kind: 'document',
-          schemaVersion: 3,
+          schemaVersion: 4,
           payload: expect.objectContaining({
             root: expect.objectContaining({
               children: [

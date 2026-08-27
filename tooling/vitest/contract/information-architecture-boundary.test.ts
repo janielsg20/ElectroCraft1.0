@@ -32,7 +32,7 @@ describe('M03.7 information architecture boundaries', () => {
     expect(editor).toContain('<PuckEditorFields');
     expect(editor).toContain('<PuckEditorPreview');
     expect(editor).toContain('<PuckEditorOutline');
-    expect(editor).toContain('id="inspector-advanced"');
+    expect(editor).toContain('<LayoutStyleInspector />');
     expect(editor).toContain('<StudioEmptyState id="canvas"');
     expect(editor).toContain('<StudioEmptyState id="outline"');
     expect(editor).toContain('<StudioEmptyState id="inspector"');

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 4,
+  "id": "ec_document_0000000000002",
+  "version": 4,
+  "name": "Inicio",
+  "kind": "screen",
+  "root": {
+    "id": "ec_node_0000000000003",
+    "componentRef": "core.root",
+    "props": {
+      "label": "Inicio"
+    },
+    "layout": null,
+    "style": null,
+    "children": []
+  },
+  "references": {
+    "documentRefs": []
+  },
+  "metadata": {
+    "fixture": "m06.1"
+  },
+  "formMeta": null,
+  "templateMeta": null
+}

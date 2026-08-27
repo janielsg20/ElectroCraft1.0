@@ -70,7 +70,7 @@ describe('M02.3 data/query/form ownership', () => {
   });
 
   it('keeps forms inside ElectroCraftDocument with required formMeta', () => {
-    const form = electroCraftDocumentSchema.parse(fixture('form-v3'));
+    const form = electroCraftDocumentSchema.parse(fixture('form-v4'));
     const schema = electroCraftDataSchemaSchema.parse(fixture('data-schema-v1'));
 
     expect(form.kind).toBe('form');
@@ -88,7 +88,7 @@ describe('M02.3 data/query/form ownership', () => {
       sources: [electroCraftDataSourceDefinitionSchema.parse(fixture('data-source-v1'))],
       schemas: [electroCraftDataSchemaSchema.parse(fixture('data-schema-v1'))],
       queries: [electroCraftQueryDefinitionSchema.parse(fixture('query-v1'))],
-      forms: [electroCraftDocumentSchema.parse(fixture('form-v3'))],
+      forms: [electroCraftDocumentSchema.parse(fixture('form-v4'))],
     };
 
     expect(validateDataOwnershipGraph(graph)).toEqual([]);
@@ -101,7 +101,7 @@ describe('M02.3 data/query/form ownership', () => {
     expect(project).toMatchObject({ migratedFrom: 1, project: { schemaVersion: 3 } });
     expect(document).toMatchObject({
       migratedFrom: 1,
-      document: { schemaVersion: 3, formMeta: null, templateMeta: null },
+      document: { schemaVersion: 4, formMeta: null, templateMeta: null },
     });
   });
 });

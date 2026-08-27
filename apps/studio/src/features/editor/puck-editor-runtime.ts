@@ -30,7 +30,7 @@ export interface LoadStudioPuckEditorOptions {
 function createInitialScreen(project: StoredProjectDefinition): ElectroCraftDocument {
   const documentId = createDeterministicObjectId('document', `${project.id}:studio-primary-screen`);
   return electroCraftDocumentSchema.parse({
-    schemaVersion: 3,
+    schemaVersion: 4,
     id: documentId,
     version: 1,
     name: project.name,
@@ -39,6 +39,8 @@ function createInitialScreen(project: StoredProjectDefinition): ElectroCraftDocu
       id: createDeterministicObjectId('node', `${documentId}:root`),
       componentRef: 'core.root',
       props: {},
+      layout: null,
+      style: null,
       children: [],
     },
     references: { documentRefs: [] },

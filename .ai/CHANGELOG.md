@@ -28,3 +28,15 @@ El changelog histórico original hasta M00.8 se preserva sin modificaciones en `
 
 ## 2026-08-25 — F05 iniciada
 - M05.1 activa: `PuckAdapter` y component mapping canónico detrás de `@electrocraft/editor-puck`, preservando IDs/Slots, diagnostics recuperables y separación entre editor history y Project Revisions.
+
+## 2026-08-27 — F05 completada
+- M05.1–M05.8 integraron Puck como único Screen Composer con mapping/Slots, composition pública, action sync, history visual, inline editing, extensiones mínimas y Editor core E2E real.
+- Base CI `33101434587` (#742) cerró `GREEN`; PR `#60` se fusionó mediante squash a `main` en `a81ca149c17391b9fe77aaaf57b125d229320173`.
+- F06 inició con M06.1 para `ElectroCraftLayout/Style inspector`.
+
+## 2026-08-27 — M06.1 completada
+- `ElectroCraftDocument` avanzó a v4 con Layout/Style por nodo y migración recursiva desde v3.
+- El adapter `@electrocraft/editor-puck` integra selección/replace públicos de Puck sin persistir internals ni CSS crudo.
+- Inspector Diseño/Estilo, presets/tokens/reset/herencia, ayuda persistente y Canvas semántico quedaron funcionales y verificados.
+- Gate local: lint, typecheck, Node 41/41, Vitest 415/415, build Studio/PWA y Playwright M06.1 GREEN.
+- M06.2 queda activa para responsive inheritance y reset.

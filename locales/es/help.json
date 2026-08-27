@@ -120,5 +120,9 @@
   "help.section.deploy.title": "Desplegar",
   "help.section.deploy.short": "Publica un artefacto ya validado mediante el adapter del target.",
   "help.section.deploy.long": "Desplegar es posterior a exportación y validación. La ausencia de un destino o credencial debe mostrarse como estado bloqueado, nunca como despliegue exitoso.",
-  "help.section.deploy.example": "Selecciona un destino configurado y publica únicamente después de una exportación válida."
+  "help.section.deploy.example": "Selecciona un destino configurado y publica únicamente después de una exportación válida.",
+  "help.editor.advanced.title": "Diseño y estilo del elemento",
+  "help.editor.advanced.short": "Ajusta disposición y tokens del elemento seleccionado con valores portables.",
+  "help.editor.advanced.long": "Diseño y Estilo editan ElectroCraftLayout y ElectroCraftStyle mediante la selección pública de Puck. Restablecer vuelve a la definición del componente; los valores responsive se configuran en su fase dedicada.",
+  "help.editor.advanced.example": "Selecciona un Contenedor, elige Fila y un token de separación; usa Restablecer para volver al valor heredado."
 }

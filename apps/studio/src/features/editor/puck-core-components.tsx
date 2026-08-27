@@ -5,6 +5,7 @@ import {
 } from '@electrocraft/domain';
 import type { PuckCanonicalRenderer, PuckRendererRegistry } from '@electrocraft/editor-puck';
 import { createElement, isValidElement, type ComponentType, type ReactNode } from 'react';
+import { resolveStudioPresentationStyle } from './advanced/presentation-style';
 
 const emptyStyle = Object.freeze({
   schemaVersion: 1 as const,
@@ -93,24 +94,42 @@ function slotNode(value: unknown): ReactNode {
   return null;
 }
 
-const ContainerRenderer: PuckCanonicalRenderer = ({ children }) =>
-  createElement('div', { 'data-ec-core-component': 'Container' }, slotNode(children));
+function presentationStyle(props: Record<string, unknown>, definitionIndex: number) {
+  const definition = studioCoreEditorDefinitions[definitionIndex];
+  return resolveStudioPresentationStyle(props, definition.layout, definition.style);
+}
 
-const TextRenderer: PuckCanonicalRenderer = ({ text }) =>
-  createElement('p', { 'data-ec-core-component': 'Text' }, typeof text === 'string' ? text : '');
+const ContainerRenderer: PuckCanonicalRenderer = ({ children, ...props }) =>
+  createElement(
+    'div',
+    { 'data-ec-core-component': 'Container', style: presentationStyle(props, 0) },
+    slotNode(children),
+  );
 
-const ImageRenderer: PuckCanonicalRenderer = ({ src, alt }) => {
+const TextRenderer: PuckCanonicalRenderer = ({ text, ...props }) =>
+  createElement(
+    'p',
+    { 'data-ec-core-component': 'Text', style: presentationStyle(props, 1) },
+    typeof text === 'string' ? text : '',
+  );
+
+const ImageRenderer: PuckCanonicalRenderer = ({ src, alt, ...props }) => {
   const source = typeof src === 'string' ? src.trim() : '';
   const alternative = typeof alt === 'string' && alt.trim() ? alt.trim() : 'Imagen';
+  const style = presentationStyle(props, 2);
   return source
-    ? createElement('img', { 'data-ec-core-component': 'Image', src: source, alt: alternative })
-    : createElement('div', { 'data-ec-core-component': 'Image', role: 'img', 'aria-label': alternative }, alternative);
+    ? createElement('img', { 'data-ec-core-component': 'Image', src: source, alt: alternative, style })
+    : createElement(
+        'div',
+        { 'data-ec-core-component': 'Image', role: 'img', 'aria-label': alternative, style },
+        alternative,
+      );
 };
 
-const ButtonRenderer: PuckCanonicalRenderer = ({ label }) =>
+const ButtonRenderer: PuckCanonicalRenderer = ({ label, ...props }) =>
   createElement(
     'button',
-    { 'data-ec-core-component': 'Button', type: 'button' },
+    { 'data-ec-core-component': 'Button', type: 'button', style: presentationStyle(props, 3) },
     typeof label === 'string' ? label : 'Botón',
   );
 
