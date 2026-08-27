@@ -121,7 +121,11 @@ test.describe('M05.8 Editor core E2E', () => {
 
     await page.getByRole('tab', { name: 'Capas' }).click();
     const outline = page.locator('[data-puck-composition="outline"]');
-    await outline.getByText('Texto', { exact: true }).first().click();
+    await expect(outline).toBeVisible();
+    await dispatchPuckAction(page, {
+      type: 'setUi',
+      ui: { itemSelector: { index: 0, zone: `${containerId}:children` } },
+    });
 
     const fields = page.locator('[data-puck-composition="fields"]');
     const textField = fields.getByLabel('Texto', { exact: true });
