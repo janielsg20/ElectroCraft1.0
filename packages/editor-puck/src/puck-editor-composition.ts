@@ -1,5 +1,6 @@
 import { Puck, createUsePuck, type Config, type Data } from '@puckeditor/core';
 import { Fragment, createElement, useEffect, useSyncExternalStore, type ComponentProps } from 'react';
+import { puckEditorCommandControls } from './puck-command-controls';
 import { puckEditorHistoryControls } from './puck-history-controls';
 import { applyPuckHistoryPolicy } from './puck-history-policy';
 
@@ -29,6 +30,13 @@ export const electroCraftPuckIframeConfig = Object.freeze({
 
 const useElectroCraftPuck = createUsePuck();
 
+function PuckCommandBridge() {
+  const dispatch = usePuckEditorDispatch();
+
+  useEffect(() => puckEditorCommandControls.connect(dispatch), [dispatch]);
+  return null;
+}
+
 function PuckHistoryBridge() {
   const history = usePuckEditorHistoryControls();
   const controls = useSyncExternalStore(
@@ -56,9 +64,9 @@ function PuckHistoryBridge() {
 
 /**
  * Public Puck composition surface owned by the editor-puck adapter.
- * Studio never imports @puckeditor/core directly. The session-only history
- * bridge is mounted inside the owning Puck context so shell controls can
- * delegate without copying AppState or the visual history stack.
+ * Studio never imports @puckeditor/core directly. Session-only command/history
+ * bridges are mounted inside the owning Puck context and expose delegation
+ * only; AppState, selection and the visual history stack remain in Puck.
  */
 export function PuckEditorRoot({ iframe, children, ...props }: ComponentProps<typeof Puck>) {
   return createElement(
@@ -70,7 +78,13 @@ export function PuckEditorRoot({ iframe, children, ...props }: ComponentProps<ty
         ...electroCraftPuckIframeConfig,
       },
     },
-    createElement(Fragment, null, createElement(PuckHistoryBridge), children),
+    createElement(
+      Fragment,
+      null,
+      createElement(PuckCommandBridge),
+      createElement(PuckHistoryBridge),
+      children,
+    ),
   );
 }
 
