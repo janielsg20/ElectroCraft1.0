@@ -172,7 +172,9 @@ function EditorPanelControls({
         className="ec-editor-window-action"
         variant="ghost"
         size="icon"
-        aria-label={controls.expanded ? editorT('studio.editor.panel.restore') : editorT('studio.editor.panel.maximize')}
+        aria-label={
+          controls.expanded ? editorT('studio.editor.panel.restore') : editorT('studio.editor.panel.maximize')
+        }
         title={controls.expanded ? editorT('studio.editor.panel.restore') : editorT('studio.editor.panel.maximize')}
         onClick={controls.onExpand}
       >
