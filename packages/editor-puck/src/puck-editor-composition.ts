@@ -1,7 +1,7 @@
 import { Puck, createUsePuck, type Config, type Data } from '@puckeditor/core';
 import { Fragment, createElement, useEffect, useSyncExternalStore, type ComponentProps } from 'react';
 import { puckEditorHistoryControls } from './puck-history-controls';
-import { resolvePuckHistoryWindow } from './puck-history-policy';
+import { applyPuckHistoryPolicy } from './puck-history-policy';
 
 export type PuckEditorConfig = Config;
 export type PuckEditorOnChange = (data: Data) => void;
@@ -123,12 +123,15 @@ export function usePuckEditorHistoryPolicy(visualHistoryLimit: number) {
   const setHistoryIndex = useElectroCraftPuck((api) => api.history.setHistoryIndex);
 
   useEffect(() => {
-    const plan = resolvePuckHistoryWindow(histories, index, visualHistoryLimit);
-    if (!plan) return;
-
-    const nextHistories = [...plan.histories];
-    setHistories(nextHistories);
-    setHistoryIndex(plan.index);
+    applyPuckHistoryPolicy(
+      {
+        histories,
+        index,
+        setHistories,
+        setHistoryIndex,
+      },
+      visualHistoryLimit,
+    );
   }, [histories, index, setHistories, setHistoryIndex, visualHistoryLimit]);
 }
 
