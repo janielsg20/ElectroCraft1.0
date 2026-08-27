@@ -26,28 +26,28 @@ describe('M05.4 Puck action synchronization', () => {
     expect(resolvePuckDocumentActionChange(action('setUi'), appState(current), appState(previous))).toBeNull();
   });
 
-  it.each(['reorder', 'duplicate', 'remove', 'setData'] as const)(
-    'detects authoring data changes for %s',
-    (type) => {
-      const previous = {
-        content: [{ type: 'Text', props: { id: 'ec_node_0000000000001', text: 'Antes' } }],
-        root: { props: {} },
-      } as PuckEditorData;
-      const current = {
-        ...previous,
-        content: [{ type: 'Text', props: { id: 'ec_node_0000000000001', text: 'Después' } }],
-      } as PuckEditorData;
+  it.each(['reorder', 'duplicate', 'remove', 'setData'] as const)('detects authoring data changes for %s', (type) => {
+    const previous = {
+      content: [{ type: 'Text', props: { id: 'ec_node_0000000000001', text: 'Antes' } }],
+      root: { props: {} },
+    } as PuckEditorData;
+    const current = {
+      ...previous,
+      content: [{ type: 'Text', props: { id: 'ec_node_0000000000001', text: 'Después' } }],
+    } as PuckEditorData;
 
-      const change = resolvePuckDocumentActionChange(action(type), appState(current), appState(previous));
+    const change = resolvePuckDocumentActionChange(action(type), appState(current), appState(previous));
 
-      expect(change).toMatchObject({ actionType: type, data: current, previousData: previous });
-    },
-  );
+    expect(change).toMatchObject({ actionType: type, data: current, previousData: previous });
+  });
 
   it('forwards changed Data to canonical persistence and keeps AppState out of the bridge', () => {
     const data = { content: [], root: { props: {} } } as PuckEditorData;
     const previous = { content: [], root: { props: {} } } as PuckEditorData;
-    const reconstruction = { document: { id: 'document' }, diagnostics: [] } as unknown as PuckDocumentReconstruction;
+    const reconstruction = {
+      document: { id: 'document' },
+      diagnostics: [],
+    } as unknown as PuckDocumentReconstruction;
     const apply = vi.fn(() => reconstruction);
     const synchronized = vi.fn();
     const sync = createStudioPuckActionSync({
