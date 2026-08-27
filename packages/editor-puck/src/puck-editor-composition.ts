@@ -89,6 +89,15 @@ export function usePuckEditorConfig() {
 }
 
 /**
+ * Thin public dispatch bridge for engine-owned editor interactions. Consumers
+ * may issue documented Puck actions without importing @puckeditor/core or
+ * receiving AppState internals. The reducer/history remain entirely in Puck.
+ */
+export function usePuckEditorDispatch() {
+  return useElectroCraftPuck((api) => api.dispatch);
+}
+
+/**
  * Minimal public-data subscription for empty-state rendering. This observes
  * only Data.content; selection/history remain owned by Puck and outside the
  * canonical persistence bridge.
@@ -141,7 +150,7 @@ export function usePuckEditorHistoryPolicy(visualHistoryLimit: number) {
  * unsupported catalog item never becomes a silent Puck success.
  */
 export function usePuckPaletteInsert() {
-  const dispatch = useElectroCraftPuck((api) => api.dispatch);
+  const dispatch = usePuckEditorDispatch();
 
   return (componentType: string) => {
     dispatch({
