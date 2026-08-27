@@ -26,7 +26,9 @@ test.describe('M05.5 Puck visual history', () => {
     const limit = editor.getByRole('spinbutton', { name: 'Límite del historial visual' });
     await expect(limit).toHaveValue('50');
     await limit.fill('1');
-    await expect.poll(() => page.evaluate((key) => window.localStorage.getItem(key), VISUAL_HISTORY_KEY)).toBe('1');
+    await expect
+      .poll(() => page.evaluate((key) => window.localStorage.getItem(key), VISUAL_HISTORY_KEY))
+      .toBe('1');
 
     await page.keyboard.press('Escape');
     await page.reload();
@@ -35,7 +37,9 @@ test.describe('M05.5 Puck visual history', () => {
 
     await page.locator('[data-topbar-settings-trigger]').click();
     await expect(
-      page.locator('[data-settings-destination="editor"]').getByRole('spinbutton', { name: 'Límite del historial visual' }),
+      page
+        .locator('[data-settings-destination="editor"]')
+        .getByRole('spinbutton', { name: 'Límite del historial visual' }),
     ).toHaveValue('1');
   });
 
@@ -48,7 +52,9 @@ test.describe('M05.5 Puck visual history', () => {
     const limit = editor.getByRole('spinbutton', { name: 'Límite del historial visual' });
     await limit.fill('999');
     await expect(limit).toHaveValue('100');
-    await expect.poll(() => page.evaluate((key) => window.localStorage.getItem(key), VISUAL_HISTORY_KEY)).toBe('100');
+    await expect
+      .poll(() => page.evaluate((key) => window.localStorage.getItem(key), VISUAL_HISTORY_KEY))
+      .toBe('100');
 
     const metrics = await page.evaluate(() => ({
       scrollWidth: document.documentElement.scrollWidth,
@@ -65,7 +71,11 @@ test.describe('M05.5 Puck visual history', () => {
       const { projectStorageRuntime } = await import('/src/features/projects/project-storage-runtime.ts');
 
       const projectId = crypto.randomUUID();
-      const project = { id: projectId, name: 'Proyecto history M05.5', metadata: { source: 'm05.5-browser' } };
+      const project = {
+        id: projectId,
+        name: 'Proyecto history M05.5',
+        metadata: { source: 'm05.5-browser' },
+      };
       const document = {
         schemaVersion: 3 as const,
         id: 'ec_document_0000000000055',
