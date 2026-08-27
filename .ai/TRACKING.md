@@ -44,14 +44,15 @@ Date: 2026-08-27.
 Rama: `codex/m05-8-editor-core-e2e`.
 
 Implementación actual:
-- `apps/studio/src/features/editor/studio-core-components.ts` define un catálogo core canónico mínimo real para `Container`, `Text`, `Image` y `Button`, con IDs deterministas, fields canónicos y renderers Puck.
-- `useStudioPuckEditorRuntime()` carga ese catálogo al abrir proyectos reales; el editor deja de entrar con `components: {}` cuando existe un proyecto activo.
+- `apps/studio/src/features/editor/puck-core-components.tsx` es el único kit core del Studio para `Container`, `Text`, `Image` y `Button`, con IDs deterministas, fields canónicos y renderers Puck.
+- `loadStudioPuckEditor()` usa ese kit por defecto para proyectos reales; `useStudioPuckEditorRuntime()` delega al runtime sin mantener un segundo registry.
 - `Container` usa el Slot público ya mapeado por M05.3; `Text` hereda `contentEditable` de M05.6.
-- Canvas recibe presentación mínima de los cuatro componentes sin crear un runtime alternativo.
+- `puckEditorCommandControls` expone solo delegación session-only al dispatch público Puck; no copia `Data`, selection, DnD ni history.
+- Canvas recibe presentación mínima de los cuatro componentes mediante `data-ec-core-component`, sin runtime alternativo.
 - Integration cubre registry/config real, nesting, reorder, edits, fail-closed por renderer ausente y canonical round-trip sin `history/ui/zones`.
-- Playwright cubre proyecto real, inserción desde Palette, selección desde `Puck.Outline`, edición desde `Puck.Fields`, Undo/Redo del Topbar, autosave F04, reload/reopen y un round-trip nested/reordered en storage browser.
-- Contract test bloquea cualquier segundo editor/store y exige reutilizar Composition, history y persistence existentes.
-- Gate final previsto: únicamente `ElectroCraft Base CI`.
+- Playwright cubre proyecto real, inserción desde Palette, nesting/move y reorder mediante dispatch Puck, selección desde `Puck.Outline`, edición desde `Puck.Fields`, Undo/Redo del Topbar, autosave F04 y reload/reopen.
+- Contract test bloquea cualquier segundo editor/store y exige reutilizar Composition, command delegation, history y persistence existentes.
+- Gate final: únicamente `ElectroCraft Base CI` en PR `#60`.
 
 Blockers funcionales P0/P1 conocidos: `0`.
 
