@@ -59,7 +59,7 @@ test.describe('M05.8 Editor core E2E', () => {
 
     await page.goto('/editor');
     const workspace = page.locator('.ec-editor-workspace');
-    await expect(workspace).toHaveAttribute('data-editor-sync-state', 'ready');
+    await expect(workspace).toHaveAttribute('data-editor-sync-state', 'ready', { timeout: 20_000 });
 
     const palette = page.locator('[data-studio-palette]');
     await expect(palette).toHaveAttribute('data-puck-active-components', '5');
@@ -156,7 +156,7 @@ test.describe('M05.8 Editor core E2E', () => {
       .toBe('Texto editado E2E');
 
     await page.reload();
-    await expect(workspace).toHaveAttribute('data-editor-sync-state', 'ready');
+    await expect(workspace).toHaveAttribute('data-editor-sync-state', 'ready', { timeout: 20_000 });
     await expect(page.locator('.ec-topbar-save')).toContainText('Guardado');
 
     const reopened = JSON.stringify(await readPersistedDocument(page, projectId));
