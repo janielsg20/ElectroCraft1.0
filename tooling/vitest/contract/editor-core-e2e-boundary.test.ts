@@ -48,8 +48,8 @@ describe('M05.8 editor core ownership boundary', () => {
     expect(e2e).toContain('palette.basic.text');
     expect(e2e).toContain('palette.basic.image');
     expect(e2e).toContain('palette.basic.button');
-    expect(e2e).toContain('studioPuckEditorCommands.dispatch');
     expect(e2e).toContain('data-puck-history-action');
+    expect(e2e).toContain('runtime.persistence.apply(data)');
     expect(e2e).toContain('flushAutosave');
     expect(e2e).toContain('page.reload()');
     expect(e2e).toContain("componentRef: 'Container'");
