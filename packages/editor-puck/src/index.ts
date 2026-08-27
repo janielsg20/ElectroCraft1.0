@@ -1,6 +1,7 @@
 import { packageDescriptor as dep0 } from '@electrocraft/domain';
 import { packageDescriptor as dep1 } from '@electrocraft/application';
 
+export * from './puck-action-sync';
 export * from './puck-adapter-contract';
 export * from './puck-component-adapter';
 export * from './puck-document-adapter';
