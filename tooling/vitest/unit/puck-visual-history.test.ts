@@ -1,0 +1,74 @@
+import { VISUAL_HISTORY_LIMITS, normalizeVisualHistoryLimit } from '@electrocraft/application';
+import { puckEditorHistoryControls, resolvePuckHistoryWindow } from '@electrocraft/editor-puck';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+afterEach(() => {
+  puckEditorHistoryControls.setVisualHistoryLimit(VISUAL_HISTORY_LIMITS.defaultValue);
+});
+
+describe('M05.5 Puck visual history policy', () => {
+  it('normalizes the safe default and clamps the supported range', () => {
+    expect(normalizeVisualHistoryLimit(undefined)).toBe(50);
+    expect(normalizeVisualHistoryLimit(Number.NaN)).toBe(50);
+    expect(normalizeVisualHistoryLimit(0)).toBe(1);
+    expect(normalizeVisualHistoryLimit(1)).toBe(1);
+    expect(normalizeVisualHistoryLimit(101)).toBe(100);
+    expect(normalizeVisualHistoryLimit(42.6)).toBe(43);
+  });
+
+  it('keeps current plus one undo step when the configured limit is one', () => {
+    const histories = ['initial', 'edit', 'delete'];
+    expect(resolvePuckHistoryWindow(histories, 2, 1)).toEqual({
+      histories: ['edit', 'delete'],
+      index: 1,
+    });
+  });
+
+  it('keeps the default and maximum windows bounded at the current tip', () => {
+    const defaultHistories = Array.from({ length: VISUAL_HISTORY_LIMITS.defaultValue + 8 }, (_, index) => index);
+    const defaultPlan = resolvePuckHistoryWindow(
+      defaultHistories,
+      defaultHistories.length - 1,
+      VISUAL_HISTORY_LIMITS.defaultValue,
+    );
+    expect(defaultPlan?.histories).toHaveLength(VISUAL_HISTORY_LIMITS.defaultValue + 1);
+    expect(defaultPlan?.histories.at(-1)).toBe(defaultHistories.at(-1));
+
+    const maxHistories = Array.from({ length: VISUAL_HISTORY_LIMITS.max + 4 }, (_, index) => index);
+    const maxPlan = resolvePuckHistoryWindow(maxHistories, maxHistories.length - 1, VISUAL_HISTORY_LIMITS.max);
+    expect(maxPlan?.histories).toHaveLength(VISUAL_HISTORY_LIMITS.max + 1);
+    expect(maxPlan?.index).toBe(VISUAL_HISTORY_LIMITS.max);
+  });
+
+  it('defers trimming while positioned before the tip so redo and branching stay intact', () => {
+    const histories = ['initial', 'edit-a', 'drag', 'delete'];
+    expect(resolvePuckHistoryWindow(histories, 1, 1)).toBeNull();
+
+    const branchAfterUndo = ['initial', 'edit-a', 'edit-b'];
+    expect(resolvePuckHistoryWindow(branchAfterUndo, 2, 1)).toEqual({
+      histories: ['edit-a', 'edit-b'],
+      index: 1,
+    });
+  });
+
+  it('delegates undo and redo without owning a second history stack', () => {
+    const undo = vi.fn();
+    const redo = vi.fn();
+    puckEditorHistoryControls.setVisualHistoryLimit(12);
+    const disconnect = puckEditorHistoryControls.connect({ undo, redo });
+
+    puckEditorHistoryControls.updateAvailability(true, false);
+    expect(puckEditorHistoryControls.getSnapshot()).toEqual({ canUndo: true, canRedo: false, visualHistoryLimit: 12 });
+    expect(puckEditorHistoryControls.undo()).toBe(true);
+    expect(puckEditorHistoryControls.redo()).toBe(false);
+    expect(undo).toHaveBeenCalledTimes(1);
+    expect(redo).not.toHaveBeenCalled();
+
+    puckEditorHistoryControls.updateAvailability(false, true);
+    expect(puckEditorHistoryControls.redo()).toBe(true);
+    expect(redo).toHaveBeenCalledTimes(1);
+
+    disconnect();
+    expect(puckEditorHistoryControls.getSnapshot()).toEqual({ canUndo: false, canRedo: false, visualHistoryLimit: 12 });
+  });
+});
