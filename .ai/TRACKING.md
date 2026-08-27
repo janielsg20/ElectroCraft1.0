@@ -15,83 +15,46 @@ Date: 2026-08-27.
 | F05 / M05.4        | COMPLETADA / GREEN | PR `#56`; Base CI `33035570789` (#692)         |
 | F05 / M05.5        | COMPLETADA / GREEN | PR `#57`; Base CI `33081006606` (#702)         |
 | F05 / M05.6        | COMPLETADA / GREEN | PR `#58`; Base CI `33086731332` (#707)         |
-| F05 / M05.7        | ACTIVE             | `codex/m05-7-palette-outline-extensions`       |
+| F05 / M05.7        | COMPLETADA / GREEN | PR `#59`; Base CI `33089363788` (#709)         |
+| F05 / M05.8        | ACTIVE             | `codex/m05-8-editor-core-e2e`                  |
 
-## Cierre M05.1
+## Cierres M05.1–M05.6
 
-- Head funcional: `9aa330dbf44b39485516ee0d3dc181a9aee4196b`.
-- PR `#49`; squash merge a `main`: `733abdc44f21d16b56b4624c7bec61f0131bd3f1`.
-- `ElectroCraft Base CI` run `32868029914` (#656): `success`.
-- Puck queda encapsulado por `@electrocraft/editor-puck`; Studio no importa `@puckeditor/core` para el adapter.
-- `ElectroCraftDocument.root` se conserva como envelope canónico y sus hijos se proyectan a `Data.content`.
-- Slots públicos preservan IDs/nesting; unknown components generan diagnostics visibles y recuperables.
-- Puck Data vuelve al documento canónico y al autosave sin persistir selección, DnD o historial del engine.
+- M05.1: PR `#49`, Base CI `32868029914` (#656), squash `733abdc44f21d16b56b4624c7bec61f0131bd3f1`.
+- M05.2: PR `#50`, Base CI `32990513971` (#661), squash `fadc2ecb64764c120c75cb5e4c7b154d3cc4ade6`.
+- M05.3: PR `#52`, Base CI `33016557679` (#674), squash `fd5901dff66acca5d92ffee832a2ac881721458b`.
+- M05.4: PR `#56`, Base CI `33035570789` (#692), squash `98b51b7ad35b3204f0b67899b4fd2392d1c100e7`.
+- M05.5: PR `#57`, Base CI `33081006606` (#702), squash `7aeaf701b077781f5b6ca0d659be2726dec7412b`.
+- M05.6: PR `#58`, Base CI `33086731332` (#707), squash `459d07d73f08fb8b2a826f54787124011f7c7ca8`.
 
-## Cierre M05.2
+## Cierre M05.7
 
-- Head funcional validado: `9321356994e5cc48748f1d406c920e28b8c9b141`.
-- PR `#50`; squash merge a `main`: `fadc2ecb64764c120c75cb5e4c7b154d3cc4ade6`.
-- `ElectroCraft Base CI` run `32990513971` (#661): `success`.
-- Composition pública integrada: `Puck.Components`, `Puck.Outline`, `Puck.Preview`, `Puck.Fields`.
-- Palette resuelve disponibilidad desde el `Config` Puck activo; no existe segundo ComponentRegistry.
-- Preview usa iframe con aislamiento de estilos del host.
+- Head funcional validado: `f07d6ddcffbf98f1e53ad7d9ff1a19478c99bffc`.
+- PR `#59`; squash merge a `main`: `f75dcb85ca73b05008c982958f442f6f6031fd40`.
+- `ElectroCraft Base CI` run `33089363788` (#709): `success`.
+- `ComponentDefinition.category` se proyecta a `Config.categories` público de Puck.
+- `Puck.Components` sigue siendo la fuente draggable; discovery Electro es opcional y tiene fallback `puck-base`.
+- `Puck.Outline` permanece directo, sin override/plugin experimental release-critical.
+- Favoritos/recientes siguen como preferencias locales del workspace, fuera de `ElectroCraftDocument`.
+- Lock se traduce a permisos públicos `edit/drag/delete/duplicate = false`; no existe lock store paralelo.
+- Diagnostics recuperables permanecen ocultos/no insertables en la Palette.
 
-## Cierre M05.3
+## M05.8 en curso
 
-- Head funcional validado: `176b41a31a017f800cb8f63b41be3b7e65f52324`.
-- PR `#52`; squash merge a `main`: `fd5901dff66acca5d92ffee832a2ac881721458b`.
-- `ElectroCraft Base CI` run `33016557679` (#674): `success`.
-- Slots recursivos estables para `Container`, `Section`, `Tabs` y `Accordion` mediante `field.type = "slot"`.
-- `allow/disallow` permanece en el field del Slot y la política owner-neutral se traduce a permisos públicos Puck.
-- Legacy `zones` se migra con `migrate(data, config)` oficial; `walkTree()` valida el árbol posterior.
-- Migraciones incompletas fallan cerrado con diagnóstico ElectroCraft estable sin filtrar errores internos Puck.
-- Playwright cubre round-trip browser/storage legacy -> canonical sin persistir `zones`.
-
-## Cierre M05.4
-
-- Head funcional validado: `a56575ab62660eb94d70ae08aaf0df6c5cd6a010`.
-- PR `#56`; squash merge a `main`: `98b51b7ad35b3204f0b67899b4fd2392d1c100e7`.
-- `ElectroCraft Base CI` run `33035570789` (#692): `success`.
-- `packages/editor-puck/src/puck-action-sync.ts` consume `onAction(action, appState, prevAppState)` y persiste solo cambios reales en `Data.content/root/zones`.
-- Studio reconstruye `ElectroCraftDocument` mediante el adapter canónico y reutiliza el autosave F04; no existe debounce paralelo.
-- El editor visible usa `config/data/onAction` de la sesión canónica real y mantiene fail-closed visible ante errores de reconstrucción.
-- Selección, DnD, `ui` e history Puck permanecen session-only; Project Revisions sigue siendo historial durable separado.
-
-## Cierre M05.5
-
-- Head funcional validado: `9d61c1e3f9976893594b518e952320e723b59f81`.
-- PR `#57`; squash merge a `main`: `7aeaf701b077781f5b6ca0d659be2726dec7412b`.
-- `ElectroCraft Base CI` run `33081006606` (#702): `success`.
-- Topbar Deshacer/Rehacer delega en `history.back/forward/hasPast/hasFuture` público de Puck.
-- La ventana visual se limita mediante `setHistories/setHistoryIndex` sin mantener un stack paralelo.
-- `visualHistoryLimit` queda en preferencias locales del Studio con default `50` y rango `1–100`.
-- Undo/redo continúa por el bridge M05.4 y autosave F04; `history/ui` no se serializa en el proyecto.
-
-## Cierre M05.6
-
-- Head funcional validado: `96145da4e74d856c1368f9a0418379acfcff0b2a`.
-- PR `#58`; squash merge a `main`: `459d07d73f08fb8b2a826f54787124011f7c7ca8`.
-- `ElectroCraft Base CI` run `33086731332` (#707): `success`.
-- `Text` usa field Puck `text` con `contentEditable: true`; Heading/Párrafo heredan al resolver al mismo `componentRef`.
-- `RichText` usa `richtext + contentEditable` y Puck/Tiptap permanece engine owner.
-- El valor transportable sigue siendo string HTML canónico y no persiste selection/ui/history/Tiptap internals.
-- El action bridge M05.4, autosave F04 e history M05.5 se reutilizan sin segundo pipeline.
-
-## M05.7 en curso
-
-Rama: `codex/m05-7-palette-outline-extensions`.
+Rama: `codex/m05-8-editor-core-e2e`.
 
 Implementación actual:
-- `createPuckCategories()` proyecta `ComponentDefinition.category` al API público `Config.categories` consumido por `Puck.Components`.
-- El componente diagnóstico recuperable queda en categoría oculta y con `insert: false`, evitando que aparezca como pieza insertable.
-- `locked` mapea `edit/drag/delete/duplicate = false` mediante permisos públicos Puck; no se añade lock store paralelo.
-- `StudioPalette` conserva búsqueda/categorías/favoritos/recientes alrededor de `Puck.Components` y expone un modo `puck-base` para probar que las extensiones Electro son opcionales.
-- Favoritos/recientes siguen siendo preferencias workspace/user locales (`electrocraft.workspace.palette.v1`), nunca `ComponentDefinitions` ni parte de `ElectroCraftDocument`.
-- `Puck.Outline` permanece directo, sin overrides/plugins experimentales; hidden/visibility no se inventa en el adapter mientras no exista owner canónico correspondiente.
-- Unit/contract/Playwright cubren categorías, lock, diagnóstico no insertable, fallback Puck base, búsqueda/preferencias y ausencia de internals de Outline en canonical data.
+- `apps/studio/src/features/editor/studio-core-components.ts` define un catálogo core canónico mínimo real para `Container`, `Text`, `Image` y `Button`, con IDs deterministas, fields canónicos y renderers Puck.
+- `useStudioPuckEditorRuntime()` carga ese catálogo al abrir proyectos reales; el editor deja de entrar con `components: {}` cuando existe un proyecto activo.
+- `Container` usa el Slot público ya mapeado por M05.3; `Text` hereda `contentEditable` de M05.6.
+- Canvas recibe presentación mínima de los cuatro componentes sin crear un runtime alternativo.
+- Integration cubre registry/config real, nesting, reorder, edits, fail-closed por renderer ausente y canonical round-trip sin `history/ui/zones`.
+- Playwright cubre proyecto real, inserción desde Palette, selección desde `Puck.Outline`, edición desde `Puck.Fields`, Undo/Redo del Topbar, autosave F04, reload/reopen y un round-trip nested/reordered en storage browser.
+- Contract test bloquea cualquier segundo editor/store y exige reutilizar Composition, history y persistence existentes.
+- Gate final previsto: únicamente `ElectroCraft Base CI`.
 
 Blockers funcionales P0/P1 conocidos: `0`.
 
 ## Próxima microfase exacta
 
-Completar y validar `M05.7 — Extensiones de palette y outline solo necesarias`; solo después activar `M05.8 — Editor core E2E` según `.ai/microphases/M05_8.md`.
+Completar y validar `M05.8 — Editor core E2E`; después cerrar F05 o activar la microfase siguiente definida por el plan canónico si existe.
