@@ -81,22 +81,32 @@ test.describe('M03.9 single Studio theme', () => {
     await expect(appearance).toBeHidden();
   });
 
-  test('keeps the two-mode selector usable from the six-slot mobile dock without overflow', async ({ page }) => {
+  test('keeps the two-mode selector usable from Settings on mobile without expanding the five-slot dock', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 360, height: 800 });
     await resetTheme(page);
 
     const dock = page.locator('.ec-editor-mobile-dock');
     await expect(dock).toBeVisible();
-    await expect(dock.locator('[data-appearance-trigger="mobile"]')).toBeVisible();
-    expect(await dock.locator(':scope > *').count()).toBe(6);
+    await expect(dock.locator('[data-mobile-destination]')).toHaveCount(5);
+    await expect(dock.locator('[data-appearance-trigger="mobile"]')).toHaveCount(0);
 
-    await dock.locator('[data-appearance-trigger="mobile"]').click();
-    const sheet = page.locator('[data-appearance-sheet="mobile"]');
+    await page.locator('[data-topbar-settings-trigger]').click();
+    const settings = page.locator('[data-topbar-settings-sheet]');
+    const appearanceDestination = settings.locator('[data-settings-destination="appearance"]');
+    await expect(appearanceDestination).toBeVisible();
+    await appearanceDestination.locator('[data-appearance-trigger="topbar"]').click();
+
+    const sheet = page.locator('[data-appearance-sheet="topbar"]').last();
     await expect(sheet).toBeVisible();
-    await expect(sheet).toHaveAttribute('data-sheet-side', 'bottom');
     await expect(sheet.locator('[data-appearance-value]')).toHaveCount(2);
 
-    const overflow = await dock.evaluate((element) => element.scrollWidth > element.clientWidth + 1);
-    expect(overflow).toBe(false);
+    const dockOverflow = await dock.evaluate((element) => element.scrollWidth > element.clientWidth + 1);
+    expect(dockOverflow).toBe(false);
+    const documentOverflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+    );
+    expect(documentOverflow).toBe(false);
   });
 });
