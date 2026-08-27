@@ -1,6 +1,6 @@
 # TRACKING — ElectroCraft current position
 
-Date: 2026-08-26.
+Date: 2026-08-27.
 
 | Scope              | Estado             | Evidencia                                      |
 | ------------------ | ------------------ | ---------------------------------------------- |
@@ -12,7 +12,8 @@ Date: 2026-08-26.
 | F05 / M05.1        | COMPLETADA / GREEN | PR `#49`; Base CI `32868029914`                |
 | F05 / M05.2        | COMPLETADA / GREEN | PR `#50`; Base CI `32990513971` (#661)         |
 | F05 / M05.3        | COMPLETADA / GREEN | PR `#52`; Base CI `33016557679` (#674)         |
-| F05 / M05.4        | ACTIVE             | `codex/m05-4-puck-action-sync-v2`              |
+| F05 / M05.4        | COMPLETADA / GREEN | PR `#56`; Base CI `33035570789` (#692)         |
+| F05 / M05.5        | ACTIVE             | `codex/m05-5-puck-visual-history`               |
 
 ## Cierre M05.1
 
@@ -44,32 +45,30 @@ Date: 2026-08-26.
 - Migraciones incompletas fallan cerrado con diagnóstico ElectroCraft estable sin filtrar errores internos Puck.
 - Playwright cubre round-trip browser/storage legacy -> canonical sin persistir `zones`.
 
-## M05.4 en curso
+## Cierre M05.4
 
-Rama: `codex/m05-4-puck-action-sync-v2`.
+- Head funcional validado: `a56575ab62660eb94d70ae08aaf0df6c5cd6a010`.
+- PR `#56`; squash merge a `main`: `98b51b7ad35b3204f0b67899b4fd2392d1c100e7`.
+- `ElectroCraft Base CI` run `33035570789` (#692): `success`.
+- `packages/editor-puck/src/puck-action-sync.ts` consume `onAction(action, appState, prevAppState)` y persiste solo cambios reales en `Data.content/root/zones`.
+- Studio reconstruye `ElectroCraftDocument` mediante el adapter canónico y reutiliza `projectStorageRuntime.queueAutosave()`; no existe debounce paralelo.
+- El editor visible usa `config/data/onAction` de la sesión canónica real y mantiene fail-closed visible ante errores de reconstrucción.
+- Selección, DnD, `ui` e history Puck permanecen session-only; Project Revisions sigue siendo historial durable separado.
+- Unit/integration/contract/Playwright cubren edit/reorder/duplicate/remove, selección ignorada, payload sin internals y round-trip browser/storage real.
 
-Implementado:
-- `packages/editor-puck/src/puck-action-sync.ts`: observa `onAction/appState/prevAppState` y detecta únicamente cambios en `Data.content/root/zones`; acciones UI-only quedan fuera de persistencia.
-- `apps/studio/src/features/editor/puck-action-sync.ts`: transforma cada cambio authoring estable mediante el bridge canónico y falla cerrado con diagnóstico tipado.
-- `apps/studio/src/features/editor/puck-editor-runtime.ts`: abre el proyecto/documento canónico real, crea la sesión Puck y reutiliza `queueAutosave()` F04; no crea otro debounce ni store.
-- `apps/studio/src/features/editor/use-puck-editor-runtime.ts`: lifecycle `empty/loading/ready/blocked` para el AppShell.
-- `apps/studio/src/shell/editor-workspace.tsx`: el editor visible usa `config/data/onAction` de la sesión real sin perder los controles recientes de panel; empty states leen `Data.content` activo.
-- `apps/studio/src/features/editor/puck-action-sync.css`: diagnóstico visible de sincronización bloqueada.
-- `tooling/vitest/unit/puck-action-sync.test.ts`: UI-only, cambios authoring, forward canónico y fail-closed.
-- `tooling/vitest/integration/puck-action-persistence.test.ts`: edit/reorder/duplicate/remove, selección ignorada y ausencia de internals Puck en payload.
-- `tooling/playwright/m05-4-puck-action-sync.spec.ts`: round-trip browser/storage real por F04 con dirty/flush y selección post-flush sin nuevo autosave.
+## M05.5 en curso
 
-API/engine utilizado:
-- Puck público `onAction(action, appState, prevAppState)`.
-- Puck `Data` como snapshot de authoring; AppState/history/selection no se persisten.
-- F04 `projectStorageRuntime.queueAutosave()` conserva debounce 650 ms y Project Revisions separado del history visual.
+Rama: `codex/m05-5-puck-visual-history`.
 
-Continuidad:
-- PR `#55` quedó cerrada sin merge porque la rama original chocó con mejoras recientes de `main`; M05.4 fue reconstruida sobre el `main` actual en la rama `-v2`.
-- No se añadió workflow dedicado.
+Objetivo:
+- conectar Deshacer/Rehacer del Topbar a la history pública de Puck;
+- mantener el history visual session-only y separado de Project Revisions;
+- sincronizar cada undo/redo de vuelta a `ElectroCraftDocument` y al autosave F04;
+- exponer `visualHistoryLimit` con rango seguro en Configuración > Editor;
+- recortar la ventana de history solo con API pública Puck, sin serializar AppState/history en el proyecto.
 
-Blockers funcionales P0/P1 conocidos: `0` antes del gate final.
+Blockers funcionales P0/P1 conocidos: `0` al activar M05.5.
 
 ## Próxima microfase exacta
 
-Completar y validar `M05.4 — Sincronizar Puck actions con ElectroCraftDocument`; solo después activar `M05.5 — Usar Puck visual history`.
+Completar y validar `M05.5 — Usar Puck visual history`; solo después activar `M05.6` según `.ai/microphases/M05_6.md`.
