@@ -9,9 +9,9 @@ import {
 import { puckEditorCommandControls, type PuckRendererRegistry } from '@electrocraft/editor-puck';
 import { projectStorageRuntime } from '../projects/project-storage-runtime';
 import { createStudioPuckActionSync } from './puck-action-sync';
+import { studioCoreEditorDefinitions, studioCoreEditorRenderers } from './puck-core-components';
 import { createStudioPuckDocumentPersistenceBridge, type PuckDocumentAutosavePort } from './puck-document-persistence';
 import { createStudioPuckDocumentSession } from './puck-document-session';
-import { studioCoreComponentDefinitions, studioCorePuckRenderers } from './studio-core-components';
 
 export interface StudioPuckProjectRuntimePort extends PuckDocumentAutosavePort {
   initialize(): Promise<unknown>;
@@ -81,8 +81,8 @@ export async function loadStudioPuckEditor(options: LoadStudioPuckEditorOptions)
   if (!opened) throw new Error('El proyecto seleccionado ya no está disponible.');
 
   const { document, created } = resolveProjectDocument(opened);
-  const definitions = options.definitions ?? studioCoreComponentDefinitions;
-  const renderers = options.renderers ?? studioCorePuckRenderers;
+  const definitions = options.definitions ?? studioCoreEditorDefinitions;
+  const renderers = options.renderers ?? studioCoreEditorRenderers;
   const session = createStudioPuckDocumentSession(document, definitions, renderers);
   const persistence = createStudioPuckDocumentPersistenceBridge({
     project: opened.project,
