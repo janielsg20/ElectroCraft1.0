@@ -1,4 +1,5 @@
 import { Puck, createUsePuck, type Config, type Data } from '@puckeditor/core';
+import { createDeterministicObjectId } from '@electrocraft/domain';
 import { Fragment, createElement, useEffect, useSyncExternalStore, type ComponentProps } from 'react';
 import { puckEditorCommandControls } from './puck-command-controls';
 import { puckEditorHistoryControls } from './puck-history-controls';
@@ -155,17 +156,25 @@ export function usePuckEditorHistoryPolicy(visualHistoryLimit: number) {
 /**
  * Accessible click-to-insert bridge for Palette UI.
  * Availability is resolved by the Studio catalog before dispatching so an
- * unsupported catalog item never becomes a silent Puck success.
+ * unsupported catalog item never becomes a silent Puck success. ElectroCraft
+ * supplies the public insert action with a canonical node id up front so Puck
+ * history, commands and canonical persistence all address the same node.
  */
 export function usePuckPaletteInsert() {
   const dispatch = usePuckEditorDispatch();
 
   return (componentType: string) => {
+    const id = createDeterministicObjectId(
+      'node',
+      `puck-insert:${componentType}:${globalThis.crypto.randomUUID()}`,
+    );
+
     dispatch({
       type: 'insert',
       componentType,
       destinationIndex: 0,
       destinationZone: 'root:default-zone',
+      id,
     });
   };
 }
