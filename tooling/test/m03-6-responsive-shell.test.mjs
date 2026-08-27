@@ -10,7 +10,7 @@ test('M03.6 structural gate preserves capabilities across responsive modes', asy
     read('apps/studio/src/shell/editor-layout-model.ts'),
     read('apps/studio/src/shell/responsive-shell.css'),
     read('packages/design-system/src/icons/studio-icon-registry.ts'),
-    read('.ai/HELP_ARCHITECTURE_MODELS.md'),
+    read('apps/studio/src/help/help-registry.ts'),
     read('.ai/STATE.md'),
   ]);
 
