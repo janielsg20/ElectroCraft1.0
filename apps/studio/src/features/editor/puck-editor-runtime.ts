@@ -6,7 +6,7 @@ import {
   type ElectroCraftComponentDefinition,
   type ElectroCraftDocument,
 } from '@electrocraft/domain';
-import type { PuckRendererRegistry } from '@electrocraft/editor-puck';
+import { puckEditorCommandControls, type PuckRendererRegistry } from '@electrocraft/editor-puck';
 import { projectStorageRuntime } from '../projects/project-storage-runtime';
 import { createStudioPuckActionSync } from './puck-action-sync';
 import { studioCoreEditorDefinitions, studioCoreEditorRenderers } from './puck-core-components';
@@ -106,5 +106,12 @@ export async function loadStudioPuckEditor(options: LoadStudioPuckEditorOptions)
     actionSync,
   });
 }
+
+/**
+ * Studio-facing command delegation for documented Puck actions. This is the
+ * same session-only bridge mounted by PuckEditorRoot and carries no editor
+ * state of its own.
+ */
+export const studioPuckEditorCommands = puckEditorCommandControls;
 
 export type StudioPuckEditorRuntime = Awaited<ReturnType<typeof loadStudioPuckEditor>>;
