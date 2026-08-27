@@ -5,8 +5,9 @@ import test from 'node:test';
 const read = (path) => readFile(path, 'utf8');
 
 test('M03.6 structural gate preserves capabilities across responsive modes', async () => {
-  const [workspace, responsiveCss, icons, help, state] = await Promise.all([
+  const [workspace, layoutModel, responsiveCss, icons, help, state] = await Promise.all([
     read('apps/studio/src/shell/editor-workspace.tsx'),
+    read('apps/studio/src/shell/editor-layout-model.ts'),
     read('apps/studio/src/shell/responsive-shell.css'),
     read('packages/design-system/src/icons/studio-icon-registry.ts'),
     read('.ai/HELP_ARCHITECTURE_MODELS.md'),
@@ -14,7 +15,7 @@ test('M03.6 structural gate preserves capabilities across responsive modes', asy
   ]);
 
   for (const mode of ['desktop', 'laptop', 'tablet', 'mobile']) {
-    assert.equal(workspace.includes(`'${mode}'`), true, `M03.6 editor mode missing: ${mode}`);
+    assert.equal(layoutModel.includes(`'${mode}'`), true, `M03.6 editor mode missing: ${mode}`);
   }
 
   for (const token of [
