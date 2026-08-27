@@ -28,8 +28,18 @@ function emptyDocument() {
 
 describe('M05.8 Studio core editor kit', () => {
   it('provides deterministic Container/Text/Image/Button definitions used by a fresh editor', () => {
-    expect(studioCoreEditorDefinitions.map((definition) => definition.key)).toEqual(['Container', 'Text', 'Image', 'Button']);
-    expect(studioCoreEditorDefinitions.map((definition) => definition.category)).toEqual(['Layout', 'Basic', 'Basic', 'Basic']);
+    expect(studioCoreEditorDefinitions.map((definition) => definition.key)).toEqual([
+      'Container',
+      'Text',
+      'Image',
+      'Button',
+    ]);
+    expect(studioCoreEditorDefinitions.map((definition) => definition.category)).toEqual([
+      'Layout',
+      'Basic',
+      'Basic',
+      'Basic',
+    ]);
     expect(Object.keys(studioCoreEditorRenderers)).toEqual(['Container', 'Text', 'Image', 'Button']);
     expect(new Set(studioCoreEditorDefinitions.map((definition) => definition.id)).size).toBe(4);
     for (const definition of studioCoreEditorDefinitions) {
@@ -38,9 +48,15 @@ describe('M05.8 Studio core editor kit', () => {
   });
 
   it('projects the core kit through the same Puck config, Slots and inline editing policies as the real Studio', () => {
-    const session = createStudioPuckDocumentSession(emptyDocument(), studioCoreEditorDefinitions, studioCoreEditorRenderers);
+    const session = createStudioPuckDocumentSession(
+      emptyDocument(),
+      studioCoreEditorDefinitions,
+      studioCoreEditorRenderers,
+    );
 
-    expect(Object.keys(session.config.components)).toEqual(expect.arrayContaining(['Container', 'Text', 'Image', 'Button']));
+    expect(Object.keys(session.config.components)).toEqual(
+      expect.arrayContaining(['Container', 'Text', 'Image', 'Button']),
+    );
     expect(session.config.categories?.Layout).toMatchObject({ components: ['Container'] });
     expect(session.config.categories?.Basic).toMatchObject({ components: ['Text', 'Image', 'Button'] });
     expect(session.config.components.Container.fields?.children).toMatchObject({ type: 'slot' });
