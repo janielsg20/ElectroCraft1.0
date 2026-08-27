@@ -31,7 +31,8 @@
 - M05.1 — Crear PuckAdapter y component mapping: `COMPLETADA`; Gate `GREEN`.
 - M05.2 — Componer Components/Outline/Preview/Fields: `COMPLETADA`; Gate `GREEN`.
 - M05.3 — Nested Slots, permissions y Puck data migration: `COMPLETADA`; Gate `GREEN`.
-- M05.4 — Sincronizar Puck actions con ElectroCraftDocument: `ACTIVE`.
+- M05.4 — Sincronizar Puck actions con ElectroCraftDocument: `COMPLETADA`; Gate `GREEN`.
+- M05.5 — Usar Puck visual history: `ACTIVE`.
 - Blockers P0/P1 funcionales conocidos: `0`.
 
 ## Cierre F04 / M04.8
@@ -58,8 +59,14 @@ M05.3 cerró sobre head `176b41a31a017f800cb8f63b41be3b7e65f52324`. `ElectroCraf
 
 La PR `#52` fue fusionada mediante squash a `main` en `fd5901dff66acca5d92ffee832a2ac881721458b` (`feat(M05.3): add nested Slots permissions and Puck migration`). Quedan activos Slots anidados, `allow/disallow`, permisos públicos Puck, migración oficial `zones -> slots`, `walkTree()` y fallo cerrado estable para migraciones incompletas.
 
+## Cierre F05 / M05.4
+
+M05.4 cerró sobre head `a56575ab62660eb94d70ae08aaf0df6c5cd6a010`. `ElectroCraft Base CI` run `33035570789` (#692) terminó `success`: documentación, lint/Prettier, typecheck, 371 tests Vitest, build, Playwright repository gate, empty repository fixture y artifacts base quedaron GREEN.
+
+La PR `#56` fue fusionada mediante squash a `main` en `98b51b7ad35b3204f0b67899b4fd2392d1c100e7` (`feat(M05.4): sync Puck actions with canonical documents`). Puck `onAction(action, appState, prevAppState)` sincroniza únicamente cambios authoring reales hacia `ElectroCraftDocument`, reutiliza el autosave incremental F04 y mantiene selection/ui/history del engine fuera del payload canónico y separado de Project Revisions.
+
 ## Microfase activa
 
-`M05.4` — Sincronizar Puck actions con ElectroCraftDocument.
+`M05.5` — Usar Puck visual history.
 
-Referencias: `.ai/microphases/M05_4.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
+Referencias: `.ai/microphases/M05_5.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
