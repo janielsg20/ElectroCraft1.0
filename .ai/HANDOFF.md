@@ -2,42 +2,45 @@
 
 ## Current
 
-F05 / M05.7 — Extensiones de palette y outline solo necesarias — `ACTIVE`.
+F05 / M05.8 — Editor core E2E — `ACTIVE`.
 
 ## Heredado
 
 - F04/M04.1–M04.8 cerró `COMPLETADA / GREEN` con persistencia, recovery, Project Home, backup/import, workspace preferences y revisiones no destructivas.
-- M05.1 cerró `COMPLETADA / GREEN`; PR `#49`, Base CI `32868029914` (#656), squash `733abdc44f21d16b56b4624c7bec61f0131bd3f1`.
-- M05.2 cerró `COMPLETADA / GREEN`; Base CI `32990513971` (#661), PR `#50` fusionada a `main` en `fadc2ecb64764c120c75cb5e4c7b154d3cc4ade6`.
-- M05.3 cerró `COMPLETADA / GREEN`; head `176b41a31a017f800cb8f63b41be3b7e65f52324`, Base CI `33016557679` (#674), PR `#52` fusionada a `main` en `fd5901dff66acca5d92ffee832a2ac881721458b`.
-- M05.4 cerró `COMPLETADA / GREEN`; head `a56575ab62660eb94d70ae08aaf0df6c5cd6a010`, Base CI `33035570789` (#692), PR `#56` fusionada a `main` en `98b51b7ad35b3204f0b67899b4fd2392d1c100e7`.
-- M05.5 cerró `COMPLETADA / GREEN`; head `9d61c1e3f9976893594b518e952320e723b59f81`, Base CI `33081006606` (#702), PR `#57` fusionada a `main` en `7aeaf701b077781f5b6ca0d659be2726dec7412b`.
-- M05.6 cerró `COMPLETADA / GREEN`; head `96145da4e74d856c1368f9a0418379acfcff0b2a`, Base CI `33086731332` (#707), PR `#58` fusionada a `main` en `459d07d73f08fb8b2a826f54787124011f7c7ca8`.
+- M05.1–M05.6 están `COMPLETADA / GREEN` con sus respectivos Base CI y merges registrados en STATE/TRACKING.
+- M05.7 cerró `COMPLETADA / GREEN`; head `f07d6ddcffbf98f1e53ad7d9ff1a19478c99bffc`, Base CI `33089363788` (#709), PR `#59` fusionada a `main` en `f75dcb85ca73b05008c982958f442f6f6031fd40`.
 - `@electrocraft/editor-puck` sigue siendo el boundary propietario; Studio no persiste internals Puck/Tiptap.
 - Composition pública Puck vive dentro del AppShell; Preview mantiene aislamiento por iframe.
-- Slots anidados, allow/disallow, permisos públicos, migration `zones -> slots`, onAction sync, visual history e inline editing ya están cerrados.
-- No crear workflow dedicado M05.7; usar únicamente el Base CI transversal final.
+- Slots, permissions, migration, action sync, visual history, inline editing y extensiones mínimas de Palette/Outline ya están cerrados.
+- No crear workflow dedicado M05.8; usar únicamente el Base CI transversal final.
 - Blockers P0/P1 conocidos: `0`.
 
-## Objetivo M05.7
+## Objetivo M05.8
 
-1. Mantener `Puck.Components` como owner de la lista draggable y usar `Config.categories` público para agrupar definiciones canónicas.
-2. Conservar búsqueda, categorías, favoritos y recientes como capas de descubrimiento Electro alrededor de Puck; nunca duplicar ComponentDefinitions.
-3. Mantener favoritos/recientes como preferencia workspace/user y fuera de `ElectroCraftDocument`.
-4. Probar un modo `puck-base` donde desactivar extensiones Electro deja `Puck.Components` funcional.
-5. Mantener `Puck.Outline` directo; no usar overrides/plugins experimentales para funciones release-critical.
-6. Traducir lock a permisos públicos `edit/drag/delete/duplicate`; no inventar hidden/visibility sin owner canónico.
-7. Mantener diagnóstico recuperable fuera de la lista insertable.
-8. Probar categorías, lock, fallback base, búsqueda/preferencias y ausencia de internals en canonical data.
+1. Abrir un proyecto real con `Container`, `Text`, `Image` y `Button` disponibles en el `Config` Puck activo.
+2. Insertar componentes desde la Palette real y comprobar persistencia canónica por F04 autosave.
+3. Seleccionar mediante `Puck.Outline` y editar mediante `Puck.Fields`/inline sin UI paralela.
+4. Probar nesting/reorder mediante acciones públicas Puck y conservar IDs/estructura sin `history/ui/zones`.
+5. Probar Undo/Redo del Topbar contra la history pública Puck y sincronizar los resultados al documento canónico.
+6. Recargar/reabrir el proyecto y comprobar que el estado durable vuelve desde storage, no desde AppState de Puck.
+7. Mantener fail-closed visible si falta renderer/config canónica.
+
+## Implementación actual
+
+- Rama `codex/m05-8-editor-core-e2e`; PR `#60`.
+- `puck-core-components.tsx` es el único kit core built-in para los cuatro componentes requeridos.
+- `loadStudioPuckEditor()` usa ese kit por defecto; el hook Studio no duplica definitions/renderers.
+- `puckEditorCommandControls` es un bridge session-only al dispatch de Puck y no almacena estado del editor.
+- `puck-composition.css` presenta el contenido real usando los `data-ec-core-component` del kit único.
+- Integration/contract/Playwright cubren registry, insert, move/nest/reorder, selection/edit, history, autosave y reopen.
 
 ## Siguiente acción exacta
 
-1. Revisar el diff de `codex/m05-7-palette-outline-extensions` contra `main`.
-2. Corregir cualquier riesgo de tipo/formato antes de abrir PR.
-3. Abrir una única PR contra `main` y usar únicamente `ElectroCraft Base CI`.
-4. Corregir fallos reales en la misma rama, sin workflows ni PRs paralelas.
-5. Con head exacto GREEN, fusionar M05.7 y activar `M05.8 — Editor core E2E`.
+1. Esperar el Base CI automático del último head de PR `#60`.
+2. Corregir cualquier fallo real en la misma rama sin workflows adicionales.
+3. Con head exacto GREEN, fusionar PR `#60` mediante squash.
+4. Actualizar STATE/TRACKING/HANDOFF/F05 con evidencia final y cerrar F05 o activar la siguiente microfase canónica.
 
 ## Read set
 
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M05_7.md → packages/editor-puck → apps/studio/src/features/editor → apps/studio/src/shell/palette-* → tooling/vitest → tooling/playwright`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M05_8.md → packages/editor-puck → apps/studio/src/features/editor → apps/studio/src/shell → tooling/vitest → tooling/playwright`.

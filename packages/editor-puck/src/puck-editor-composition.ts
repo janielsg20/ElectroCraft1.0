@@ -1,5 +1,7 @@
 import { Puck, createUsePuck, type Config, type Data } from '@puckeditor/core';
+import { createDeterministicObjectId } from '@electrocraft/domain';
 import { Fragment, createElement, useEffect, useSyncExternalStore, type ComponentProps } from 'react';
+import { puckEditorCommandControls } from './puck-command-controls';
 import { puckEditorHistoryControls } from './puck-history-controls';
 import { applyPuckHistoryPolicy } from './puck-history-policy';
 
@@ -29,6 +31,13 @@ export const electroCraftPuckIframeConfig = Object.freeze({
 
 const useElectroCraftPuck = createUsePuck();
 
+function PuckCommandBridge() {
+  const dispatch = usePuckEditorDispatch();
+
+  useEffect(() => puckEditorCommandControls.connect(dispatch), [dispatch]);
+  return null;
+}
+
 function PuckHistoryBridge() {
   const history = usePuckEditorHistoryControls();
   const controls = useSyncExternalStore(
@@ -56,9 +65,9 @@ function PuckHistoryBridge() {
 
 /**
  * Public Puck composition surface owned by the editor-puck adapter.
- * Studio never imports @puckeditor/core directly. The session-only history
- * bridge is mounted inside the owning Puck context so shell controls can
- * delegate without copying AppState or the visual history stack.
+ * Studio never imports @puckeditor/core directly. Session-only command/history
+ * bridges are mounted inside the owning Puck context and expose delegation
+ * only; AppState, selection and the visual history stack remain in Puck.
  */
 export function PuckEditorRoot({ iframe, children, ...props }: ComponentProps<typeof Puck>) {
   return createElement(
@@ -70,7 +79,7 @@ export function PuckEditorRoot({ iframe, children, ...props }: ComponentProps<ty
         ...electroCraftPuckIframeConfig,
       },
     },
-    createElement(Fragment, null, createElement(PuckHistoryBridge), children),
+    createElement(Fragment, null, createElement(PuckCommandBridge), createElement(PuckHistoryBridge), children),
   );
 }
 
@@ -86,6 +95,15 @@ export const PuckEditorFields = Puck.Fields;
  */
 export function usePuckEditorConfig() {
   return useElectroCraftPuck((api) => api.config);
+}
+
+/**
+ * Thin public dispatch bridge for engine-owned editor interactions. Consumers
+ * may issue documented Puck actions without importing @puckeditor/core or
+ * receiving AppState internals. The reducer/history remain entirely in Puck.
+ */
+export function usePuckEditorDispatch() {
+  return useElectroCraftPuck((api) => api.dispatch);
 }
 
 /**
@@ -138,17 +156,22 @@ export function usePuckEditorHistoryPolicy(visualHistoryLimit: number) {
 /**
  * Accessible click-to-insert bridge for Palette UI.
  * Availability is resolved by the Studio catalog before dispatching so an
- * unsupported catalog item never becomes a silent Puck success.
+ * unsupported catalog item never becomes a silent Puck success. ElectroCraft
+ * supplies the public insert action with a canonical node id up front so Puck
+ * history, commands and canonical persistence all address the same node.
  */
 export function usePuckPaletteInsert() {
-  const dispatch = useElectroCraftPuck((api) => api.dispatch);
+  const dispatch = usePuckEditorDispatch();
 
   return (componentType: string) => {
+    const id = createDeterministicObjectId('node', `puck-insert:${componentType}:${globalThis.crypto.randomUUID()}`);
+
     dispatch({
       type: 'insert',
       componentType,
       destinationIndex: 0,
       destinationZone: 'root:default-zone',
+      id,
     });
   };
 }

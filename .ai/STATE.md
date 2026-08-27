@@ -34,7 +34,8 @@
 - M05.4 — Sincronizar Puck actions con ElectroCraftDocument: `COMPLETADA`; Gate `GREEN`.
 - M05.5 — Usar Puck visual history: `COMPLETADA`; Gate `GREEN`.
 - M05.6 — Text/RichText inline editing: `COMPLETADA`; Gate `GREEN`.
-- M05.7 — Extensiones de palette y outline solo necesarias: `ACTIVE`.
+- M05.7 — Extensiones de palette y outline solo necesarias: `COMPLETADA`; Gate `GREEN`.
+- M05.8 — Editor core E2E: `ACTIVE`.
 - Blockers P0/P1 funcionales conocidos: `0`.
 
 ## Cierre F04 / M04.8
@@ -79,8 +80,14 @@ M05.6 cerró sobre head `96145da4e74d856c1368f9a0418379acfcff0b2a`. `ElectroCraf
 
 La PR `#58` fue fusionada mediante squash a `main` en `459d07d73f08fb8b2a826f54787124011f7c7ca8` (`feat(M05.6): add Puck inline Text and RichText editing`). `Text` usa `text + contentEditable`, `RichText` usa `richtext + contentEditable` sobre Puck/Tiptap, y el valor transportable sigue siendo string HTML canónico sin selection/ui/history/Tiptap internals.
 
+## Cierre F05 / M05.7
+
+M05.7 cerró sobre head `f07d6ddcffbf98f1e53ad7d9ff1a19478c99bffc`. `ElectroCraft Base CI` run `33089363788` (#709) terminó `success`: documentación, lint/Prettier, typecheck, tests, build, Playwright repository gate, empty repository fixture y artifacts base quedaron GREEN.
+
+La PR `#59` fue fusionada mediante squash a `main` en `f75dcb85ca73b05008c982958f442f6f6031fd40` (`feat(M05.7): keep palette and outline extensions engine-owned`). `Config.categories`, `Puck.Components` y `Puck.Outline` siguen siendo engine-owned; búsqueda/favoritos/recientes permanecen discovery local y los permisos lock se traducen al API público Puck sin stores paralelos.
+
 ## Microfase activa
 
-`M05.7` — Extensiones de palette y outline solo necesarias.
+`M05.8` — Editor core E2E.
 
-Referencias: `.ai/microphases/M05_7.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
+Referencias: `.ai/microphases/M05_8.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.

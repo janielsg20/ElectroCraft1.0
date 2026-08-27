@@ -19,3 +19,52 @@
 .ec-editor-puck-preview :focus-visible {
   outline-color: var(--puck-color-focus-ring);
 }
+
+[data-ec-core-component] {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+[data-ec-core-component='Container'] {
+  min-height: 112px;
+  padding: 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--puck-color-surface-muted) 55%, transparent);
+}
+
+[data-ec-core-component='Container'] > * {
+  min-height: 88px;
+}
+
+[data-ec-core-component='Text'] {
+  margin: 0;
+  padding: 4px 2px;
+  line-height: 1.5;
+}
+
+[data-ec-core-component='Image'] {
+  display: block;
+  width: 100%;
+  min-height: 128px;
+  margin: 0;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+div[data-ec-core-component='Image'] {
+  display: grid;
+  place-items: center;
+  background: var(--puck-color-surface-muted);
+  color: var(--puck-color-text-secondary);
+}
+
+[data-ec-core-component='Button'] {
+  min-height: 38px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font: inherit;
+  font-weight: 600;
+}
