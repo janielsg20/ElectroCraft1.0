@@ -8,7 +8,7 @@ test('M03.6 structural gate preserves capabilities across responsive modes', asy
   const [workspace, responsiveCss, icons, help, state] = await Promise.all([
     read('apps/studio/src/shell/editor-workspace.tsx'),
     read('apps/studio/src/shell/responsive-shell.css'),
-    read('packages/design-system/src/icons/icon-registry.ts'),
+    read('packages/design-system/src/icons/studio-icon-registry.ts'),
     read('.ai/HELP_ARCHITECTURE_MODELS.md'),
     read('.ai/STATE.md'),
   ]);
