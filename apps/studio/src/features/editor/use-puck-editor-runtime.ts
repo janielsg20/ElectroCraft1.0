@@ -9,7 +9,6 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 import { projectStorageRuntime } from '../projects/project-storage-runtime';
 import { workspacePreferencesRuntime } from '../projects/workspace-preferences-runtime';
 import { loadStudioPuckEditor, type StudioPuckEditorRuntime } from './puck-editor-runtime';
-import { studioCoreComponentDefinitions, studioCorePuckRenderers } from './studio-core-components';
 
 export type StudioPuckEditorRuntimeState = 'empty' | 'loading' | 'ready' | 'blocked';
 
@@ -54,8 +53,6 @@ export function useStudioPuckEditorRuntime() {
     setSnapshot(Object.freeze({ state: 'loading', runtime: null, message: 'Cargando documento del editor…' }));
     void loadStudioPuckEditor({
       projectId,
-      definitions: studioCoreComponentDefinitions,
-      renderers: studioCorePuckRenderers,
       onSynchronized: () => {
         if (!active) return;
         setSnapshot((current) =>
