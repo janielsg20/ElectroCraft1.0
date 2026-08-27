@@ -19,3 +19,62 @@
 .ec-editor-puck-preview :focus-visible {
   outline-color: var(--puck-color-focus-ring);
 }
+
+.ec-core-component {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.ec-core-container {
+  min-height: 112px;
+  padding: 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--puck-color-surface-muted) 55%, transparent);
+}
+
+.ec-core-container-slot {
+  min-height: 88px;
+}
+
+.ec-core-text {
+  margin: 0;
+  padding: 4px 2px;
+  line-height: 1.5;
+}
+
+.ec-core-image {
+  margin: 0;
+}
+
+.ec-core-image img,
+.ec-core-image-placeholder {
+  display: block;
+  width: 100%;
+  min-height: 128px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.ec-core-image-placeholder {
+  display: grid;
+  place-items: center;
+  background: var(--puck-color-surface-muted);
+  color: var(--puck-color-text-secondary);
+}
+
+.ec-core-button {
+  min-height: 38px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font: inherit;
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ec-core-component {
+    scroll-behavior: auto;
+  }
+}
