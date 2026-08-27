@@ -7,6 +7,7 @@ export const VISUAL_HISTORY_LIMITS = Object.freeze({
 });
 
 export function normalizeVisualHistoryLimit(value: unknown): number {
-  const candidate = typeof value === 'number' && Number.isFinite(value) ? Math.round(value) : VISUAL_HISTORY_LIMITS.defaultValue;
+  const candidate =
+    typeof value === 'number' && Number.isFinite(value) ? Math.round(value) : VISUAL_HISTORY_LIMITS.defaultValue;
   return Math.min(VISUAL_HISTORY_LIMITS.max, Math.max(VISUAL_HISTORY_LIMITS.min, candidate));
 }
