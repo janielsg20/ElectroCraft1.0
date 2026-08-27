@@ -58,9 +58,15 @@ function documentFixture(): ElectroCraftDocument {
 
 describe('M05.8 editor core runtime', () => {
   it('opens the real core registry with public Puck Slot/Fields configuration', () => {
-    const session = createStudioPuckDocumentSession(documentFixture(), studioCoreEditorDefinitions, studioCoreEditorRenderers);
+    const session = createStudioPuckDocumentSession(
+      documentFixture(),
+      studioCoreEditorDefinitions,
+      studioCoreEditorRenderers,
+    );
 
-    expect(Object.keys(session.config.components)).toEqual(expect.arrayContaining(['Container', 'Text', 'Image', 'Button']));
+    expect(Object.keys(session.config.components)).toEqual(
+      expect.arrayContaining(['Container', 'Text', 'Image', 'Button']),
+    );
     expect(session.config.components.Container.fields?.children).toMatchObject({ type: 'slot' });
     expect(session.config.components.Text.fields?.text).toMatchObject({ type: 'text', contentEditable: true });
     expect(session.config.categories?.Layout).toMatchObject({ components: ['Container'] });
@@ -100,7 +106,11 @@ describe('M05.8 editor core runtime', () => {
     delete renderers.Button;
 
     expect(() =>
-      createStudioPuckDocumentSession(documentFixture(), studioCoreEditorDefinitions, renderers as typeof studioCoreEditorRenderers),
+      createStudioPuckDocumentSession(
+        documentFixture(),
+        studioCoreEditorDefinitions,
+        renderers as typeof studioCoreEditorRenderers,
+      ),
     ).toThrow('missing Puck renderer for component key: Button');
   });
 });
