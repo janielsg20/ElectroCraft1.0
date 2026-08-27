@@ -23,8 +23,8 @@ import {
   usePuckEditorHasContent,
 } from '@electrocraft/editor-puck';
 import { useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode, type RefObject } from 'react';
-import { useStudioPuckEditorRuntime } from '../features/editor/use-puck-editor-runtime';
 import '../features/editor/puck-action-sync.css';
+import { useStudioPuckEditorRuntime } from '../features/editor/use-puck-editor-runtime';
 import { workspacePreferencesRuntime } from '../features/projects/workspace-preferences-runtime';
 import { editorT } from '../i18n/editor.es';
 import { iaT } from '../i18n/information-architecture.es';
@@ -172,9 +172,7 @@ function EditorPanelControls({
         className="ec-editor-window-action"
         variant="ghost"
         size="icon"
-        aria-label={
-          controls.expanded ? editorT('studio.editor.panel.restore') : editorT('studio.editor.panel.maximize')
-        }
+        aria-label={controls.expanded ? editorT('studio.editor.panel.restore') : editorT('studio.editor.panel.maximize')}
         title={controls.expanded ? editorT('studio.editor.panel.restore') : editorT('studio.editor.panel.maximize')}
         onClick={controls.onExpand}
       >
@@ -715,12 +713,7 @@ export function StudioEditorWorkspace() {
 
   return (
     <div className="ec-editor-puck-root">
-      <PuckEditorRoot
-        key={runtime.sessionKey}
-        config={runtime.config}
-        data={runtime.data}
-        onAction={runtime.onAction}
-      >
+      <PuckEditorRoot key={runtime.sessionKey} config={runtime.config} data={runtime.data} onAction={runtime.onAction}>
         <section
           className="ec-editor-workspace"
           style={editorStyle}
