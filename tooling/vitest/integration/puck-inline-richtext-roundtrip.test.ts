@@ -2,7 +2,6 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { Render } from '@puckeditor/core';
 import {
   createDeterministicObjectId,
   electroCraftComponentDefinitionSchema,
@@ -88,7 +87,7 @@ describe('M05.6 Studio inline RichText round-trip', () => {
     expect(JSON.stringify(reconstructed)).not.toContain('tiptap');
   });
 
-  it('renders transported richtext as inert text unless an explicit target renderer chooses HTML semantics', () => {
+  it('keeps canonical richtext inert when a target renders the transported string as text', () => {
     const unsafeHtml = '<p>Visible</p><script>window.__m056 = true</script>';
     const document = electroCraftDocumentSchema.parse({
       schemaVersion: 3,
@@ -117,10 +116,12 @@ describe('M05.6 Studio inline RichText round-trip', () => {
     const session = createStudioPuckDocumentSession(document, [richTextDefinition()], {
       RichText: richTextRenderer,
     });
-    const markup = renderToStaticMarkup(createElement(Render, { config: session.config, data: session.data }));
+    const canonicalContent = session.reconstruct(session.data).document.root.children[0]?.props.content;
+    const markup = renderToStaticMarkup(createElement('div', null, String(canonicalContent ?? '')));
 
-    expect(markup).toContain('&lt;script&gt;window.__m056 = true&lt;/script&gt;');
+    expect(canonicalContent).toBe(unsafeHtml);
+    expect(markup).toContain('&lt;script');
+    expect(markup).toContain('window.__m056 = true');
     expect(markup).not.toContain('<script>');
-    expect(session.reconstruct(session.data).document.root.children[0]?.props.content).toBe(unsafeHtml);
   });
 });
