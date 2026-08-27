@@ -20,10 +20,11 @@ import {
   PuckEditorOutline,
   PuckEditorPreview,
   PuckEditorRoot,
-  structuralPuckConfig,
-  structuralPuckData,
+  usePuckEditorHasContent,
 } from '@electrocraft/editor-puck';
 import { useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode, type RefObject } from 'react';
+import { useStudioPuckEditorRuntime } from '../features/editor/use-puck-editor-runtime';
+import '../features/editor/puck-action-sync.css';
 import { workspacePreferencesRuntime } from '../features/projects/workspace-preferences-runtime';
 import { editorT } from '../i18n/editor.es';
 import { iaT } from '../i18n/information-architecture.es';
@@ -62,7 +63,6 @@ const ContentTabIcon = getStudioIcon('studio.topbar.document');
 const DesignTabIcon = getStudioIcon('studio.theme');
 const ActionsTabIcon = getStudioIcon('studio.sidebar.workflows');
 const screensDestination = getStudioSidebarNavigationItem('screens');
-const hasStructuralContent = structuralPuckData.content.length > 0;
 
 type SecondaryTool = 'context' | 'inspector';
 type MobileTool = 'components' | 'properties' | 'outline';
@@ -223,9 +223,10 @@ function ComponentsContent() {
 }
 
 function OutlineContent() {
+  const hasContent = usePuckEditorHasContent();
   return (
     <div className="ec-editor-puck-slot" data-puck-composition="outline">
-      {!hasStructuralContent ? <StudioEmptyState id="outline" /> : null}
+      {!hasContent ? <StudioEmptyState id="outline" /> : null}
       <PuckEditorOutline />
     </div>
   );
@@ -245,6 +246,7 @@ function InspectorContent() {
     workspacePreferencesRuntime.getSnapshot,
     workspacePreferencesRuntime.getSnapshot,
   );
+  const hasContent = usePuckEditorHasContent();
   const tab = resolveWorkspaceTab<InspectorTab>(preferences.layout.lastTabs, 'inspector', inspectorTabs, 'content');
 
   return (
@@ -276,7 +278,7 @@ function InspectorContent() {
         >
           <h3>{iaT('studio.ia.inspector.primaryTitle')}</h3>
           <p>{iaT('studio.ia.inspector.primarySummary')}</p>
-          {!hasStructuralContent ? <StudioEmptyState id="inspector" /> : null}
+          {!hasContent ? <StudioEmptyState id="inspector" /> : null}
           <FieldsContent />
         </section>
       </TabsContent>
@@ -364,6 +366,7 @@ function CanvasRegion({
   readonly stageRef?: RefObject<HTMLDivElement | null>;
   readonly controls?: EditorRegionControls;
 }) {
+  const hasContent = usePuckEditorHasContent();
   return (
     <EditorRegion
       region="canvas"
@@ -379,7 +382,7 @@ function CanvasRegion({
     >
       <div className="ec-editor-canvas-stage" data-editor-canvas-stage ref={stageRef} tabIndex={-1}>
         <StructuralNotice>{editorT('studio.editor.canvasStructural')}</StructuralNotice>
-        {!hasStructuralContent ? <StudioEmptyState id="canvas" className="ec-editor-canvas-empty" /> : null}
+        {!hasContent ? <StudioEmptyState id="canvas" className="ec-editor-canvas-empty" /> : null}
         <div className="ec-editor-puck-preview" data-puck-composition="preview">
           <PuckEditorPreview id="electrocraft-editor-preview" />
         </div>
@@ -647,6 +650,7 @@ function MobileEditorLayout() {
 export function StudioEditorWorkspace() {
   const viewportWidth = useEditorViewportWidth();
   const mode = resolveEditorLayoutMode(viewportWidth);
+  const runtime = useStudioPuckEditorRuntime();
   const preferences = useSyncExternalStore(
     workspacePreferencesRuntime.subscribe,
     workspacePreferencesRuntime.getSnapshot,
@@ -711,16 +715,30 @@ export function StudioEditorWorkspace() {
 
   return (
     <div className="ec-editor-puck-root">
-      <PuckEditorRoot config={structuralPuckConfig} data={structuralPuckData}>
+      <PuckEditorRoot
+        key={runtime.sessionKey}
+        config={runtime.config}
+        data={runtime.data}
+        onAction={runtime.onAction}
+      >
         <section
           className="ec-editor-workspace"
           style={editorStyle}
           data-editor-layout={mode}
+          data-editor-sync-state={runtime.state}
           data-expanded-region={expandedRegion ?? 'none'}
           data-context-collapsed={collapsedRegions.context ? 'true' : 'false'}
           data-inspector-collapsed={collapsedRegions.inspector ? 'true' : 'false'}
           aria-label={editorT('studio.editor.workspaceLabel')}
         >
+          <span className="sr-only" role="status" aria-live="polite">
+            {runtime.message}
+          </span>
+          {runtime.state === 'blocked' ? (
+            <p className="ec-editor-sync-diagnostic" role="alert">
+              {runtime.message}
+            </p>
+          ) : null}
           {mode === 'desktop' ? (
             <>
               <ResizableTriPane
