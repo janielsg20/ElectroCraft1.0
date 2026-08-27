@@ -1,6 +1,10 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 const VISUAL_HISTORY_KEY = 'electrocraft.editor.visualHistoryLimit.v1';
+
+function readStoredHistoryLimit(page: Page) {
+  return page.evaluate((key) => window.localStorage.getItem(key), VISUAL_HISTORY_KEY);
+}
 
 test.describe('M05.5 Puck visual history', () => {
   test('keeps a clean Puck session and persists the bounded Editor history preference', async ({ page }) => {
@@ -26,9 +30,7 @@ test.describe('M05.5 Puck visual history', () => {
     const limit = editor.getByRole('spinbutton', { name: 'Límite del historial visual' });
     await expect(limit).toHaveValue('50');
     await limit.fill('1');
-    await expect
-      .poll(() => page.evaluate((key) => window.localStorage.getItem(key), VISUAL_HISTORY_KEY))
-      .toBe('1');
+    await expect.poll(() => readStoredHistoryLimit(page)).toBe('1');
 
     await page.keyboard.press('Escape');
     await page.reload();
@@ -36,11 +38,9 @@ test.describe('M05.5 Puck visual history', () => {
     await expect(redo).toBeDisabled();
 
     await page.locator('[data-topbar-settings-trigger]').click();
-    await expect(
-      page
-        .locator('[data-settings-destination="editor"]')
-        .getByRole('spinbutton', { name: 'Límite del historial visual' }),
-    ).toHaveValue('1');
+    const reopenedEditor = page.locator('[data-settings-destination="editor"]');
+    const reopenedLimit = reopenedEditor.getByRole('spinbutton', { name: 'Límite del historial visual' });
+    await expect(reopenedLimit).toHaveValue('1');
   });
 
   test('clamps unsafe preference input and remains usable on mobile', async ({ page }) => {
@@ -52,9 +52,7 @@ test.describe('M05.5 Puck visual history', () => {
     const limit = editor.getByRole('spinbutton', { name: 'Límite del historial visual' });
     await limit.fill('999');
     await expect(limit).toHaveValue('100');
-    await expect
-      .poll(() => page.evaluate((key) => window.localStorage.getItem(key), VISUAL_HISTORY_KEY))
-      .toBe('100');
+    await expect.poll(() => readStoredHistoryLimit(page)).toBe('100');
 
     const metrics = await page.evaluate(() => ({
       scrollWidth: document.documentElement.scrollWidth,
@@ -156,29 +154,30 @@ test.describe('M05.5 Puck visual history', () => {
         definitions: definitions as unknown as Parameters<typeof loadStudioPuckEditor>[0]['definitions'],
         renderers: { Text: () => null },
       });
-      const action = (type: string) => ({ type }) as Parameters<typeof runtime.actionSync.applyAction>[0];
-      const appState = (data: unknown) => ({ data }) as Parameters<typeof runtime.actionSync.applyAction>[1];
+      type SyncAction = Parameters<typeof runtime.actionSync.applyAction>[0];
+      type SyncState = Parameters<typeof runtime.actionSync.applyAction>[1];
+      const action = (type: string) => ({ type }) as SyncAction;
+      const appState = (data: unknown) => ({ data }) as SyncState;
       const initial = runtime.session.data;
       const edited = structuredClone(initial);
       edited.content[0]!.props.text = 'Editado';
 
+      async function readDocument() {
+        const opened = await projectStorageRuntime.openProject(projectId);
+        return opened?.objects.find((object) => object.objectId === document.id);
+      }
+
       runtime.actionSync.applyAction(action('setData'), appState(edited), appState(initial));
       await projectStorageRuntime.flushAutosave();
-      const afterEdit = (await projectStorageRuntime.openProject(projectId))?.objects.find(
-        (object) => object.objectId === document.id,
-      );
+      const afterEdit = await readDocument();
 
       runtime.actionSync.applyAction(action('set'), appState(initial), appState(edited));
       await projectStorageRuntime.flushAutosave();
-      const afterUndo = (await projectStorageRuntime.openProject(projectId))?.objects.find(
-        (object) => object.objectId === document.id,
-      );
+      const afterUndo = await readDocument();
 
       runtime.actionSync.applyAction(action('set'), appState(edited), appState(initial));
       await projectStorageRuntime.flushAutosave();
-      const afterRedo = (await projectStorageRuntime.openProject(projectId))?.objects.find(
-        (object) => object.objectId === document.id,
-      );
+      const afterRedo = await readDocument();
 
       return {
         afterEdit,
