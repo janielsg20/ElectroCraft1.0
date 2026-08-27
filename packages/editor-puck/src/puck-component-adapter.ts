@@ -140,8 +140,8 @@ function toSlotField(slot: PuckSlotMapping): Field {
 function toPuckPermissions(policy?: ElectroCraftEditorPolicy) {
   if (!policy) return undefined;
   const permissions = {
-    ...(policy.locked === true ? { drag: false, delete: false, duplicate: false } : {}),
-    ...(policy.editable === false ? { edit: false } : {}),
+    ...(policy.locked === true ? { drag: false, delete: false, duplicate: false, edit: false } : {}),
+    ...(policy.locked !== true && policy.editable === false ? { edit: false } : {}),
     ...(policy.insertable === false ? { insert: false } : {}),
   };
   return Object.keys(permissions).length > 0 ? permissions : undefined;
@@ -158,6 +158,40 @@ function validateInlineEditingMapping(
       throw new TypeError(`Puck inline field is not canonical: ${definition.key}.${fieldKey}`);
     }
   }
+}
+
+/**
+ * Puck.Components owns the draggable component list. ElectroCraft projects the
+ * canonical category label into Puck's public categories API instead of
+ * rebuilding category semantics in a second component registry.
+ */
+export function createPuckCategories(
+  definitions: readonly ElectroCraftComponentDefinition[],
+  includeDiagnosticCategory = false,
+): NonNullable<PuckCanonicalConfig['categories']> {
+  const categories: Record<string, { title: string; components: string[]; visible?: boolean }> = {};
+
+  for (const definition of definitions) {
+    const category = categories[definition.category];
+    if (category) {
+      category.components.push(definition.key);
+      continue;
+    }
+    categories[definition.category] = {
+      title: definition.category,
+      components: [definition.key],
+    };
+  }
+
+  if (includeDiagnosticCategory) {
+    categories.__electrocraftDiagnostics = {
+      title: 'Diagnósticos',
+      components: [ELECTROCRAFT_PUCK_DIAGNOSTIC_COMPONENT],
+      visible: false,
+    };
+  }
+
+  return categories;
 }
 
 export function createPuckComponentConfig(
@@ -240,9 +274,13 @@ export function createPuckConfig(
       },
       defaultProps: { [ELECTROCRAFT_PUCK_CHILDREN_SLOT]: [] },
       metadata: { electrocraftDiagnostic: true },
+      permissions: { insert: false },
       render: options.diagnosticRenderer,
     };
   }
 
-  return { components };
+  return {
+    components,
+    categories: createPuckCategories(definitions, Boolean(options.diagnosticRenderer)),
+  };
 }
