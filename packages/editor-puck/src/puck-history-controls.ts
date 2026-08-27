@@ -34,9 +34,9 @@ function publish(next: PuckEditorHistoryControlSnapshot) {
 }
 
 /**
- * Shell bridge for Puck visual history. It never stores histories or AppState;
- * it only exposes availability, the bounded policy value, and delegates to the
- * currently mounted Puck instance.
+ * Shell bridge for Puck visual history. It never stores the history snapshots
+ * or private engine state; it only exposes availability, the bounded policy
+ * value, and delegates to the currently mounted Puck instance.
  */
 export const puckEditorHistoryControls = Object.freeze({
   subscribe(listener: () => void) {
