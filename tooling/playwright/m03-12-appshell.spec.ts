@@ -84,7 +84,7 @@ test.describe('M03.12 AppShell E2E closure matrix', () => {
         const dock = page.getByRole('navigation', { name: 'Navegación inferior del editor' });
         await expect(dock).toBeVisible();
         await expect(dock.locator('[data-mobile-destination]')).toHaveCount(5);
-        await expect(page.locator('[data-appearance-trigger="mobile"]')).toBeVisible();
+        await expect(dock.locator('[data-appearance-trigger="mobile"]')).toHaveCount(0);
       }
 
       await assertNoHorizontalOverflow(page);

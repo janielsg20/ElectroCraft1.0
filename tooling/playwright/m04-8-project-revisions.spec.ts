@@ -13,7 +13,16 @@ async function createAndOpenProject(page: import('@playwright/test').Page) {
 }
 
 async function openHistory(page: import('@playwright/test').Page) {
-  const history = page.getByRole('link', { name: 'Historial', exact: true }).first();
+  const directHistory = page.locator('.ec-topbar-center a[href="/history"]');
+  let history = directHistory;
+
+  if (!(await directHistory.isVisible())) {
+    const tools = page.locator('.ec-topbar-tools-trigger');
+    await expect(tools).toBeVisible({ timeout: 60_000 });
+    await tools.click();
+    history = page.locator('.ec-topbar-sheet a[href="/history"]');
+  }
+
   await expect(history).toBeVisible({ timeout: 60_000 });
   await history.click();
   await expect(page).toHaveURL(/\/history$/);

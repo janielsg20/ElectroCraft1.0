@@ -60,6 +60,15 @@ export function usePuckEditorConfig() {
 }
 
 /**
+ * Minimal public-data subscription for empty-state rendering. This observes
+ * only Data.content; selection/history remain owned by Puck and outside the
+ * canonical persistence bridge.
+ */
+export function usePuckEditorHasContent() {
+  return useElectroCraftPuck((api) => api.appState.data.content.length > 0);
+}
+
+/**
  * Accessible click-to-insert bridge for Palette UI.
  * Availability is resolved by the Studio catalog before dispatching so an
  * unsupported catalog item never becomes a silent Puck success.
