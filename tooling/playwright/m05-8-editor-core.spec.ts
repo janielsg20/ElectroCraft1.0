@@ -74,7 +74,8 @@ test.describe('M05.8 Editor core E2E', () => {
 
     await expect
       .poll(
-        async () => ((await readPersistedDocument(page, projectId)) as StoredDocument | null)?.root?.children?.length,
+        async () =>
+          ((await readPersistedDocument(page, projectId)) as StoredDocument | null)?.root?.children?.length,
       )
       .toBe(4);
 
