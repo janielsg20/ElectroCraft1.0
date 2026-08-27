@@ -9,9 +9,9 @@ import {
 import { puckEditorCommandControls, type PuckRendererRegistry } from '@electrocraft/editor-puck';
 import { projectStorageRuntime } from '../projects/project-storage-runtime';
 import { createStudioPuckActionSync } from './puck-action-sync';
-import { studioCoreEditorDefinitions, studioCoreEditorRenderers } from './puck-core-components';
 import { createStudioPuckDocumentPersistenceBridge, type PuckDocumentAutosavePort } from './puck-document-persistence';
 import { createStudioPuckDocumentSession } from './puck-document-session';
+import { studioCoreComponentDefinitions, studioCorePuckRenderers } from './studio-core-components';
 
 export interface StudioPuckProjectRuntimePort extends PuckDocumentAutosavePort {
   initialize(): Promise<unknown>;
@@ -69,9 +69,9 @@ function resolveProjectDocument(opened: OpenProjectResult): { document: ElectroC
 /**
  * Opens the current local project, establishes one canonical Puck session and
  * wires Puck onAction -> canonical reconstruction -> F04 incremental autosave.
- * The real Studio defaults to the deterministic core editor kit so Palette and
- * Puck.Components can insert Container/Text/Image/Button in a fresh project.
- * Definitions/renderers remain injectable for tests and later component packs
+ * The real Studio defaults to its deterministic built-in core registry so
+ * Palette and Puck.Components can insert Container/Text/Image/Button in a fresh
+ * project. Definitions/renderers remain injectable for tests and later packs
  * without introducing a second registry or persisting editor-only internals.
  */
 export async function loadStudioPuckEditor(options: LoadStudioPuckEditorOptions) {
@@ -81,8 +81,8 @@ export async function loadStudioPuckEditor(options: LoadStudioPuckEditorOptions)
   if (!opened) throw new Error('El proyecto seleccionado ya no está disponible.');
 
   const { document, created } = resolveProjectDocument(opened);
-  const definitions = options.definitions ?? studioCoreEditorDefinitions;
-  const renderers = options.renderers ?? studioCoreEditorRenderers;
+  const definitions = options.definitions ?? studioCoreComponentDefinitions;
+  const renderers = options.renderers ?? studioCorePuckRenderers;
   const session = createStudioPuckDocumentSession(document, definitions, renderers);
   const persistence = createStudioPuckDocumentPersistenceBridge({
     project: opened.project,
