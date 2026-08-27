@@ -106,4 +106,17 @@ describe('M05.8 editor core runtime', () => {
     expect(serialized).not.toContain('history');
     expect(serialized).not.toContain('zones');
   });
+
+  it('fails closed when a canonical core definition has no renderer', () => {
+    const renderers = { ...studioCorePuckRenderers } as Record<string, (props: Record<string, unknown>) => unknown>;
+    delete renderers.Button;
+
+    expect(() =>
+      createStudioPuckDocumentSession(
+        documentFixture(),
+        studioCoreComponentDefinitions,
+        renderers as typeof studioCorePuckRenderers,
+      ),
+    ).toThrow('missing Puck renderer for component key: Button');
+  });
 });
