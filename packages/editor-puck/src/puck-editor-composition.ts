@@ -78,13 +78,7 @@ export function PuckEditorRoot({ iframe, children, ...props }: ComponentProps<ty
         ...electroCraftPuckIframeConfig,
       },
     },
-    createElement(
-      Fragment,
-      null,
-      createElement(PuckCommandBridge),
-      createElement(PuckHistoryBridge),
-      children,
-    ),
+    createElement(Fragment, null, createElement(PuckCommandBridge), createElement(PuckHistoryBridge), children),
   );
 }
 
