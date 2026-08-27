@@ -30,12 +30,13 @@
 - F05 — Screen Composer con Puck: `IN_PROGRESS`.
 - M05.1 — Crear PuckAdapter y component mapping: `COMPLETADA`; Gate `GREEN`.
 - M05.2 — Componer Components/Outline/Preview/Fields: `COMPLETADA`; Gate `GREEN`.
-- M05.3 — Nested Slots, permissions y Puck data migration: `ACTIVE`.
+- M05.3 — Nested Slots, permissions y Puck data migration: `COMPLETADA`; Gate `GREEN`.
+- M05.4 — Sincronizar Puck actions con ElectroCraftDocument: `ACTIVE`.
 - Blockers P0/P1 funcionales conocidos: `0`.
 
 ## Cierre F04 / M04.8
 
-M04.8 cerró sobre head funcional `1df11b22fcd3bee7ea37846a459e28374271fc85` y PR `#48`. `ElectroCraft Base CI` run `32859794266` terminó `success`: documentación, lint/Prettier, typecheck, tests, build, Playwright repository gate, empty repository fixture y artifacts base quedaron verdes. La corrección final mantuvo recovery/autosave M04.3 sobre el nuevo `ProjectRevisionService`.
+M04.8 cerró sobre head funcional `1df11b22fcd3bee7ea37846a459e28374271fc85` y PR `#48`. `ElectroCraft Base CI` run `32859794266` terminó `success`: documentación, lint/Prettier, typecheck, tests, build, Playwright repository gate, empty repository fixture y artifacts base quedaron verdes.
 
 La PR `#48` fue fusionada mediante squash a `main` en `ad64c0e5468b13a3fa3a712adb6621fa33d22fd0` (`feat(f04): complete project revision checkpoints and restore`). F04 queda cerrada con object versions deduplicadas, checkpoints tipados, restore no destructivo, historial de revisiones y persistencia multi-tab real.
 
@@ -45,14 +46,20 @@ El workflow dedicado de M04.7 se archiva tras el cierre de F04; el quality gate 
 
 M05.1 cerró sobre head `9aa330dbf44b39485516ee0d3dc181a9aee4196b` y PR `#49`. `ElectroCraft Base CI` run `32868029914` (#656) terminó `success` con documentación, lint/Prettier, typecheck, tests, build, Playwright repository gate, empty repository fixture y artifacts base en GREEN.
 
-La PR `#49` fue fusionada mediante squash a `main` en `733abdc44f21d16b56b4624c7bec61f0131bd3f1` (`feat(f05): add canonical Puck adapter and component mapping`). El adapter canónico preserva IDs/nesting, mantiene diagnostics recuperables, rechaza internals legacy no portables y mantiene el historial del editor separado de Project Revisions.
+La PR `#49` fue fusionada mediante squash a `main` en `733abdc44f21d16b56b4624c7bec61f0131bd3f1` (`feat(f05): add canonical Puck adapter and component mapping`). El adapter canónico preserva IDs/nesting, mantiene diagnostics recuperables y mantiene el historial del editor separado de Project Revisions.
 
 ## Cierre F05 / M05.2
 
-M05.2 cerró con head funcional corregido `9321356994e5cc48748f1d406c920e28b8c9b141`. `ElectroCraft Base CI` run `32990513971` (#661) terminó `success`. La implementación se fusionó mediante squash por PR `#50` a `main` en `fadc2ecb64764c120c75cb5e4c7b154d3cc4ade6` (`feat(f05): compose Puck editor surfaces`). La PR de validación `#51` se cerró sin merge para evitar duplicar el mismo contenido validado.
+M05.2 cerró con head funcional corregido `9321356994e5cc48748f1d406c920e28b8c9b141`. `ElectroCraft Base CI` run `32990513971` (#661) terminó `success`. La implementación se fusionó mediante squash por PR `#50` a `main` en `fadc2ecb64764c120c75cb5e4c7b154d3cc4ade6` (`feat(f05): compose Puck editor surfaces`).
+
+## Cierre F05 / M05.3
+
+M05.3 cerró sobre head `176b41a31a017f800cb8f63b41be3b7e65f52324`. `ElectroCraft Base CI` run `33016557679` (#674) terminó `success`: documentación, lint, typecheck, 360 tests Vitest, build, Playwright repository gate y artifacts base quedaron GREEN.
+
+La PR `#52` fue fusionada mediante squash a `main` en `fd5901dff66acca5d92ffee832a2ac881721458b` (`feat(M05.3): add nested Slots permissions and Puck migration`). Quedan activos Slots anidados, `allow/disallow`, permisos públicos Puck, migración oficial `zones -> slots`, `walkTree()` y fallo cerrado estable para migraciones incompletas.
 
 ## Microfase activa
 
-`M05.3` — Nested Slots, permissions y Puck data migration.
+`M05.4` — Sincronizar Puck actions con ElectroCraftDocument.
 
-Referencias: `.ai/microphases/M05_3.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
+Referencias: `.ai/microphases/M05_4.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
