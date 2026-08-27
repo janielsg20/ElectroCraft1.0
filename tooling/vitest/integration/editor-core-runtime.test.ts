@@ -6,9 +6,9 @@ import {
 } from '@electrocraft/domain';
 import { createStudioPuckDocumentSession } from '../../../apps/studio/src/features/editor/puck-document-session';
 import {
-  studioCoreComponentDefinitions,
-  studioCorePuckRenderers,
-} from '../../../apps/studio/src/features/editor/studio-core-components';
+  studioCoreEditorDefinitions,
+  studioCoreEditorRenderers,
+} from '../../../apps/studio/src/features/editor/puck-core-components';
 
 function documentFixture(): ElectroCraftDocument {
   return electroCraftDocumentSchema.parse({
@@ -30,7 +30,7 @@ function documentFixture(): ElectroCraftDocument {
             {
               id: createDeterministicObjectId('node', 'm05.8-text'),
               componentRef: 'Text',
-              props: { content: 'Texto inicial' },
+              props: { text: 'Texto inicial' },
               children: [],
             },
           ],
@@ -58,47 +58,35 @@ function documentFixture(): ElectroCraftDocument {
 
 describe('M05.8 editor core runtime', () => {
   it('opens the real core registry with public Puck Slot/Fields configuration', () => {
-    const session = createStudioPuckDocumentSession(
-      documentFixture(),
-      studioCoreComponentDefinitions,
-      studioCorePuckRenderers,
-    );
+    const session = createStudioPuckDocumentSession(documentFixture(), studioCoreEditorDefinitions, studioCoreEditorRenderers);
 
-    expect(Object.keys(session.config.components)).toEqual(
-      expect.arrayContaining(['Container', 'Text', 'Image', 'Button']),
-    );
+    expect(Object.keys(session.config.components)).toEqual(expect.arrayContaining(['Container', 'Text', 'Image', 'Button']));
     expect(session.config.components.Container.fields?.children).toMatchObject({ type: 'slot' });
-    expect(session.config.components.Text.fields?.content).toMatchObject({ type: 'text', contentEditable: true });
+    expect(session.config.components.Text.fields?.text).toMatchObject({ type: 'text', contentEditable: true });
     expect(session.config.categories?.Layout).toMatchObject({ components: ['Container'] });
     expect(session.config.categories?.Basic?.components).toEqual(expect.arrayContaining(['Text', 'Image', 'Button']));
   });
 
   it('round-trips nesting, reorder and edits without serializing Puck internals', () => {
     const base = documentFixture();
-    const session = createStudioPuckDocumentSession(base, studioCoreComponentDefinitions, studioCorePuckRenderers);
+    const session = createStudioPuckDocumentSession(base, studioCoreEditorDefinitions, studioCoreEditorRenderers);
     const data = structuredClone(session.data);
     const container = data.content.find((item) => item.type === 'Container');
     const image = data.content.find((item) => item.type === 'Image');
     const button = data.content.find((item) => item.type === 'Button');
 
-    expect(container).toBeDefined();
-    expect(image).toBeDefined();
-    expect(button).toBeDefined();
+    if (!container || !image || !button) throw new Error('invalid M05.8 fixture');
+    const nested = container.props.children;
+    if (!Array.isArray(nested) || !nested[0]) throw new Error('missing nested Text fixture');
 
-    const nested = container?.props.children;
-    expect(Array.isArray(nested)).toBe(true);
-    if (!Array.isArray(nested) || !image || !button || !container) throw new Error('invalid M05.8 fixture');
-
-    const text = nested[0];
-    if (!text) throw new Error('missing nested Text fixture');
-    text.props.content = 'Texto editado';
+    nested[0].props.text = 'Texto editado';
     data.content = [button, container, image];
     (data as typeof data & { ui?: unknown; history?: unknown }).ui = { itemSelector: { index: 1 } };
     (data as typeof data & { ui?: unknown; history?: unknown }).history = { records: ['session-only'] };
 
     const reconstructed = session.reconstruct(data).document;
     expect(reconstructed.root.children.map((node) => node.componentRef)).toEqual(['Button', 'Container', 'Image']);
-    expect(reconstructed.root.children[1]?.children[0]?.props.content).toBe('Texto editado');
+    expect(reconstructed.root.children[1]?.children[0]?.props.text).toBe('Texto editado');
 
     const serialized = JSON.stringify(reconstructed);
     expect(serialized).not.toContain('itemSelector');
@@ -108,15 +96,11 @@ describe('M05.8 editor core runtime', () => {
   });
 
   it('fails closed when a canonical core definition has no renderer', () => {
-    const renderers = { ...studioCorePuckRenderers } as Record<string, (props: Record<string, unknown>) => unknown>;
+    const renderers = { ...studioCoreEditorRenderers } as Record<string, (props: Record<string, unknown>) => unknown>;
     delete renderers.Button;
 
     expect(() =>
-      createStudioPuckDocumentSession(
-        documentFixture(),
-        studioCoreComponentDefinitions,
-        renderers as typeof studioCorePuckRenderers,
-      ),
+      createStudioPuckDocumentSession(documentFixture(), studioCoreEditorDefinitions, renderers as typeof studioCoreEditorRenderers),
     ).toThrow('missing Puck renderer for component key: Button');
   });
 });
