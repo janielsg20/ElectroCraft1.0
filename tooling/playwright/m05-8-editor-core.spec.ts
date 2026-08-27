@@ -1,5 +1,16 @@
 import { expect, test, type Page } from '@playwright/test';
 
+interface StoredNode {
+  readonly id?: string;
+  readonly componentRef?: string;
+  readonly props?: Record<string, unknown>;
+  readonly children?: StoredNode[];
+}
+
+interface StoredDocument {
+  readonly root?: { readonly children?: StoredNode[] };
+}
+
 async function seedEmptyProject(page: Page, projectId: string) {
   await page.goto('/');
   await page.evaluate(async (id) => {
@@ -26,8 +37,16 @@ async function readPersistedDocument(page: Page, projectId: string) {
   }, projectId);
 }
 
+async function dispatchPuckAction(page: Page, action: Record<string, unknown>) {
+  await page.evaluate(async (nextAction) => {
+    const { studioPuckEditorCommands } = await import('/src/features/editor/puck-editor-runtime.ts');
+    if (!studioPuckEditorCommands.isConnected()) throw new Error('Puck command bridge is not connected.');
+    studioPuckEditorCommands.dispatch(nextAction as Parameters<typeof studioPuckEditorCommands.dispatch>[0]);
+  }, action);
+}
+
 test.describe('M05.8 Editor core E2E', () => {
-  test('inserts, edits, undoes/redoes, saves and reopens the real core editor', async ({ page }) => {
+  test('inserts, nests, reorders, edits, undoes/redoes, saves and reopens the real editor', async ({ page }) => {
     test.setTimeout(120_000);
     await page.setViewportSize({ width: 1600, height: 900 });
     const projectId = `m05-8-core-${Date.now()}`;
@@ -53,46 +72,79 @@ test.describe('M05.8 Editor core E2E', () => {
     const redo = page.locator('[data-puck-history-action="redo"]').first();
     await expect(undo).toBeEnabled();
 
-    const afterInsert = (await readPersistedDocument(page, projectId)) as {
-      root?: { children?: Array<{ componentRef?: string; props?: Record<string, unknown> }> };
-    } | null;
-    expect(afterInsert?.root?.children?.map((node) => node.componentRef)).toEqual([
-      'Button',
-      'Image',
-      'Text',
-      'Container',
-    ]);
+    await expect
+      .poll(async () => ((await readPersistedDocument(page, projectId)) as StoredDocument | null)?.root?.children?.length)
+      .toBe(4);
+
+    const inserted = (await readPersistedDocument(page, projectId)) as StoredDocument | null;
+    const insertedChildren = inserted?.root?.children ?? [];
+    expect(insertedChildren.map((node) => node.componentRef)).toEqual(['Button', 'Image', 'Text', 'Container']);
+
+    const textIndex = insertedChildren.findIndex((node) => node.componentRef === 'Text');
+    const containerIndex = insertedChildren.findIndex((node) => node.componentRef === 'Container');
+    const containerId = insertedChildren[containerIndex]?.id;
+    expect(textIndex).toBeGreaterThanOrEqual(0);
+    expect(containerIndex).toBeGreaterThanOrEqual(0);
+    expect(containerId).toBeTruthy();
+
+    await dispatchPuckAction(page, {
+      type: 'move',
+      sourceIndex: textIndex,
+      sourceZone: 'root:default-zone',
+      destinationIndex: 0,
+      destinationZone: `${containerId}:children`,
+    });
+
+    await expect.poll(async () => {
+      const payload = (await readPersistedDocument(page, projectId)) as StoredDocument | null;
+      const container = payload?.root?.children?.find((node) => node.componentRef === 'Container');
+      return container?.children?.[0]?.componentRef;
+    }).toBe('Text');
+
+    const afterMove = (await readPersistedDocument(page, projectId)) as StoredDocument | null;
+    const containerIndexAfterMove = afterMove?.root?.children?.findIndex((node) => node.componentRef === 'Container') ?? -1;
+    expect(containerIndexAfterMove).toBeGreaterThanOrEqual(0);
+
+    await dispatchPuckAction(page, {
+      type: 'reorder',
+      sourceIndex: containerIndexAfterMove,
+      destinationIndex: 0,
+      destinationZone: 'root:default-zone',
+    });
+
+    await expect.poll(async () => {
+      const payload = (await readPersistedDocument(page, projectId)) as StoredDocument | null;
+      return payload?.root?.children?.map((node) => node.componentRef);
+    }).toEqual(['Container', 'Button', 'Image']);
 
     await page.getByRole('tab', { name: 'Capas' }).click();
     const outline = page.locator('[data-puck-composition="outline"]');
     await outline.getByText('Texto', { exact: true }).first().click();
 
-    const textField = page.locator('[data-puck-composition="fields"]').getByLabel('Texto', { exact: true });
+    const fields = page.locator('[data-puck-composition="fields"]');
+    const textField = fields.getByLabel('Texto', { exact: true });
     await expect(textField).toBeVisible();
     await textField.fill('Texto editado E2E');
 
     await expect.poll(async () => {
-      const payload = (await readPersistedDocument(page, projectId)) as {
-        root?: { children?: Array<{ componentRef?: string; props?: Record<string, unknown> }> };
-      } | null;
-      return payload?.root?.children?.find((node) => node.componentRef === 'Text')?.props?.text;
+      const payload = (await readPersistedDocument(page, projectId)) as StoredDocument | null;
+      const container = payload?.root?.children?.find((node) => node.componentRef === 'Container');
+      return container?.children?.[0]?.props?.text;
     }).toBe('Texto editado E2E');
 
     await undo.click();
     await expect(redo).toBeEnabled();
     await expect.poll(async () => {
-      const payload = (await readPersistedDocument(page, projectId)) as {
-        root?: { children?: Array<{ componentRef?: string; props?: Record<string, unknown> }> };
-      } | null;
-      return payload?.root?.children?.find((node) => node.componentRef === 'Text')?.props?.text;
+      const payload = (await readPersistedDocument(page, projectId)) as StoredDocument | null;
+      const container = payload?.root?.children?.find((node) => node.componentRef === 'Container');
+      return container?.children?.[0]?.props?.text;
     }).toBe('Texto');
 
     await redo.click();
     await expect.poll(async () => {
-      const payload = (await readPersistedDocument(page, projectId)) as {
-        root?: { children?: Array<{ componentRef?: string; props?: Record<string, unknown> }> };
-      } | null;
-      return payload?.root?.children?.find((node) => node.componentRef === 'Text')?.props?.text;
+      const payload = (await readPersistedDocument(page, projectId)) as StoredDocument | null;
+      const container = payload?.root?.children?.find((node) => node.componentRef === 'Container');
+      return container?.children?.[0]?.props?.text;
     }).toBe('Texto editado E2E');
 
     await page.reload();
@@ -101,64 +153,11 @@ test.describe('M05.8 Editor core E2E', () => {
 
     const reopened = JSON.stringify(await readPersistedDocument(page, projectId));
     expect(reopened).toContain('Texto editado E2E');
+    expect(reopened).toContain('Container');
+    expect(reopened).toContain('Image');
+    expect(reopened).toContain('Button');
     expect(reopened).not.toContain('"history"');
     expect(reopened).not.toContain('"ui"');
     expect(reopened).not.toContain('"zones"');
-  });
-
-  test('round-trips nested/reordered core data through the browser autosave bridge', async ({ page }) => {
-    test.setTimeout(90_000);
-    await page.goto('/');
-    const result = await page.evaluate(async () => {
-      const { projectStorageRuntime } = await import('/src/features/projects/project-storage-runtime.ts');
-      const { loadStudioPuckEditor } = await import('/src/features/editor/puck-editor-runtime.ts');
-      const { studioCoreEditorDefinitions, studioCoreEditorRenderers } = await import(
-        '/src/features/editor/puck-core-components.tsx'
-      );
-
-      const projectId = `m05-8-nested-${Date.now()}`;
-      await projectStorageRuntime.initialize();
-      await projectStorageRuntime.saveProject({
-        project: { id: projectId, name: 'Nested M05.8', metadata: {} },
-        objects: [],
-        reason: 'm05.8-nested-seed',
-      });
-      const runtime = await loadStudioPuckEditor({
-        projectId,
-        definitions: studioCoreEditorDefinitions,
-        renderers: studioCoreEditorRenderers,
-      });
-      const data = structuredClone(runtime.session.data);
-      const component = (type: string, id: string, props: Record<string, unknown>) => ({
-        type,
-        props: { id, ...props },
-      });
-      data.content = [
-        component('Container', 'ec_node_0000000000580', {
-          children: [component('Text', 'ec_node_0000000000581', { text: 'Anidado' })],
-        }),
-        component('Button', 'ec_node_0000000000582', { label: 'Acción' }),
-        component('Image', 'ec_node_0000000000583', { src: '', alt: 'Imagen nested' }),
-      ];
-
-      runtime.persistence.apply(data);
-      await projectStorageRuntime.flushAutosave();
-      const opened = await projectStorageRuntime.openProject(projectId);
-      const payload = opened?.objects.find((object) => object.kind === 'document')?.payload;
-      return { payload, serialized: JSON.stringify(payload ?? {}) };
-    });
-
-    expect(result.payload).toMatchObject({
-      root: {
-        children: [
-          { componentRef: 'Container', children: [{ componentRef: 'Text', props: { text: 'Anidado' } }] },
-          { componentRef: 'Button', props: { label: 'Acción' } },
-          { componentRef: 'Image', props: { alt: 'Imagen nested' } },
-        ],
-      },
-    });
-    expect(result.serialized).not.toContain('"history"');
-    expect(result.serialized).not.toContain('"ui"');
-    expect(result.serialized).not.toContain('"zones"');
   });
 });
