@@ -20,26 +20,26 @@ F05 / M05.8 — Editor core E2E — `ACTIVE`.
 1. Abrir un proyecto real con `Container`, `Text`, `Image` y `Button` disponibles en el `Config` Puck activo.
 2. Insertar componentes desde la Palette real y comprobar persistencia canónica por F04 autosave.
 3. Seleccionar mediante `Puck.Outline` y editar mediante `Puck.Fields`/inline sin UI paralela.
-4. Probar nesting/reorder y que `ElectroCraftDocument` conserve IDs/estructura sin `history/ui/zones`.
-5. Probar Undo/Redo del Topbar contra la history pública Puck y que los cambios resultantes vuelvan al documento canónico.
+4. Probar nesting/reorder mediante acciones públicas Puck y conservar IDs/estructura sin `history/ui/zones`.
+5. Probar Undo/Redo del Topbar contra la history pública Puck y sincronizar los resultados al documento canónico.
 6. Recargar/reabrir el proyecto y comprobar que el estado durable vuelve desde storage, no desde AppState de Puck.
 7. Mantener fail-closed visible si falta renderer/config canónica.
 
 ## Implementación actual
 
-- Rama `codex/m05-8-editor-core-e2e`.
-- Nuevo `studio-core-components.ts` con definiciones canónicas built-in y renderers para los cuatro componentes core requeridos.
-- `useStudioPuckEditorRuntime()` pasa estas definitions/renderers al único `loadStudioPuckEditor()`.
-- `puck-composition.css` da presentación mínima al contenido real del Canvas.
-- Integration/contract/Playwright cubren registry, insertion, selection/edit, nesting/reorder, history, autosave y reopen.
+- Rama `codex/m05-8-editor-core-e2e`; PR `#60`.
+- `puck-core-components.tsx` es el único kit core built-in para los cuatro componentes requeridos.
+- `loadStudioPuckEditor()` usa ese kit por defecto; el hook Studio no duplica definitions/renderers.
+- `puckEditorCommandControls` es un bridge session-only al dispatch de Puck y no almacena estado del editor.
+- `puck-composition.css` presenta el contenido real usando los `data-ec-core-component` del kit único.
+- Integration/contract/Playwright cubren registry, insert, move/nest/reorder, selection/edit, history, autosave y reopen.
 
 ## Siguiente acción exacta
 
-1. Revisar diff completo contra `main` y corregir riesgos de tipo/formato.
-2. Abrir una única PR de M05.8.
-3. Usar únicamente `ElectroCraft Base CI` como gate.
-4. Corregir cualquier fallo real en la misma rama.
-5. Con head exacto GREEN, fusionar M05.8 y actualizar STATE/TRACKING/HANDOFF/F05 para el cierre de F05 o la siguiente microfase canónica.
+1. Esperar el Base CI automático del último head de PR `#60`.
+2. Corregir cualquier fallo real en la misma rama sin workflows adicionales.
+3. Con head exacto GREEN, fusionar PR `#60` mediante squash.
+4. Actualizar STATE/TRACKING/HANDOFF/F05 con evidencia final y cerrar F05 o activar la siguiente microfase canónica.
 
 ## Read set
 
