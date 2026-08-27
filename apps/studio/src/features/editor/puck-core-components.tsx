@@ -61,9 +61,13 @@ function coreDefinition(
 
 export const studioCoreEditorDefinitions = Object.freeze([
   coreDefinition('Container', 'Contenedor', 'Layout', [], {}),
-  coreDefinition('Text', 'Texto', 'Basic', [{ key: 'text', label: 'Texto', kind: 'text', required: false, options: [] }], {
-    text: 'Texto',
-  }),
+  coreDefinition(
+    'Text',
+    'Texto',
+    'Basic',
+    [{ key: 'text', label: 'Texto', kind: 'text', required: false, options: [] }],
+    { text: 'Texto' },
+  ),
   coreDefinition(
     'Image',
     'Imagen',
@@ -74,9 +78,13 @@ export const studioCoreEditorDefinitions = Object.freeze([
     ],
     { src: '', alt: 'Imagen' },
   ),
-  coreDefinition('Button', 'Botón', 'Basic', [{ key: 'label', label: 'Etiqueta', kind: 'text', required: false, options: [] }], {
-    label: 'Botón',
-  }),
+  coreDefinition(
+    'Button',
+    'Botón',
+    'Basic',
+    [{ key: 'label', label: 'Etiqueta', kind: 'text', required: false, options: [] }],
+    { label: 'Botón' },
+  ),
 ] satisfies readonly ElectroCraftComponentDefinition[]);
 
 function slotNode(value: unknown): ReactNode {
