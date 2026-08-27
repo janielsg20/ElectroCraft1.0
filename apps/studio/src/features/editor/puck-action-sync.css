@@ -15,8 +15,27 @@
   line-height: 1.4;
 }
 
+.ec-editor-puck-preview [contenteditable='true'] {
+  border-radius: 4px;
+  outline: 1px solid transparent;
+  outline-offset: 2px;
+  transition:
+    outline-color 120ms ease,
+    background-color 120ms ease;
+}
+
+.ec-editor-puck-preview [contenteditable='true']:focus,
+.ec-editor-puck-preview [contenteditable='true']:focus-visible {
+  outline-color: color-mix(in srgb, var(--primary) 58%, transparent);
+  background: color-mix(in srgb, var(--primary) 4%, transparent);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ec-editor-sync-diagnostic {
     scroll-behavior: auto;
+  }
+
+  .ec-editor-puck-preview [contenteditable='true'] {
+    transition: none;
   }
 }
