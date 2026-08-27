@@ -73,7 +73,9 @@ test.describe('M05.8 Editor core E2E', () => {
     await expect(undo).toBeEnabled();
 
     await expect
-      .poll(async () => ((await readPersistedDocument(page, projectId)) as StoredDocument | null)?.root?.children?.length)
+      .poll(
+        async () => ((await readPersistedDocument(page, projectId)) as StoredDocument | null)?.root?.children?.length,
+      )
       .toBe(4);
 
     const inserted = (await readPersistedDocument(page, projectId)) as StoredDocument | null;
@@ -102,7 +104,8 @@ test.describe('M05.8 Editor core E2E', () => {
     }).toBe('Text');
 
     const afterMove = (await readPersistedDocument(page, projectId)) as StoredDocument | null;
-    const containerIndexAfterMove = afterMove?.root?.children?.findIndex((node) => node.componentRef === 'Container') ?? -1;
+    const containerIndexAfterMove =
+      afterMove?.root?.children?.findIndex((node) => node.componentRef === 'Container') ?? -1;
     expect(containerIndexAfterMove).toBeGreaterThanOrEqual(0);
 
     await dispatchPuckAction(page, {
