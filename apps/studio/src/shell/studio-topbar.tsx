@@ -9,7 +9,10 @@ import {
   SheetTrigger,
   getStudioIcon,
 } from '@electrocraft/design-system';
+import { puckEditorHistoryControls } from '@electrocraft/editor-puck';
 import { useEffect, useSyncExternalStore } from 'react';
+import { editorHistoryPreferencesRuntime } from '../features/editor/editor-history-preferences-runtime';
+import { EditorSettings } from '../features/editor/editor-settings';
 import { projectStorageRuntime } from '../features/projects/project-storage-runtime';
 import { StorageSettings } from '../features/projects/storage-settings';
 import { WorkspaceSettings } from '../features/projects/workspace-settings';
@@ -107,6 +110,11 @@ function TopbarToolCluster({
   readonly breakpoint: StudioViewportBreakpoint;
 }) {
   const zoom = normalizeZoomPercent(100);
+  const visualHistory = useSyncExternalStore(
+    puckEditorHistoryControls.subscribe,
+    puckEditorHistoryControls.getSnapshot,
+    puckEditorHistoryControls.getSnapshot,
+  );
 
   return (
     <div className="ec-topbar-tool-cluster" aria-label={copy.toolsTitle}>
@@ -136,10 +144,26 @@ function TopbarToolCluster({
           {copy.historyLabel}
         </a>
       </Button>
-      <Button variant="ghost" size="icon" disabled aria-label={copy.undoLabel} title={copy.historyUnavailable}>
+      <Button
+        variant="ghost"
+        size="icon"
+        disabled={!visualHistory.canUndo}
+        aria-label={copy.undoLabel}
+        title={visualHistory.canUndo ? copy.undoLabel : copy.historyUnavailable}
+        data-puck-history-action="undo"
+        onClick={() => puckEditorHistoryControls.undo()}
+      >
         <UndoIcon aria-hidden="true" />
       </Button>
-      <Button variant="ghost" size="icon" disabled aria-label={copy.redoLabel} title={copy.historyUnavailable}>
+      <Button
+        variant="ghost"
+        size="icon"
+        disabled={!visualHistory.canRedo}
+        aria-label={copy.redoLabel}
+        title={visualHistory.canRedo ? copy.redoLabel : copy.historyUnavailable}
+        data-puck-history-action="redo"
+        onClick={() => puckEditorHistoryControls.redo()}
+      >
         <RedoIcon aria-hidden="true" />
       </Button>
       <span className="ec-topbar-tool" data-topbar-tool="zoom" aria-label={`${copy.zoomLabel}: ${zoom}%`}>
@@ -153,6 +177,11 @@ function TopbarToolCluster({
 export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help }: StudioTopbarProps) {
   const width = useSyncExternalStore(subscribeViewport, getViewportWidth, () => 1440);
   useSyncExternalStore(preferencesPort.subscribe, preferencesPort.getSnapshot, preferencesPort.getSnapshot);
+  const editorHistoryPreferences = useSyncExternalStore(
+    editorHistoryPreferencesRuntime.subscribe,
+    editorHistoryPreferencesRuntime.getSnapshot,
+    editorHistoryPreferencesRuntime.getSnapshot,
+  );
   const storage = useSyncExternalStore(
     projectStorageRuntime.subscribe,
     projectStorageRuntime.getSnapshot,
@@ -162,6 +191,10 @@ export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help 
   useEffect(() => {
     void projectStorageRuntime.initialize();
   }, []);
+
+  useEffect(() => {
+    puckEditorHistoryControls.setVisualHistoryLimit(editorHistoryPreferences.visualHistoryLimit);
+  }, [editorHistoryPreferences.visualHistoryLimit]);
 
   const breakpoint = resolveStudioViewportBreakpoint(width);
   const storageStatus: AppShellStatus =
@@ -267,6 +300,7 @@ export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help 
 
               <LanguageSettings />
               <WorkspaceSettings />
+              <EditorSettings />
               <StorageSettings />
 
               <section
