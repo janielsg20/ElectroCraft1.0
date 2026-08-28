@@ -64,6 +64,9 @@ test.describe('M06.1 Layout/Style inspector', () => {
       .toBe(1);
 
     await dispatch(page, { type: 'setUi', ui: { itemSelector: { index: 0, zone: 'root:default-zone' } } });
+    const advancedDisclosure = page.locator('[data-progressive-disclosure="inspector-advanced"]');
+    await advancedDisclosure.locator('.ec-ia-disclosure-trigger').click();
+    await expect(advancedDisclosure).toHaveAttribute('data-state', 'open');
     await page.locator('.ec-editor-panel-tab').filter({ hasText: 'Diseño' }).click();
 
     const inspector = page.locator('[data-puck-layout-style-inspector]');
