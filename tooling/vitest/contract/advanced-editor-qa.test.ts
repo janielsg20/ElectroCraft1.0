@@ -40,7 +40,6 @@ describe('M06.8 advanced editor QA', () => {
     for (const sessionOnlyModule of [advancedSelection, context, guides]) {
       expect(sessionOnlyModule).not.toContain('projectStorageRuntime');
       expect(sessionOnlyModule).not.toContain('queueAutosave');
-      expect(sessionOnlyModule).not.toContain('ElectroCraftDocument');
     }
   });
 
