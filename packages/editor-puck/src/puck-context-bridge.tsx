@@ -6,7 +6,6 @@ import {
   type ElectroCraftDocumentNode,
 } from '@electrocraft/domain';
 import { useEffect, useMemo } from 'react';
-import { ELECTROCRAFT_PUCK_CHILDREN_SLOT } from './puck-adapter-contract';
 import { puckContextControls, type PuckContextBreadcrumb } from './puck-context-controls';
 import { parsePuckNodePresentation, projectPuckNodePresentation, stripPuckNodePresentation } from './puck-layout-style';
 
@@ -119,7 +118,8 @@ export function PuckContextBridge() {
           return puckNodeToCanonical(item, config);
         },
         paste(node) {
-          const selectedSelector = selectedId ? getSelectorForId(selectedId) : null;
+          const currentSelectedId = puckContextControls.getSnapshot().selectedId;
+          const selectedSelector = currentSelectedId ? getSelectorForId(currentSelectedId) : null;
           const destinationZone = selectedSelector?.zone ?? 'root:default-zone';
           const destinationIndex = selectedSelector ? selectedSelector.index + 1 : 0;
           const cloned = cloneCanonicalNode(node, globalThis.crypto.randomUUID());
@@ -201,7 +201,7 @@ export function PuckContextBridge() {
         },
         refreshPermissions,
       }),
-    [config, dispatch, getItemById, getSelectorForId, refreshPermissions, selectedId],
+    [config, dispatch, getItemById, getSelectorForId, refreshPermissions],
   );
 
   return null;
