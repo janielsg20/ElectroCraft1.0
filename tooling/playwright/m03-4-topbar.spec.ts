@@ -58,7 +58,8 @@ test.describe('M03.4 Topbar global + Settings', () => {
     await expect(tools).toBeVisible();
     await tools.click();
     const toolsDialog = page.getByRole('dialog', { name: 'Herramientas contextuales' });
-    await expect(toolsDialog).toContainText('Tablet');
+    await expect(toolsDialog.locator('[data-topbar-tool="platform"]')).toContainText('Web');
+    await expect(toolsDialog.locator('[data-topbar-tool="breakpoint"]')).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(tools).toBeFocused();
 

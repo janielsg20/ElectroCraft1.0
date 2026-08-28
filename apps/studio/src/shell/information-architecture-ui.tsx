@@ -55,8 +55,10 @@ export function ProgressiveDisclosure({
   defaultOpen = false,
   children,
 }: ProgressiveDisclosureProps) {
+  const startsOpen = level === 'diagnostic' ? defaultOpen : false;
+
   return (
-    <Collapsible defaultOpen={defaultOpen} data-information-level={level} data-progressive-disclosure={id}>
+    <Collapsible defaultOpen={startsOpen} data-information-level={level} data-progressive-disclosure={id}>
       <CollapsibleTrigger asChild>
         <Button className="ec-ia-disclosure-trigger" variant="ghost" size="sm" aria-describedby={`${id}-summary`}>
           <span className="ec-ia-disclosure-label">{title}</span>

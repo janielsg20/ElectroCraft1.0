@@ -177,8 +177,9 @@ test.describe('M05.4 Puck actions canonical synchronization', () => {
     expect(result.persisted).toMatchObject({
       objectId: 'ec_document_0000000000001',
       kind: 'document',
-      schemaVersion: 3,
+      schemaVersion: 4,
       payload: expect.objectContaining({
+        schemaVersion: 4,
         root: expect.objectContaining({
           children: [
             expect.objectContaining({ id: 'ec_node_0000000000004', props: { text: 'B' } }),
