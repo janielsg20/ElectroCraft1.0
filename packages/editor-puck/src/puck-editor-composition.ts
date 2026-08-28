@@ -133,7 +133,8 @@ function PuckAdvancedSelectionBridge() {
     () =>
       puckAdvancedSelectionControls.connect({
         group(ids) {
-          if (!config.components.Container) throw new Error('El registry activo no contiene un Container para agrupar.');
+          if (!config.components.Container)
+            throw new Error('El registry activo no contiene un Container para agrupar.');
           const selected = ids.map((id) => {
             const selector = getSelectorForId(id);
             if (!selector) throw new Error(`Puck no pudo resolver ${id} para Agrupar.`);

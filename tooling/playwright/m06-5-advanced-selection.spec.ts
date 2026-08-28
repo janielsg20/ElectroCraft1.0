@@ -37,7 +37,9 @@ async function readDocument(page: Page, projectId: string): Promise<StoredDocume
     const { projectStorageRuntime } = await import('/src/features/projects/project-storage-runtime.ts');
     await projectStorageRuntime.flushAutosave();
     const opened = await projectStorageRuntime.openProject(id);
-    return (opened?.objects.find((object) => object.kind === 'document')?.payload as StoredDocument | undefined) ?? null;
+    return (
+      (opened?.objects.find((object) => object.kind === 'document')?.payload as StoredDocument | undefined) ?? null
+    );
   }, projectId);
 }
 
@@ -108,16 +110,19 @@ test.describe('M06.5 advanced selection', () => {
       .poll(async () => (await readDocument(page, projectId))?.root?.children?.map((node) => node.componentRef).sort())
       .toEqual(['Button', 'Text']);
 
-    const blockedResizeMessage = await page.evaluate(async (id) => {
-      const { studioPuckAdvancedSelection } = await import('/src/features/editor/puck-editor-runtime.ts');
-      studioPuckAdvancedSelection.selectOnly(id);
-      try {
-        studioPuckAdvancedSelection.resize(999, null);
-      } catch {
-        return studioPuckAdvancedSelection.getSnapshot().message;
-      }
-      return null;
-    }, childIds.find((id) => (initial.find((node) => node.id === id)?.componentRef ?? '') === 'Text') ?? childIds[0]);
+    const blockedResizeMessage = await page.evaluate(
+      async (id) => {
+        const { studioPuckAdvancedSelection } = await import('/src/features/editor/puck-editor-runtime.ts');
+        studioPuckAdvancedSelection.selectOnly(id);
+        try {
+          studioPuckAdvancedSelection.resize(999, null);
+        } catch {
+          return studioPuckAdvancedSelection.getSnapshot().message;
+        }
+        return null;
+      },
+      childIds.find((id) => (initial.find((node) => node.id === id)?.componentRef ?? '') === 'Text') ?? childIds[0],
+    );
     expect(blockedResizeMessage).toMatch(/no declara resize compatible/i);
 
     await page.reload();

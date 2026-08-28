@@ -34,7 +34,10 @@ describe('M06.6 context controls', () => {
     });
     puckContextControls.syncContext({
       selectedId: node.id,
-      breadcrumbs: [{ id: 'root', label: 'Página' }, { id: node.id, label: 'Texto' }],
+      breadcrumbs: [
+        { id: 'root', label: 'Página' },
+        { id: node.id, label: 'Texto' },
+      ],
       hidden: false,
     });
 

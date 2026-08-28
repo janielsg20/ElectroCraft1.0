@@ -11,11 +11,7 @@ export interface PlatformBadgeProps extends HTMLAttributes<HTMLSpanElement> {
 
 export function PlatformBadge({ label, tone = 'neutral', className, ...props }: PlatformBadgeProps) {
   return (
-    <span
-      className={cn('ec-platform-badge', className)}
-      data-platform-badge-tone={tone}
-      {...props}
-    >
+    <span className={cn('ec-platform-badge', className)} data-platform-badge-tone={tone} {...props}>
       {label}
     </span>
   );

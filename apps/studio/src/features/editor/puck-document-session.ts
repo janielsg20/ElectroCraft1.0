@@ -9,10 +9,7 @@ import {
   type PuckEditorData,
   type PuckRendererRegistry,
 } from '@electrocraft/editor-puck';
-import {
-  createStudioEditorPlatformRegistry,
-  studioEditorPlatformCapabilities,
-} from './advanced/platform-capabilities';
+import { createStudioEditorPlatformRegistry, studioEditorPlatformCapabilities } from './advanced/platform-capabilities';
 import { studioPuckDiagnosticRenderer } from './puck-diagnostic-renderer';
 
 export function createStudioPuckDocumentSession(

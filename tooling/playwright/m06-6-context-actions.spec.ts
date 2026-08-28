@@ -34,7 +34,8 @@ async function readDocuments(page: Page, projectId: string): Promise<StoredDocum
     const { projectStorageRuntime } = await import('/src/features/projects/project-storage-runtime.ts');
     await projectStorageRuntime.flushAutosave();
     const opened = await projectStorageRuntime.openProject(id);
-    return (opened?.objects.filter((object) => object.kind === 'document').map((object) => object.payload) ?? []) as StoredDocument[];
+    return (opened?.objects.filter((object) => object.kind === 'document').map((object) => object.payload) ??
+      []) as StoredDocument[];
   }, projectId);
 }
 
@@ -46,7 +47,9 @@ async function dispatch(page: Page, action: Record<string, unknown>) {
 }
 
 test.describe('M06.6 breadcrumbs and context actions', () => {
-  test('copies canonical subtree, persists visibility and reusable block, and keeps lock session-only', async ({ page }) => {
+  test('copies canonical subtree, persists visibility and reusable block, and keeps lock session-only', async ({
+    page,
+  }) => {
     test.setTimeout(180_000);
     await page.setViewportSize({ width: 1600, height: 900 });
     const projectId = `m06-6-${Date.now()}`;
@@ -59,10 +62,12 @@ test.describe('M06.6 breadcrumbs and context actions', () => {
     await palette.locator('[data-palette-item="palette.layout.container"] .ec-palette-item-main').click();
     await palette.locator('[data-palette-item="palette.basic.text"] .ec-palette-item-main').click();
 
-    await expect.poll(async () => {
-      const screen = (await readDocuments(page, projectId)).find((document) => document.kind === 'screen');
-      return screen?.root?.children?.length;
-    }).toBe(2);
+    await expect
+      .poll(async () => {
+        const screen = (await readDocuments(page, projectId)).find((document) => document.kind === 'screen');
+        return screen?.root?.children?.length;
+      })
+      .toBe(2);
 
     const screen = (await readDocuments(page, projectId)).find((document) => document.kind === 'screen');
     const root = screen?.root?.children ?? [];
@@ -94,10 +99,12 @@ test.describe('M06.6 breadcrumbs and context actions', () => {
       return studioPuckContextControls.paste();
     });
 
-    await expect.poll(async () => {
-      const current = (await readDocuments(page, projectId)).find((document) => document.kind === 'screen');
-      return current?.root?.children?.find((node) => node.componentRef === 'Container')?.children?.length;
-    }).toBe(2);
+    await expect
+      .poll(async () => {
+        const current = (await readDocuments(page, projectId)).find((document) => document.kind === 'screen');
+        return current?.root?.children?.find((node) => node.componentRef === 'Container')?.children?.length;
+      })
+      .toBe(2);
 
     const copiedIds = (await readDocuments(page, projectId))
       .find((document) => document.kind === 'screen')
@@ -114,19 +121,21 @@ test.describe('M06.6 breadcrumbs and context actions', () => {
       return blockId;
     });
 
-    await expect.poll(async () => {
-      const documents = await readDocuments(page, projectId);
-      const current = documents.find((document) => document.kind === 'screen');
-      const pasted = current?.root?.children
-        ?.find((node) => node.componentRef === 'Container')
-        ?.children?.find((node) => node.id === pastedId);
-      const reusable = documents.find((document) => document.id === reusableId);
-      return {
-        visibility: pasted?.style?.base?.visibility,
-        reusableKind: reusable?.kind,
-        reusableRoot: reusable?.root?.componentRef,
-      };
-    }).toEqual({ visibility: 'hidden', reusableKind: 'reusable-component', reusableRoot: 'Text' });
+    await expect
+      .poll(async () => {
+        const documents = await readDocuments(page, projectId);
+        const current = documents.find((document) => document.kind === 'screen');
+        const pasted = current?.root?.children
+          ?.find((node) => node.componentRef === 'Container')
+          ?.children?.find((node) => node.id === pastedId);
+        const reusable = documents.find((document) => document.id === reusableId);
+        return {
+          visibility: pasted?.style?.base?.visibility,
+          reusableKind: reusable?.kind,
+          reusableRoot: reusable?.root?.componentRef,
+        };
+      })
+      .toEqual({ visibility: 'hidden', reusableKind: 'reusable-component', reusableRoot: 'Text' });
 
     const locked = await page.evaluate(async (id) => {
       const { studioPuckContextControls } = await import('/src/features/editor/puck-editor-runtime.ts');

@@ -1,7 +1,4 @@
-import {
-  electroCraftEditorPlatformSchema,
-  type ElectroCraftEditorPlatform,
-} from '@electrocraft/domain';
+import { electroCraftEditorPlatformSchema, type ElectroCraftEditorPlatform } from '@electrocraft/domain';
 
 export interface PuckPlatformControlsSnapshot {
   readonly current: ElectroCraftEditorPlatform;

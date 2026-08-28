@@ -102,7 +102,11 @@ function resolveProjectDocument(opened: OpenProjectResult): { document: ElectroC
   }
 }
 
-function cloneReusableNode(node: ElectroCraftDocumentNode, documentId: string, path = 'root'): ElectroCraftDocumentNode {
+function cloneReusableNode(
+  node: ElectroCraftDocumentNode,
+  documentId: string,
+  path = 'root',
+): ElectroCraftDocumentNode {
   return electroCraftDocumentNodeSchema.parse({
     ...structuredClone(node),
     id: createDeterministicObjectId('node', `${documentId}:${path}`),

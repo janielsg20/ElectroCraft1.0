@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { createDefaultElectroCraftLayout, createDefaultElectroCraftStyle, setPlatformStyleOverride } from '@electrocraft/domain';
+import {
+  createDefaultElectroCraftLayout,
+  createDefaultElectroCraftStyle,
+  setPlatformStyleOverride,
+} from '@electrocraft/domain';
 import { resolveStudioPresentationStyle } from '../../../apps/studio/src/features/editor/advanced/presentation-style';
 
 describe('platform Canvas presentation', () => {
@@ -26,7 +30,11 @@ describe('platform Canvas presentation', () => {
     };
     style = setPlatformStyleOverride(style, 'ios', 'opacity', 0.9);
 
-    expect(resolveStudioPresentationStyle({}, createDefaultElectroCraftLayout(), style, [], null, 'android').opacity).toBe(0.7);
-    expect(resolveStudioPresentationStyle({}, createDefaultElectroCraftLayout(), style, [], null, 'ios').opacity).toBe(0.9);
+    expect(
+      resolveStudioPresentationStyle({}, createDefaultElectroCraftLayout(), style, [], null, 'android').opacity,
+    ).toBe(0.7);
+    expect(resolveStudioPresentationStyle({}, createDefaultElectroCraftLayout(), style, [], null, 'ios').opacity).toBe(
+      0.9,
+    );
   });
 });

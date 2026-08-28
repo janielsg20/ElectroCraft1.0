@@ -40,7 +40,9 @@ async function readDocument(page: Page, projectId: string): Promise<StoredDocume
     const { projectStorageRuntime } = await import('/src/features/projects/project-storage-runtime.ts');
     await projectStorageRuntime.flushAutosave();
     const opened = await projectStorageRuntime.openProject(id);
-    return (opened?.objects.find((object) => object.kind === 'document')?.payload as StoredDocument | undefined) ?? null;
+    return (
+      (opened?.objects.find((object) => object.kind === 'document')?.payload as StoredDocument | undefined) ?? null
+    );
   }, projectId);
 }
 

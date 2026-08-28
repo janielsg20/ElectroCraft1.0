@@ -1,8 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
-const read = (relativePath: string) =>
-  readFileSync(new URL(`../../../${relativePath}`, import.meta.url), 'utf8');
+const read = (relativePath: string) => readFileSync(new URL(`../../../${relativePath}`, import.meta.url), 'utf8');
 
 describe('M06.3 platform override boundaries', () => {
   it('keeps Studio advanced UI behind editor-puck instead of importing Puck directly', () => {

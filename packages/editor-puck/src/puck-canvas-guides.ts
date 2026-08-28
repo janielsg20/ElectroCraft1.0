@@ -50,7 +50,12 @@ export function resolvePuckCanvasSnap(
   const gridValue = Math.round(value / gridSize) * gridSize;
   const allCandidates = [
     ...candidates.map((candidate) => ({ ...candidate, distance: Math.abs(candidate.value - value) })),
-    { value: gridValue, source: 'grid' as const, label: `Cuadrícula ${gridSize}px`, distance: Math.abs(gridValue - value) },
+    {
+      value: gridValue,
+      source: 'grid' as const,
+      label: `Cuadrícula ${gridSize}px`,
+      distance: Math.abs(gridValue - value),
+    },
   ]
     .filter((candidate) => candidate.distance <= threshold)
     .sort(
@@ -96,7 +101,9 @@ export const puckCanvasGuideControls = Object.freeze({
     return () => listeners.delete(listener);
   },
   getSnapshot: () => snapshot,
-  configure(value: Partial<Pick<PuckCanvasGuideSnapshot, 'rulersVisible' | 'guidesVisible' | 'snappingEnabled' | 'gridSize'>>) {
+  configure(
+    value: Partial<Pick<PuckCanvasGuideSnapshot, 'rulersVisible' | 'guidesVisible' | 'snappingEnabled' | 'gridSize'>>,
+  ) {
     publish({
       ...snapshot,
       ...value,

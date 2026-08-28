@@ -59,7 +59,9 @@ function lengthValue(value: ElectroCraftLength | null): string {
 function readCapabilityRegistry(config: ReturnType<typeof usePuckEditorConfig>, componentType: string) {
   const metadata = config.components[componentType]?.metadata;
   const record = metadata && typeof metadata === 'object' ? (metadata as Record<string, unknown>) : {};
-  const registry = electroCraftRegistryDefinitionSchema.safeParse(record[ELECTROCRAFT_PUCK_REGISTRY_DEFINITION_METADATA]);
+  const registry = electroCraftRegistryDefinitionSchema.safeParse(
+    record[ELECTROCRAFT_PUCK_REGISTRY_DEFINITION_METADATA],
+  );
   const rawCapabilities = record[ELECTROCRAFT_PUCK_CAPABILITY_DEFINITIONS_METADATA];
   const capabilities = Array.isArray(rawCapabilities)
     ? rawCapabilities.flatMap((value) => {
