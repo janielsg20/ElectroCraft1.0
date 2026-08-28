@@ -6,7 +6,12 @@ import {
   type ElectroCraftComponentDefinition,
   type ElectroCraftDocument,
 } from '@electrocraft/domain';
-import { puckCanvasGuideControls, puckEditorCommandControls, type PuckRendererRegistry } from '@electrocraft/editor-puck';
+import {
+  puckAdvancedSelectionControls,
+  puckCanvasGuideControls,
+  puckEditorCommandControls,
+  type PuckRendererRegistry,
+} from '@electrocraft/editor-puck';
 import { projectStorageRuntime } from '../projects/project-storage-runtime';
 import { editorCanvasPreferencesRuntime } from './editor-canvas-preferences-runtime';
 import { createStudioPuckActionSync } from './puck-action-sync';
@@ -119,10 +124,11 @@ export async function loadStudioPuckEditor(options: LoadStudioPuckEditorOptions)
 }
 
 /**
- * Studio-facing command delegation for documented Puck actions. This is the
- * same session-only bridge mounted by PuckEditorRoot and carries no editor
- * state of its own.
+ * Studio-facing command delegation for documented Puck actions. These are the
+ * same session-only bridges mounted by PuckEditorRoot and carry no editor Data,
+ * AppState or history copy of their own.
  */
 export const studioPuckEditorCommands = puckEditorCommandControls;
+export const studioPuckAdvancedSelection = puckAdvancedSelectionControls;
 
 export type StudioPuckEditorRuntime = Awaited<ReturnType<typeof loadStudioPuckEditor>>;
