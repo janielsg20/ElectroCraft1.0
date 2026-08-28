@@ -6,6 +6,7 @@ let disconnect: (() => void) | null = null;
 afterEach(() => {
   disconnect?.();
   disconnect = null;
+  puckAdvancedSelectionControls.syncPrimary(null);
   puckAdvancedSelectionControls.clear();
 });
 
@@ -19,6 +20,31 @@ describe('M06.5 advanced selection controls', () => {
     expect(puckAdvancedSelectionControls.getSnapshot()).toMatchObject({
       primaryId: 'node-c',
       selectedIds: ['node-c'],
+    });
+  });
+
+  it('preserves the live selection while Puck delegate references reconnect', () => {
+    const delegates = {
+      group: () => 'group-1',
+      ungroup: () => ['node-a', 'node-b'],
+      resize: () => undefined,
+    };
+    const firstDisconnect = puckAdvancedSelectionControls.connect(delegates);
+    puckAdvancedSelectionControls.syncPrimary('node-a');
+    puckAdvancedSelectionControls.toggle('node-b');
+
+    firstDisconnect();
+    expect(puckAdvancedSelectionControls.getSnapshot()).toMatchObject({
+      connected: false,
+      primaryId: 'node-a',
+      selectedIds: ['node-a', 'node-b'],
+    });
+
+    disconnect = puckAdvancedSelectionControls.connect({ ...delegates });
+    expect(puckAdvancedSelectionControls.getSnapshot()).toMatchObject({
+      connected: true,
+      primaryId: 'node-a',
+      selectedIds: ['node-a', 'node-b'],
     });
   });
 
