@@ -76,7 +76,7 @@ test.describe('M05.7 Palette and Outline extensions', () => {
         metadata: {},
       });
       const document = {
-        schemaVersion: 3 as const,
+        schemaVersion: 4 as const,
         id: 'ec_document_0000000000570',
         version: 1,
         name: 'Palette M05.7',
