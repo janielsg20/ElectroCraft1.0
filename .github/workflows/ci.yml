@@ -38,6 +38,12 @@ jobs:
           test -f package-lock.json
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Normalize formatting for F06 gate diagnostics
+        run: |
+          npm run format
+          echo '--- PRETTIER PATCH START ---'
+          git diff --no-ext-diff -- .
+          echo '--- PRETTIER PATCH END ---'
       - name: Verify documentation conventions
         run: npm run test:docs
       - name: Lint
