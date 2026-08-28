@@ -9,6 +9,7 @@ import {
   type ElectroCraftStyle,
 } from '@electrocraft/domain';
 import { Fragment, createElement, useEffect, useMemo, useSyncExternalStore, type ComponentProps } from 'react';
+import { PuckCanvasGuideOverlay } from './puck-canvas-guide-overlay';
 import { puckEditorCommandControls } from './puck-command-controls';
 import { puckEditorHistoryControls } from './puck-history-controls';
 import { applyPuckHistoryPolicy } from './puck-history-policy';
@@ -146,7 +147,14 @@ export function PuckEditorRoot({ iframe, children, ...props }: ComponentProps<ty
 
 export const PuckEditorComponents = Puck.Components;
 export const PuckEditorOutline = Puck.Outline;
-export const PuckEditorPreview = Puck.Preview;
+export function PuckEditorPreview(props: ComponentProps<typeof Puck.Preview>) {
+  return createElement(
+    'div',
+    { className: 'ec-puck-preview-with-guides', 'data-puck-preview-with-guides': true },
+    createElement(Puck.Preview, props),
+    createElement(PuckCanvasGuideOverlay),
+  );
+}
 export const PuckEditorFields = Puck.Fields;
 
 /**
