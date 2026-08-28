@@ -1,6 +1,7 @@
 import type { ComponentConfig, Config, Field } from '@puckeditor/core';
 import type { ElectroCraftComponentDefinition, ElectroCraftComponentField } from '@electrocraft/domain';
 import { ELECTROCRAFT_PUCK_CHILDREN_SLOT, ELECTROCRAFT_PUCK_DIAGNOSTIC_COMPONENT } from './puck-adapter-contract';
+import { puckContextControls } from './puck-context-controls';
 
 export type PuckCanonicalProps = Record<string, unknown>;
 export type PuckCanonicalComponentConfig = ComponentConfig<PuckCanonicalProps>;
@@ -230,6 +231,17 @@ export function createPuckComponentConfig(
       electrocraftResizable: definition.metadata.resizable === true,
     },
     ...(permissions ? { permissions } : {}),
+    resolvePermissions(data, { permissions: inheritedPermissions }) {
+      const id = typeof data.props.id === 'string' ? data.props.id : null;
+      if (!id || !puckContextControls.isLocked(id)) return inheritedPermissions;
+      return {
+        ...inheritedPermissions,
+        drag: false,
+        delete: false,
+        duplicate: false,
+        edit: false,
+      };
+    },
     render: renderer,
   };
 }
