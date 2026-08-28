@@ -39,4 +39,14 @@ El changelog histórico original hasta M00.8 se preserva sin modificaciones en `
 - El adapter `@electrocraft/editor-puck` integra selección/replace públicos de Puck sin persistir internals ni CSS crudo.
 - Inspector Diseño/Estilo, presets/tokens/reset/herencia, ayuda persistente y Canvas semántico quedaron funcionales y verificados.
 - Gate local: lint, typecheck, Node 41/41, Vitest 415/415, build Studio/PWA y Playwright M06.1 GREEN.
-- M06.2 queda activa para responsive inheritance y reset.
+- M06.2 quedó habilitada para responsive inheritance y reset.
+
+## 2026-08-28 — F06 closure candidate
+- M06.2 consolidó responsive inheritance/reset y viewports Puck con breakpoints canónicos.
+- M06.3 añadió overrides Web/Android/iOS y capability diagnostics.
+- M06.4 añadió rulers/guides/snapping editor-only con preferencias locales y alternativa de teclado.
+- M06.5 añadió multiselección session-only, Group/Ungroup mediante acciones Puck y resize canónico compatible.
+- M06.6 añadió breadcrumbs, copy/paste de subárbol canónico, visibilidad, lock por permisos y reusable blocks reales.
+- M06.7 confirmó un único Puck para desktop/tablet/mobile con Sheets y dock móvil existente.
+- M06.8 consolidó ownership, eliminó CSS duplicado, reforzó compatibilidad legacy de `visibility` y añadió QA contractual/E2E transversal.
+- El gate `ElectroCraft Base CI` queda reservado para la PR final de F06; M06.8 permanece `ACTIVE` hasta resultado GREEN.
