@@ -64,6 +64,23 @@ export const electroCraftStyleDeclarationSchema = z.strictObject({
 });
 export type ElectroCraftStyleDeclaration = z.infer<typeof electroCraftStyleDeclarationSchema>;
 
+export const ELECTROCRAFT_STYLE_PROPERTIES = Object.freeze([
+  'width',
+  'height',
+  'minWidth',
+  'maxWidth',
+  'gap',
+  'padding',
+  'margin',
+  'fontSize',
+  'fontWeight',
+  'textAlign',
+  'foreground',
+  'background',
+  'opacity',
+  'visibility',
+] as const satisfies readonly (keyof ElectroCraftStyleDeclaration)[]);
+
 export const electroCraftStyleOverrideSchema = electroCraftStyleDeclarationSchema.partial();
 export const electroCraftBreakpointSchema = z.enum(['mobile', 'tablet', 'laptop', 'desktop']);
 export const electroCraftResponsiveBreakpointIdSchema = z.string().regex(/^[a-z][a-z0-9-]{0,63}$/);
