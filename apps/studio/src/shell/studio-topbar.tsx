@@ -95,6 +95,12 @@ const AppearanceIcon = getStudioIcon('studio.theme');
 const CloseIcon = getStudioIcon('window.close');
 const HistoryIcon = getStudioIcon('studio.history');
 
+const platformLabels = Object.freeze({
+  web: 'Web',
+  android: 'Android',
+  ios: 'iOS',
+} as const);
+
 function subscribeViewport(listener: () => void) {
   if (typeof window === 'undefined') return () => undefined;
   window.addEventListener('resize', listener, { passive: true });
@@ -144,7 +150,7 @@ function TopbarToolCluster({
           onValueChange={(value) => puckPlatformControls.select(value as 'web' | 'android' | 'ios')}
         >
           <SelectTrigger aria-label={copy.platformLabel}>
-            <SelectValue placeholder={copy.platformValue} />
+            <SelectValue placeholder={copy.platformValue}>{platformLabels[platform.current]}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="web">Web</SelectItem>
