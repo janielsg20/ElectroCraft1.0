@@ -4,7 +4,7 @@ import {
   type ElectroCraftComponentDefinition,
 } from '@electrocraft/domain';
 import type { PuckCanonicalRenderer, PuckRendererRegistry } from '@electrocraft/editor-puck';
-import { puckResponsiveControls } from '@electrocraft/editor-puck';
+import { puckPlatformControls, puckResponsiveControls } from '@electrocraft/editor-puck';
 import { createElement, isValidElement, useSyncExternalStore, type ComponentType, type ReactNode } from 'react';
 import { resolveStudioPresentationStyle } from './advanced/presentation-style';
 
@@ -102,12 +102,18 @@ function usePresentationStyle(props: Record<string, unknown>, definitionIndex: n
     puckResponsiveControls.getSnapshot,
     puckResponsiveControls.getSnapshot,
   );
+  const platform = useSyncExternalStore(
+    puckPlatformControls.subscribe,
+    puckPlatformControls.getSnapshot,
+    puckPlatformControls.getSnapshot,
+  );
   return resolveStudioPresentationStyle(
     props,
     definition.layout,
     definition.style,
     responsive.breakpoints.map((breakpoint) => breakpoint.id),
     responsive.currentId,
+    platform.current,
   );
 }
 
