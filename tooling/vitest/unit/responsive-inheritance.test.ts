@@ -104,4 +104,17 @@ describe('responsive inheritance', () => {
     });
     expect(mobile).toEqual(before);
   });
+
+  it('resolves optional visibility overrides for legacy base declarations that do not contain the key', () => {
+    const legacyBase = structuredClone(createDefaultElectroCraftStyle().base);
+    delete legacyBase.visibility;
+    const responsive = setResponsiveStyleOverride(
+      { base: legacyBase, overrides: {} },
+      'mobile-small',
+      'visibility',
+      'hidden',
+    );
+
+    expect(resolveResponsiveStyleDeclaration(responsive, ids, 'mobile-small').visibility).toBe('hidden');
+  });
 });
