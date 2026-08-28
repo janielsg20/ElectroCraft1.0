@@ -7,6 +7,7 @@ export interface PuckContextBreadcrumb {
 
 export interface PuckContextSnapshot {
   readonly connected: boolean;
+  readonly blockSaverConnected: boolean;
   readonly selectedId: string | null;
   readonly breadcrumbs: readonly PuckContextBreadcrumb[];
   readonly clipboardAvailable: boolean;
@@ -24,11 +25,15 @@ interface PuckContextDelegates {
   readonly refreshPermissions: () => void;
 }
 
+type SaveBlock = (node: ElectroCraftDocumentNode) => string;
+
 let delegates: PuckContextDelegates | null = null;
+let saveBlock: SaveBlock | null = null;
 let clipboard: ElectroCraftDocumentNode | null = null;
 const lockedIds = new Set<string>();
 let snapshot: PuckContextSnapshot = Object.freeze({
   connected: false,
+  blockSaverConnected: false,
   selectedId: null,
   breadcrumbs: Object.freeze([]),
   clipboardAvailable: false,
@@ -45,6 +50,7 @@ function publish(patch: Partial<PuckContextSnapshot>) {
     breadcrumbs: Object.freeze([...(patch.breadcrumbs ?? snapshot.breadcrumbs)]),
     lockedIds: Object.freeze([...lockedIds]),
     clipboardAvailable: clipboard !== null,
+    blockSaverConnected: saveBlock !== null,
   });
   for (const listener of listeners) listener();
 }
@@ -88,6 +94,15 @@ export const puckContextControls = Object.freeze({
       publish({ connected: false, selectedId: null, breadcrumbs: [], hidden: false, message: null });
     };
   },
+  connectBlockSaver(nextSaveBlock: SaveBlock) {
+    saveBlock = nextSaveBlock;
+    publish({ message: null });
+    return () => {
+      if (saveBlock !== nextSaveBlock) return;
+      saveBlock = null;
+      publish({ message: null });
+    };
+  },
   syncContext(context: {
     readonly selectedId: string | null;
     readonly breadcrumbs: readonly PuckContextBreadcrumb[];
@@ -122,6 +137,14 @@ export const puckContextControls = Object.freeze({
       const id = requireDelegates().paste(structuredClone(clipboard as ElectroCraftDocumentNode));
       publish({ selectedId: id, message: null });
       return id;
+    });
+  },
+  saveAsBlock() {
+    const id = selectedId('guardar como bloque');
+    return run(() => {
+      if (!saveBlock) throw new Error('El guardado de bloques no está conectado al proyecto actual.');
+      const node = requireDelegates().copy(id);
+      return saveBlock(structuredClone(node));
     });
   },
   duplicate() {
