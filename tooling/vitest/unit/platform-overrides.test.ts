@@ -6,6 +6,7 @@ import {
   electroPlatformCapabilityDefinitionSchema,
   resetPlatformStyleOverride,
   resolveDeclaredPlatformCapabilities,
+  resolvePlatformStyleDeclaration,
   resolvePlatformStyleProperty,
   setPlatformStyleOverride,
   summarizeDeclaredPlatformCapabilities,
@@ -43,6 +44,14 @@ describe('platform overrides', () => {
 
     expect(reset.platform.android).toEqual({ opacity: 0.8 });
     expect(base.platform).toEqual({});
+  });
+
+  it('resolves optional platform visibility when a legacy responsive declaration omits the key', () => {
+    const style = setPlatformStyleOverride(createDefaultElectroCraftStyle(), 'ios', 'visibility', 'hidden');
+    const legacyResponsive = structuredClone(responsive);
+    delete legacyResponsive.visibility;
+
+    expect(resolvePlatformStyleDeclaration(style, legacyResponsive, 'ios').visibility).toBe('hidden');
   });
 
   it('uses registry declarations for target badges and fails closed when a capability is missing', () => {
