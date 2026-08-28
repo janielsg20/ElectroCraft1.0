@@ -3,6 +3,7 @@ import { packageDescriptor as dep1 } from '@electrocraft/application';
 
 export * from './puck-action-sync';
 export * from './puck-adapter-contract';
+export * from './puck-advanced-selection';
 export * from './puck-canvas-guide-overlay';
 export * from './puck-canvas-guides';
 export * from './puck-command-controls';
