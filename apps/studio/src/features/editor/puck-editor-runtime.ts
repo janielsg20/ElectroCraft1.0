@@ -6,8 +6,9 @@ import {
   type ElectroCraftComponentDefinition,
   type ElectroCraftDocument,
 } from '@electrocraft/domain';
-import { puckEditorCommandControls, type PuckRendererRegistry } from '@electrocraft/editor-puck';
+import { puckCanvasGuideControls, puckEditorCommandControls, type PuckRendererRegistry } from '@electrocraft/editor-puck';
 import { projectStorageRuntime } from '../projects/project-storage-runtime';
+import { editorCanvasPreferencesRuntime } from './editor-canvas-preferences-runtime';
 import { createStudioPuckActionSync } from './puck-action-sync';
 import { studioCoreEditorDefinitions, studioCoreEditorRenderers } from './puck-core-components';
 import { createStudioPuckDocumentPersistenceBridge, type PuckDocumentAutosavePort } from './puck-document-persistence';
@@ -79,6 +80,14 @@ function resolveProjectDocument(opened: OpenProjectResult): { document: ElectroC
 export async function loadStudioPuckEditor(options: LoadStudioPuckEditorOptions) {
   const runtime = options.projectRuntime ?? projectStorageRuntime;
   await runtime.initialize();
+  const canvasPreferences = editorCanvasPreferencesRuntime.getSnapshot();
+  puckCanvasGuideControls.configure({
+    rulersVisible: canvasPreferences.rulersVisible,
+    guidesVisible: canvasPreferences.guidesVisible,
+    snappingEnabled: canvasPreferences.snappingEnabled,
+    gridSize: canvasPreferences.snapGridSize,
+  });
+
   const opened = await runtime.openProject(options.projectId);
   if (!opened) throw new Error('El proyecto seleccionado ya no está disponible.');
 
