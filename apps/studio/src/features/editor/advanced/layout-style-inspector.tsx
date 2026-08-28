@@ -11,8 +11,16 @@ import {
   TabsList,
   TabsTrigger,
 } from '@electrocraft/design-system';
-import type { ElectroCraftLayout, ElectroCraftLength, ElectroCraftStyle } from '@electrocraft/domain';
-import { usePuckEditorPresentation } from '@electrocraft/editor-puck';
+import {
+  resetResponsiveStyleOverride,
+  resolveResponsiveStyleProperty,
+  setResponsiveStyleOverride,
+  type ElectroCraftLayout,
+  type ElectroCraftLength,
+  type ElectroCraftStyle,
+} from '@electrocraft/domain';
+import { puckResponsiveControls, usePuckEditorPresentation } from '@electrocraft/editor-puck';
+import { useSyncExternalStore } from 'react';
 import { getStudioHelpDescriptor } from '../../../help/help-registry';
 import './layout-style-inspector.css';
 
@@ -222,6 +230,158 @@ function StyleControls({
   );
 }
 
+function ResponsiveControls({
+  style,
+  onChange,
+}: {
+  readonly style: ElectroCraftStyle;
+  readonly onChange: (style: ElectroCraftStyle) => void;
+}) {
+  const responsive = useSyncExternalStore(
+    puckResponsiveControls.subscribe,
+    puckResponsiveControls.getSnapshot,
+    puckResponsiveControls.getSnapshot,
+  );
+  const breakpointId = responsive.currentId;
+  const currentBreakpoint = responsive.breakpoints.find((breakpoint) => breakpoint.id === breakpointId);
+  const breakpointIds = responsive.breakpoints.map((breakpoint) => breakpoint.id);
+  const resolved = resolveResponsiveStyleProperty(
+    { base: style.base, overrides: style.responsive },
+    breakpointIds,
+    breakpointId,
+    'width',
+  );
+  const width = resolved.value;
+  const hasOverride = resolved.source.kind === 'override';
+  const inheritedId = resolved.source.kind === 'inherited' ? resolved.source.breakpointId : null;
+  const source =
+    resolved.source.kind === 'base'
+      ? 'Base'
+      : resolved.source.kind === 'override'
+        ? 'Anulado aquí'
+        : `Heredado de ${responsive.breakpoints.find((item) => item.id === inheritedId)?.label ?? inheritedId}`;
+
+  const setWidth = (value: ElectroCraftLength | null) => {
+    if (breakpointId === null) {
+      onChange({ ...style, base: { ...style.base, width: value } });
+      return;
+    }
+    const updated = setResponsiveStyleOverride(
+      { base: style.base, overrides: style.responsive },
+      breakpointId,
+      'width',
+      value,
+    );
+    onChange({ ...style, responsive: updated.overrides });
+  };
+
+  const resetWidth = () => {
+    if (breakpointId === null) return;
+    const updated = resetResponsiveStyleOverride(
+      { base: style.base, overrides: style.responsive },
+      breakpointId,
+      'width',
+    );
+    onChange({ ...style, responsive: updated.overrides });
+  };
+
+  return (
+    <section className="ec-presentation-group" aria-labelledby="ec-responsive-heading">
+      <div className="ec-presentation-group-heading">
+        <div>
+          <h4 id="ec-responsive-heading">Responsive</h4>
+          <span data-responsive-source={hasOverride ? 'override' : breakpointId ? 'inherited' : 'base'}>{source}</span>
+        </div>
+        <Button size="sm" variant="ghost" disabled={!hasOverride} onClick={resetWidth}>
+          Restablecer
+        </Button>
+      </div>
+      <p>
+        {breakpointId === null
+          ? 'Selecciona un breakpoint en la barra superior para crear una anulación.'
+          : `Editando ${responsive.breakpoints.find((item) => item.id === breakpointId)?.label ?? breakpointId}.`}
+      </p>
+      <div className="ec-layout-presets" role="group" aria-label="Breakpoints personalizados">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            let suffix = responsive.breakpoints.length + 1;
+            while (responsive.breakpoints.some((breakpoint) => breakpoint.id === `custom-${suffix}`)) suffix += 1;
+            const id = `custom-${suffix}`;
+            puckResponsiveControls.addCustom({
+              id,
+              label: `Personalizado ${suffix}`,
+              width: 1200,
+              height: 800,
+              orientation: 'landscape',
+            });
+          }}
+        >
+          Crear breakpoint
+        </Button>
+      </div>
+      {currentBreakpoint?.custom ? (
+        <div className="ec-presentation-group" aria-label="Editar breakpoint personalizado">
+          <label className="ec-presentation-field">
+            <span>Identificador estable</span>
+            <Input
+              key={`${currentBreakpoint.id}-id`}
+              defaultValue={currentBreakpoint.id}
+              onBlur={(event) =>
+                puckResponsiveControls.updateCustom(currentBreakpoint.id, { id: event.currentTarget.value })
+              }
+            />
+          </label>
+          <label className="ec-presentation-field">
+            <span>Nombre</span>
+            <Input
+              key={`${currentBreakpoint.id}-label`}
+              defaultValue={currentBreakpoint.label}
+              onBlur={(event) =>
+                puckResponsiveControls.updateCustom(currentBreakpoint.id, { label: event.currentTarget.value })
+              }
+            />
+          </label>
+          <label className="ec-presentation-field">
+            <span>Ancho del viewport</span>
+            <Input
+              type="number"
+              min={240}
+              max={7680}
+              value={currentBreakpoint.width}
+              onChange={(event) =>
+                puckResponsiveControls.updateCustom(currentBreakpoint.id, { width: event.currentTarget.valueAsNumber })
+              }
+            />
+          </label>
+        </div>
+      ) : null}
+      <label className="ec-presentation-field">
+        <span>Ancho</span>
+        <Input
+          type="number"
+          min={0}
+          value={width?.kind === 'value' && width.unit === 'px' ? width.value : ''}
+          placeholder="Automático"
+          onChange={(event) =>
+            setWidth(
+              event.currentTarget.value === ''
+                ? null
+                : { kind: 'value', value: event.currentTarget.valueAsNumber, unit: 'px' },
+            )
+          }
+        />
+      </label>
+      {breakpointId !== null && !hasOverride ? (
+        <Button variant="outline" size="sm" onClick={() => setWidth(style.base.width)}>
+          Anular aquí
+        </Button>
+      ) : null}
+    </section>
+  );
+}
+
 export function LayoutStyleInspector() {
   const presentation = usePuckEditorPresentation();
 
@@ -234,9 +394,10 @@ export function LayoutStyleInspector() {
   return (
     <div className="ec-presentation-inspector" data-puck-layout-style-inspector>
       <Tabs defaultValue="layout">
-        <TabsList className="ec-presentation-tabs" aria-label="Diseño y estilo">
+        <TabsList className="ec-presentation-tabs" aria-label="Diseño, estilo y responsive">
           <TabsTrigger value="layout">Diseño</TabsTrigger>
           <TabsTrigger value="style">Estilo</TabsTrigger>
+          <TabsTrigger value="responsive">Responsive</TabsTrigger>
         </TabsList>
         <TabsContent value="layout">
           <LayoutControls
@@ -253,6 +414,9 @@ export function LayoutStyleInspector() {
             onChange={presentation.setStyle}
             onReset={presentation.resetStyle}
           />
+        </TabsContent>
+        <TabsContent value="responsive">
+          <ResponsiveControls style={presentation.style} onChange={presentation.setStyle} />
         </TabsContent>
       </Tabs>
       <aside className="ec-presentation-help" data-help-id="help.editor.advanced" aria-label={help.title}>

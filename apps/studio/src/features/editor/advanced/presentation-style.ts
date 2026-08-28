@@ -3,7 +3,9 @@ import type {
   ElectroCraftLayout,
   ElectroCraftLength,
   ElectroCraftStyle,
+  ElectroCraftBreakpointId,
 } from '@electrocraft/domain';
+import { resolveResponsiveStyleDeclaration } from '@electrocraft/domain';
 import { parsePuckNodePresentation } from '@electrocraft/editor-puck';
 import type { CSSProperties } from 'react';
 
@@ -50,8 +52,16 @@ function layoutStyle(layout: ElectroCraftLayout): CSSProperties {
   return shared;
 }
 
-function declarationStyle(style: ElectroCraftStyle): CSSProperties {
-  const base = style.base;
+function declarationStyle(
+  style: ElectroCraftStyle,
+  breakpointIds: readonly ElectroCraftBreakpointId[],
+  breakpointId: ElectroCraftBreakpointId | null,
+): CSSProperties {
+  const base = resolveResponsiveStyleDeclaration(
+    { base: style.base, overrides: style.responsive },
+    breakpointIds,
+    breakpointId,
+  );
   return {
     width: length(base.width),
     height: length(base.height),
@@ -73,10 +83,12 @@ export function resolveStudioPresentationStyle(
   props: Readonly<Record<string, unknown>>,
   fallbackLayout: ElectroCraftLayout,
   fallbackStyle: ElectroCraftStyle,
+  breakpointIds: readonly ElectroCraftBreakpointId[] = [],
+  breakpointId: ElectroCraftBreakpointId | null = null,
 ): CSSProperties {
   const presentation = parsePuckNodePresentation(props);
   return {
     ...layoutStyle(presentation.layout ?? fallbackLayout),
-    ...declarationStyle(presentation.style ?? fallbackStyle),
+    ...declarationStyle(presentation.style ?? fallbackStyle, breakpointIds, breakpointId),
   };
 }

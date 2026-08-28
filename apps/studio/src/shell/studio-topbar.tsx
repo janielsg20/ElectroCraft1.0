@@ -1,5 +1,10 @@
 import {
   Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Sheet,
   SheetClose,
   SheetContent,
@@ -9,7 +14,7 @@ import {
   SheetTrigger,
   getStudioIcon,
 } from '@electrocraft/design-system';
-import { puckEditorHistoryControls } from '@electrocraft/editor-puck';
+import { puckEditorHistoryControls, puckResponsiveControls } from '@electrocraft/editor-puck';
 import { useEffect, useSyncExternalStore } from 'react';
 import { editorHistoryPreferencesRuntime } from '../features/editor/editor-history-preferences-runtime';
 import { EditorSettings } from '../features/editor/editor-settings';
@@ -115,6 +120,11 @@ function TopbarToolCluster({
     puckEditorHistoryControls.getSnapshot,
     puckEditorHistoryControls.getSnapshot,
   );
+  const responsive = useSyncExternalStore(
+    puckResponsiveControls.subscribe,
+    puckResponsiveControls.getSnapshot,
+    puckResponsiveControls.getSnapshot,
+  );
 
   return (
     <div className="ec-topbar-tool-cluster" aria-label={copy.toolsTitle}>
@@ -130,14 +140,25 @@ function TopbarToolCluster({
         <PlatformIcon aria-hidden="true" />
         <span>{copy.platformValue}</span>
       </span>
-      <span
-        className="ec-topbar-tool"
-        data-topbar-tool="breakpoint"
-        aria-label={`${copy.breakpointLabel}: ${copy.breakpointLabels[breakpoint]}`}
-      >
+      <div className="ec-topbar-tool ec-topbar-breakpoint-select" data-topbar-tool="breakpoint">
         <BreakpointIcon aria-hidden="true" />
-        <span>{copy.breakpointLabels[breakpoint]}</span>
-      </span>
+        <Select
+          value={responsive.currentId ?? ''}
+          disabled={!responsive.connected}
+          onValueChange={(value) => puckResponsiveControls.select(value)}
+        >
+          <SelectTrigger aria-label={copy.breakpointLabel}>
+            <SelectValue placeholder={copy.breakpointLabels[breakpoint]} />
+          </SelectTrigger>
+          <SelectContent>
+            {responsive.breakpoints.map((item) => (
+              <SelectItem key={item.id} value={item.id}>
+                {item.label} · {item.width}px
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
       <Button variant="ghost" size="sm" asChild>
         <a href="/history">
           <HistoryIcon aria-hidden="true" />

@@ -5,6 +5,9 @@ import {
   type ElectroCraftDocument,
   type ElectroCraftDocumentNode,
   type JsonValue,
+  ELECTROCRAFT_RESPONSIVE_METADATA_KEY,
+  readResponsiveConfigurationMetadata,
+  electroCraftResponsiveConfigurationSchema,
 } from '@electrocraft/domain';
 import {
   ELECTROCRAFT_PUCK_CHILDREN_SLOT,
@@ -20,6 +23,7 @@ import {
   projectPuckNodePresentation,
   stripPuckNodePresentation,
 } from './puck-layout-style';
+import { ELECTROCRAFT_PUCK_RESPONSIVE_CONFIG_PROP } from './puck-responsive-viewports';
 
 export type PuckEditorData = Data;
 export type PuckDocumentDiagnosticCode =
@@ -312,8 +316,13 @@ export function createPuckDocumentAdapter(options: PuckDocumentAdapterOptions): 
       return Object.freeze({
         data: {
           content,
-          root: { props: projectPuckNodePresentation(cloneCanonicalProps(canonical.root.props), canonical.root) },
-        },
+          root: {
+            props: {
+              ...projectPuckNodePresentation(cloneCanonicalProps(canonical.root.props), canonical.root),
+              [ELECTROCRAFT_PUCK_RESPONSIVE_CONFIG_PROP]: readResponsiveConfigurationMetadata(canonical.metadata),
+            },
+          },
+        } as PuckEditorData,
         diagnostics: Object.freeze(diagnostics),
       });
     },
@@ -334,13 +343,31 @@ export function createPuckDocumentAdapter(options: PuckDocumentAdapterOptions): 
       const diagnostics: PuckDocumentDiagnostic[] = [];
       const seenIds = new Set<string>([base.root.id]);
       const children = currentData.content.map((component) => reconstructNode(component, diagnostics, seenIds));
+      const rootProps = currentRootProps(currentData);
+      const responsive = electroCraftResponsiveConfigurationSchema.parse(
+        rootProps[ELECTROCRAFT_PUCK_RESPONSIVE_CONFIG_PROP] ?? readResponsiveConfigurationMetadata(base.metadata),
+      );
+      const canonicalRootProps = stripPuckNodePresentation(rootProps);
+      delete canonicalRootProps[ELECTROCRAFT_PUCK_RESPONSIVE_CONFIG_PROP];
       const root = electroCraftDocumentNodeSchema.parse({
         ...base.root,
-        props: stripPuckNodePresentation(currentRootProps(currentData)),
-        ...parsePuckNodePresentation(currentRootProps(currentData)),
+        props: canonicalRootProps,
+        ...parsePuckNodePresentation(rootProps),
         children,
       });
-      const document = electroCraftDocumentSchema.parse({ ...base, root });
+      const metadata = { ...base.metadata };
+      const baseResponsive = readResponsiveConfigurationMetadata(base.metadata);
+      if (
+        ELECTROCRAFT_RESPONSIVE_METADATA_KEY in base.metadata ||
+        JSON.stringify(responsive) !== JSON.stringify(baseResponsive)
+      ) {
+        metadata[ELECTROCRAFT_RESPONSIVE_METADATA_KEY] = responsive;
+      }
+      const document = electroCraftDocumentSchema.parse({
+        ...base,
+        root,
+        metadata,
+      });
 
       return Object.freeze({ document, diagnostics: Object.freeze(diagnostics) });
     },

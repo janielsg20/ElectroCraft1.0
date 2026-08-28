@@ -74,7 +74,12 @@ describe('M05.1/M05.3 ElectroCraftDocument <-> Puck Data adapter', () => {
     const projection = adapter.toPuck(document);
 
     expect(projection.diagnostics).toEqual([]);
-    expect(projection.data.root).toEqual({ props: { label: 'Inicio' } });
+    expect(projection.data.root).toMatchObject({
+      props: {
+        label: 'Inicio',
+        __electrocraftResponsiveConfiguration: { schemaVersion: 1, breakpoints: expect.any(Array) },
+      },
+    });
     expect(projection.data.content).toHaveLength(1);
     expect(projection.data.content[0]).toMatchObject({
       type: 'Container',
@@ -95,6 +100,30 @@ describe('M05.1/M05.3 ElectroCraftDocument <-> Puck Data adapter', () => {
     expect(reconstructed.document.root.id).toBe(rootId);
     expect(reconstructed.document.root.componentRef).toBe('core.root');
     expect(reconstructed.document.metadata).toEqual({ locale: 'es', source: 'm05.1' });
+  });
+
+  it('persists custom responsive configuration through the root adapter transport', () => {
+    const document = documentFixture();
+    const adapter = createPuckDocumentAdapter({ knownComponentRefs: ['Container', 'Text'] });
+    const projection = adapter.toPuck(document);
+    const rootProps = projection.data.root.props as Record<string, unknown>;
+    const configuration = rootProps.__electrocraftResponsiveConfiguration as {
+      schemaVersion: 1;
+      breakpoints: Array<Record<string, unknown>>;
+    };
+    rootProps.__electrocraftResponsiveConfiguration = {
+      ...configuration,
+      breakpoints: [
+        ...configuration.breakpoints,
+        { id: 'kiosk', label: 'Quiosco', width: 1920, height: 1080, orientation: 'landscape', custom: true },
+      ],
+    };
+
+    const reconstructed = adapter.fromPuck(projection.data, document).document;
+    expect(reconstructed.metadata.responsive).toMatchObject({
+      breakpoints: expect.arrayContaining([expect.objectContaining({ id: 'kiosk', width: 1920, custom: true })]),
+    });
+    expect(reconstructed.root.props).toEqual(document.root.props);
   });
 
   it('projects an unknown canonical component as a visible recoverable diagnostic without data loss', () => {

@@ -28,9 +28,12 @@ describe('M06.1 Layout/Style inspector ownership boundary', () => {
     expect(css).toContain('min-height: 44px');
   });
 
-  it('keeps raw CSS and responsive authoring out of the M06.1 inspector', () => {
+  it('keeps raw CSS out while M06.2 responsive authoring crosses the public adapter', () => {
     const studio = read('apps/studio/src/features/editor/advanced/layout-style-inspector.tsx');
-    expect(studio).not.toMatch(/className.*onChange|cssText|mediaQuery|breakpoint/);
+    const controls = read('packages/editor-puck/src/puck-responsive-controls.ts');
+    expect(studio).not.toMatch(/className.*onChange|cssText|mediaQuery|@puckeditor\/core/);
     expect(studio).toContain("kind: 'token'");
+    expect(studio).toContain('puckResponsiveControls');
+    expect(controls).not.toContain("type: 'setUi'");
   });
 });
