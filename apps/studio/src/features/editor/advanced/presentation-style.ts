@@ -1,11 +1,12 @@
 import type {
+  ElectroCraftBreakpointId,
   ElectroCraftColor,
+  ElectroCraftEditorPlatform,
   ElectroCraftLayout,
   ElectroCraftLength,
   ElectroCraftStyle,
-  ElectroCraftBreakpointId,
 } from '@electrocraft/domain';
-import { resolveResponsiveStyleDeclaration } from '@electrocraft/domain';
+import { resolvePlatformStyleDeclaration, resolveResponsiveStyleDeclaration } from '@electrocraft/domain';
 import { parsePuckNodePresentation } from '@electrocraft/editor-puck';
 import type { CSSProperties } from 'react';
 
@@ -56,26 +57,28 @@ function declarationStyle(
   style: ElectroCraftStyle,
   breakpointIds: readonly ElectroCraftBreakpointId[],
   breakpointId: ElectroCraftBreakpointId | null,
+  platform: ElectroCraftEditorPlatform,
 ): CSSProperties {
-  const base = resolveResponsiveStyleDeclaration(
+  const responsive = resolveResponsiveStyleDeclaration(
     { base: style.base, overrides: style.responsive },
     breakpointIds,
     breakpointId,
   );
+  const declaration = resolvePlatformStyleDeclaration(style, responsive, platform);
   return {
-    width: length(base.width),
-    height: length(base.height),
-    minWidth: length(base.minWidth),
-    maxWidth: length(base.maxWidth),
-    gap: length(base.gap),
-    padding: length(base.padding),
-    margin: length(base.margin),
-    fontSize: length(base.fontSize),
-    fontWeight: base.fontWeight ?? undefined,
-    textAlign: base.textAlign ?? undefined,
-    color: color(base.foreground),
-    background: color(base.background),
-    opacity: base.opacity ?? undefined,
+    width: length(declaration.width),
+    height: length(declaration.height),
+    minWidth: length(declaration.minWidth),
+    maxWidth: length(declaration.maxWidth),
+    gap: length(declaration.gap),
+    padding: length(declaration.padding),
+    margin: length(declaration.margin),
+    fontSize: length(declaration.fontSize),
+    fontWeight: declaration.fontWeight ?? undefined,
+    textAlign: declaration.textAlign ?? undefined,
+    color: color(declaration.foreground),
+    background: color(declaration.background),
+    opacity: declaration.opacity ?? undefined,
   };
 }
 
@@ -85,10 +88,11 @@ export function resolveStudioPresentationStyle(
   fallbackStyle: ElectroCraftStyle,
   breakpointIds: readonly ElectroCraftBreakpointId[] = [],
   breakpointId: ElectroCraftBreakpointId | null = null,
+  platform: ElectroCraftEditorPlatform = 'web',
 ): CSSProperties {
   const presentation = parsePuckNodePresentation(props);
   return {
     ...layoutStyle(presentation.layout ?? fallbackLayout),
-    ...declarationStyle(presentation.style ?? fallbackStyle, breakpointIds, breakpointId),
+    ...declarationStyle(presentation.style ?? fallbackStyle, breakpointIds, breakpointId, platform),
   };
 }
