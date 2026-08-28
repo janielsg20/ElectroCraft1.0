@@ -82,7 +82,7 @@ describe('M05.1 Studio Puck document session', () => {
       },
     );
 
-    expect(session.data.root).toEqual({ props: { label: 'Inicio' } });
+    expect(session.data.root).toMatchObject({ props: { label: 'Inicio' } });
     expect(session.config.components.Container.fields?.children).toMatchObject({ type: 'slot', label: 'Contenido' });
     expect(session.diagnostics).toContainEqual(
       expect.objectContaining({ code: 'unknown-component', componentRef: 'LegacyWidget' }),

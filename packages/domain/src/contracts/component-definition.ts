@@ -65,12 +65,13 @@ export type ElectroCraftStyleDeclaration = z.infer<typeof electroCraftStyleDecla
 
 export const electroCraftStyleOverrideSchema = electroCraftStyleDeclarationSchema.partial();
 export const electroCraftBreakpointSchema = z.enum(['mobile', 'tablet', 'laptop', 'desktop']);
+export const electroCraftResponsiveBreakpointIdSchema = z.string().regex(/^[a-z][a-z0-9-]{0,63}$/);
 export const electroCraftPlatformSchema = z.enum(['web', 'native', 'ios', 'android']);
 
 export const electroCraftStyleSchema = z.strictObject({
   schemaVersion: z.literal(1),
   base: electroCraftStyleDeclarationSchema,
-  responsive: z.partialRecord(electroCraftBreakpointSchema, electroCraftStyleOverrideSchema),
+  responsive: z.record(electroCraftResponsiveBreakpointIdSchema, electroCraftStyleOverrideSchema),
   platform: z.partialRecord(electroCraftPlatformSchema, electroCraftStyleOverrideSchema),
 });
 export type ElectroCraftStyle = z.infer<typeof electroCraftStyleSchema>;

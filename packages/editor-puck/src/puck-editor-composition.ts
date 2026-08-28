@@ -1,7 +1,9 @@
 import { Puck, createUsePuck, type Config, type Data } from '@puckeditor/core';
 import { createDeterministicObjectId } from '@electrocraft/domain';
 import {
+  ELECTROCRAFT_RESPONSIVE_PRESETS,
   electroCraftLayoutSchema,
+  electroCraftResponsiveConfigurationSchema,
   electroCraftStyleSchema,
   type ElectroCraftLayout,
   type ElectroCraftStyle,
@@ -11,6 +13,11 @@ import { puckEditorCommandControls } from './puck-command-controls';
 import { puckEditorHistoryControls } from './puck-history-controls';
 import { applyPuckHistoryPolicy } from './puck-history-policy';
 import { parsePuckNodePresentation, projectPuckNodePresentation } from './puck-layout-style';
+import { puckResponsiveControls } from './puck-responsive-controls';
+import {
+  ELECTROCRAFT_PUCK_RESPONSIVE_CONFIG_PROP,
+  projectResponsiveConfigurationToPuckViewports,
+} from './puck-responsive-viewports';
 
 export type PuckEditorConfig = Config;
 export type PuckEditorOnChange = (data: Data) => void;
@@ -70,6 +77,45 @@ function PuckHistoryBridge() {
   return null;
 }
 
+function PuckResponsiveBridge() {
+  const dispatch = usePuckEditorDispatch();
+  const currentWidth = useElectroCraftPuck((api) => api.appState.ui.viewports.current.width);
+  const root = useElectroCraftPuck((api) => api.appState.data.root);
+  const rootProps = (root.props ?? {}) as Record<string, unknown>;
+  const responsiveConfiguration = useMemo(
+    () =>
+      electroCraftResponsiveConfigurationSchema.parse(
+        rootProps[ELECTROCRAFT_PUCK_RESPONSIVE_CONFIG_PROP] ?? ELECTROCRAFT_RESPONSIVE_PRESETS,
+      ),
+    [rootProps],
+  );
+  useEffect(
+    () =>
+      puckResponsiveControls.connect({
+        setViewport: (current) =>
+          dispatch({ type: 'setUi', ui: (previous) => ({ viewports: { ...previous.viewports, current } }) }),
+        setBreakpoints: (breakpoints) =>
+          dispatch({
+            type: 'replaceRoot',
+            root: {
+              ...root,
+              props: {
+                ...rootProps,
+                [ELECTROCRAFT_PUCK_RESPONSIVE_CONFIG_PROP]: { schemaVersion: 1, breakpoints },
+              },
+            } as typeof root,
+          }),
+      }),
+    [dispatch, root, rootProps],
+  );
+  useEffect(
+    () => puckResponsiveControls.setBreakpoints(responsiveConfiguration.breakpoints),
+    [responsiveConfiguration.breakpoints],
+  );
+  useEffect(() => puckResponsiveControls.syncCurrent(currentWidth), [currentWidth]);
+  return null;
+}
+
 /**
  * Public Puck composition surface owned by the editor-puck adapter.
  * Studio never imports @puckeditor/core directly. Session-only command/history
@@ -85,8 +131,16 @@ export function PuckEditorRoot({ iframe, children, ...props }: ComponentProps<ty
         ...iframe,
         ...electroCraftPuckIframeConfig,
       },
+      viewports: props.viewports ?? projectResponsiveConfigurationToPuckViewports(ELECTROCRAFT_RESPONSIVE_PRESETS),
     },
-    createElement(Fragment, null, createElement(PuckCommandBridge), createElement(PuckHistoryBridge), children),
+    createElement(
+      Fragment,
+      null,
+      createElement(PuckCommandBridge),
+      createElement(PuckHistoryBridge),
+      createElement(PuckResponsiveBridge),
+      children,
+    ),
   );
 }
 

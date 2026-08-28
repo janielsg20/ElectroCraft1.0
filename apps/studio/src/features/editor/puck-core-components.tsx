@@ -4,7 +4,8 @@ import {
   type ElectroCraftComponentDefinition,
 } from '@electrocraft/domain';
 import type { PuckCanonicalRenderer, PuckRendererRegistry } from '@electrocraft/editor-puck';
-import { createElement, isValidElement, type ComponentType, type ReactNode } from 'react';
+import { puckResponsiveControls } from '@electrocraft/editor-puck';
+import { createElement, isValidElement, useSyncExternalStore, type ComponentType, type ReactNode } from 'react';
 import { resolveStudioPresentationStyle } from './advanced/presentation-style';
 
 const emptyStyle = Object.freeze({
@@ -94,29 +95,36 @@ function slotNode(value: unknown): ReactNode {
   return null;
 }
 
-function presentationStyle(props: Record<string, unknown>, definitionIndex: number) {
+function usePresentationStyle(props: Record<string, unknown>, definitionIndex: number) {
   const definition = studioCoreEditorDefinitions[definitionIndex];
-  return resolveStudioPresentationStyle(props, definition.layout, definition.style);
+  const responsive = useSyncExternalStore(
+    puckResponsiveControls.subscribe,
+    puckResponsiveControls.getSnapshot,
+    puckResponsiveControls.getSnapshot,
+  );
+  return resolveStudioPresentationStyle(
+    props,
+    definition.layout,
+    definition.style,
+    responsive.breakpoints.map((breakpoint) => breakpoint.id),
+    responsive.currentId,
+  );
 }
 
-const ContainerRenderer: PuckCanonicalRenderer = ({ children, ...props }) =>
-  createElement(
-    'div',
-    { 'data-ec-core-component': 'Container', style: presentationStyle(props, 0) },
-    slotNode(children),
-  );
+const ContainerRenderer: PuckCanonicalRenderer = ({ children, ...props }) => {
+  const style = usePresentationStyle(props, 0);
+  return createElement('div', { 'data-ec-core-component': 'Container', style }, slotNode(children));
+};
 
-const TextRenderer: PuckCanonicalRenderer = ({ text, ...props }) =>
-  createElement(
-    'p',
-    { 'data-ec-core-component': 'Text', style: presentationStyle(props, 1) },
-    typeof text === 'string' ? text : '',
-  );
+const TextRenderer: PuckCanonicalRenderer = ({ text, ...props }) => {
+  const style = usePresentationStyle(props, 1);
+  return createElement('p', { 'data-ec-core-component': 'Text', style }, typeof text === 'string' ? text : '');
+};
 
 const ImageRenderer: PuckCanonicalRenderer = ({ src, alt, ...props }) => {
   const source = typeof src === 'string' ? src.trim() : '';
   const alternative = typeof alt === 'string' && alt.trim() ? alt.trim() : 'Imagen';
-  const style = presentationStyle(props, 2);
+  const style = usePresentationStyle(props, 2);
   return source
     ? createElement('img', { 'data-ec-core-component': 'Image', src: source, alt: alternative, style })
     : createElement(
@@ -126,12 +134,14 @@ const ImageRenderer: PuckCanonicalRenderer = ({ src, alt, ...props }) => {
       );
 };
 
-const ButtonRenderer: PuckCanonicalRenderer = ({ label, ...props }) =>
-  createElement(
+const ButtonRenderer: PuckCanonicalRenderer = ({ label, ...props }) => {
+  const style = usePresentationStyle(props, 3);
+  return createElement(
     'button',
-    { 'data-ec-core-component': 'Button', type: 'button', style: presentationStyle(props, 3) },
+    { 'data-ec-core-component': 'Button', type: 'button', style },
     typeof label === 'string' ? label : 'Botón',
   );
+};
 
 export const studioCoreEditorRenderers = Object.freeze({
   Container: ContainerRenderer,
