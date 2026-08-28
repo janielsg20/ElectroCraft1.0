@@ -110,7 +110,6 @@ test.describe('M06.6 breadcrumbs and context actions', () => {
       const { studioPuckContextControls } = await import('/src/features/editor/puck-editor-runtime.ts');
       studioPuckContextControls.setVisible(false);
       const blockId = studioPuckContextControls.saveAsBlock();
-      expect;
       studioPuckContextControls.toggleLock();
       return blockId;
     });
