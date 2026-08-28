@@ -9,6 +9,7 @@ import {
 import {
   puckAdvancedSelectionControls,
   puckCanvasGuideControls,
+  puckContextControls,
   puckEditorCommandControls,
   type PuckRendererRegistry,
 } from '@electrocraft/editor-puck';
@@ -130,5 +131,6 @@ export async function loadStudioPuckEditor(options: LoadStudioPuckEditorOptions)
  */
 export const studioPuckEditorCommands = puckEditorCommandControls;
 export const studioPuckAdvancedSelection = puckAdvancedSelectionControls;
+export const studioPuckContextControls = puckContextControls;
 
 export type StudioPuckEditorRuntime = Awaited<ReturnType<typeof loadStudioPuckEditor>>;
