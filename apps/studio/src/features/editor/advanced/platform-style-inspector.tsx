@@ -20,6 +20,7 @@ import {
   type ElectroCraftDeclaredPlatformCapability,
   type ElectroCraftEditorPlatform,
   type ElectroCraftLength,
+  type ElectroCraftPlatformValueSource,
   type ElectroCraftStyle,
   type ElectroCraftStyleDeclaration,
 } from '@electrocraft/domain';
@@ -73,10 +74,7 @@ function capabilityTone(capabilities: readonly ElectroCraftDeclaredPlatformCapab
   return summarizeDeclaredPlatformCapabilities(capabilities) ?? 'neutral';
 }
 
-function sourceLabel(
-  source: ReturnType<typeof resolvePlatformStyleProperty>['source'],
-  platform: ElectroCraftEditorPlatform,
-) {
+function sourceLabel(source: ElectroCraftPlatformValueSource, platform: ElectroCraftEditorPlatform) {
   if (source.kind === 'platform') return `Anulado en ${platformLabels[platform]}`;
   if (source.kind === 'native') return 'Heredado de Nativo';
   return 'Heredado de Responsive';
