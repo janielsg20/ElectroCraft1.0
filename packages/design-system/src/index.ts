@@ -1,5 +1,4 @@
 import './styles/globals.css';
-import './styles/editor-guides.css';
 import { packageDescriptor as dep0 } from '@electrocraft/domain';
 
 export * from './components/ui';
