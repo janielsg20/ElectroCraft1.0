@@ -68,6 +68,14 @@ function ContextBar() {
           <button type="button" role="menuitem" onClick={() => safely(() => puckContextControls.duplicate())}>
             Duplicar
           </button>
+          <button
+            type="button"
+            role="menuitem"
+            disabled={!context.blockSaverConnected}
+            onClick={() => safely(() => puckContextControls.saveAsBlock())}
+          >
+            Guardar como bloque
+          </button>
           <button type="button" role="menuitem" onClick={() => safely(() => puckContextControls.setVisible(context.hidden))}>
             {context.hidden ? 'Visible' : 'Ocultar'}
           </button>
