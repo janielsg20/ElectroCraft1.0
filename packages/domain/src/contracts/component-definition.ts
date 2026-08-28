@@ -60,6 +60,7 @@ export const electroCraftStyleDeclarationSchema = z.strictObject({
   foreground: electroCraftColorSchema.nullable(),
   background: electroCraftColorSchema.nullable(),
   opacity: z.number().min(0).max(1).nullable(),
+  visibility: z.enum(['visible', 'hidden']).nullable().optional(),
 });
 export type ElectroCraftStyleDeclaration = z.infer<typeof electroCraftStyleDeclarationSchema>;
 
@@ -93,6 +94,7 @@ export function createDefaultElectroCraftStyle(): ElectroCraftStyle {
       foreground: null,
       background: null,
       opacity: null,
+      visibility: null,
     },
     responsive: {},
     platform: {},
