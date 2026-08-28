@@ -79,6 +79,7 @@ function declarationStyle(
     color: color(declaration.foreground),
     background: color(declaration.background),
     opacity: declaration.opacity ?? undefined,
+    display: declaration.visibility === 'hidden' ? 'none' : undefined,
   };
 }
 
