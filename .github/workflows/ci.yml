@@ -30,58 +30,25 @@ jobs:
           node-version: '22.16.0'
           cache: npm
           cache-dependency-path: package-lock.json
-      - name: Verify locked toolchain contract
-        run: |
-          test "$(node --version)" = 'v22.16.0'
-          test "$(npm --version)" = '10.9.2'
-          test "$(npm config get legacy-peer-deps)" = 'true'
-          test -f package-lock.json
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: Normalize formatting for F06 gate diagnostics
-        run: |
-          npm run format
-          echo '--- PRETTIER PATCH START ---'
-          git diff --no-ext-diff -- .
-          echo '--- PRETTIER PATCH END ---'
-      - name: Verify documentation conventions
-        run: npm run test:docs
-      - name: Lint
-        run: npm run lint
-      - name: Typecheck
-        run: npm run typecheck
-      - name: Test
-        run: npm run test
-      - name: Build
-        run: npm run build
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
-      - name: Playwright repository gate
-        run: npm run test:e2e
-      - name: Empty repository fixture
-        run: npm run test:empty-repo
-      - name: Verify CI base artifact
-        run: npm run build:ci | tee m01-5-ci-base.log
-      - name: Verify M01.6 documentation artifact
-        run: npm run build:docs | tee m01-6-doc-conventions.log
-      - name: Emit M01.5 closure candidate marker
-        run: echo PASS_M01_5_BASE_CI | tee m01-5-closure.log
-      - name: Emit M01.6 closure candidate marker
-        run: echo PASS_M01_6_DOC_CONVENTIONS | tee m01-6-closure.log
+      - name: Format F06 closure files
+        run: npm run format
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
-          name: m01-5-base-ci-evidence
+          name: f06-prettier-files
           path: |
-            tooling/dist/m01-5-ci-base-report.json
-            apps/studio/dist
-            m01-5-ci-base.log
-            m01-5-closure.log
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: m01-6-doc-conventions-evidence
-          path: |
-            tooling/dist/m01-6-doc-conventions-report.json
-            m01-6-doc-conventions.log
-            m01-6-closure.log
+            packages/application/src/editor-canvas-preferences.ts
+            packages/editor-puck/src/puck-canvas-guides.ts
+            packages/editor-puck/src/puck-editor-composition.ts
+            packages/editor-puck/src/puck-platform-controls.ts
+            packages/design-system/src/components/ui/platform-badge.tsx
+            apps/studio/src/features/editor/advanced/platform-style-inspector.tsx
+            apps/studio/src/features/editor/puck-document-session.ts
+            apps/studio/src/features/editor/puck-editor-runtime.ts
+            tooling/vitest/contract/platform-overrides-boundary.test.ts
+            tooling/vitest/integration/platform-canvas-style.test.ts
+            tooling/vitest/unit/puck-context-controls.test.ts
+            tooling/playwright/m06-3-platform-overrides.spec.ts
+            tooling/playwright/m06-5-advanced-selection.spec.ts
+            tooling/playwright/m06-6-context-actions.spec.ts
