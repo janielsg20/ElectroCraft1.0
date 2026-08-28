@@ -10,6 +10,7 @@ import {
   isValidElement,
   useSyncExternalStore,
   type ComponentType,
+  type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from 'react';
@@ -138,14 +139,32 @@ function useAdvancedSelection(id: unknown) {
     event.stopPropagation();
     puckAdvancedSelectionControls.toggle(nodeId);
   };
+  const onKeyDown = (event: ReactKeyboardEvent<HTMLElement>) => {
+    if (!nodeId || !event.shiftKey || (event.key !== 'Enter' && event.key !== ' ')) return;
+    event.preventDefault();
+    event.stopPropagation();
+    puckAdvancedSelectionControls.toggle(nodeId);
+  };
   return {
     nodeId,
     selected,
     onPointerDown,
+    onKeyDown,
     selectionStyle: selected
       ? ({ outline: '2px solid var(--puck-color-selection-border, currentColor)', outlineOffset: '2px' } as const)
       : null,
   };
+}
+
+function advancedSelectionProps(selection: ReturnType<typeof useAdvancedSelection>) {
+  return {
+    'data-ec-node-id': selection.nodeId ?? undefined,
+    'data-ec-multi-selected': selection.selected ? 'true' : 'false',
+    'aria-keyshortcuts': 'Shift+Enter',
+    tabIndex: 0,
+    onPointerDown: selection.onPointerDown,
+    onKeyDown: selection.onKeyDown,
+  } as const;
 }
 
 const ContainerRenderer: PuckCanonicalRenderer = ({ children, id, ...props }) => {
@@ -155,9 +174,7 @@ const ContainerRenderer: PuckCanonicalRenderer = ({ children, id, ...props }) =>
     'div',
     {
       'data-ec-core-component': 'Container',
-      'data-ec-node-id': selection.nodeId ?? undefined,
-      'data-ec-multi-selected': selection.selected ? 'true' : 'false',
-      onPointerDown: selection.onPointerDown,
+      ...advancedSelectionProps(selection),
       style: { ...style, ...(selection.selectionStyle ?? {}) },
     },
     slotNode(children),
@@ -171,9 +188,7 @@ const TextRenderer: PuckCanonicalRenderer = ({ text, id, ...props }) => {
     'p',
     {
       'data-ec-core-component': 'Text',
-      'data-ec-node-id': selection.nodeId ?? undefined,
-      'data-ec-multi-selected': selection.selected ? 'true' : 'false',
-      onPointerDown: selection.onPointerDown,
+      ...advancedSelectionProps(selection),
       style: { ...style, ...(selection.selectionStyle ?? {}) },
     },
     typeof text === 'string' ? text : '',
@@ -187,9 +202,7 @@ const ImageRenderer: PuckCanonicalRenderer = ({ src, alt, id, ...props }) => {
   const selection = useAdvancedSelection(id);
   const editorProps = {
     'data-ec-core-component': 'Image',
-    'data-ec-node-id': selection.nodeId ?? undefined,
-    'data-ec-multi-selected': selection.selected ? 'true' : 'false',
-    onPointerDown: selection.onPointerDown,
+    ...advancedSelectionProps(selection),
     style: { ...style, ...(selection.selectionStyle ?? {}) },
   };
   return source
@@ -204,9 +217,7 @@ const ButtonRenderer: PuckCanonicalRenderer = ({ label, id, ...props }) => {
     'button',
     {
       'data-ec-core-component': 'Button',
-      'data-ec-node-id': selection.nodeId ?? undefined,
-      'data-ec-multi-selected': selection.selected ? 'true' : 'false',
-      onPointerDown: selection.onPointerDown,
+      ...advancedSelectionProps(selection),
       type: 'button',
       style: { ...style, ...(selection.selectionStyle ?? {}) },
     },
