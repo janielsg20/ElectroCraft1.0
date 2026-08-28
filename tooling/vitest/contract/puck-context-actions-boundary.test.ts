@@ -49,7 +49,8 @@ describe('M06.6 context actions boundary', () => {
 
     expect(model).toContain("visibility: z.enum(['visible', 'hidden'])");
     expect(bridge).toContain("visibility: hidden ? 'hidden' : 'visible'");
-    expect(presentation).toContain("declaration.visibility === 'hidden' ? 'none' : undefined");
+    expect(presentation).toContain("if (declaration.visibility === 'hidden') resolved.display = 'none'");
+    expect(presentation).not.toContain("declaration.visibility === 'hidden' ? 'none' : undefined");
   });
 
   it('exposes persistent Spanish breadcrumbs and context actions without experimental Puck overrides', () => {
