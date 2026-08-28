@@ -6,6 +6,7 @@
 
 .ec-presentation-tabs {
   width: 100%;
+  overflow-x: auto;
 }
 
 .ec-presentation-group {
@@ -13,7 +14,8 @@
 }
 
 .ec-presentation-group-heading,
-.ec-presentation-field {
+.ec-presentation-field,
+.ec-platform-property-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -28,7 +30,9 @@
 
 .ec-presentation-group-heading span,
 .ec-presentation-help p,
-.ec-presentation-state {
+.ec-presentation-state,
+.ec-platform-property-heading span,
+.ec-platform-diagnostic span {
   margin: 0;
   color: var(--muted-foreground);
   font-size: var(--ec-text-xs);
@@ -52,22 +56,80 @@
 }
 
 .ec-presentation-help,
-.ec-presentation-state {
+.ec-presentation-state,
+.ec-platform-diagnostic,
+.ec-platform-property {
   border: 1px solid var(--border);
   border-radius: var(--radius);
+}
+
+.ec-presentation-help,
+.ec-presentation-state,
+.ec-platform-diagnostic {
   background: var(--muted);
   padding: var(--ec-space-3);
 }
 
-.ec-presentation-state--blocked {
+.ec-presentation-state--blocked,
+.ec-platform-diagnostic[data-platform-diagnostic='blocked'] {
   border-color: var(--destructive);
   color: var(--destructive);
+}
+
+.ec-platform-diagnostic,
+.ec-platform-diagnostic > div,
+.ec-platform-property {
+  display: grid;
+  gap: var(--ec-space-2);
+}
+
+.ec-platform-diagnostic > div strong {
+  font-size: var(--ec-text-xs);
+}
+
+.ec-platform-property {
+  padding: var(--ec-space-3);
+  background: var(--background);
+}
+
+.ec-platform-property-heading > div:first-child {
+  display: grid;
+  gap: 2px;
+}
+
+.ec-platform-property-heading strong {
+  font-size: var(--ec-text-sm);
+}
+
+.ec-platform-property-badges,
+.ec-platform-property-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--ec-space-1);
 }
 
 @media (max-width: 767px) {
   .ec-layout-presets button,
   .ec-presentation-field > input,
-  .ec-presentation-field > button {
+  .ec-presentation-field > button,
+  .ec-platform-property-actions button {
     min-height: 44px;
+  }
+
+  .ec-platform-property-heading,
+  .ec-presentation-field {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ec-platform-property-badges,
+  .ec-platform-property-actions {
+    justify-content: flex-start;
+  }
+
+  .ec-presentation-field > input,
+  .ec-presentation-field > button {
+    width: 100%;
   }
 }

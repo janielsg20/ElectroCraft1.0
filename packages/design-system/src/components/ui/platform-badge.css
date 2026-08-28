@@ -1,0 +1,38 @@
+.ec-platform-badge {
+  display: inline-flex;
+  min-height: 20px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 4px);
+  padding: 1px 6px;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.ec-platform-badge[data-platform-badge-tone='supported'] {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.ec-platform-badge[data-platform-badge-tone='adapted'] {
+  border-style: dashed;
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+.ec-platform-badge[data-platform-badge-tone='blocked'] {
+  border-color: var(--destructive);
+  background: color-mix(in srgb, var(--destructive) 8%, var(--background));
+  color: var(--destructive);
+}
+
+.ec-platform-badge[data-platform-badge-tone='override'] {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 9%, var(--background));
+  color: var(--foreground);
+}

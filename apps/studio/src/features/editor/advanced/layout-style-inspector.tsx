@@ -23,6 +23,7 @@ import { puckResponsiveControls, usePuckEditorPresentation } from '@electrocraft
 import { useSyncExternalStore } from 'react';
 import { getStudioHelpDescriptor } from '../../../help/help-registry';
 import './layout-style-inspector.css';
+import { PlatformStyleInspector } from './platform-style-inspector';
 
 const help = getStudioHelpDescriptor('help.editor.advanced');
 
@@ -394,10 +395,11 @@ export function LayoutStyleInspector() {
   return (
     <div className="ec-presentation-inspector" data-puck-layout-style-inspector>
       <Tabs defaultValue="layout">
-        <TabsList className="ec-presentation-tabs" aria-label="Diseño, estilo y responsive">
+        <TabsList className="ec-presentation-tabs" aria-label="Diseño, estilo, responsive y plataforma">
           <TabsTrigger value="layout">Diseño</TabsTrigger>
           <TabsTrigger value="style">Estilo</TabsTrigger>
           <TabsTrigger value="responsive">Responsive</TabsTrigger>
+          <TabsTrigger value="platform">Plataforma</TabsTrigger>
         </TabsList>
         <TabsContent value="layout">
           <LayoutControls
@@ -417,6 +419,13 @@ export function LayoutStyleInspector() {
         </TabsContent>
         <TabsContent value="responsive">
           <ResponsiveControls style={presentation.style} onChange={presentation.setStyle} />
+        </TabsContent>
+        <TabsContent value="platform">
+          <PlatformStyleInspector
+            componentType={presentation.componentType}
+            style={presentation.style}
+            onChange={presentation.setStyle}
+          />
         </TabsContent>
       </Tabs>
       <aside className="ec-presentation-help" data-help-id="help.editor.advanced" aria-label={help.title}>

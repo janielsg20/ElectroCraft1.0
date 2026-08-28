@@ -4,10 +4,12 @@ import {
   createPuckDocumentAdapter,
   electroCraftCorePuckInlineEditing,
   electroCraftCorePuckSlots,
+  projectPlatformCapabilitiesToPuckConfig,
   type PuckDocumentReconstruction,
   type PuckEditorData,
   type PuckRendererRegistry,
 } from '@electrocraft/editor-puck';
+import { createStudioEditorPlatformRegistry, studioEditorPlatformCapabilities } from './advanced/platform-capabilities';
 import { studioPuckDiagnosticRenderer } from './puck-diagnostic-renderer';
 
 export function createStudioPuckDocumentSession(
@@ -15,11 +17,15 @@ export function createStudioPuckDocumentSession(
   definitions: readonly ElectroCraftComponentDefinition[],
   renderers: PuckRendererRegistry,
 ) {
-  const config = createPuckConfig(definitions, renderers, undefined, {
+  const baseConfig = createPuckConfig(definitions, renderers, undefined, {
     slots: electroCraftCorePuckSlots,
     inlineEditing: electroCraftCorePuckInlineEditing,
     diagnosticRenderer: studioPuckDiagnosticRenderer,
     diagnosticLabel: 'Componente no disponible',
+  });
+  const config = projectPlatformCapabilitiesToPuckConfig(baseConfig, definitions, {
+    definitions: createStudioEditorPlatformRegistry(definitions),
+    capabilities: studioEditorPlatformCapabilities,
   });
   const adapter = createPuckDocumentAdapter({
     knownComponentRefs: definitions.map((definition) => definition.key),

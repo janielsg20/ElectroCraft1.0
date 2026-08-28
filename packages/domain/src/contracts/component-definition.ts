@@ -60,8 +60,26 @@ export const electroCraftStyleDeclarationSchema = z.strictObject({
   foreground: electroCraftColorSchema.nullable(),
   background: electroCraftColorSchema.nullable(),
   opacity: z.number().min(0).max(1).nullable(),
+  visibility: z.enum(['visible', 'hidden']).nullable().optional(),
 });
 export type ElectroCraftStyleDeclaration = z.infer<typeof electroCraftStyleDeclarationSchema>;
+
+export const ELECTROCRAFT_STYLE_PROPERTIES = Object.freeze([
+  'width',
+  'height',
+  'minWidth',
+  'maxWidth',
+  'gap',
+  'padding',
+  'margin',
+  'fontSize',
+  'fontWeight',
+  'textAlign',
+  'foreground',
+  'background',
+  'opacity',
+  'visibility',
+] as const satisfies readonly (keyof ElectroCraftStyleDeclaration)[]);
 
 export const electroCraftStyleOverrideSchema = electroCraftStyleDeclarationSchema.partial();
 export const electroCraftBreakpointSchema = z.enum(['mobile', 'tablet', 'laptop', 'desktop']);
@@ -93,6 +111,7 @@ export function createDefaultElectroCraftStyle(): ElectroCraftStyle {
       foreground: null,
       background: null,
       opacity: null,
+      visibility: null,
     },
     responsive: {},
     platform: {},

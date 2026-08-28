@@ -4,8 +4,16 @@ import {
   type ElectroCraftComponentDefinition,
 } from '@electrocraft/domain';
 import type { PuckCanonicalRenderer, PuckRendererRegistry } from '@electrocraft/editor-puck';
-import { puckResponsiveControls } from '@electrocraft/editor-puck';
-import { createElement, isValidElement, useSyncExternalStore, type ComponentType, type ReactNode } from 'react';
+import { puckAdvancedSelectionControls, puckPlatformControls, puckResponsiveControls } from '@electrocraft/editor-puck';
+import {
+  createElement,
+  isValidElement,
+  useSyncExternalStore,
+  type ComponentType,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
+  type ReactNode,
+} from 'react';
 import { resolveStudioPresentationStyle } from './advanced/presentation-style';
 
 const emptyStyle = Object.freeze({
@@ -57,7 +65,7 @@ function coreDefinition(
     layout: key === 'Container' ? { ...baseLayout, mode: 'stack' } : baseLayout,
     style: emptyStyle,
     references: { componentRefs: [], assetRefs: [], actionRefs: [] },
-    metadata: { builtin: 'studio-core', editorCore: true },
+    metadata: { builtin: 'studio-core', editorCore: true, resizable: key !== 'Text' },
   });
 }
 
@@ -102,43 +110,117 @@ function usePresentationStyle(props: Record<string, unknown>, definitionIndex: n
     puckResponsiveControls.getSnapshot,
     puckResponsiveControls.getSnapshot,
   );
+  const platform = useSyncExternalStore(
+    puckPlatformControls.subscribe,
+    puckPlatformControls.getSnapshot,
+    puckPlatformControls.getSnapshot,
+  );
   return resolveStudioPresentationStyle(
     props,
     definition.layout,
     definition.style,
     responsive.breakpoints.map((breakpoint) => breakpoint.id),
     responsive.currentId,
+    platform.current,
   );
 }
 
-const ContainerRenderer: PuckCanonicalRenderer = ({ children, ...props }) => {
-  const style = usePresentationStyle(props, 0);
-  return createElement('div', { 'data-ec-core-component': 'Container', style }, slotNode(children));
+function useAdvancedSelection(id: unknown) {
+  const selection = useSyncExternalStore(
+    puckAdvancedSelectionControls.subscribe,
+    puckAdvancedSelectionControls.getSnapshot,
+    puckAdvancedSelectionControls.getSnapshot,
+  );
+  const nodeId = typeof id === 'string' ? id : null;
+  const selected = nodeId !== null && selection.selectedIds.includes(nodeId);
+  const onPointerDown = (event: ReactPointerEvent<HTMLElement>) => {
+    if (!nodeId || (!event.metaKey && !event.ctrlKey && !event.shiftKey)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    puckAdvancedSelectionControls.toggle(nodeId);
+  };
+  const onKeyDown = (event: ReactKeyboardEvent<HTMLElement>) => {
+    if (!nodeId || !event.shiftKey || (event.key !== 'Enter' && event.key !== ' ')) return;
+    event.preventDefault();
+    event.stopPropagation();
+    puckAdvancedSelectionControls.toggle(nodeId);
+  };
+  return {
+    nodeId,
+    selected,
+    onPointerDown,
+    onKeyDown,
+    selectionStyle: selected
+      ? ({ outline: '2px solid var(--puck-color-selection-border, currentColor)', outlineOffset: '2px' } as const)
+      : null,
+  };
+}
+
+function advancedSelectionProps(selection: ReturnType<typeof useAdvancedSelection>) {
+  return {
+    'data-ec-node-id': selection.nodeId ?? undefined,
+    'data-ec-multi-selected': selection.selected ? 'true' : 'false',
+    'aria-keyshortcuts': 'Shift+Enter',
+    tabIndex: 0,
+    onPointerDown: selection.onPointerDown,
+    onKeyDown: selection.onKeyDown,
+  } as const;
+}
+
+const ContainerRenderer: PuckCanonicalRenderer = ({ children, id, ...props }) => {
+  const style = usePresentationStyle({ ...props, id }, 0);
+  const selection = useAdvancedSelection(id);
+  return createElement(
+    'div',
+    {
+      'data-ec-core-component': 'Container',
+      ...advancedSelectionProps(selection),
+      style: { ...style, ...(selection.selectionStyle ?? {}) },
+    },
+    slotNode(children),
+  );
 };
 
-const TextRenderer: PuckCanonicalRenderer = ({ text, ...props }) => {
-  const style = usePresentationStyle(props, 1);
-  return createElement('p', { 'data-ec-core-component': 'Text', style }, typeof text === 'string' ? text : '');
+const TextRenderer: PuckCanonicalRenderer = ({ text, id, ...props }) => {
+  const style = usePresentationStyle({ ...props, id }, 1);
+  const selection = useAdvancedSelection(id);
+  return createElement(
+    'p',
+    {
+      'data-ec-core-component': 'Text',
+      ...advancedSelectionProps(selection),
+      style: { ...style, ...(selection.selectionStyle ?? {}) },
+    },
+    typeof text === 'string' ? text : '',
+  );
 };
 
-const ImageRenderer: PuckCanonicalRenderer = ({ src, alt, ...props }) => {
+const ImageRenderer: PuckCanonicalRenderer = ({ src, alt, id, ...props }) => {
   const source = typeof src === 'string' ? src.trim() : '';
   const alternative = typeof alt === 'string' && alt.trim() ? alt.trim() : 'Imagen';
-  const style = usePresentationStyle(props, 2);
+  const style = usePresentationStyle({ ...props, id }, 2);
+  const selection = useAdvancedSelection(id);
+  const editorProps = {
+    'data-ec-core-component': 'Image',
+    ...advancedSelectionProps(selection),
+    style: { ...style, ...(selection.selectionStyle ?? {}) },
+  };
   return source
-    ? createElement('img', { 'data-ec-core-component': 'Image', src: source, alt: alternative, style })
-    : createElement(
-        'div',
-        { 'data-ec-core-component': 'Image', role: 'img', 'aria-label': alternative, style },
-        alternative,
-      );
+    ? createElement('img', { ...editorProps, src: source, alt: alternative })
+    : createElement('div', { ...editorProps, role: 'img', 'aria-label': alternative }, alternative);
 };
 
-const ButtonRenderer: PuckCanonicalRenderer = ({ label, ...props }) => {
-  const style = usePresentationStyle(props, 3);
+const ButtonRenderer: PuckCanonicalRenderer = ({ label, id, ...props }) => {
+  const style = usePresentationStyle({ ...props, id }, 3);
+  const selection = useAdvancedSelection(id);
   return createElement(
     'button',
-    { 'data-ec-core-component': 'Button', type: 'button', style },
+    {
+      'data-ec-core-component': 'Button',
+      ...advancedSelectionProps(selection),
+      type: 'button',
+      style: { ...style, ...(selection.selectionStyle ?? {}) },
+    },
     typeof label === 'string' ? label : 'Botón',
   );
 };

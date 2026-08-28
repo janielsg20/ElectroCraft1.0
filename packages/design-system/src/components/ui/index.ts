@@ -7,6 +7,7 @@ export * from './dropdown-menu';
 export * from './empty-state';
 export * from './input';
 export * from './loader';
+export * from './platform-badge';
 export * from './popover';
 export * from './radio-group';
 export * from './resizable-pane-layout';

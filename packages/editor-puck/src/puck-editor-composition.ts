@@ -9,6 +9,9 @@ import {
   type ElectroCraftStyle,
 } from '@electrocraft/domain';
 import { Fragment, createElement, useEffect, useMemo, useSyncExternalStore, type ComponentProps } from 'react';
+import { puckAdvancedSelectionControls } from './puck-advanced-selection';
+import { ELECTROCRAFT_PUCK_CHILDREN_SLOT } from './puck-adapter-contract';
+import { PuckCanvasGuideOverlay } from './puck-canvas-guide-overlay';
 import { puckEditorCommandControls } from './puck-command-controls';
 import { puckEditorHistoryControls } from './puck-history-controls';
 import { applyPuckHistoryPolicy } from './puck-history-policy';
@@ -116,6 +119,132 @@ function PuckResponsiveBridge() {
   return null;
 }
 
+function PuckAdvancedSelectionBridge() {
+  const dispatch = usePuckEditorDispatch();
+  const selectedItem = useElectroCraftPuck((api) => api.selectedItem);
+  const getSelectorForId = useElectroCraftPuck((api) => api.getSelectorForId);
+  const getItemById = useElectroCraftPuck((api) => api.getItemById);
+  const config = useElectroCraftPuck((api) => api.config);
+  const primaryId = typeof selectedItem?.props.id === 'string' ? selectedItem.props.id : null;
+
+  useEffect(() => puckAdvancedSelectionControls.syncPrimary(primaryId), [primaryId]);
+
+  useEffect(
+    () =>
+      puckAdvancedSelectionControls.connect({
+        group(ids) {
+          if (!config.components.Container)
+            throw new Error('El registry activo no contiene un Container para agrupar.');
+          const selected = ids.map((id) => {
+            const selector = getSelectorForId(id);
+            if (!selector) throw new Error(`Puck no pudo resolver ${id} para Agrupar.`);
+            return { id, selector };
+          });
+          const zone = selected[0]?.selector.zone;
+          if (!zone || selected.some(({ selector }) => selector.zone !== zone)) {
+            throw new Error('Agrupar requiere elementos hermanos dentro del mismo contenedor.');
+          }
+          const ordered = selected.toSorted((left, right) => left.selector.index - right.selector.index);
+          const groupId = createDeterministicObjectId('node', `puck-group:${globalThis.crypto.randomUUID()}`);
+          dispatch({
+            type: 'insert',
+            componentType: 'Container',
+            destinationIndex: ordered[0].selector.index,
+            destinationZone: zone,
+            id: groupId,
+          });
+          for (const { id } of ordered.toReversed()) {
+            const selector = getSelectorForId(id);
+            if (!selector) throw new Error(`Puck perdió la referencia ${id} durante Agrupar.`);
+            dispatch({
+              type: 'move',
+              sourceIndex: selector.index,
+              sourceZone: selector.zone,
+              destinationIndex: 0,
+              destinationZone: `${groupId}:${ELECTROCRAFT_PUCK_CHILDREN_SLOT}`,
+            });
+          }
+          const groupSelector = getSelectorForId(groupId);
+          if (groupSelector) dispatch({ type: 'setUi', ui: { itemSelector: groupSelector } });
+          return groupId;
+        },
+        ungroup(id) {
+          const item = getItemById(id);
+          if (!item || String(item.type) !== 'Container') {
+            throw new Error('Desagrupar solo está disponible para un Container seleccionado.');
+          }
+          const rawChildren = (item.props as Record<string, unknown>)[ELECTROCRAFT_PUCK_CHILDREN_SLOT];
+          if (!Array.isArray(rawChildren) || rawChildren.length === 0) {
+            throw new Error('El Container seleccionado no contiene elementos para desagrupar.');
+          }
+          const childIds = rawChildren.map((child) => {
+            const props = (child as { props?: Record<string, unknown> }).props;
+            const childId = props?.id;
+            if (typeof childId !== 'string' || childId.length === 0) {
+              throw new Error('Un elemento del grupo no tiene un identificador estable.');
+            }
+            return childId;
+          });
+          for (const childId of childIds.toReversed()) {
+            const source = getSelectorForId(childId);
+            const containerSelector = getSelectorForId(id);
+            if (!source || !containerSelector) throw new Error('Puck perdió una referencia durante Desagrupar.');
+            dispatch({
+              type: 'move',
+              sourceIndex: source.index,
+              sourceZone: source.zone,
+              destinationIndex: containerSelector.index + 1,
+              destinationZone: containerSelector.zone,
+            });
+          }
+          const containerSelector = getSelectorForId(id);
+          if (!containerSelector) throw new Error('Puck no pudo resolver el grupo al finalizar Desagrupar.');
+          dispatch({ type: 'remove', index: containerSelector.index, zone: containerSelector.zone });
+          const firstSelector = getSelectorForId(childIds[0]);
+          if (firstSelector) dispatch({ type: 'setUi', ui: { itemSelector: firstSelector } });
+          return childIds;
+        },
+        resize(id, width, height) {
+          const item = getItemById(id);
+          const selector = getSelectorForId(id);
+          if (!item || !selector) throw new Error('Puck no pudo resolver el elemento para cambiar su tamaño.');
+          const componentType = String(item.type);
+          const metadata = config.components[componentType]?.metadata;
+          const metadataRecord = metadata && typeof metadata === 'object' ? (metadata as Record<string, unknown>) : {};
+          if (metadataRecord.electrocraftResizable !== true) {
+            throw new Error(`El componente ${componentType} no declara resize compatible.`);
+          }
+          const defaultStyle = electroCraftStyleSchema.safeParse(metadataRecord.electrocraftStyle);
+          if (!defaultStyle.success) throw new Error(`El componente ${componentType} no expone Style canónico válido.`);
+          const presentation = parsePuckNodePresentation(item.props as Record<string, unknown>);
+          const style = presentation.style ?? defaultStyle.data;
+          const nextStyle = electroCraftStyleSchema.parse({
+            ...style,
+            base: {
+              ...style.base,
+              width: width === null ? null : { kind: 'value', value: width, unit: 'px' },
+              height: height === null ? null : { kind: 'value', value: height, unit: 'px' },
+            },
+          });
+          const props = projectPuckNodePresentation(item.props as Record<string, unknown>, {
+            layout: presentation.layout,
+            style: nextStyle,
+          });
+          props.id = id;
+          dispatch({
+            type: 'replace',
+            destinationIndex: selector.index,
+            destinationZone: selector.zone,
+            data: { ...item, props: props as typeof item.props },
+          });
+        },
+      }),
+    [config.components, dispatch, getItemById, getSelectorForId],
+  );
+
+  return null;
+}
+
 /**
  * Public Puck composition surface owned by the editor-puck adapter.
  * Studio never imports @puckeditor/core directly. Session-only command/history
@@ -139,6 +268,7 @@ export function PuckEditorRoot({ iframe, children, ...props }: ComponentProps<ty
       createElement(PuckCommandBridge),
       createElement(PuckHistoryBridge),
       createElement(PuckResponsiveBridge),
+      createElement(PuckAdvancedSelectionBridge),
       children,
     ),
   );
@@ -146,7 +276,14 @@ export function PuckEditorRoot({ iframe, children, ...props }: ComponentProps<ty
 
 export const PuckEditorComponents = Puck.Components;
 export const PuckEditorOutline = Puck.Outline;
-export const PuckEditorPreview = Puck.Preview;
+export function PuckEditorPreview(props: ComponentProps<typeof Puck.Preview>) {
+  return createElement(
+    'div',
+    { className: 'ec-puck-preview-with-guides', 'data-puck-preview-with-guides': true },
+    createElement(Puck.Preview, props),
+    createElement(PuckCanvasGuideOverlay),
+  );
+}
 export const PuckEditorFields = Puck.Fields;
 
 /**

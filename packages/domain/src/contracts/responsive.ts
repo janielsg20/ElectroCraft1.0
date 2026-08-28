@@ -1,5 +1,6 @@
 import * as z from 'zod';
 import {
+  ELECTROCRAFT_STYLE_PROPERTIES,
   electroCraftResponsiveBreakpointIdSchema,
   electroCraftStyleDeclarationSchema,
   type ElectroCraftStyleDeclaration,
@@ -139,10 +140,10 @@ export function resolveResponsiveStyleDeclaration(
   orderedBreakpointIds: readonly ElectroCraftBreakpointId[],
   breakpointId: ElectroCraftBreakpointId | null,
 ): ElectroCraftStyleDeclaration {
-  const declaration = {} as ElectroCraftStyleDeclaration;
-  for (const property of Object.keys(responsive.base) as ElectroCraftStyleProperty[]) {
-    declaration[property] = resolveResponsiveStyleProperty(responsive, orderedBreakpointIds, breakpointId, property)
-      .value as never;
+  const declaration: Record<string, unknown> = {};
+  for (const property of ELECTROCRAFT_STYLE_PROPERTIES) {
+    const value = resolveResponsiveStyleProperty(responsive, orderedBreakpointIds, breakpointId, property).value;
+    if (value !== undefined) declaration[property] = value;
   }
-  return electroCraftStyleDeclarationSchema.parse(declaration);
+  return electroCraftStyleDeclarationSchema.parse(declaration) as ElectroCraftStyleDeclaration;
 }

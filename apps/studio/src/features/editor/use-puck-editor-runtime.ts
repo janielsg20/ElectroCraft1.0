@@ -43,6 +43,7 @@ export function useStudioPuckEditorRuntime() {
 
   useEffect(() => {
     let active = true;
+    let loadedRuntime: StudioPuckEditorRuntime | null = null;
     if (!projectId) {
       setSnapshot(emptySnapshot);
       return () => {
@@ -73,7 +74,11 @@ export function useStudioPuckEditorRuntime() {
       },
     })
       .then((runtime) => {
-        if (!active) return;
+        loadedRuntime = runtime;
+        if (!active) {
+          runtime.dispose();
+          return;
+        }
         setSnapshot(Object.freeze({ state: 'ready', runtime, message: 'Documento listo.' }));
       })
       .catch((error: unknown) => {
@@ -89,6 +94,7 @@ export function useStudioPuckEditorRuntime() {
 
     return () => {
       active = false;
+      loadedRuntime?.dispose();
     };
   }, [projectId]);
 

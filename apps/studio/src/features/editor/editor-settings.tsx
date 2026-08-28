@@ -1,14 +1,31 @@
 import { VISUAL_HISTORY_LIMITS } from '@electrocraft/application';
-import { Button, Input } from '@electrocraft/design-system';
+import { Button, Checkbox, Input } from '@electrocraft/design-system';
+import { puckCanvasGuideControls } from '@electrocraft/editor-puck';
 import { useSyncExternalStore } from 'react';
 import { HelpTrigger } from '../../help/help-ui';
+import { editorCanvasPreferencesRuntime } from './editor-canvas-preferences-runtime';
 import { editorHistoryPreferencesRuntime } from './editor-history-preferences-runtime';
 
+function patchCanvasPreferences(patch: Parameters<typeof editorCanvasPreferencesRuntime.patch>[0]) {
+  const next = editorCanvasPreferencesRuntime.patch(patch);
+  puckCanvasGuideControls.configure({
+    rulersVisible: next.rulersVisible,
+    guidesVisible: next.guidesVisible,
+    snappingEnabled: next.snappingEnabled,
+    gridSize: next.snapGridSize,
+  });
+}
+
 export function EditorSettings() {
-  const preferences = useSyncExternalStore(
+  const historyPreferences = useSyncExternalStore(
     editorHistoryPreferencesRuntime.subscribe,
     editorHistoryPreferencesRuntime.getSnapshot,
     editorHistoryPreferencesRuntime.getSnapshot,
+  );
+  const canvasPreferences = useSyncExternalStore(
+    editorCanvasPreferencesRuntime.subscribe,
+    editorCanvasPreferencesRuntime.getSnapshot,
+    editorCanvasPreferencesRuntime.getSnapshot,
   );
 
   return (
@@ -41,18 +58,86 @@ export function EditorSettings() {
           type="number"
           min={VISUAL_HISTORY_LIMITS.min}
           max={VISUAL_HISTORY_LIMITS.max}
-          value={preferences.visualHistoryLimit}
+          value={historyPreferences.visualHistoryLimit}
           aria-label="Límite del historial visual"
           onChange={(event) => editorHistoryPreferencesRuntime.setVisualHistoryLimit(Number(event.target.value))}
         />
       </div>
 
       <div className="ec-topbar-setting-row">
+        <label htmlFor="editor-rulers-visible">
+          <strong>Regla</strong>
+          <p>Muestra reglas en los bordes del Canvas para crear guías.</p>
+        </label>
+        <Checkbox
+          id="editor-rulers-visible"
+          checked={canvasPreferences.rulersVisible}
+          aria-label={canvasPreferences.rulersVisible ? 'Ocultar regla' : 'Mostrar regla'}
+          onCheckedChange={(checked) => patchCanvasPreferences({ rulersVisible: checked === true })}
+        />
+      </div>
+
+      <div className="ec-topbar-setting-row">
+        <label htmlFor="editor-guides-visible">
+          <strong>Guías</strong>
+          <p>Visible u oculto solo en el editor; las guías no se publican.</p>
+        </label>
+        <Checkbox
+          id="editor-guides-visible"
+          checked={canvasPreferences.guidesVisible}
+          aria-label={canvasPreferences.guidesVisible ? 'Ocultar guías' : 'Mostrar guías'}
+          onCheckedChange={(checked) => patchCanvasPreferences({ guidesVisible: checked === true })}
+        />
+      </div>
+
+      <div className="ec-topbar-setting-row">
+        <label htmlFor="editor-snapping-enabled">
+          <strong>Ajuste</strong>
+          <p>Prioriza guías, hermanos, padre y cuadrícula durante ajustes compatibles.</p>
+        </label>
+        <Checkbox
+          id="editor-snapping-enabled"
+          checked={canvasPreferences.snappingEnabled}
+          aria-label={canvasPreferences.snappingEnabled ? 'Desactivar ajuste' : 'Activar ajuste'}
+          onCheckedChange={(checked) => patchCanvasPreferences({ snappingEnabled: checked === true })}
+        />
+      </div>
+
+      <div className="ec-topbar-setting-row">
+        <label htmlFor="editor-snap-grid-size">
+          <strong>Cuadrícula de ajuste</strong>
+          <p>Separación base en píxeles cuando no existe una guía de mayor prioridad.</p>
+        </label>
+        <Input
+          id="editor-snap-grid-size"
+          type="number"
+          min={1}
+          max={64}
+          value={canvasPreferences.snapGridSize}
+          aria-label="Tamaño de la cuadrícula de ajuste"
+          onChange={(event) => patchCanvasPreferences({ snapGridSize: Number(event.target.value) })}
+        />
+      </div>
+
+      <div className="ec-topbar-setting-row">
         <div>
-          <strong>Valor predeterminado</strong>
-          <p>{VISUAL_HISTORY_LIMITS.defaultValue} pasos por sesión.</p>
+          <strong>Valores predeterminados</strong>
+          <p>50 pasos de historial, regla/guías/ajuste visibles y cuadrícula de 8px.</p>
         </div>
-        <Button variant="outline" size="sm" onClick={() => editorHistoryPreferencesRuntime.restoreDefault()}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            editorHistoryPreferencesRuntime.restoreDefault();
+            const next = editorCanvasPreferencesRuntime.restoreDefault();
+            puckCanvasGuideControls.configure({
+              rulersVisible: next.rulersVisible,
+              guidesVisible: next.guidesVisible,
+              snappingEnabled: next.snappingEnabled,
+              gridSize: next.snapGridSize,
+            });
+          }}
+        >
           Restaurar
         </Button>
       </div>

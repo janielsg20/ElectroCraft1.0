@@ -14,7 +14,7 @@ import {
   SheetTrigger,
   getStudioIcon,
 } from '@electrocraft/design-system';
-import { puckEditorHistoryControls, puckResponsiveControls } from '@electrocraft/editor-puck';
+import { puckEditorHistoryControls, puckPlatformControls, puckResponsiveControls } from '@electrocraft/editor-puck';
 import { useEffect, useSyncExternalStore } from 'react';
 import { editorHistoryPreferencesRuntime } from '../features/editor/editor-history-preferences-runtime';
 import { EditorSettings } from '../features/editor/editor-settings';
@@ -120,6 +120,11 @@ function TopbarToolCluster({
     puckEditorHistoryControls.getSnapshot,
     puckEditorHistoryControls.getSnapshot,
   );
+  const platform = useSyncExternalStore(
+    puckPlatformControls.subscribe,
+    puckPlatformControls.getSnapshot,
+    puckPlatformControls.getSnapshot,
+  );
   const responsive = useSyncExternalStore(
     puckResponsiveControls.subscribe,
     puckResponsiveControls.getSnapshot,
@@ -132,14 +137,22 @@ function TopbarToolCluster({
         <DocumentIcon aria-hidden="true" />
         <span>{activeLabel}</span>
       </span>
-      <span
-        className="ec-topbar-tool"
-        data-topbar-tool="platform"
-        aria-label={`${copy.platformLabel}: ${copy.platformValue}`}
-      >
+      <div className="ec-topbar-tool ec-topbar-breakpoint-select" data-topbar-tool="platform">
         <PlatformIcon aria-hidden="true" />
-        <span>{copy.platformValue}</span>
-      </span>
+        <Select
+          value={platform.current}
+          onValueChange={(value) => puckPlatformControls.select(value as 'web' | 'android' | 'ios')}
+        >
+          <SelectTrigger aria-label={copy.platformLabel}>
+            <SelectValue placeholder={copy.platformValue} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="web">Web</SelectItem>
+            <SelectItem value="android">Android</SelectItem>
+            <SelectItem value="ios">iOS</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
       <div className="ec-topbar-tool ec-topbar-breakpoint-select" data-topbar-tool="breakpoint">
         <BreakpointIcon aria-hidden="true" />
         <Select

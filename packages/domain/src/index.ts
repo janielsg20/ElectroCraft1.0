@@ -10,6 +10,7 @@ export * from './contracts/json-value';
 export * from './contracts/migration-registry';
 export * from './contracts/model-ownership';
 export * from './contracts/object-id';
+export * from './contracts/platform-overrides';
 export * from './contracts/project-definition';
 export * from './contracts/project-snapshot';
 export * from './contracts/query-definition';
