@@ -265,7 +265,7 @@ export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help 
         <TopbarToolCluster copy={copy} activeLabel={activeLabel} breakpoint={breakpoint} />
       </div>
 
-      <div className="ec-topbar-right">
+      <div className="ec-topbar-right" style={{ flexShrink: 0 }}>
         <Sheet>
           <SheetTrigger asChild>
             <Button className="ec-topbar-tools-trigger" variant="ghost" size="icon" aria-label={copy.toolsLabel}>
