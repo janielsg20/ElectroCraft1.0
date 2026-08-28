@@ -10,6 +10,8 @@ export * from './puck-editor-composition';
 export * from './puck-history-controls';
 export * from './puck-history-policy';
 export * from './puck-layout-style';
+export * from './puck-platform-capabilities';
+export * from './puck-platform-controls';
 export * from './puck-responsive-viewports';
 export * from './puck-responsive-controls';
 
