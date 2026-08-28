@@ -6,103 +6,59 @@
 - F01 — Monorepo, límites, documentación y CI: `COMPLETADA`; Gate `GREEN`.
 - F02 — Modelo canónico del proyecto: `COMPLETADA`; Gate `GREEN`.
 - F03 — Design System, AppShell, español y ayuda: `COMPLETADA`; Gate `GREEN`.
-- M03.1 — Design System del Studio: `COMPLETADA`; Gate `GREEN`.
-- M03.2 — AppShell base del Studio: `COMPLETADA`; Gate `GREEN`.
-- M03.3 — Sidebar global: `COMPLETADA`; Gate `GREEN`.
-- M03.4 — Topbar global + Settings: `COMPLETADA`; Gate `GREEN`.
-- M03.5 — Context / Canvas / Inspector / Status: `COMPLETADA`; Gate `GREEN`.
-- M03.6 — AppShell y editor responsive: `COMPLETADA`; Gate `GREEN`.
-- M03.7 — Progressive Disclosure y arquitectura de información: `COMPLETADA`; Gate `GREEN`.
-- M03.8 — Palette descubrible: `COMPLETADA`; Gate `GREEN`.
-- M03.9 — Apariencia del Studio Editor: `COMPLETADA`; Gate `GREEN`.
-- M03.10 — Infraestructura español-primero e i18n tipado: `COMPLETADA`; Gate `GREEN`.
-- M03.11 — Sistema de ayuda contextual: `COMPLETADA`; Gate `GREEN`.
-- M03.12 — E2E AppShell completo: `COMPLETADA`; Gate `GREEN`.
 - F04 — Persistencia local, proyectos y revisiones: `COMPLETADA`; Gate `GREEN`.
-- M04.1 — Schema físico estable con PGlite/Drizzle + storage browser: `COMPLETADA`; Gate `GREEN`.
-- M04.2 — Inicializar PGlite Multi-Tab Worker y migrations: `COMPLETADA`; Gate `GREEN`.
-- M04.3 — Persistencia incremental, autosave y recovery: `COMPLETADA`; Gate `GREEN`.
-- M04.4 — Project Home real: `COMPLETADA`; Gate `GREEN`.
-- M04.5 — New Project Wizard y project actions: `COMPLETADA`; Gate `GREEN`.
-- M04.6 — Import/Backup/Restore: `COMPLETADA`; Gate `GREEN`.
-- M04.7 — Workspace preferences: `COMPLETADA`; Gate `GREEN`.
-- M04.8 — Project Revision Checkpoints y Restore: `COMPLETADA`; Gate `GREEN`.
 - F05 — Screen Composer con Puck: `COMPLETADA`; Gate `GREEN`.
-- M05.1 — Crear PuckAdapter y component mapping: `COMPLETADA`; Gate `GREEN`.
-- M05.2 — Componer Components/Outline/Preview/Fields: `COMPLETADA`; Gate `GREEN`.
-- M05.3 — Nested Slots, permissions y Puck data migration: `COMPLETADA`; Gate `GREEN`.
-- M05.4 — Sincronizar Puck actions con ElectroCraftDocument: `COMPLETADA`; Gate `GREEN`.
-- M05.5 — Usar Puck visual history: `COMPLETADA`; Gate `GREEN`.
-- M05.6 — Text/RichText inline editing: `COMPLETADA`; Gate `GREEN`.
-- M05.7 — Extensiones de palette y outline solo necesarias: `COMPLETADA`; Gate `GREEN`.
-- M05.8 — Editor core E2E: `COMPLETADA`; Gate `GREEN`.
-- F06 — Layout, responsive y edición avanzada: `IN_PROGRESS`.
+- F06 — Layout, responsive y edición avanzada: `IN_PROGRESS`; closure candidate preparado.
 - M06.1 — ElectroCraftLayout/Style inspector: `COMPLETADA`; Gate `GREEN`.
-- M06.2 — Responsive inheritance y reset: `ACTIVE`.
+- M06.2 — Responsive inheritance y reset: `IMPLEMENTADA`; incluida en gate final F06.
+- M06.3 — Platform overrides y diagnostics: `IMPLEMENTADA`; incluida en gate final F06.
+- M06.4 — Advanced canvas guides/snapping: `IMPLEMENTADA`; incluida en gate final F06.
+- M06.5 — Multi-select, Group/Ungroup y Resize: `IMPLEMENTADA`; incluida en gate final F06.
+- M06.6 — Breadcrumbs y context actions: `IMPLEMENTADA`; incluida en gate final F06.
+- M06.7 — Mobile/tablet editor tools: `IMPLEMENTADA`; incluida en gate final F06.
+- M06.8 — Advanced editor QA: `ACTIVE`.
 - Blockers P0/P1 funcionales conocidos: `0`.
-
-## Cierre F04 / M04.8
-
-M04.8 cerró sobre head funcional `1df11b22fcd3bee7ea37846a459e28374271fc85` y PR `#48`. `ElectroCraft Base CI` run `32859794266` terminó `success`: documentación, lint/Prettier, typecheck, tests, build, Playwright repository gate, empty repository fixture y artifacts base quedaron verdes.
-
-La PR `#48` fue fusionada mediante squash a `main` en `ad64c0e5468b13a3fa3a712adb6621fa33d22fd0` (`feat(f04): complete project revision checkpoints and restore`). F04 queda cerrada con object versions deduplicadas, checkpoints tipados, restore no destructivo, historial de revisiones y persistencia multi-tab real.
-
-El workflow dedicado de M04.7 se archiva tras el cierre de F04; el quality gate transversal continúa siendo `.github/workflows/ci.yml`.
-
-## Cierre F05 / M05.1
-
-M05.1 cerró sobre head `9aa330dbf44b39485516ee0d3dc181a9aee4196b` y PR `#49`. `ElectroCraft Base CI` run `32868029914` (#656) terminó `success` con documentación, lint/Prettier, typecheck, tests, build, Playwright repository gate, empty repository fixture y artifacts base en GREEN.
-
-La PR `#49` fue fusionada mediante squash a `main` en `733abdc44f21d16b56b4624c7bec61f0131bd3f1` (`feat(f05): add canonical Puck adapter and component mapping`). El adapter canónico preserva IDs/nesting, mantiene diagnostics recuperables y mantiene el historial del editor separado de Project Revisions.
-
-## Cierre F05 / M05.2
-
-M05.2 cerró con head funcional corregido `9321356994e5cc48748f1d406c920e28b8c9b141`. `ElectroCraft Base CI` run `32990513971` (#661) terminó `success`. La implementación se fusionó mediante squash por PR `#50` a `main` en `fadc2ecb64764c120c75cb5e4c7b154d3cc4ade6` (`feat(f05): compose Puck editor surfaces`).
-
-## Cierre F05 / M05.3
-
-M05.3 cerró sobre head `176b41a31a017f800cb8f63b41be3b7e65f52324`. `ElectroCraft Base CI` run `33016557679` (#674) terminó `success`: documentación, lint, typecheck, 360 tests Vitest, build, Playwright repository gate y artifacts base quedaron GREEN.
-
-La PR `#52` fue fusionada mediante squash a `main` en `fd5901dff66acca5d92ffee832a2ac881721458b` (`feat(M05.3): add nested Slots permissions and Puck migration`). Quedan activos Slots anidados, `allow/disallow`, permisos públicos Puck, migración oficial `zones -> slots`, `walkTree()` y fallo cerrado estable para migraciones incompletas.
-
-## Cierre F05 / M05.4
-
-M05.4 cerró sobre head `a56575ab62660eb94d70ae08aaf0df6c5cd6a010`. `ElectroCraft Base CI` run `33035570789` (#692) terminó `success`: documentación, lint/Prettier, typecheck, 371 tests Vitest, build, Playwright repository gate, empty repository fixture y artifacts base quedaron GREEN.
-
-La PR `#56` fue fusionada mediante squash a `main` en `98b51b7ad35b3204f0b67899b4fd2392d1c100e7` (`feat(M05.4): sync Puck actions with canonical documents`). Puck `onAction(action, appState, prevAppState)` sincroniza únicamente cambios authoring reales hacia `ElectroCraftDocument`, reutiliza el autosave incremental F04 y mantiene selection/ui/history del engine fuera del payload canónico y separado de Project Revisions.
-
-## Cierre F05 / M05.5
-
-M05.5 cerró sobre head `9d61c1e3f9976893594b518e952320e723b59f81`. `ElectroCraft Base CI` run `33081006606` (#702) terminó `success`: documentación, lint/Prettier, typecheck, 381 tests Vitest, build, Playwright repository gate, empty repository fixture y artifacts base quedaron GREEN.
-
-La PR `#57` fue fusionada mediante squash a `main` en `7aeaf701b077781f5b6ca0d659be2726dec7412b` (`feat(M05.5): use Puck visual history`). Deshacer/Rehacer del Topbar delega en la history pública de Puck, `visualHistoryLimit` queda local al Studio con rango seguro y el stack visual permanece session-only y separado de Project Revisions.
-
-## Cierre F05 / M05.6
-
-M05.6 cerró sobre head `96145da4e74d856c1368f9a0418379acfcff0b2a`. `ElectroCraft Base CI` run `33086731332` (#707) terminó `success`: documentación, lint/Prettier, typecheck, 391 tests Vitest, build, Playwright repository gate, empty repository fixture y artifacts base quedaron GREEN.
-
-La PR `#58` fue fusionada mediante squash a `main` en `459d07d73f08fb8b2a826f54787124011f7c7ca8` (`feat(M05.6): add Puck inline Text and RichText editing`). `Text` usa `text + contentEditable`, `RichText` usa `richtext + contentEditable` sobre Puck/Tiptap, y el valor transportable sigue siendo string HTML canónico sin selection/ui/history/Tiptap internals.
-
-## Cierre F05 / M05.7
-
-M05.7 cerró sobre head `f07d6ddcffbf98f1e53ad7d9ff1a19478c99bffc`. `ElectroCraft Base CI` run `33089363788` (#709) terminó `success`: documentación, lint/Prettier, typecheck, tests, build, Playwright repository gate, empty repository fixture y artifacts base quedaron GREEN.
-
-La PR `#59` fue fusionada mediante squash a `main` en `f75dcb85ca73b05008c982958f442f6f6031fd40` (`feat(M05.7): keep palette and outline extensions engine-owned`). `Config.categories`, `Puck.Components` y `Puck.Outline` siguen siendo engine-owned; búsqueda/favoritos/recientes permanecen discovery local y los permisos lock se traducen al API público Puck sin stores paralelos.
-
-## Cierre F05 / M05.8
-
-M05.8 cerró sobre head funcional `b6b3aab`. `ElectroCraft Base CI` run `33101434587` (#742) terminó `success` en 13m 30s con el job transversal de documentación, lint/Prettier, typecheck, tests, build, Playwright repository gate y artifacts base en GREEN.
-
-La PR `#60` fue fusionada mediante squash a `main` en `a81ca149c17391b9fe77aaaf57b125d229320173` (`feat(M05.8): validate the real editor core end to end`). F05 queda cerrada con un único runtime Puck, kit core canónico, nesting/reorder/edit/history/autosave/reopen E2E y ausencia contractual de un segundo editor/store. El despliegue Cloudflare asociado falló, pero no pertenece al único gate de release definido para M05.8 y no invalida el Base CI GREEN.
 
 ## Microfase activa
 
-`M06.2` — Responsive inheritance y reset.
+`M06.8` — Advanced editor QA.
 
-## Cierre F06 / M06.1
+## Closure candidate F06 — 2026-08-28
 
-M06.1 cerró localmente en la rama `codex/m06-1-layout-style-inspector` con modelo documental v4, migración v3 → v4, transporte Layout/Style encapsulado por `@electrocraft/editor-puck` y un Inspector funcional en español sobre la selección y el dispatch públicos de Puck. La UI aplica presets semánticos y tokens al Canvas, conserva ayuda persistente y Progressive Disclosure, y no persiste internals de Puck ni CSS crudo.
+La rama `codex/f06-advanced-editor` acumula M06.3–M06.8 sobre el `main` que ya contenía M06.2. La estrategia de esta fase evita Actions por microfase: el único gate ejecutable oficial se lanza al final mediante `ElectroCraft Base CI` sobre la PR de F06.
 
-Gate local `GREEN`: lint/Prettier, typecheck, 41 tests Node, 415 tests Vitest en 116 archivos, build Studio/PWA y Playwright M06.1 real con insert/edit/history/autosave/reopen. Evidencia: `.ai/evidence/F06/M06.1/CLOSURE_2026-08-27.md`.
+Capacidades implementadas:
 
-Referencias: `.ai/microphases/M06_2.md`, `.ai/TRACKING.md`, `.ai/HANDOFF.md`.
+- Responsive canónico por breakpoint con presets/custom widths, herencia por propiedad y reset sin persistir viewport transitorio.
+- Selector Web/Android/iOS, overrides por propiedad, fallback responsive/native y diagnostics basados en capability registry declarado.
+- Reglas/guías/snapping editor-only con prioridad guía > hermano > padre > grid y preferencias locales del Studio.
+- Multiselección session-only, Agrupar/Desagrupar mediante acciones públicas Puck y resize canónico solo para definiciones compatibles.
+- Breadcrumbs jerárquicos, clipboard como `ElectroCraftDocumentNode`, visibilidad canónica, lock mediante permisos Puck, eliminar/duplicar y Guardar como bloque reutilizable real.
+- Un solo `PuckEditorRoot` para desktop/laptop/tablet/mobile; mobile reutiliza Components/Outline/Properties mediante Sheets y mantiene click-to-insert/teclado.
+- QA de ownership, ausencia de overrides experimentales release-critical, estado transitorio fuera de persistencia, workload mediano y E2E cross-responsive.
+
+Correcciones QA importantes:
+
+- La visualización avanzada del Canvas quedó con una sola hoja propietaria; se eliminó el stylesheet duplicado del Design System.
+- `visibility` permanece opcional para documentos v4 antiguos, pero responsive/plataforma recorren una lista canónica única de propiedades para no perder overrides legacy.
+- Los reusable blocks no pueden desplazar accidentalmente a la `screen` principal al reabrir `/editor`.
+- Clipboard, locks, multiselección, guides y feedback no entran al payload canónico ni al autosave.
+
+Evidencia candidate: `.ai/evidence/F06/CLOSURE_CANDIDATE_2026-08-28.md`.
+
+## Cierres heredados
+
+- F04: `.ai/evidence/F04/CLOSURE_2026-08-25.md`; PR `#48`; Base CI GREEN.
+- F05: PR `#60`, squash `a81ca149c17391b9fe77aaaf57b125d229320173`, Base CI `33101434587` (#742) GREEN.
+- M06.1: `.ai/evidence/F06/M06.1/CLOSURE_2026-08-27.md`; gate local GREEN.
+- M06.2 llegó a `main` en `97486d53b591f4d71cc848828e5f0a6929a870d8` antes de abrir la rama consolidada de cierre F06.
+
+## Siguiente transición
+
+Cuando `ElectroCraft Base CI` de la PR F06 quede GREEN:
+
+1. marcar F06 y M06.2–M06.8 `COMPLETADA / GREEN`;
+2. fusionar la PR de F06;
+3. activar `M07.1 — Modelo de Pantalla, Ruta y Navigation Graph`.
+
+Referencias: `.ai/TRACKING.md`, `.ai/HANDOFF.md`, `.ai/phases/F06.md`, `.ai/microphases/M06_8.md`.
