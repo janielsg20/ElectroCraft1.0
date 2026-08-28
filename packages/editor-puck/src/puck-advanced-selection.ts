@@ -44,6 +44,14 @@ function runOperation(operation: () => void) {
   }
 }
 
+function onlySelectedId(operation: string) {
+  const id = snapshot.selectedIds[0];
+  if (snapshot.selectedIds.length !== 1 || !id) {
+    throw new Error(`Selecciona un único elemento para ${operation}.`);
+  }
+  return id;
+}
+
 export const puckAdvancedSelectionControls = Object.freeze({
   subscribe(listener: () => void) {
     listeners.add(listener);
@@ -90,18 +98,18 @@ export const puckAdvancedSelectionControls = Object.freeze({
     return groupId;
   },
   ungroup() {
-    if (snapshot.selectedIds.length !== 1) throw new Error('Selecciona un único grupo para desagrupar.');
+    const id = onlySelectedId('desagrupar');
     let children: readonly string[] = [];
     runOperation(() => {
-      children = requireDelegates().ungroup(snapshot.selectedIds[0]);
+      children = requireDelegates().ungroup(id);
       publish({ ...snapshot, primaryId: children[0] ?? null, selectedIds: children, message: null });
     });
     return children;
   },
   resize(width: number | null, height: number | null) {
-    if (snapshot.selectedIds.length !== 1) throw new Error('Selecciona un único elemento para cambiar su tamaño.');
+    const id = onlySelectedId('cambiar su tamaño');
     runOperation(() => {
-      requireDelegates().resize(snapshot.selectedIds[0], width, height);
+      requireDelegates().resize(id, width, height);
       publish({ ...snapshot, message: null });
     });
   },
