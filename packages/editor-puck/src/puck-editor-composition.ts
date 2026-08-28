@@ -146,26 +146,24 @@ function PuckAdvancedSelectionBridge() {
           }
           const ordered = selected.toSorted((left, right) => left.selector.index - right.selector.index);
           const groupId = createDeterministicObjectId('node', `puck-group:${globalThis.crypto.randomUUID()}`);
+          const groupIndex = ordered[0].selector.index;
           dispatch({
             type: 'insert',
             componentType: 'Container',
-            destinationIndex: ordered[0].selector.index,
+            destinationIndex: groupIndex,
             destinationZone: zone,
             id: groupId,
           });
-          for (const { id } of ordered.toReversed()) {
-            const selector = getSelectorForId(id);
-            if (!selector) throw new Error(`Puck perdió la referencia ${id} durante Agrupar.`);
+          for (const { selector } of ordered.toReversed()) {
             dispatch({
               type: 'move',
-              sourceIndex: selector.index,
-              sourceZone: selector.zone,
+              sourceIndex: selector.index + 1,
+              sourceZone: zone,
               destinationIndex: 0,
               destinationZone: `${groupId}:${ELECTROCRAFT_PUCK_CHILDREN_SLOT}`,
             });
           }
-          const groupSelector = getSelectorForId(groupId);
-          if (groupSelector) dispatch({ type: 'setUi', ui: { itemSelector: groupSelector } });
+          dispatch({ type: 'setUi', ui: { itemSelector: { index: groupIndex, zone } } });
           return groupId;
         },
         ungroup(id) {
@@ -185,23 +183,23 @@ function PuckAdvancedSelectionBridge() {
             }
             return childId;
           });
-          for (const childId of childIds.toReversed()) {
-            const source = getSelectorForId(childId);
-            const containerSelector = getSelectorForId(id);
-            if (!source || !containerSelector) throw new Error('Puck perdió una referencia durante Desagrupar.');
+          const containerSelector = getSelectorForId(id);
+          if (!containerSelector) throw new Error('Puck no pudo resolver el grupo para Desagrupar.');
+          const sourceZone = `${id}:${ELECTROCRAFT_PUCK_CHILDREN_SLOT}`;
+          for (let sourceIndex = childIds.length - 1; sourceIndex >= 0; sourceIndex -= 1) {
             dispatch({
               type: 'move',
-              sourceIndex: source.index,
-              sourceZone: source.zone,
+              sourceIndex,
+              sourceZone,
               destinationIndex: containerSelector.index + 1,
               destinationZone: containerSelector.zone,
             });
           }
-          const containerSelector = getSelectorForId(id);
-          if (!containerSelector) throw new Error('Puck no pudo resolver el grupo al finalizar Desagrupar.');
           dispatch({ type: 'remove', index: containerSelector.index, zone: containerSelector.zone });
-          const firstSelector = getSelectorForId(childIds[0]);
-          if (firstSelector) dispatch({ type: 'setUi', ui: { itemSelector: firstSelector } });
+          dispatch({
+            type: 'setUi',
+            ui: { itemSelector: { index: containerSelector.index, zone: containerSelector.zone } },
+          });
           return childIds;
         },
         resize(id, width, height) {
