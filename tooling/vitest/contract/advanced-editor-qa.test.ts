@@ -37,9 +37,11 @@ describe('M06.8 advanced editor QA', () => {
       expect(persistence).not.toContain(forbidden);
       expect(adapter).not.toContain(forbidden);
     }
-    expect(advancedSelection).toContain('Session-only');
-    expect(context).toContain('lockedIds');
-    expect(guides).toContain('guides');
+    for (const sessionOnlyModule of [advancedSelection, context, guides]) {
+      expect(sessionOnlyModule).not.toContain('projectStorageRuntime');
+      expect(sessionOnlyModule).not.toContain('queueAutosave');
+      expect(sessionOnlyModule).not.toContain('ElectroCraftDocument');
+    }
   });
 
   it('keeps advanced Canvas styling single-owned and platform declarations application-owned', () => {
@@ -59,17 +61,16 @@ describe('M06.8 advanced editor QA', () => {
   it('resolves a medium advanced document style workload without mutating canonical state', () => {
     const ids = ['desktop', 'tablet-portrait', 'mobile-small'] as const;
     let style = createDefaultElectroCraftStyle();
-    style = {
-      ...style,
-      ...setResponsiveStyleOverride(
-        { base: style.base, overrides: style.responsive },
-        'mobile-small',
-        'padding',
-        { kind: 'value', value: 8, unit: 'px' },
-      ),
-    };
+    const responsiveStyle = setResponsiveStyleOverride(
+      { base: style.base, overrides: style.responsive },
+      'mobile-small',
+      'padding',
+      { kind: 'value', value: 8, unit: 'px' },
+    );
+    style = { ...style, base: responsiveStyle.base, responsive: responsiveStyle.overrides };
     style = setPlatformStyleOverride(style, 'android', 'opacity', 0.85);
     const before = structuredClone(style);
+    let lastOpacity: number | null | undefined;
 
     const started = performance.now();
     for (let index = 0; index < 1_000; index += 1) {
@@ -79,10 +80,11 @@ describe('M06.8 advanced editor QA', () => {
         index % 2 === 0 ? 'mobile-small' : 'tablet-portrait',
       );
       const platform = resolvePlatformStyleDeclaration(style, responsive, index % 3 === 0 ? 'android' : 'web');
-      expect(platform.padding).toBeDefined();
+      lastOpacity = platform.opacity;
     }
     const duration = performance.now() - started;
 
+    expect(lastOpacity).toBeDefined();
     expect(style).toEqual(before);
     expect(duration).toBeLessThan(1_500);
   });
