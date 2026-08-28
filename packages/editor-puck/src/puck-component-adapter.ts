@@ -227,6 +227,7 @@ export function createPuckComponentConfig(
       electrocraftVersion: definition.version,
       electrocraftLayout: definition.layout,
       electrocraftStyle: definition.style,
+      electrocraftResizable: definition.metadata.resizable === true,
     },
     ...(permissions ? { permissions } : {}),
     render: renderer,
