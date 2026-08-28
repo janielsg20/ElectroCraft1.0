@@ -36,11 +36,13 @@ describe('M05.1/M05.3 Puck adapter boundary', () => {
     expect(adapter).not.toContain('draggedItem');
   });
 
-  it('reuses Puck public Composition pieces instead of recreating editor chrome', () => {
+  it('reuses Puck public Composition pieces while layering the advanced Canvas overlay', () => {
     const composition = source('packages/editor-puck/src/puck-editor-composition.ts');
     expect(composition).toContain('export const PuckEditorComponents = Puck.Components');
     expect(composition).toContain('export const PuckEditorOutline = Puck.Outline');
-    expect(composition).toContain('export const PuckEditorPreview = Puck.Preview');
+    expect(composition).toContain('export function PuckEditorPreview');
+    expect(composition).toContain('createElement(Puck.Preview, props)');
+    expect(composition).toContain('createElement(PuckCanvasGuideOverlay)');
     expect(composition).toContain('export const PuckEditorFields = Puck.Fields');
     expect(composition).toContain('export function PuckEditorRoot');
     expect(composition).toContain('createElement(');
