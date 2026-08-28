@@ -1,10 +1,13 @@
 import type { OpenProjectResult, StoredProjectDefinition } from '@electrocraft/application';
 import {
   createDeterministicObjectId,
+  electroCraftDocumentNodeSchema,
   electroCraftDocumentSchema,
   importElectroCraftDocument,
   type ElectroCraftComponentDefinition,
   type ElectroCraftDocument,
+  type ElectroCraftDocumentNode,
+  type JsonValue,
 } from '@electrocraft/domain';
 import {
   puckAdvancedSelectionControls,
@@ -75,6 +78,33 @@ function resolveProjectDocument(opened: OpenProjectResult): { document: ElectroC
   }
 }
 
+function cloneReusableNode(node: ElectroCraftDocumentNode, documentId: string, path = 'root'): ElectroCraftDocumentNode {
+  return electroCraftDocumentNodeSchema.parse({
+    ...structuredClone(node),
+    id: createDeterministicObjectId('node', `${documentId}:${path}`),
+    children: node.children.map((child, index) => cloneReusableNode(child, documentId, `${path}.${index}`)),
+  });
+}
+
+function createReusableComponentDocument(node: ElectroCraftDocumentNode): ElectroCraftDocument {
+  const documentId = createDeterministicObjectId(
+    'document',
+    `reusable:${node.componentRef}:${globalThis.crypto.randomUUID()}`,
+  );
+  return electroCraftDocumentSchema.parse({
+    schemaVersion: 4,
+    id: documentId,
+    version: 1,
+    name: `Bloque ${node.componentRef}`,
+    kind: 'reusable-component',
+    root: cloneReusableNode(node, documentId),
+    references: { documentRefs: [] },
+    metadata: { source: 'editor-context-save-as-block' },
+    formMeta: null,
+    templateMeta: null,
+  });
+}
+
 /**
  * Opens the current local project, establishes one canonical Puck session and
  * wires Puck onAction -> canonical reconstruction -> F04 incremental autosave.
@@ -111,6 +141,21 @@ export async function loadStudioPuckEditor(options: LoadStudioPuckEditorOptions)
     onSynchronized: options.onSynchronized,
     onError: options.onError,
   });
+  const disconnectBlockSaver = puckContextControls.connectBlockSaver((node) => {
+    const block = createReusableComponentDocument(node);
+    runtime.queueAutosave({
+      project: opened.project,
+      dirtyObjects: [
+        {
+          objectId: block.id,
+          kind: 'document',
+          schemaVersion: block.schemaVersion,
+          payload: structuredClone(block) as unknown as JsonValue,
+        },
+      ],
+    });
+    return block.id;
+  });
 
   if (created) persistence.apply(session.data);
 
@@ -121,6 +166,9 @@ export async function loadStudioPuckEditor(options: LoadStudioPuckEditorOptions)
     session,
     persistence,
     actionSync,
+    dispose() {
+      disconnectBlockSaver();
+    },
   });
 }
 
