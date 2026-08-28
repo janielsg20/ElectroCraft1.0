@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { createDefaultElectroCraftStyle, electroCraftLayoutSchema, electroCraftStyleSchema } from '@electrocraft/domain';
+import {
+  createDefaultElectroCraftStyle,
+  electroCraftLayoutSchema,
+  electroCraftStyleSchema,
+} from '@electrocraft/domain';
 import { resolveStudioPresentationStyle } from '../../../apps/studio/src/features/editor/advanced/presentation-style';
 
 const rowLayout = electroCraftLayoutSchema.parse({
