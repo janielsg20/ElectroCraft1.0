@@ -1,5 +1,6 @@
 import * as z from 'zod';
 import {
+  ELECTROCRAFT_STYLE_PROPERTIES,
   electroCraftStyleDeclarationSchema,
   electroCraftStyleSchema,
   type ElectroCraftStyle,
@@ -36,23 +37,6 @@ export interface ElectroCraftDeclaredPlatformCapability {
   readonly adapter: string | null;
   readonly reason: string | null;
 }
-
-const styleProperties = Object.freeze([
-  'width',
-  'height',
-  'minWidth',
-  'maxWidth',
-  'gap',
-  'padding',
-  'margin',
-  'fontSize',
-  'fontWeight',
-  'textAlign',
-  'foreground',
-  'background',
-  'opacity',
-  'visibility',
-] satisfies readonly ElectroCraftPlatformStyleProperty[]);
 
 function hasOwn<T extends object>(value: T, key: PropertyKey): boolean {
   return Object.prototype.hasOwnProperty.call(value, key);
@@ -91,7 +75,7 @@ export function resolvePlatformStyleDeclaration(
   platform: ElectroCraftEditorPlatform,
 ): ElectroCraftStyleDeclaration {
   const declaration: Record<string, unknown> = {};
-  for (const property of styleProperties) {
+  for (const property of ELECTROCRAFT_STYLE_PROPERTIES) {
     const resolved = resolvePlatformStyleProperty(style, responsiveDeclaration, platform, property).value;
     if (resolved !== undefined) declaration[property] = resolved;
   }
