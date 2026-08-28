@@ -8,6 +8,7 @@ export * from './puck-canvas-guide-overlay';
 export * from './puck-canvas-guides';
 export * from './puck-command-controls';
 export * from './puck-component-adapter';
+export * from './puck-context-controls';
 export * from './puck-document-adapter';
 export * from './puck-editor-composition';
 export * from './puck-history-controls';
