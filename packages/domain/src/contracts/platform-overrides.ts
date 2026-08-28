@@ -1,5 +1,6 @@
 import * as z from 'zod';
 import {
+  electroCraftStyleDeclarationSchema,
   electroCraftStyleSchema,
   type ElectroCraftStyle,
   type ElectroCraftStyleDeclaration,
@@ -35,6 +36,23 @@ export interface ElectroCraftDeclaredPlatformCapability {
   readonly adapter: string | null;
   readonly reason: string | null;
 }
+
+const styleProperties = Object.freeze([
+  'width',
+  'height',
+  'minWidth',
+  'maxWidth',
+  'gap',
+  'padding',
+  'margin',
+  'fontSize',
+  'fontWeight',
+  'textAlign',
+  'foreground',
+  'background',
+  'opacity',
+  'visibility',
+] satisfies readonly ElectroCraftPlatformStyleProperty[]);
 
 function hasOwn<T extends object>(value: T, key: PropertyKey): boolean {
   return Object.prototype.hasOwnProperty.call(value, key);
@@ -72,11 +90,12 @@ export function resolvePlatformStyleDeclaration(
   responsiveDeclaration: ElectroCraftStyleDeclaration,
   platform: ElectroCraftEditorPlatform,
 ): ElectroCraftStyleDeclaration {
-  const declaration = {} as ElectroCraftStyleDeclaration;
-  for (const property of Object.keys(responsiveDeclaration) as ElectroCraftPlatformStyleProperty[]) {
-    declaration[property] = resolvePlatformStyleProperty(style, responsiveDeclaration, platform, property).value as never;
+  const declaration: Record<string, unknown> = {};
+  for (const property of styleProperties) {
+    const resolved = resolvePlatformStyleProperty(style, responsiveDeclaration, platform, property).value;
+    if (resolved !== undefined) declaration[property] = resolved;
   }
-  return declaration;
+  return electroCraftStyleDeclarationSchema.parse(declaration) as ElectroCraftStyleDeclaration;
 }
 
 export function setPlatformStyleOverride<K extends ElectroCraftPlatformStyleProperty>(
