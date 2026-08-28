@@ -58,7 +58,11 @@ test.describe('M03.4 Topbar global + Settings', () => {
     await expect(tools).toBeVisible();
     await tools.click();
     const toolsDialog = page.getByRole('dialog', { name: 'Herramientas contextuales' });
-    await expect(toolsDialog).toContainText('Tablet');
+    const breakpoint = toolsDialog.locator('[data-topbar-tool="breakpoint"]').getByRole('combobox');
+    await expect(breakpoint).toBeVisible();
+    await expect(breakpoint).toContainText(
+      /Móvil pequeño|Móvil grande|Tablet vertical|Tablet horizontal|Portátil|Escritorio/,
+    );
     await page.keyboard.press('Escape');
     await expect(tools).toBeFocused();
 
