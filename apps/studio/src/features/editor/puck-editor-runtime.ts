@@ -60,10 +60,34 @@ function createInitialScreen(project: StoredProjectDefinition): ElectroCraftDocu
   });
 }
 
+function payloadDocumentKind(payload: unknown): string | null {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return null;
+  const kind = (payload as { kind?: unknown }).kind;
+  return typeof kind === 'string' ? kind : null;
+}
+
+function documentPriority(payload: unknown) {
+  switch (payloadDocumentKind(payload)) {
+    case 'screen':
+      return 0;
+    case 'admin-screen':
+    case 'form':
+    case 'template':
+      return 1;
+    case 'reusable-component':
+      return 2;
+    default:
+      return 1;
+  }
+}
+
 function resolveProjectDocument(opened: OpenProjectResult): { document: ElectroCraftDocument; created: boolean } {
   const documentObjects = opened.objects
     .filter((object) => object.kind === 'document')
-    .sort((left, right) => left.objectId.localeCompare(right.objectId));
+    .sort((left, right) => {
+      const priority = documentPriority(left.payload) - documentPriority(right.payload);
+      return priority === 0 ? left.objectId.localeCompare(right.objectId) : priority;
+    });
 
   if (documentObjects.length === 0) {
     return { document: createInitialScreen(opened.project), created: true };
