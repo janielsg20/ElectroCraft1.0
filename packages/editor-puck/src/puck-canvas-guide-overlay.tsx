@@ -1,4 +1,5 @@
-import { useSyncExternalStore, type KeyboardEvent, type MouseEvent } from 'react';
+import { useState, useSyncExternalStore, type KeyboardEvent, type MouseEvent } from 'react';
+import { puckAdvancedSelectionControls } from './puck-advanced-selection';
 import { puckCanvasGuideControls, type PuckCanvasGuide } from './puck-canvas-guides';
 
 function addGuideFromRuler(event: MouseEvent<HTMLButtonElement>, axis: 'x' | 'y') {
@@ -21,9 +22,92 @@ function handleGuideKey(event: KeyboardEvent<HTMLButtonElement>, guide: PuckCanv
   puckCanvasGuideControls.moveGuide(guide.id, guide.position + (negative ? -step : step));
 }
 
+function safely(action: () => void) {
+  try {
+    action();
+  } catch {
+    // The adapter publishes a visible diagnostic before rethrowing.
+  }
+}
+
+function AdvancedSelectionBar() {
+  const selection = useSyncExternalStore(
+    puckAdvancedSelectionControls.subscribe,
+    puckAdvancedSelectionControls.getSnapshot,
+    puckAdvancedSelectionControls.getSnapshot,
+  );
+  const [width, setWidth] = useState('');
+  const [height, setHeight] = useState('');
+
+  if (!selection.connected || selection.selectedIds.length === 0) return null;
+  const count = selection.selectedIds.length;
+  const size = (value: string) => (value.trim() === '' ? null : Math.max(0, Number(value) || 0));
+
+  return (
+    <div className="ec-advanced-selection-toolbar" data-advanced-selection-toolbar role="toolbar" aria-label="Selección avanzada">
+      <span className="ec-advanced-selection-count" aria-live="polite">
+        {count === 1 ? '1 elemento seleccionado' : `${count} elementos seleccionados`}
+      </span>
+      {count >= 2 ? (
+        <button type="button" className="ec-advanced-selection-action" onClick={() => safely(() => puckAdvancedSelectionControls.group())}>
+          Agrupar
+        </button>
+      ) : (
+        <button type="button" className="ec-advanced-selection-action" onClick={() => safely(() => puckAdvancedSelectionControls.ungroup())}>
+          Desagrupar
+        </button>
+      )}
+      {count === 1 ? (
+        <div className="ec-advanced-resize" aria-label="Cambiar tamaño base">
+          <label>
+            <span>Ancho</span>
+            <input
+              type="number"
+              min={0}
+              inputMode="numeric"
+              value={width}
+              placeholder="Auto"
+              aria-label="Ancho base en píxeles"
+              onChange={(event) => setWidth(event.currentTarget.value)}
+            />
+          </label>
+          <label>
+            <span>Alto</span>
+            <input
+              type="number"
+              min={0}
+              inputMode="numeric"
+              value={height}
+              placeholder="Auto"
+              aria-label="Alto base en píxeles"
+              onChange={(event) => setHeight(event.currentTarget.value)}
+            />
+          </label>
+          <button
+            type="button"
+            className="ec-advanced-selection-action"
+            onClick={() => safely(() => puckAdvancedSelectionControls.resize(size(width), size(height)))}
+          >
+            Aplicar tamaño
+          </button>
+        </div>
+      ) : null}
+      <button type="button" className="ec-advanced-selection-action ec-advanced-selection-action--ghost" onClick={() => puckAdvancedSelectionControls.clear()}>
+        Limpiar selección
+      </button>
+      {selection.message ? (
+        <span className="ec-advanced-selection-diagnostic" role="alert">
+          {selection.message}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
 /**
  * Editor-only visual extension layered beside Puck.Preview. It never intercepts
- * Puck's component drag surface; only rulers and guide handles are interactive.
+ * Puck's component drag surface; only rulers, guide handles and explicit
+ * advanced-selection controls are interactive.
  */
 export function PuckCanvasGuideOverlay() {
   const snapshot = useSyncExternalStore(
@@ -31,11 +115,17 @@ export function PuckCanvasGuideOverlay() {
     puckCanvasGuideControls.getSnapshot,
     puckCanvasGuideControls.getSnapshot,
   );
+  const selection = useSyncExternalStore(
+    puckAdvancedSelectionControls.subscribe,
+    puckAdvancedSelectionControls.getSnapshot,
+    puckAdvancedSelectionControls.getSnapshot,
+  );
 
-  if (!snapshot.rulersVisible && !snapshot.guidesVisible) return null;
+  if (!snapshot.rulersVisible && !snapshot.guidesVisible && selection.selectedIds.length === 0) return null;
 
   return (
-    <div className="ec-canvas-guides" data-canvas-guides aria-label="Guías y ajuste del lienzo">
+    <div className="ec-canvas-guides" data-canvas-guides aria-label="Guías, ajuste y selección avanzada del lienzo">
+      <AdvancedSelectionBar />
       {snapshot.rulersVisible ? (
         <>
           <button
