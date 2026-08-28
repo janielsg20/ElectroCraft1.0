@@ -1,0 +1,66 @@
+.ec-advanced-selection-toolbar {
+  position: absolute;
+  z-index: 6;
+  inset-inline: var(--ec-space-3);
+  top: var(--ec-space-3);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--ec-space-2);
+  min-height: 36px;
+  padding: var(--ec-space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--background);
+  box-shadow: var(--shadow-sm);
+}
+
+.ec-advanced-selection-count,
+.ec-advanced-selection-diagnostic,
+.ec-advanced-resize label > span {
+  font-size: var(--ec-text-xs);
+}
+
+.ec-advanced-selection-count {
+  font-weight: 600;
+}
+
+.ec-advanced-resize {
+  display: flex;
+  align-items: end;
+  gap: var(--ec-space-2);
+}
+
+.ec-advanced-resize label {
+  display: grid;
+  gap: var(--ec-space-1);
+}
+
+.ec-advanced-resize input {
+  width: 5.5rem;
+}
+
+.ec-advanced-selection-diagnostic {
+  flex-basis: 100%;
+  color: var(--destructive);
+}
+
+@media (max-width: 767px) {
+  .ec-advanced-selection-toolbar {
+    position: sticky;
+    inset-inline: auto;
+    top: 0;
+    align-items: stretch;
+  }
+
+  .ec-advanced-resize {
+    flex-basis: 100%;
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+
+  .ec-advanced-selection-toolbar button,
+  .ec-advanced-resize input {
+    min-height: 44px;
+  }
+}
