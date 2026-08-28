@@ -20,6 +20,104 @@
   outline-color: var(--puck-color-focus-ring);
 }
 
+.ec-puck-preview-with-guides {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+}
+
+.ec-canvas-guides {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.ec-canvas-ruler,
+.ec-canvas-guide,
+.ec-canvas-snap-feedback {
+  position: absolute;
+  pointer-events: auto;
+}
+
+.ec-canvas-ruler {
+  z-index: 5;
+  border: 0;
+  background: color-mix(in srgb, var(--muted) 92%, transparent);
+  color: var(--muted-foreground);
+  cursor: crosshair;
+}
+
+.ec-canvas-ruler--x {
+  top: 0;
+  left: 24px;
+  right: 0;
+  height: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ec-canvas-ruler--y {
+  top: 24px;
+  bottom: 0;
+  left: 0;
+  width: 24px;
+  border-right: 1px solid var(--border);
+}
+
+.ec-canvas-guide {
+  z-index: 6;
+  border: 0;
+  padding: 0;
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.ec-canvas-guide--x {
+  top: 24px;
+  bottom: 0;
+  width: 1px;
+  cursor: ew-resize;
+}
+
+.ec-canvas-guide--y {
+  left: 24px;
+  right: 0;
+  height: 1px;
+  cursor: ns-resize;
+}
+
+.ec-canvas-guide > span {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  min-width: max-content;
+  border-radius: calc(var(--radius) - 3px);
+  padding: 1px 4px;
+  background: var(--primary);
+  font-size: 10px;
+  line-height: 16px;
+}
+
+.ec-canvas-guide:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.ec-canvas-snap-feedback {
+  z-index: 8;
+  right: 12px;
+  bottom: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 8px;
+  background: var(--background);
+  color: var(--foreground);
+  box-shadow: var(--shadow-sm);
+  font-size: var(--ec-text-xs);
+}
+
 [data-ec-core-component] {
   box-sizing: border-box;
   max-width: 100%;
@@ -255,7 +353,7 @@ div[data-ec-core-component='Image'] {
   }
 
   .ec-canvas-context-bar {
-    top: 36px;
+    top: 32px;
   }
 
   .ec-advanced-selection-toolbar {
@@ -265,8 +363,26 @@ div[data-ec-core-component='Image'] {
   .ec-canvas-context-menu > summary,
   .ec-canvas-context-menu-content button,
   .ec-advanced-selection-action,
-  .ec-advanced-resize input {
+  .ec-advanced-resize input,
+  .ec-canvas-ruler {
     min-height: 44px;
+  }
+
+  .ec-canvas-ruler--x {
+    left: 0;
+    height: 32px;
+  }
+
+  .ec-canvas-ruler--y {
+    display: none;
+  }
+
+  .ec-canvas-guide--x {
+    top: 32px;
+  }
+
+  .ec-canvas-guide--y {
+    left: 0;
   }
 
   .ec-advanced-resize {
@@ -276,5 +392,14 @@ div[data-ec-core-component='Image'] {
 
   .ec-canvas-context-menu-content {
     width: min(220px, calc(100vw - 32px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ec-canvas-guide,
+  .ec-canvas-context-bar,
+  .ec-advanced-selection-toolbar {
+    scroll-behavior: auto;
+    transition: none;
   }
 }
