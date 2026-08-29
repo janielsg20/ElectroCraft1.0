@@ -14,7 +14,9 @@ import {
   type ElectroCraftRouteParamDefinition,
 } from '@electrocraft/domain';
 import { useMemo, useState } from 'react';
+import { HelpTrigger } from '../../help/help-ui';
 import { routeNavigationActionRuntime } from './route-navigation-action-runtime';
+import { RouteGuardEditor } from './route-guard-editor';
 import './route-action-editor.css';
 
 function parseLiteral(param: ElectroCraftRouteParamDefinition, raw: string) {
@@ -62,8 +64,7 @@ export function RouteActionEditor({
             ? []
             : destinationRoute.params.flatMap((param) => {
                 const raw = paramValues[param.name]?.trim() ?? '';
-                if (!raw && !param.required) return [];
-                if (!raw && param.required) return [];
+                if (!raw) return [];
                 return [{ param: param.name, value: { source: 'literal', value: parseLiteral(param, raw) } }];
               }),
       });
@@ -94,27 +95,44 @@ export function RouteActionEditor({
   return (
     <div className="ec-route-action-editor" data-route-action-editor>
       <section className="ec-route-detail" aria-labelledby="route-detail-title">
-        <h4 id="route-detail-title">Ruta</h4>
+        <div className="ec-route-detail-heading">
+          <h4 id="route-detail-title">Ruta</h4>
+          <HelpTrigger helpId="help.navigation.routes" />
+        </div>
         <dl>
-          <dt>Path</dt><dd><code>{sourceRoute.path}</code></dd>
-          <dt>Parámetros</dt><dd>{sourceRoute.params.length}</dd>
-          <dt>Enlace profundo</dt><dd>{sourceRoute.deepLink.enabled ? 'Activo' : 'Desactivado'}</dd>
-          <dt>Guards</dt><dd>{sourceRoute.guards.length}</dd>
-          <dt>Acciones</dt><dd>{sourceRoute.actionRefs.length}</dd>
+          <dt>Path</dt>
+          <dd>
+            <code>{sourceRoute.path}</code>
+          </dd>
+          <dt>Parámetros</dt>
+          <dd>{sourceRoute.params.length}</dd>
+          <dt>Enlace profundo</dt>
+          <dd>{sourceRoute.deepLink.enabled ? 'Activo' : 'Desactivado'}</dd>
+          <dt>Guards</dt>
+          <dd>{sourceRoute.guards.length}</dd>
+          <dt>Acciones</dt>
+          <dd>{sourceRoute.actionRefs.length}</dd>
         </dl>
         {sourceRoute.params.length > 0 ? (
           <ul className="ec-route-param-list" aria-label="Parámetros de Ruta">
             {sourceRoute.params.map((param) => (
               <li key={param.name}>
                 <code>{param.name}</code>
-                <span>{param.source} · {param.valueType}{param.required ? ' · requerido' : ''}</span>
+                <span>
+                  {param.source} · {param.valueType}
+                  {param.required ? ' · requerido' : ''}
+                </span>
               </li>
             ))}
           </ul>
         ) : null}
         {sourceRoute.deepLink.aliases.length > 0 ? (
           <ul className="ec-route-deep-link-list" aria-label="Enlaces profundos">
-            {sourceRoute.deepLink.aliases.map((alias) => <li key={alias}><code>{alias}</code></li>)}
+            {sourceRoute.deepLink.aliases.map((alias) => (
+              <li key={alias}>
+                <code>{alias}</code>
+              </li>
+            ))}
           </ul>
         ) : null}
       </section>
@@ -124,7 +142,9 @@ export function RouteActionEditor({
         <label>
           <span>Acción</span>
           <Select value={actionType} onValueChange={(value) => setActionType(value as 'navigate' | 'external-url')}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="navigate">Navegar</SelectItem>
               <SelectItem value="external-url">Abrir enlace externo</SelectItem>
@@ -137,7 +157,9 @@ export function RouteActionEditor({
             <label>
               <span>Modo</span>
               <Select value={mode} onValueChange={(value) => setMode(value as 'push' | 'replace' | 'back')}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="push">Destino</SelectItem>
                   <SelectItem value="replace">Reemplazar</SelectItem>
@@ -149,10 +171,14 @@ export function RouteActionEditor({
               <label>
                 <span>Destino</span>
                 <Select value={destinationRouteId} onValueChange={setDestinationRouteId}>
-                  <SelectTrigger><SelectValue placeholder="Seleccionar Ruta" /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar Ruta" />
+                  </SelectTrigger>
                   <SelectContent>
                     {routes.map((route) => (
-                      <SelectItem key={route.id} value={route.id}>{route.name} · {route.path}</SelectItem>
+                      <SelectItem key={route.id} value={route.id}>
+                        {route.name} · {route.path}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -164,20 +190,30 @@ export function RouteActionEditor({
                 <legend>Parámetros</legend>
                 {destinationRoute.params.map((param) => (
                   <label key={param.name}>
-                    <span>{param.name}{param.required ? ' *' : ''} · {param.valueType}</span>
+                    <span>
+                      {param.name}
+                      {param.required ? ' *' : ''} · {param.valueType}
+                    </span>
                     {param.valueType === 'boolean' ? (
                       <Select
                         value={paramValues[param.name] ?? ''}
                         onValueChange={(value) => setParamValues((current) => ({ ...current, [param.name]: value }))}
                       >
-                        <SelectTrigger><SelectValue placeholder={param.required ? 'Seleccionar' : 'Sin valor'} /></SelectTrigger>
-                        <SelectContent><SelectItem value="true">true</SelectItem><SelectItem value="false">false</SelectItem></SelectContent>
+                        <SelectTrigger>
+                          <SelectValue placeholder={param.required ? 'Seleccionar' : 'Sin valor'} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="true">true</SelectItem>
+                          <SelectItem value="false">false</SelectItem>
+                        </SelectContent>
                       </Select>
                     ) : (
                       <Input
                         type={param.valueType === 'number' ? 'number' : 'text'}
                         value={paramValues[param.name] ?? ''}
-                        onChange={(event) => setParamValues((current) => ({ ...current, [param.name]: event.target.value }))}
+                        onChange={(event) =>
+                          setParamValues((current) => ({ ...current, [param.name]: event.target.value }))
+                        }
                         placeholder={param.required ? 'Requerido' : 'Opcional'}
                       />
                     )}
@@ -195,8 +231,13 @@ export function RouteActionEditor({
             </label>
             <label>
               <span>Apertura</span>
-              <Select value={externalMode} onValueChange={(value) => setExternalMode(value as 'same-context' | 'new-context')}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={externalMode}
+                onValueChange={(value) => setExternalMode(value as 'same-context' | 'new-context')}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="same-context">Mismo contexto</SelectItem>
                   <SelectItem value="new-context">Nuevo contexto</SelectItem>
@@ -207,9 +248,19 @@ export function RouteActionEditor({
           </>
         )}
 
-        {error ? <p className="ec-route-action-error" role="alert">{error}</p> : null}
-        {message ? <p className="ec-route-action-success" role="status">{message}</p> : null}
+        {error ? (
+          <p className="ec-route-action-error" role="alert">
+            {error}
+          </p>
+        ) : null}
+        {message ? (
+          <p className="ec-route-action-success" role="status">
+            {message}
+          </p>
+        ) : null}
       </section>
+
+      <RouteGuardEditor route={sourceRoute} routes={routes} />
     </div>
   );
 }
