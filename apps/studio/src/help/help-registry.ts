@@ -17,6 +17,7 @@ export type StudioHelpId =
   | 'help.projects'
   | 'help.editor.advanced'
   | 'help.navigation'
+  | 'help.screens'
   | `help.section.${SidebarNavigationItemId}`;
 
 export interface HelpDescriptor {
@@ -153,9 +154,21 @@ const studioDefinitions = Object.freeze([
     shortKey: helpKey('help.section.navigation.short'),
     longKey: helpKey('help.section.navigation.long'),
     exampleKeys: [helpKey('help.section.navigation.example')],
-    relatedIds: ['help.section.screens', 'help.section.navigation', 'help.section.workflows'],
+    relatedIds: ['help.screens', 'help.section.navigation', 'help.section.workflows'],
     keywords: ['navigation graph', 'pantallas', 'rutas', 'ruta', 'stack', 'tabs', 'drawer', 'modal', 'parámetros', 'deep link', 'guards'],
     learnMoreRef: '.ai/microphases/M07_1.md',
+  },
+  {
+    id: 'help.screens',
+    sectionId: 'screens-management',
+    navigationItemId: 'screens',
+    titleKey: helpKey('help.section.screens.title'),
+    shortKey: helpKey('help.section.screens.short'),
+    longKey: helpKey('help.section.screens.long'),
+    exampleKeys: [helpKey('help.section.screens.example')],
+    relatedIds: ['help.navigation', 'help.section.editor'],
+    keywords: ['pantallas', 'screen', 'ruta', 'navigator', 'plantilla', 'estado', 'duplicar', 'abrir en editor'],
+    learnMoreRef: '.ai/microphases/M07_2.md',
   },
 ] as const satisfies readonly HelpDefinition[]);
 
@@ -187,9 +200,9 @@ const navigationKeywords: Readonly<Record<SidebarNavigationItemId, readonly stri
 });
 
 const navigationRelated: Partial<Record<SidebarNavigationItemId, readonly StudioHelpId[]>> = Object.freeze({
-  editor: ['help.section.components', 'help.section.screens'],
-  screens: ['help.navigation', 'help.section.editor'],
-  navigation: ['help.navigation', 'help.section.screens'],
+  editor: ['help.section.components', 'help.screens'],
+  screens: ['help.screens', 'help.navigation', 'help.section.editor'],
+  navigation: ['help.navigation', 'help.screens'],
   components: ['help.section.editor', 'help.section.templates'],
   records: ['help.section.models', 'help.section.queries', 'help.section.forms'],
   models: ['help.section.records', 'help.section.forms'],
@@ -242,6 +255,8 @@ export function getStudioHelpDescriptor(helpId: StudioHelpId): HelpDescriptor {
 }
 
 export function getHelpIdForNavigationItem(itemId: SidebarNavigationItemId): StudioHelpId {
+  if (itemId === 'screens') return 'help.screens';
+  if (itemId === 'navigation') return 'help.navigation';
   return `help.section.${itemId}`;
 }
 
