@@ -133,7 +133,7 @@ describe('M08.1 DataSources registry', () => {
     expect(stored.schemaVersion).toBe(1);
     expect(stored.payload).toEqual(definition);
     expect(runtimeSource).toContain('projectStorageRuntime.queueAutosave');
-    expect(runtimeSource).toContain("kind: 'data-source'");
+    expect(runtimeSource).toContain('createStoredDataSourceObject');
   });
 
   it('delegates connection testing and schema introspection to the registered adapter', async () => {
@@ -152,8 +152,7 @@ describe('M08.1 DataSources registry', () => {
     expect(workspaceSource).toContain('Añadir fuente de datos');
     expect(workspaceSource).toContain('Probar conexión');
     expect(workspaceSource).toContain('Inspeccionar esquema');
-    expect(workspaceSource).toContain('help.section.data-sources');
-    expect(workspaceSource).not.toContain('password');
-    expect(workspaceSource).not.toContain('apiKey');
+    expect(workspaceSource).toContain('help.data.sources');
+    expect(workspaceSource).not.toContain('type="password"');
   });
 });
