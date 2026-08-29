@@ -19,6 +19,30 @@ export interface DataSourceConnectionResult {
   readonly message: string;
 }
 
+export interface DataSourceResourceDescriptor {
+  readonly id: string;
+  readonly label: string;
+  readonly kind: string;
+  readonly metadata?: Readonly<Record<string, JsonValue>>;
+}
+
+export type DataSourceQueryCapability = Extract<
+  ElectroCraftCanonicalDataSourceCapability,
+  'read' | 'pagination' | 'filtering' | 'sort' | 'aggregate'
+>;
+
+export interface DataSourceQueryRequest {
+  readonly resourceId: string;
+  readonly requiredCapabilities?: readonly DataSourceQueryCapability[];
+  readonly input?: JsonValue;
+}
+
+export interface DataSourceMutationRequest {
+  readonly resourceId: string;
+  readonly operation: Extract<ElectroCraftCanonicalDataSourceCapability, 'create' | 'update' | 'delete'>;
+  readonly input?: JsonValue;
+}
+
 export interface DataSourceAdapter {
   readonly adapterId: string;
   readonly displayName: string;
@@ -26,16 +50,10 @@ export interface DataSourceAdapter {
   readonly capabilities: readonly ElectroCraftCanonicalDataSourceCapability[];
   readonly supportsSchemaDiscovery: boolean;
   testConnection(context: DataSourceAdapterContext): Promise<DataSourceConnectionResult>;
+  listResources(context: DataSourceAdapterContext): Promise<readonly DataSourceResourceDescriptor[]>;
   getSchema(context: DataSourceAdapterContext): Promise<ElectroCraftDataSchema | null>;
-  read(context: DataSourceAdapterContext, request?: JsonValue): Promise<JsonValue>;
-  create(context: DataSourceAdapterContext, input: JsonValue): Promise<JsonValue>;
-  update(context: DataSourceAdapterContext, input: JsonValue): Promise<JsonValue>;
-  remove(context: DataSourceAdapterContext, input: JsonValue): Promise<JsonValue>;
-  subscribe?(
-    context: DataSourceAdapterContext,
-    request: JsonValue | undefined,
-    listener: (value: JsonValue) => void,
-  ): Promise<() => void> | (() => void);
+  query(context: DataSourceAdapterContext, request: DataSourceQueryRequest): Promise<JsonValue>;
+  mutate(context: DataSourceAdapterContext, request: DataSourceMutationRequest): Promise<JsonValue>;
 }
 
 export function createStoredDataSourceObject(source: ElectroCraftDataSourceDefinition): StoredProjectObjectInput {
