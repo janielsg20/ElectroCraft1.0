@@ -2,68 +2,68 @@
 
 ## Current
 
-F07 / M07.8 — Navigation E2E y UX — `ACTIVE`.
+F08 / M08.1 — Fuentes de datos y ConnectorRegistry — `ACTIVE`.
 
-Rama activa: `codex/m07-1-navigation-model`.
+Rama activa: `codex/m08-1-data-sources`.
 
-M07.8 mantiene activo el cierre de F07: la implementación funcional ya está completa, pero no se cierra hasta que Base CI certifique documentación, lint, typecheck, test, build y Playwright.
+F07 está cerrada y fusionada. M08.1 tiene implementación funcional preparada y evidencia; la suite completa se reserva para el Gate F08 para evitar Actions por microfase.
 
-## Heredado
+## Gate de entrada F08
 
-- F00–F05 están `COMPLETADA / GREEN`.
-- F06 fue fusionada funcionalmente a `main` mediante PR `#64`.
-- La PR correctiva F06 `#67` ejecutó run `33203881217`; docs/lint/typecheck/Vitest/build pasaron y Playwright falló.
-- La rama F07 actual parte de esa corrección y añade reparaciones de los blockers Playwright encontrados, todavía sin certificar.
-- `@electrocraft/editor-puck` sigue siendo el único boundary del engine Puck. No persistir AppState, selection, visual history, clipboard, locks, guides ni feedback transitorio.
+- Base CI F07: run `33262949215` (#795), `success` completo.
+- PR F07: `#68`.
+- merge a `main`: `e697a42546d23f89412e6dd616018759e719e448`.
+- las reparaciones Playwright heredadas de F06 quedaron certificadas dentro de este gate.
 
-## F07 implementada
+## M08.1 implementada
 
-### M07.1
-Route/Navigation v2, migración legacy, refs, cycles, params, guards, deep links y compiler source portable.
+### Contrato
 
-### M07.2
-Pantallas CRUD, búsqueda/detalle responsive, Ruta/Navigator, duplicación, apertura exacta en Editor y delete blocker por referencias.
+- Owner único de DataSource: `packages/domain/src/data/source-definition.ts`.
+- Capabilities canónicas: `read/create/update/delete/pagination/filtering/sort/aggregate/realtime/file/transactions`.
+- Aliases legacy se normalizan al importar; no crean una segunda semántica.
+- `environmentScope` + overrides por development/preview/production.
+- config portable rechaza passwords, API keys, tokens, Authorization y credenciales; usar `authRef`.
 
-### M07.3
-Screen Composer: selector de Pantalla en topbar/context/mobile, un solo `PuckEditorRoot`, history aislado por documento y breadcrumb `App > Pantalla > Node`.
+### Runtime
 
-### M07.4
-Navigation Builder tree con Pila/Pestañas/Menú lateral/Modal, reorder drag + teclado, Pantalla inicial, inspector portable y preview derivado.
+- `packages/application/src/connector-registry.ts` conserva el único singleton `dataSourceConnectorRegistry`.
+- `DataSourceAdapter`: `testConnection`, `listResources`, `getSchema`, `query`, `mutate`.
+- Registry bloquea adapter/kind/capability/environment incompatibles antes de ejecutar.
+- `packages/connectors` registra adapters sobre el registry de aplicación; no posee otro registry runtime.
+- `packages/data-web` consume el registry mediante `WebDataSourceRepository` y reutiliza PGlite/Drizzle existente.
+- `tooling/package-boundaries.json` reconoce `@electrocraft/connectors` como paquete estable #20.
 
-### M07.5
-Route params/deep links, binding `source=route`, ActionGraph Navegar `push|replace|back` y URL externa http/https separada.
+### Studio
 
-### M07.6
-Guards Público/Auth/Permiso/Condición, redirect sin loops y Preview fail-closed; auth real sigue reservado para F12.
+`/data-sources` carga directamente `apps/studio/src/features/data/data-sources-workspace.tsx`.
 
-### M07.7
-`NavigationCompilerPort` y contratos React Router, Expo Router, LAMP/Slim, WordPress, Capacitor y Static Web sin persistir objetos target.
+- Desktop: lista 300px + detalle + inspector seguridad/compatibilidad.
+- Tablet: inspector a Sheet.
+- Mobile: list → detail.
+- Secciones: Resumen, Configuración, Autenticación, Esquema, Prueba.
+- Copy: Fuentes de datos, Nueva fuente, Interna, REST API, GraphQL, Probar conexión, Esquema, Credenciales, Requiere gateway.
+- Help: `help.data.sources`.
+- adapters aún no implementados se muestran como no registrados y acciones dependientes quedan deshabilitadas con motivo.
 
-### M07.8 — ACTIVE
-`/preview` contractual, integración de cuatro Pantallas y Playwright de flujo UX/responsive preparados. La actividad restante de esta microfase es exclusivamente cerrar el Gate F07.
+## Tests preparados
 
-## Reparaciones QA heredadas incluidas
+- `tooling/vitest/unit/m08-1-data-sources-registry.test.ts`
+- `tooling/vitest/unit/help-registry.test.ts`
+- `tooling/vitest/integration/app-shell-e2e-matrix.test.ts`
 
-- Inspector avanzado sin selección: testea estado vacío accesible; controles reales permanecen cubiertos por M06.1.
-- Responsive metadata de Puck: transitoria en la sesión, ausente del documento persistido.
-- Topbar 1600px: cluster central compactado para no interceptar Undo/Redo.
-- Lock contextual: no se pierde al refrescar permisos; `clearSessionLocks()` se ejecuta al cambiar proyecto/Pantalla.
-- Breadcrumb E2E alineado con semántica F07.
+Cubren registry register/unregister, compatibilidad, 11 capabilities, unsupported operation, secret exclusion, round-trip, facade data-web y responsive/copy.
 
-## Gate requerido
+## Validación pendiente de fase
 
-PR `#68`, `codex/m07-1-navigation-model` → `main`, es el gate de fase. Base CI debe ejecutar:
+`packages/connectors` es un workspace nuevo y obliga a regenerar `package-lock.json` antes del Gate F08. También se aplicará Prettier y la suite completa en ese único gate. No abrir PR mientras se desarrollen las microfases de F08 para no disparar CI en cada commit.
 
-1. documentación;
-2. lint/Prettier;
-3. typecheck;
-4. Vitest/integración;
-5. build;
-6. Playwright repository gate;
-7. fixtures/artifacts base.
+## Siguiente microfase exacta
 
-El primer intento `33230853322` se bloqueó únicamente porque los documentos no marcaban ninguna microfase `ACTIVE`; esta corrección mantiene M07.8 como única activa. Si el siguiente run falla, corregir solo errores reales. No activar F08 hasta GREEN.
+`M08.2 — Fuente interna ElectroCraft Data sobre PGlite`.
+
+No crear una segunda base local: reutilizar PGlite + Drizzle + generic record store existente. No exponer SQL a beginner. El adapter interno debe vivir detrás del mismo ConnectorRegistry.
 
 ## Read set
 
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/phases/F07.md → .ai/microphases/M07_1.md … M07_8.md → .ai/evidence/F07/ → packages/domain/src/navigation → packages/application/src/navigation → apps/studio/src/features/navigation → tooling/vitest → tooling/playwright`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/phases/F08.md → .ai/microphases/M08_1.md → .ai/microphases/M08_2.md → .ai/evidence/F08/ → packages/domain/src/data → packages/application/src/data + connector-registry → packages/connectors → packages/data-web → apps/studio/src/features/data → tooling/vitest`.
