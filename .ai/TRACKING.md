@@ -10,9 +10,11 @@ Date: 2026-08-29.
 | F03 / M03.1–M03.12 | COMPLETADA / GREEN | `.ai/evidence/F03/CLOSURE_2026-08-20.md` |
 | F04 / M04.1–M04.8 | COMPLETADA / GREEN | `.ai/evidence/F04/CLOSURE_2026-08-25.md` |
 | F05 / M05.1–M05.8 | COMPLETADA / GREEN | PR `#60`; Base CI `33101434587` |
-| F06 / M06.1–M06.8 | IMPLEMENTACIÓN FUSIONADA; reparaciones certificadas en F07 | PR `#64`; reparaciones incluidas en Base CI F07 `33262949215` |
+| F06 / M06.1–M06.8 | IMPLEMENTACIÓN FUSIONADA; reparaciones certificadas en F07 | PR `#64`; Base CI F07 `33262949215` |
 | F07 / M07.1–M07.8 | COMPLETADA / GREEN | PR `#68`; Base CI `33262949215`; merge `e697a42546d23f89412e6dd616018759e719e448` |
-| F08 / M08.1 | ACTIVE | `.ai/evidence/F08/M08.1/IMPLEMENTATION_2026-08-29.md` |
+| F08 / M08.1 | IMPLEMENTADA / PENDIENTE GATE F08 | `.ai/evidence/F08/M08.1/IMPLEMENTATION_2026-08-29.md` |
+| F08 / M08.2 | IMPLEMENTADA / PENDIENTE GATE F08 | `.ai/evidence/F08/M08.2/IMPLEMENTATION_2026-08-29.md` |
+| F08 / M08.3 | ACTIVE | `.ai/microphases/M08_3.md` |
 
 ## Rama activa
 
@@ -20,27 +22,31 @@ Date: 2026-08-29.
 
 ## F07 — cierre certificado
 
-Base CI run `33262949215` (#795) terminó `success` en documentación, lint, typecheck, Vitest, build, Playwright, empty-repo y artefactos. PR `#68` fue fusionada a `main` mediante merge commit `e697a42546d23f89412e6dd616018759e719e448`.
+Base CI run `33262949215` (#795) terminó `success`; PR `#68` fue fusionada a `main` mediante `e697a42546d23f89412e6dd616018759e719e448`.
 
-Las reparaciones heredadas de F06 quedaron incluidas en ese mismo gate, por lo que ya no se mantiene un blocker F06/F07 abierto.
+## F08 / M08.1
 
-## F08 / M08.1 — implementación actual
+- DataSourceDefinition canónico + 11 capabilities.
+- Secrets fuera del payload y authRef portable.
+- DataSourceAdapter + único ConnectorRegistry.
+- `packages/connectors` como paquete estable #20.
+- `WebDataSourceRepository` y UI `/data-sources` responsive.
+- Help `help.data.sources`.
 
-- owner único `ElectroCraftDataSourceDefinition` en `packages/domain/src/data/source-definition.ts`;
-- capability set exacto M08.1 con aliases legacy solo para migración;
-- secrets excluidos del payload portable; `authRef` conserva solo referencia;
-- `DataSourceAdapter` con connection/resources/schema/query/mutate;
-- un único `ConnectorRegistry`, operaciones fail-closed por capability/kind/environment;
-- `packages/connectors` incorporado al grafo estable como paquete #20;
-- `packages/data-web` reutilizado como facade repository, sin segundo store PGlite;
-- `/data-sources` en `apps/studio/src/features/data/` con list/detail/inspector responsive;
-- `help.data.sources` registrado;
-- tests M08.1 y Help/AppShell matrix actualizados.
+## F08 / M08.2
+
+- `InternalDataSourceAdapter` detrás del mismo ConnectorRegistry.
+- `InternalDataRepository` sobre `content_records` PGlite/Drizzle existente.
+- Schema discovery desde ElectroCraftDataSchema; no introspección física.
+- CRUD/query/stats, offline, project permission boundary.
+- UI `ElectroCraft Data · Local · Disponible sin conexión`, Modelos, Registros y backup.
+- Help `help.data.internal`.
+- Unit tests, fixture y integración PGlite real preparados.
 
 ## Validación
 
-No se ejecuta Actions por microfase. `package-lock.json`, Prettier y suite completa se certificarán de forma reproducible en el Gate F08. Esta condición permanece visible y no se declara un GREEN ficticio para M08.1.
+No se ejecuta Actions por microfase. El Gate F08 regenerará lockfile/formato y certificará lint/typecheck/tests/build/Playwright en una sola ejecución final de fase.
 
 ## Siguiente acción exacta
 
-Completar la transición documental de `M08.1 — Fuentes de datos y ConnectorRegistry` y comenzar `M08.2 — Fuente interna ElectroCraft Data sobre PGlite` sin abrir PR ni ejecutar Actions intermedias.
+Implementar `M08.3 — REST API Connector y OpenAPI import` con Web Fetch API + `@scalar/openapi-parser@0.28.11`, parser aprobado en F00.
