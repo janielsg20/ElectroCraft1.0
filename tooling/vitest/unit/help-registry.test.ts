@@ -20,6 +20,7 @@ const studioScopedHelpIds = [
   'help.navigation.guards',
   'help.navigation.compiler',
   'help.screens',
+  'help.data.sources',
 ] as const;
 
 describe('M03.11 typed HelpRegistry', () => {
@@ -50,6 +51,15 @@ describe('M03.11 typed HelpRegistry', () => {
     expect(searchStudioHelp('enlace profundo').some((entry) => entry.id === 'help.navigation.routes')).toBe(true);
     expect(searchStudioHelp('iniciar sesión').some((entry) => entry.id === 'help.navigation.guards')).toBe(true);
     expect(searchStudioHelp('expo router').some((entry) => entry.id === 'help.navigation.compiler')).toBe(true);
+    expect(searchStudioHelp('connector registry').some((entry) => entry.id === 'help.data.sources')).toBe(true);
+  });
+
+  it('maps Fuentes de datos to its M08 contextual descriptor', () => {
+    expect(getHelpIdForNavigationItem('data-sources')).toBe('help.data.sources');
+    expect(getStudioHelpDescriptor('help.data.sources')).toMatchObject({
+      sectionId: 'data-sources-management',
+      learnMoreRef: '.ai/microphases/M08_1.md',
+    });
   });
 
   it('keeps related concepts inside the same registry', () => {
