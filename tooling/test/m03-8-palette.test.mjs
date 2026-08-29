@@ -85,16 +85,16 @@ test('Unsupported insertion remains a visible diagnostic', () => {
   assert.equal(panel.includes('diagnostic.action'), true);
 });
 
-test('M03.8 continuity remains GREEN before later F03 microphases advance', () => {
+test('M03.8 continuity remains GREEN after F03 phase closure', () => {
   const state = read('.ai/STATE.md');
-  const active = /M03\.8[^\n]*ACTIVE/.test(state);
-  const closed = /M03\.8[^\n]*COMPLETADA[^\n]*GREEN/.test(state);
-  if (closed) {
-    assert.match(
-      state,
-      /M03\.9[^\n]*(?:ACTIVE|COMPLETADA[^\n]*GREEN)/,
-      'M03.9 must have become ACTIVE or closed GREEN before F03 advances beyond M03.8',
-    );
-  }
-  assert.equal(active || closed, true, 'M03.8 must remain ACTIVE or close GREEN before later F03 microphases advance');
+  const phaseClosed = /F03[^\n]*COMPLETADA[^\n]*GREEN/.test(state);
+  const microphaseActive = /M03\.8[^\n]*ACTIVE/.test(state);
+  const microphaseClosed = /M03\.8[^\n]*COMPLETADA[^\n]*GREEN/.test(state);
+  assert.equal(
+    phaseClosed || microphaseActive || microphaseClosed,
+    true,
+    'M03.8 must remain covered by F03 GREEN closure or its explicit microphase state',
+  );
+  assert.equal(existsSync('.ai/evidence/F03/CLOSURE_2026-08-20.md'), true, 'F03 closure evidence must remain present');
+  assert.match(read('.ai/evidence/F03/CLOSURE_2026-08-20.md'), /GREEN/);
 });
