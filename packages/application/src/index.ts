@@ -4,6 +4,7 @@ export * from './app-behavior-service';
 export * from './blueprint-installer';
 export * from './component-definition-service';
 export * from './connector-registry';
+export * from './data';
 export * from './editor-canvas-preferences';
 export * from './editor-visual-history-preferences';
 export * from './engine-payload-compatibility';

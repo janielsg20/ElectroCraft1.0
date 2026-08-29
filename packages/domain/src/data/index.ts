@@ -1,0 +1,17 @@
+export {
+  electroCraftCanonicalDataSourceCapabilitySchema,
+  electroCraftDataSourceCapabilitySchema,
+  electroCraftDataSourceDefinitionSchema,
+  electroCraftDataSourceEnvironmentSchema,
+  electroCraftDataSourceKindSchema,
+  electroCraftDataSourceSchemaDiscoveryPolicySchema,
+  getDataSourceSchemaDiscoveryPolicy,
+  normalizeDataSourceCapabilities,
+  resolveDataSourceConfig,
+  type ElectroCraftCanonicalDataSourceCapability,
+  type ElectroCraftDataSourceCapability,
+  type ElectroCraftDataSourceDefinition,
+  type ElectroCraftDataSourceEnvironment,
+  type ElectroCraftDataSourceKind,
+  type ElectroCraftDataSourceSchemaDiscoveryPolicy,
+} from '../contracts/data-definition';
