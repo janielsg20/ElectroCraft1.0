@@ -12,6 +12,7 @@
   "dependencies": {
     "@electrocraft/application": "0.0.0-m01.3",
     "@electrocraft/domain": "0.0.0-m01.3",
-    "@scalar/openapi-parser": "0.28.11"
+    "@scalar/openapi-parser": "0.28.11",
+    "ajv": "8.20.0"
   }
 }
