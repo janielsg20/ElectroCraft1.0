@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 2,
+  "id": "ec_route_0000000000005",
+  "version": 2,
+  "key": "producto",
+  "name": "Producto",
+  "path": "/productos/:productId",
+  "screenRef": "ec_document_0000000000002",
+  "parentRouteRef": null,
+  "params": [
+    {
+      "name": "productId",
+      "source": "path",
+      "valueType": "string",
+      "required": true,
+      "defaultValue": null
+    },
+    {
+      "name": "preview",
+      "source": "query",
+      "valueType": "boolean",
+      "required": false,
+      "defaultValue": false
+    }
+  ],
+  "guards": [
+    {
+      "id": "ec_route-guard_0000000000001",
+      "kind": "permission",
+      "policyRef": "ec_policy_000000000000k",
+      "actionRef": null,
+      "redirectRouteRef": null,
+      "metadata": {}
+    }
+  ],
+  "deepLink": {
+    "enabled": true,
+    "aliases": ["/p/:productId"],
+    "metadata": {
+      "fixture": "m07.1"
+    }
+  },
+  "actionRefs": ["ec_action-graph_000000000000f"],
+  "stateRefs": ["ec_state_000000000000j"],
+  "metadata": {
+    "fixture": "m07.1"
+  }
+}
