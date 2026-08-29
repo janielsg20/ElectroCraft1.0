@@ -35,13 +35,14 @@ describe('M07.8 Navigation E2E flow', () => {
       path: '/productos',
       idSeed: 'm07.8-catalog-route',
     });
-    const detailRouteBase = createRouteForScreen({
+    const detailRouteSeed = createRouteForScreen({
       screen: detail,
-      path: '/productos/:productId',
+      path: '/detalle',
       idSeed: 'm07.8-detail-route',
     });
     const detailRoute = electroCraftRouteDefinitionV2Schema.parse({
-      ...detailRouteBase,
+      ...detailRouteSeed,
+      path: '/productos/:productId',
       params: [
         {
           name: 'productId',
