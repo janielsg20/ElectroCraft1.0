@@ -25,8 +25,9 @@ import {
   type ElectroCraftNavigatorKind,
   type ElectroCraftRouteDefinition,
 } from '@electrocraft/domain';
-import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { navigationWorkspaceRuntime } from './navigation-workspace-runtime';
+import { RouteActionEditor } from './route-action-editor';
 import './navigation-builder.css';
 
 const AddIcon = getStudioIcon('action.add');
@@ -386,6 +387,9 @@ export function NavigationBuilder() {
   const nodesById = new Map(navigation.nodes.map((node) => [node.id, node] as const));
   const root = nodesById.get(navigation.rootNodeRef);
   const selected = selectedNodeId ? nodesById.get(selectedNodeId) ?? null : null;
+  const selectedRoute = selected?.kind === 'screen'
+    ? snapshot.graph.routes.find(({ id }) => id === selected.routeRef) ?? null
+    : null;
   const previewRows = createNavigationPreviewRows(navigation);
 
   function dropSibling(parent: ElectroCraftNavigationNavigatorNode, draggedId: string, targetId: string) {
@@ -442,6 +446,7 @@ export function NavigationBuilder() {
             </button>
           ))}
         </div>
+        {selectedRoute ? <RouteActionEditor sourceRoute={selectedRoute} routes={snapshot.graph.routes} /> : null}
         <Sheet>
           <SheetTrigger asChild>
             <Button className="ec-nav-builder-mobile-settings" variant="outline" size="sm">
