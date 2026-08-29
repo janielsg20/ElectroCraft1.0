@@ -18,13 +18,13 @@ Date: 2026-08-28.
 | F07 / M07.5 | IMPLEMENTADA / PENDIENTE GATE F07 | `.ai/evidence/F07/M07.5/IMPLEMENTATION_2026-08-28.md` |
 | F07 / M07.6 | IMPLEMENTADA / PENDIENTE GATE F07 | `.ai/evidence/F07/M07.6/IMPLEMENTATION_2026-08-28.md` |
 | F07 / M07.7 | IMPLEMENTADA / PENDIENTE GATE F07 | `.ai/evidence/F07/M07.7/IMPLEMENTATION_2026-08-28.md` |
-| F07 / M07.8 | IMPLEMENTADA / PENDIENTE GATE F07 | `.ai/evidence/F07/M07.8/IMPLEMENTATION_2026-08-28.md` |
+| F07 / M07.8 | ACTIVE | `.ai/evidence/F07/M07.8/IMPLEMENTATION_2026-08-28.md` |
 
 ## Rama activa
 
 `codex/m07-1-navigation-model`
 
-La rama parte de la corrección F06 y contiene toda F07. No se ejecutaron Actions por microfase; la estrategia sigue siendo un único gate al cerrar la fase.
+La rama parte de la corrección F06 y contiene toda F07. No se ejecutaron Actions por microfase; M07.8 permanece `ACTIVE` mientras ejecuta el único Gate F07.
 
 ## F06 — estado de verificación heredado
 
@@ -49,10 +49,10 @@ Estas reparaciones todavía no están certificadas por un nuevo gate.
 - M07.5: params/deep links/binding de Ruta + ActionGraph Navegar + URL externa segura.
 - M07.6: Guards Público/Auth/Permiso/Condición + redirects sin loops + Preview fail-closed.
 - M07.7: compiler boundaries React Router/Expo/LAMP-Slim/WordPress/Capacitor/Static.
-- M07.8: flujo integrado, `/preview` contractual y Playwright desktop/tablet/mobile preparado.
+- M07.8: `ACTIVE` para ejecutar QA integral: flujo integrado, `/preview` contractual y Playwright desktop/tablet/mobile.
 
 ## Siguiente acción exacta
 
-`Gate F07 — Pantallas, navegación y rutas`.
+Completar `M07.8 — Navigation E2E y UX` mediante el Gate F07.
 
-Debe validar una sola vez la rama completa: docs conventions, lint/Prettier, typecheck, Vitest/integración, build y Playwright repository gate. F07 no se marcará GREEN hasta resultado `success`.
+El gate valida una sola vez la rama completa: docs conventions, lint/Prettier, typecheck, Vitest/integración, build y Playwright repository gate. F07 no se marcará GREEN hasta resultado `success`.
