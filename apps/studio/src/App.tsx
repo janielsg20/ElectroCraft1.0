@@ -54,6 +54,9 @@ const ProjectHome = lazy(() =>
 const RevisionHistoryPanel = lazy(() =>
   import('./features/projects/revision-history-panel').then((module) => ({ default: module.RevisionHistoryPanel })),
 );
+const ScreensWorkspace = lazy(() =>
+  import('./features/navigation/screens-workspace').then((module) => ({ default: module.ScreensWorkspace })),
+);
 const NavigationWorkspace = lazy(() =>
   import('./features/navigation/navigation-workspace').then((module) => ({ default: module.NavigationWorkspace })),
 );
@@ -306,10 +309,17 @@ function resolveStudioWorkspace(pathname: string, health: ReturnType<typeof eval
       </Suspense>
     );
   }
-  if (pathname === screensRoute || pathname === navigationRoute) {
+  if (pathname === screensRoute) {
     return (
-      <Suspense fallback={<StudioRouteSkeleton kind="generic" label="Cargando navegación" />}>
-        <NavigationWorkspace mode={pathname === screensRoute ? 'screens' : 'navigation'} />
+      <Suspense fallback={<StudioRouteSkeleton kind="generic" label="Cargando Pantallas" />}>
+        <ScreensWorkspace />
+      </Suspense>
+    );
+  }
+  if (pathname === navigationRoute) {
+    return (
+      <Suspense fallback={<StudioRouteSkeleton kind="generic" label="Cargando Navegación" />}>
+        <NavigationWorkspace mode="navigation" />
       </Suspense>
     );
   }
