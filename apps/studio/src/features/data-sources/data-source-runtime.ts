@@ -107,10 +107,7 @@ async function loadWorkspace(): Promise<DataSourceWorkspaceSnapshot> {
     .map((object) => ({ object, parsed: electroCraftDataSourceDefinitionSchema.safeParse(object.payload) }));
   const invalid = parsed.filter(({ parsed: result }) => !result.success);
   const sources = parsed
-    .filter((entry): entry is typeof entry & { parsed: { success: true; data: ElectroCraftDataSourceDefinition } } =>
-      entry.parsed.success,
-    )
-    .map(({ parsed: result }) => result.data)
+    .flatMap(({ parsed: result }) => (result.success ? [result.data] : []))
     .sort((left, right) => left.label.localeCompare(right.label, 'es'));
   sourceUpdatedAt = new Map(parsed.map(({ object }) => [object.objectId, object.updatedAt]));
 
