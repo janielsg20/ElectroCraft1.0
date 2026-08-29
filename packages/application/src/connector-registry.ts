@@ -226,3 +226,5 @@ export class ConnectorRegistry {
     }
   }
 }
+
+export const dataSourceConnectorRegistry = new ConnectorRegistry();
