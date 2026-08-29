@@ -9,8 +9,9 @@
 - F04 — Persistencia local, proyectos y revisiones: `COMPLETADA / GREEN`.
 - F05 — Screen Composer con Puck: `COMPLETADA / GREEN`.
 - F06 — Layout, responsive y edición avanzada: implementación fusionada a `main`; el cierre de corrección PR `#67` terminó con fallo Playwright heredado y las reparaciones están incluidas en la rama F07 actual.
-- F07 — Pantallas, navegación y rutas: `IMPLEMENTADA / PENDIENTE GATE`.
-- M07.1–M07.8: `IMPLEMENTADA / PENDIENTE GATE F07`.
+- F07 — Pantallas, navegación y rutas: `IN_PROGRESS`; M07.8 ejecuta el gate de cierre.
+- M07.1–M07.7 — Implementación funcional: `IMPLEMENTADA / PENDIENTE GATE F07`.
+- M07.8 — Navigation E2E y UX: `ACTIVE`.
 
 ## Rama activa
 
@@ -18,9 +19,7 @@
 
 ## Microfase activa
 
-No queda una microfase de F07 abierta.
-
-**Siguiente transición exacta:** `Gate F07 — Pantallas, navegación y rutas`.
+`M07.8 — Navigation E2E y UX` permanece `ACTIVE` mientras se ejecuta el Gate F07. Su implementación está completa, pero la microfase no se cierra hasta que la fase obtenga `docs + lint + typecheck + test + build + Playwright` en verde.
 
 ## Capacidades F07 implementadas
 
@@ -52,7 +51,7 @@ Reparaciones incluidas en la rama actual antes de Gate F07:
 - lock contextual sobrevive `refreshPermissions()` y se reinicia solo al cambiar la sesión de Pantalla;
 - breadcrumbs actualizados a `App > Pantalla > Node`.
 
-Ninguna de estas reparaciones se declara GREEN hasta ejecutar Gate F07.
+Ninguna de estas reparaciones se declara GREEN hasta completar M07.8 mediante Gate F07.
 
 ## Evidencia F07
 
@@ -67,4 +66,4 @@ Ninguna de estas reparaciones se declara GREEN hasta ejecutar Gate F07.
 
 ## Regla de cierre
 
-No marcar F07 `COMPLETADA / GREEN` ni activar F08 hasta que el gate de fase ejecute `docs + lint + typecheck + test + build + Playwright` con resultado `success` y blockers P0/P1 = 0.
+No marcar M07.8 ni F07 `COMPLETADA / GREEN` ni activar F08 hasta que el gate de fase termine `success` y blockers P0/P1 = 0.
