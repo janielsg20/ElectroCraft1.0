@@ -25,6 +25,10 @@
   gap: 16px;
 }
 
+.ec-screens-workspace:has(> .ec-screens-empty) > .ec-screens-header > button {
+  display: none;
+}
+
 .ec-screens-title {
   gap: 11px;
 }
