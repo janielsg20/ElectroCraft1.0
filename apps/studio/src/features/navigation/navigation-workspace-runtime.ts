@@ -43,6 +43,10 @@ function screenDocuments(graph: NavigationWorkspaceGraph): readonly ElectroCraft
   return graph.documents.filter((document) => document.kind === 'screen');
 }
 
+function cyclicNavigationDiagnostic(graph: NavigationWorkspaceGraph) {
+  return graph.diagnostics.find(({ code }) => code === 'navigation-cycle') ?? null;
+}
+
 async function persistCanonicalMigrations(project: StoredProjectDefinition, graph: NavigationWorkspaceGraph) {
   if (graph.migratedRouteIds.length === 0 && graph.migratedNavigationIds.length === 0) return false;
   const routeIds = new Set(graph.migratedRouteIds);
@@ -88,6 +92,16 @@ async function loadWorkspace(): Promise<NavigationWorkspaceSnapshot> {
       routes: opened.objects.filter(({ kind }) => kind === 'route').map(({ payload }) => payload),
       navigations: opened.objects.filter(({ kind }) => kind === 'navigation').map(({ payload }) => payload),
     });
+    const cycle = cyclicNavigationDiagnostic(graph);
+    if (cycle) {
+      return publish({
+        state: 'error',
+        graph,
+        project: opened.project,
+        message: `Navigation Graph contiene un ciclo y no se renderizará hasta repararlo${cycle.ref ? `: ${cycle.ref}` : '.'}`,
+        lastSavedMessage: null,
+      });
+    }
     const migrated = await persistCanonicalMigrations(opened.project, graph);
     return publish({
       state: 'ready',
