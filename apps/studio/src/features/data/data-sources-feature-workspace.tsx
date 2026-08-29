@@ -54,6 +54,7 @@ export function DataSourcesFeatureWorkspace() {
     [snapshot.sources],
   );
   const [summary, setSummary] = useState<InternalSummaryState>(initialSummary);
+  const [internalActionMessage, setInternalActionMessage] = useState<string | null>(null);
   const [backupMessage, setBackupMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -98,6 +99,50 @@ export function DataSourcesFeatureWorkspace() {
 
   return (
     <div className="ec-data-sources-feature-workspace">
+      {!internalSource && snapshot.project ? (
+        <section className="ec-internal-data-overview" aria-labelledby="ec-internal-data-setup-title">
+          <div className="ec-internal-data-heading">
+            <div>
+              <p>Datos · Fuente interna</p>
+              <div className="ec-internal-data-title-row">
+                <h2 id="ec-internal-data-setup-title">ElectroCraft Data</h2>
+                <HelpTrigger helpId="help.data.internal" />
+              </div>
+            </div>
+            <div className="ec-internal-data-badges" aria-label="Capacidades de ElectroCraft Data">
+              <span>Local</span>
+              <span>Disponible sin conexión</span>
+            </div>
+          </div>
+          <p className="ec-internal-data-status">
+            Usa el almacenamiento PGlite/Drizzle del proyecto y la tabla genérica de registros existente. No crea una base paralela.
+          </p>
+          <div className="ec-internal-data-actions">
+            <Button
+              size="sm"
+              disabled={snapshot.state === 'saving'}
+              onClick={() => {
+                setInternalActionMessage('Creando ElectroCraft Data…');
+                void dataSourceWorkspaceRuntime
+                  .createSource({
+                    name: 'ElectroCraft Data',
+                    key: 'electroCraftData',
+                    type: 'internal',
+                    adapter: 'internal.pglite',
+                  })
+                  .then(() => setInternalActionMessage('ElectroCraft Data creada.'))
+                  .catch((error: unknown) =>
+                    setInternalActionMessage(error instanceof Error ? error.message : 'No se pudo crear ElectroCraft Data.'),
+                  );
+              }}
+            >
+              Crear ElectroCraft Data
+            </Button>
+          </div>
+          {internalActionMessage ? <p className="ec-internal-data-status" role="status">{internalActionMessage}</p> : null}
+        </section>
+      ) : null}
+
       {internalSource && snapshot.project ? (
         <section className="ec-internal-data-overview" aria-labelledby="ec-internal-data-title">
           <div className="ec-internal-data-heading">
