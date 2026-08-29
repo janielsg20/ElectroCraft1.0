@@ -17,7 +17,6 @@ async function seedProject(page: Page, projectId: string) {
   await page.evaluate(async (id) => {
     const { projectStorageRuntime } = await import('/src/features/projects/project-storage-runtime.ts');
     const { workspacePreferencesRuntime } = await import('/src/features/projects/workspace-preferences-runtime.ts');
-    const { navigationWorkspaceRuntime } = await import('/src/features/navigation/navigation-workspace-runtime.ts');
     await projectStorageRuntime.initialize();
     await projectStorageRuntime.saveProject({
       project: { id, name: 'Platform overrides M06.3', metadata: { source: 'm06.3-e2e' } },
@@ -26,8 +25,6 @@ async function seedProject(page: Page, projectId: string) {
     });
     await workspacePreferencesRuntime.initialize();
     await workspacePreferencesRuntime.patchLayout({ lastDocumentId: id, lastTabs: [] });
-    await navigationWorkspaceRuntime.load();
-    await navigationWorkspaceRuntime.createScreen({ name: 'Inicio', path: '/' });
   }, projectId);
 }
 
@@ -49,6 +46,20 @@ async function readDocument(page: Page, projectId: string): Promise<StoredDocume
   }, projectId);
 }
 
+async function selectPlatform(page: Page, platform: 'Web' | 'Android' | 'iOS') {
+  const toolsTrigger = page.getByRole('button', { name: 'Abrir herramientas contextuales' });
+  await toolsTrigger.click();
+  const tools = page.getByRole('dialog', { name: 'Herramientas contextuales' });
+  await expect(tools).toBeVisible();
+  const platformSelect = tools.locator('[data-topbar-tool="platform"]').getByRole('combobox');
+  await platformSelect.click();
+  await page.getByRole('option', { name: platform, exact: true }).click();
+  await expect(platformSelect).toContainText(platform);
+  await page.keyboard.press('Escape');
+  await expect(tools).toHaveCount(0);
+  await expect(toolsTrigger).toBeFocused();
+}
+
 test.describe('M06.3 platform overrides', () => {
   test('authors an Android-only property and previews it without leaking editor context', async ({ page }) => {
     test.setTimeout(300_000);
@@ -60,11 +71,13 @@ test.describe('M06.3 platform overrides', () => {
     const workspace = page.locator('.ec-editor-workspace');
     await expect(workspace).toHaveAttribute('data-editor-sync-state', 'ready', { timeout: 120_000 });
     await page.locator('[data-palette-item="palette.layout.container"] .ec-palette-item-main').click();
+    await expect
+      .poll(async () => (await readDocument(page, projectId))?.root?.children?.length, { timeout: 60_000 })
+      .toBe(1);
     await dispatch(page, { type: 'setUi', ui: { itemSelector: { index: 0, zone: 'root:default-zone' } } });
     await page.locator('.ec-editor-panel-tab').filter({ hasText: 'Diseño' }).click();
 
-    await page.getByLabel('Plataforma').first().click();
-    await page.getByRole('option', { name: 'Android', exact: true }).click();
+    await selectPlatform(page, 'Android');
 
     const inspector = page.locator('[data-puck-layout-style-inspector]');
     await inspector.getByRole('tab', { name: 'Plataforma', exact: true }).click();
@@ -82,8 +95,7 @@ test.describe('M06.3 platform overrides', () => {
     const container = preview.locator('[data-ec-core-component="Container"]');
     await expect(container).toHaveCSS('width', '320px');
 
-    await page.getByLabel('Plataforma').first().click();
-    await page.getByRole('option', { name: 'Web', exact: true }).click();
+    await selectPlatform(page, 'Web');
     await expect(container).not.toHaveCSS('width', '320px');
 
     const stored = await readDocument(page, projectId);

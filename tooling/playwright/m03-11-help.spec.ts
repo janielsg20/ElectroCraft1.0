@@ -90,7 +90,8 @@ test.describe('M03.11 contextual Help system', () => {
   }) => {
     await page.setViewportSize({ width: 1280, height: 820 });
     await page.goto('/screens');
-    await expect(page.locator('[data-help-trigger="help.screens"]')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Pantallas', exact: true })).toBeVisible({ timeout: 60_000 });
+    await expect(page.locator('[data-help-trigger="help.screens"]')).toBeVisible({ timeout: 60_000 });
     await expect(page.locator('body')).not.toContainText('Taxonomías');
     await expect(page.locator('body')).not.toContainText('Relaciones');
   });
