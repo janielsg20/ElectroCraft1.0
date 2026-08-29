@@ -6,6 +6,7 @@ import {
   type PuckEditorOnAction,
 } from '@electrocraft/editor-puck';
 import { useEffect, useState, useSyncExternalStore } from 'react';
+import { editorScreenSelectionRuntime } from '../navigation/editor-screen-selection-runtime';
 import { projectStorageRuntime } from '../projects/project-storage-runtime';
 import { workspacePreferencesRuntime } from '../projects/workspace-preferences-runtime';
 import { loadStudioPuckEditor, type StudioPuckEditorRuntime } from './puck-editor-runtime';
@@ -28,22 +29,22 @@ function activeProjectId(lastProjectId: string | null) {
   return projectStorageRuntime.currentProjectId() ?? lastProjectId;
 }
 
-function selectedScreenId() {
-  if (typeof window === 'undefined') return null;
-  return new URLSearchParams(window.location.search).get('screen');
-}
-
 export function useStudioPuckEditorRuntime() {
   const preferences = useSyncExternalStore(
     workspacePreferencesRuntime.subscribe,
     workspacePreferencesRuntime.getSnapshot,
     workspacePreferencesRuntime.getSnapshot,
   );
+  const screenSelection = useSyncExternalStore(
+    editorScreenSelectionRuntime.subscribe,
+    editorScreenSelectionRuntime.getSnapshot,
+    editorScreenSelectionRuntime.getSnapshot,
+  );
   const projectId = activeProjectId(preferences.layout.lastDocumentId);
-  const screenId = selectedScreenId();
+  const screenId = screenSelection.screenId;
   const [snapshot, setSnapshot] = useState<RuntimeSnapshot>(() =>
     projectId
-      ? Object.freeze({ state: 'loading', runtime: null, message: 'Cargando documento del editor…' })
+      ? Object.freeze({ state: 'loading', runtime: null, message: 'Cargando Pantalla del editor…' })
       : emptySnapshot,
   );
 
@@ -57,7 +58,7 @@ export function useStudioPuckEditorRuntime() {
       };
     }
 
-    setSnapshot(Object.freeze({ state: 'loading', runtime: null, message: 'Cargando documento del editor…' }));
+    setSnapshot(Object.freeze({ state: 'loading', runtime: null, message: 'Cargando Pantalla del editor…' }));
     void loadStudioPuckEditor({
       projectId,
       documentId: screenId ?? undefined,
@@ -65,7 +66,7 @@ export function useStudioPuckEditorRuntime() {
         if (!active) return;
         setSnapshot((current) =>
           current.runtime
-            ? Object.freeze({ state: 'ready', runtime: current.runtime, message: 'Documento sincronizado.' })
+            ? Object.freeze({ state: 'ready', runtime: current.runtime, message: 'Pantalla sincronizada.' })
             : current,
         );
       },
@@ -75,7 +76,7 @@ export function useStudioPuckEditorRuntime() {
           Object.freeze({
             state: 'blocked',
             runtime: current.runtime,
-            message: error.message || 'No se pudo sincronizar el documento.',
+            message: error.message || 'No se pudo sincronizar la Pantalla.',
           }),
         );
       },
@@ -86,7 +87,7 @@ export function useStudioPuckEditorRuntime() {
           runtime.dispose();
           return;
         }
-        setSnapshot(Object.freeze({ state: 'ready', runtime, message: 'Documento listo.' }));
+        setSnapshot(Object.freeze({ state: 'ready', runtime, message: 'Pantalla lista.' }));
       })
       .catch((error: unknown) => {
         if (!active) return;
@@ -94,7 +95,7 @@ export function useStudioPuckEditorRuntime() {
           Object.freeze({
             state: 'blocked',
             runtime: null,
-            message: error instanceof Error ? error.message : 'No se pudo abrir el documento del editor.',
+            message: error instanceof Error ? error.message : 'No se pudo abrir la Pantalla del editor.',
           }),
         );
       });
@@ -110,7 +111,9 @@ export function useStudioPuckEditorRuntime() {
     state: snapshot.state,
     message: snapshot.message,
     projectId,
-    sessionKey: runtime?.document.id ?? `structural:${projectId ?? 'none'}`,
+    screenId: runtime?.document.id ?? screenId,
+    screenName: runtime?.document.name ?? null,
+    sessionKey: runtime?.document.id ?? `structural:${projectId ?? 'none'}:${screenId ?? 'default'}`,
     config: (runtime?.session.config ?? structuralPuckConfig) as PuckEditorConfig,
     data: (runtime?.session.data ?? structuralPuckData) as PuckEditorData,
     onAction: runtime?.actionSync.onAction as PuckEditorOnAction | undefined,
