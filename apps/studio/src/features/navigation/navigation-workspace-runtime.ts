@@ -1,4 +1,5 @@
 import {
+  addNavigationNavigator,
   addScreenRouteToNavigation,
   analyzeScreenDelete,
   createNavigationForScreenRoute,
@@ -7,6 +8,10 @@ import {
   duplicateScreenDocument,
   navigationGraphStoredObjects,
   parseNavigationWorkspaceGraph,
+  reorderNavigationChild,
+  setNavigationInitialChild,
+  updateNavigationNodeLabel,
+  updateNavigationNodePresentation,
   type NavigationWorkspaceGraph,
   type ScreenDeleteAnalysis,
   type StoredProjectDefinition,
@@ -15,6 +20,9 @@ import {
   electroCraftActionGraphSchema,
   type ElectroCraftActionGraph,
   type ElectroCraftDocument,
+  type ElectroCraftNavigationBuilderPresentation,
+  type ElectroCraftNavigationDefinition,
+  type ElectroCraftNavigatorKind,
   type JsonValue,
 } from '@electrocraft/domain';
 import { projectStorageRuntime } from '../projects/project-storage-runtime';
@@ -171,6 +179,36 @@ async function reloadAfterSave(message: string) {
   return publish({ ...snapshot, lastSavedMessage: message });
 }
 
+async function persistNavigationMutation(
+  message: string,
+  mutate: (navigation: ElectroCraftNavigationDefinition) => ElectroCraftNavigationDefinition,
+) {
+  const current = snapshot;
+  if (!current.project || !current.graph) throw new Error('Abre un proyecto antes de editar Navegación.');
+  const navigation = current.graph.navigations[0];
+  if (!navigation) throw new Error('Crea primero la Navegación principal.');
+  publish({ ...current, state: 'saving', message: 'Aplicando cambios de Navegación…', lastSavedMessage: null });
+  try {
+    const next = mutate(navigation);
+    if (next === navigation) return publish({ ...current, state: 'ready', message: 'Sin cambios.', lastSavedMessage: null });
+    projectStorageRuntime.queueAutosave({
+      project: current.project,
+      dirtyObjects: navigationGraphStoredObjects({ navigations: [next] }),
+    });
+    await projectStorageRuntime.flushAutosave();
+    await reloadAfterSave(message);
+    return next;
+  } catch (error) {
+    publish({
+      ...current,
+      state: 'error',
+      message: error instanceof Error ? error.message : 'No se pudo actualizar Navegación.',
+      lastSavedMessage: null,
+    });
+    throw error;
+  }
+}
+
 export const navigationWorkspaceRuntime = Object.freeze({
   subscribe(listener: () => void) {
     listeners.add(listener);
@@ -265,7 +303,7 @@ export const navigationWorkspaceRuntime = Object.freeze({
   async deleteScreen(screenId: string) {
     const current = snapshot;
     if (!current.project || !current.graph) throw new Error('Abre un proyecto antes de eliminar una pantalla.');
-    const analysis = this.analyzeDelete(screenId);
+    const analysis = navigationWorkspaceRuntime.analyzeDelete(screenId);
     if (!analysis.allowed) {
       throw new Error(`No se puede eliminar: la Pantalla tiene ${analysis.usages.length} referencia(s) activas.`);
     }
@@ -316,5 +354,36 @@ export const navigationWorkspaceRuntime = Object.freeze({
       });
       throw error;
     }
+  },
+  addNavigator(parentNavigatorRef: string, kind: ElectroCraftNavigatorKind, label: string) {
+    return persistNavigationMutation(`Navigator “${label.trim()}” agregado.`, (navigation) =>
+      addNavigationNavigator({
+        navigation,
+        parentNavigatorRef,
+        kind,
+        label,
+        idSeed: globalThis.crypto.randomUUID(),
+      }),
+    );
+  },
+  reorderNode(parentNavigatorRef: string, childRef: string, direction: 'up' | 'down') {
+    return persistNavigationMutation('Orden de Navegación actualizado.', (navigation) =>
+      reorderNavigationChild({ navigation, parentNavigatorRef, childRef, direction }),
+    );
+  },
+  setInitialNode(navigatorRef: string, childRef: string) {
+    return persistNavigationMutation('Pantalla inicial actualizada.', (navigation) =>
+      setNavigationInitialChild({ navigation, navigatorRef, childRef }),
+    );
+  },
+  updateNodeLabel(nodeRef: string, label: string) {
+    return persistNavigationMutation(`Nodo “${label.trim()}” actualizado.`, (navigation) =>
+      updateNavigationNodeLabel({ navigation, nodeRef, label }),
+    );
+  },
+  updateNodePresentation(nodeRef: string, presentation: ElectroCraftNavigationBuilderPresentation) {
+    return persistNavigationMutation('Presentación de Navegación actualizada.', (navigation) =>
+      updateNavigationNodePresentation({ navigation, nodeRef, presentation }),
+    );
   },
 });
