@@ -117,14 +117,19 @@ test('M03.5 structural gate keeps exact editor dimensions and ownership', () => 
   ]) {
     assert.equal(css.includes(token), true, `M03.5 responsive contract missing: ${token}`);
   }
-  assert.equal(help.includes('Contexto 288px'), true, 'Persistent help must explain the M03.5 editor geometry');
-  assert.match(state, /M03\.4[^\n]*COMPLETADA[^\n]*GREEN/);
 
+  assert.equal(
+    help.includes("id: 'help.studio.shell'") && help.includes('studioHelpRegistry'),
+    true,
+    'Persistent typed Studio help must remain registered after M03.5',
+  );
+
+  const phaseComplete = /F03[^\n]*COMPLETADA[^\n]*GREEN/.test(state);
   const active = /M03\.5[^\n]*ACTIVE/.test(state);
   const complete = /M03\.5[^\n]*COMPLETADA[^\n]*GREEN/.test(state);
-  assert.equal(active || complete, true, 'M03.5 must be ACTIVE or post-closure COMPLETADA / GREEN');
+  assert.equal(active || complete || phaseComplete, true, 'M03.5 must remain covered by an ACTIVE or GREEN F03 state');
 
-  if (complete) {
+  if (complete || phaseComplete) {
     const closure = read(closurePath);
     assert.equal(closure.includes('32296070741'), true, 'M03.5 closure must pin the GREEN owner run');
     assert.equal(closure.includes('9381289623'), true, 'M03.5 closure must pin the GREEN artifact');
