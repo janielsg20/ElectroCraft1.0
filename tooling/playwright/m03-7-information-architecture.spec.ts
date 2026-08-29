@@ -45,7 +45,8 @@ test.describe('M03.7 Progressive Disclosure and information architecture', () =>
     const advanced = inspector.locator('[data-progressive-disclosure="inspector-advanced"]');
     const advancedTrigger = advanced.getByRole('button', { name: 'Avanzado' });
     await expect(advancedTrigger).toHaveAttribute('data-state', 'open');
-    await expect(inspector.locator('[data-puck-layout-style-inspector]')).toBeVisible();
+    await expect(advanced.locator('.ec-presentation-state')).toBeVisible();
+    await expect(advanced).toContainText(/Selecciona un componente|selección/i);
   });
 
   test('uses one canonical Content route for the List/Detail pattern', async ({ page }) => {
@@ -92,6 +93,7 @@ test.describe('M03.7 Progressive Disclosure and information architecture', () =>
     const advanced = dialog.locator('[data-progressive-disclosure="inspector-advanced"]');
     await expect(advanced).toBeVisible();
     await expect(advanced.getByRole('button', { name: 'Avanzado' })).toHaveAttribute('data-state', 'open');
-    await expect(dialog.locator('[data-puck-layout-style-inspector]')).toBeVisible();
+    await expect(advanced.locator('.ec-presentation-state')).toBeVisible();
+    await expect(advanced).toContainText(/Selecciona un componente|selección/i);
   });
 });
