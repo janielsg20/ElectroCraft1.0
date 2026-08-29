@@ -31,72 +31,38 @@ jobs:
         run: |
           python <<'PY'
           from pathlib import Path
+          import re
 
-          path = Path('apps/studio/src/features/navigation/navigation-builder.tsx')
-          text = path.read_text()
-          text = text.replace(
-              "  const parent =\n    selectedParent && selectedParent.kind !== 'screen'\n      ? selectedParent\n      : (navigation.nodes.find((node) => node.id === navigation.rootNodeRef && node.kind !== 'screen') ?? null);",
+          def replace_once(path_str: str, pattern: str, replacement: str) -> None:
+              path = Path(path_str)
+              text = path.read_text()
+              next_text, count = re.subn(pattern, replacement, text, count=1, flags=re.S)
+              if count != 1:
+                  raise SystemExit(f'{path_str}: expected one replacement, found {count}')
+              path.write_text(next_text)
+
+          replace_once(
+              'apps/studio/src/features/navigation/navigation-builder.tsx',
+              r"  const parent =\s*selectedParent && selectedParent\.kind !== 'screen'\s*\? selectedParent\s*:\s*\(navigation\.nodes\.find\(\(node\) => node\.id === navigation\.rootNodeRef && node\.kind !== 'screen'\) \?\? null\);",
               "  const parent =\n    selectedParent ??\n    navigation.nodes.find((node) => node.id === navigation.rootNodeRef && node.kind !== 'screen') ??\n    null;",
           )
-          text = text.replace(
-              "    const draggedIndex = parent.childRefs.indexOf(draggedId as never);\n    const targetIndex = parent.childRefs.indexOf(targetId as never);",
+          replace_once(
+              'apps/studio/src/features/navigation/navigation-builder.tsx',
+              r"    const draggedIndex = parent\.childRefs\.indexOf\(draggedId as never\);\s*const targetIndex = parent\.childRefs\.indexOf\(targetId as never\);",
               "    const draggedIndex = parent.childRefs.findIndex((childRef) => childRef === draggedId);\n    const targetIndex = parent.childRefs.findIndex((childRef) => childRef === targetId);",
           )
-          path.write_text(text)
-
-          path = Path('apps/studio/src/features/navigation/route-action-editor.tsx')
-          text = path.read_text().replace(
-              "  const [destinationRouteId, setDestinationRouteId] = useState(routes[0]?.id ?? sourceRoute.id);",
+          replace_once(
+              'apps/studio/src/features/navigation/route-action-editor.tsx',
+              r"  const \[destinationRouteId, setDestinationRouteId\] = useState\(routes\[0\]\?\.id \?\? sourceRoute\.id\);",
               "  const [destinationRouteId, setDestinationRouteId] = useState<string>(routes[0]?.id ?? sourceRoute.id);",
           )
-          path.write_text(text)
+          replace_once(
+              'packages/application/src/navigation/navigation-action-service.ts',
+              r"  if \(config\.mode === 'back' \|\| config\.destination === null\) return null;\s*if \(config\.destination\.kind === 'route'\) \{\s*const route = routes\.find\(\(\{ id \}\) => id === config\.destination!\.routeRef\);\s*if \(!route\) diagnostics\.push\(\{ code: 'destination-route-missing', ref: config\.destination\.routeRef \}\);\s*return route \?\? null;\s*\}\s*const screen = documents\.find\(\(\{ id \}\) => id === config\.destination!\.screenRef && screen\.kind === 'screen'\);\s*if \(!screen\) \{\s*diagnostics\.push\(\{ code: 'destination-screen-missing', ref: config\.destination\.screenRef \}\);\s*return null;\s*\}",
+              "  if (config.mode === 'back' || config.destination === null) return null;\n  const destination = config.destination;\n  if (destination.kind === 'route') {\n    const route = routes.find(({ id }) => id === destination.routeRef);\n    if (!route) diagnostics.push({ code: 'destination-route-missing', ref: destination.routeRef });\n    return route ?? null;\n  }\n\n  const screen = documents.find(({ id, kind }) => id === destination.screenRef && kind === 'screen');\n  if (!screen) {\n    diagnostics.push({ code: 'destination-screen-missing', ref: destination.screenRef });\n    return null;\n  }",
+          )
 
-          path = Path('packages/application/src/navigation/navigation-action-service.ts')
-          text = path.read_text()
-          old = """  if (config.mode === 'back' || config.destination === null) return null;
-          if (config.destination.kind === 'route') {
-            const route = routes.find(({ id }) => id === config.destination!.routeRef);
-            if (!route) diagnostics.push({ code: 'destination-route-missing', ref: config.destination.routeRef });
-            return route ?? null;
-          }
-
-          const screen = documents.find(({ id }) => id === config.destination!.screenRef && screen.kind === 'screen');
-          if (!screen) {
-            diagnostics.push({ code: 'destination-screen-missing', ref: config.destination.screenRef });
-            return null;
-          }
-          """
-          new = """  if (config.mode === 'back' || config.destination === null) return null;
-          const destination = config.destination;
-          if (destination.kind === 'route') {
-            const route = routes.find(({ id }) => id === destination.routeRef);
-            if (!route) diagnostics.push({ code: 'destination-route-missing', ref: destination.routeRef });
-            return route ?? null;
-          }
-
-          const screen = documents.find(({ id, kind }) => id === destination.screenRef && kind === 'screen');
-          if (!screen) {
-            diagnostics.push({ code: 'destination-screen-missing', ref: destination.screenRef });
-            return null;
-          }
-          """
-          if old not in text:
-              raise SystemExit('navigation-action-service pattern not found')
-          path.write_text(text.replace(old, new))
-
-          path = Path('packages/domain/src/navigation/export-ir.ts')
-          text = path.read_text()
-          old = """/**
-           * ExportIR keeps formatVersion=1 while Route/Navigation evolve independently.
-           * The refined F02 envelope is preserved and only these two canonical object
-           * collections are upgraded to their M07.1 schemas.
-           */
-          export const electroCraftExportIrSchema = legacyElectroCraftExportIrSchema.safeExtend({
-            routes: z.array(electroCraftRouteDefinitionSchema),
-            navigations: z.array(electroCraftNavigationDefinitionSchema),
-          });
-          """
-          new = """const forbiddenIrKeyNames = new Set([
+          export_replacement = r'''const forbiddenIrKeyNames = new Set([
             'workspacestate',
             'puckhistory',
             'retehistory',
@@ -121,10 +87,13 @@ jobs:
           ]);
 
           function normalizeKey(key: string): string {
-            return key.replace(/[-_.\\s]/g, '').toLowerCase();
+            return key.replace(/[-_.\s]/g, '').toLowerCase();
           }
 
-          function findForbiddenIrPath(value: unknown, path: Array<string | number> = []): Array<string | number> | null {
+          function findForbiddenIrPath(
+            value: unknown,
+            path: Array<string | number> = [],
+          ): Array<string | number> | null {
             if (Array.isArray(value)) {
               for (let index = 0; index < value.length; index += 1) {
                 const found = findForbiddenIrPath(value[index], [...path, index]);
@@ -162,11 +131,12 @@ jobs:
                     'ExportIR cannot contain Studio/engine history, target-specific internals, prompts, caches, or secret values',
                 });
               }
-            });
-          """
-          if old not in text:
-              raise SystemExit('export-ir pattern not found')
-          path.write_text(text.replace(old, new))
+            });'''
+          replace_once(
+              'packages/domain/src/navigation/export-ir.ts',
+              r"/\*\*\s*\* ExportIR keeps formatVersion=1 while Route/Navigation evolve independently\.\s*\* The refined F02 envelope is preserved and only these two canonical object\s*\* collections are upgraded to their M07\.1 schemas\.\s*\*/\s*export const electroCraftExportIrSchema = legacyElectroCraftExportIrSchema\.safeExtend\(\{\s*routes: z\.array\(electroCraftRouteDefinitionSchema\),\s*navigations: z\.array\(electroCraftNavigationDefinitionSchema\),\s*\}\);",
+              export_replacement,
+          )
           PY
       - name: Format canonical workspace
         run: npm run format
