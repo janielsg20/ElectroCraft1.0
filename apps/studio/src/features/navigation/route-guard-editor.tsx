@@ -14,6 +14,7 @@ import {
   type ElectroCraftRouteDefinition,
 } from '@electrocraft/domain';
 import { useEffect, useState } from 'react';
+import { HelpTrigger } from '../../help/help-ui';
 import { routeGuardRuntime } from './route-guard-runtime';
 import './route-guard-editor.css';
 
@@ -61,7 +62,10 @@ export function RouteGuardEditor({
 
   return (
     <section className="ec-route-guard-editor" aria-labelledby="route-access-title" data-route-guard-editor>
-      <h4 id="route-access-title">Acceso</h4>
+      <div className="ec-route-guard-title-row">
+        <h4 id="route-access-title">Acceso</h4>
+        <HelpTrigger helpId="help.navigation.guards" />
+      </div>
       <label>
         <span>Acceso</span>
         <Select value={mode} onValueChange={(value) => setMode(value as ElectroCraftRouteAccessMode)}>
