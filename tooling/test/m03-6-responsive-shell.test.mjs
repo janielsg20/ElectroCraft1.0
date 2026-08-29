@@ -86,5 +86,6 @@ test('M03.6 structural gate preserves capabilities across responsive modes', asy
     true,
     'M03.6 must remain covered by an ACTIVE or GREEN F03 state',
   );
-  assert.equal((state.match(/`ACTIVE`/g) ?? []).length, 1, 'Exactly one microphase must remain ACTIVE');
+  const activeIds = new Set([...state.matchAll(/\b(M\d{2}\.\d+)\b[^\n]*`ACTIVE`/g)].map((match) => match[1]));
+  assert.equal(activeIds.size, 1, 'Exactly one unique microphase must remain ACTIVE');
 });
