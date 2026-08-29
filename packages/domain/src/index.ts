@@ -34,6 +34,7 @@ export {
   type ElectroCraftRouteImportResult,
   type ElectroCraftRouteParamDefinition,
 } from './navigation';
+export * from './navigation/builder';
 export * from './contracts/canonical-json';
 export * from './contracts/capability-report';
 export * from './contracts/component-definition';
