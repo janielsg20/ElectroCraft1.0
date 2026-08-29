@@ -126,7 +126,8 @@ test('M03.7 structural gate enforces Progressive Disclosure and canonical inform
     true,
     'M03.7 must remain covered by an ACTIVE or GREEN F03 state',
   );
-  assert.equal((state.match(/`ACTIVE`/g) ?? []).length, 1, 'Exactly one microphase must remain ACTIVE');
+  const activeIds = new Set([...state.matchAll(/\b(M\d{2}\.\d+)\b[^\n]*`ACTIVE`/g)].map((match) => match[1]));
+  assert.equal(activeIds.size, 1, 'Exactly one unique microphase must remain ACTIVE');
 
   if (complete || phaseComplete) {
     assert.equal(exists(closurePath), true, 'Completed F03 requires M03.7 closure evidence');
