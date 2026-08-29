@@ -64,6 +64,7 @@ export const electroCraftDataOperationDefinitionSchema = z
     kind: electroCraftDataOperationKindSchema,
     method: electroCraftRestMethodSchema,
     path: z.string().trim().min(1).max(500).refine((value) => value.startsWith('/'), 'REST operation path must start with /'),
+    requiresAuth: z.boolean(),
     parameters: z.array(electroCraftRestParameterSchema).max(100),
     inputSchema: jsonValueSchema.nullable(),
     outputSchema: jsonValueSchema.nullable(),
