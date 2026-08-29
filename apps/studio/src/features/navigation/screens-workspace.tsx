@@ -13,7 +13,11 @@ import {
   SheetTitle,
   getStudioIcon,
 } from '@electrocraft/design-system';
-import { type ElectroCraftDocument, type ElectroCraftNavigationDefinition, type ElectroCraftRouteDefinition } from '@electrocraft/domain';
+import type {
+  ElectroCraftDocument,
+  ElectroCraftNavigationDefinition,
+  ElectroCraftRouteDefinition,
+} from '@electrocraft/domain';
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { HelpTrigger } from '../../help/help-ui';
 import { navigationWorkspaceRuntime } from './navigation-workspace-runtime';
@@ -32,14 +36,24 @@ function navigatorForRoute(navigations: readonly ElectroCraftNavigationDefinitio
     const screenNode = navigation.nodes.find((node) => node.kind === 'screen' && node.routeRef === routeId);
     if (!screenNode) continue;
     const parent = navigation.nodes.find((node) => node.kind !== 'screen' && node.childRefs.includes(screenNode.id));
-    return parent && parent.kind !== 'screen' ? parent : null;
+    if (parent && parent.kind !== 'screen') return parent;
   }
   return null;
 }
 
+function isInitialRoute(navigations: readonly ElectroCraftNavigationDefinition[], routeId: string | null) {
+  if (!routeId) return false;
+  return navigations.some((navigation) =>
+    navigation.nodes.some((node) => {
+      if (node.kind === 'screen' || !node.initialNodeRef) return false;
+      const initialNode = navigation.nodes.find(({ id }) => id === node.initialNodeRef);
+      return initialNode?.kind === 'screen' && initialNode.routeRef === routeId;
+    }),
+  );
+}
+
 function screenStatus(screen: ElectroCraftDocument) {
   const status = screen.metadata.status;
-  if (typeof status !== 'string') return 'Borrador';
   if (status === 'published') return 'Publicada';
   if (status === 'archived') return 'Archivada';
   return 'Borrador';
@@ -52,13 +66,17 @@ function formatUpdatedAt(value: string | null) {
   return new Intl.DateTimeFormat('es', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
 }
 
-function NewScreenSheet({
-  open,
-  onOpenChange,
-}: {
-  readonly open: boolean;
-  readonly onOpenChange: (open: boolean) => void;
-}) {
+function suggestedPath(name: string) {
+  const slug = name
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('es')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return slug ? `/${slug}` : '/';
+}
+
+function NewScreenSheet({ open, onOpenChange }: { readonly open: boolean; readonly onOpenChange: (open: boolean) => void }) {
   const snapshot = useSyncExternalStore(
     navigationWorkspaceRuntime.subscribe,
     navigationWorkspaceRuntime.getSnapshot,
@@ -94,7 +112,7 @@ function NewScreenSheet({
         <SheetHeader>
           <SheetTitle>Nueva pantalla</SheetTitle>
           <SheetDescription>
-            Define la pantalla, su Ruta portable y el Navigator donde aparecerá. No se crean rutas específicas de Web o Mobile.
+            Define la Pantalla, su Ruta portable y el Navigator donde aparecerá. ElectroCraft no separa Pantallas Web y Mobile.
           </SheetDescription>
         </SheetHeader>
 
@@ -131,15 +149,7 @@ function NewScreenSheet({
               onChange={(event) => {
                 const value = event.target.value;
                 setName(value);
-                if (!pathEdited) {
-                  const slug = value
-                    .normalize('NFKD')
-                    .replace(/[\u0300-\u036f]/g, '')
-                    .toLocaleLowerCase('es')
-                    .replace(/[^a-z0-9]+/g, '-')
-                    .replace(/^-+|-+$/g, '');
-                  setPath(slug ? `/${slug}` : '/');
-                }
+                if (!pathEdited) setPath(suggestedPath(value));
               }}
             />
           </label>
@@ -147,9 +157,7 @@ function NewScreenSheet({
           <label>
             <span>Tipo / Plantilla</span>
             <Select value={template} onValueChange={setTemplate}>
-              <SelectTrigger aria-label="Tipo o plantilla de pantalla">
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger aria-label="Tipo o plantilla de pantalla"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="blank">Pantalla en blanco</SelectItem>
                 <SelectItem value="core.list-detail">Lista + detalle</SelectItem>
@@ -169,36 +177,27 @@ function NewScreenSheet({
                 setPath(event.target.value);
               }}
             />
-            <small>La Ruta pertenece a ElectroCraft y se compila después para cada target.</small>
+            <small>La Ruta se compila después para cada target; no se persisten objetos de routers específicos.</small>
           </label>
 
           <label>
             <span>Navigator</span>
             <Select value={navigatorRef} onValueChange={setNavigatorRef}>
-              <SelectTrigger aria-label="Navigator de la pantalla">
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger aria-label="Navigator de la pantalla"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="root">
                   {navigation ? 'Navigator raíz' : 'Principal · se creará automáticamente'}
                 </SelectItem>
                 {navigators
                   .filter(({ id }) => id !== navigation?.rootNodeRef)
-                  .map((node) => (
-                    <SelectItem key={node.id} value={node.id}>
-                      {node.label}
-                    </SelectItem>
-                  ))}
+                  .map((node) => <SelectItem key={node.id} value={node.id}>{node.label}</SelectItem>)}
               </SelectContent>
             </Select>
           </label>
 
           {error ? <p className="ec-screen-wizard-error" role="alert">{error}</p> : null}
-
           <div className="ec-screen-wizard-actions">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancelar
-            </Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
             <Button type="submit" disabled={!name.trim() || !path.trim() || snapshot.state === 'saving'}>
               Crear y abrir
             </Button>
@@ -219,6 +218,7 @@ export function ScreensWorkspace() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [sort, setSort] = useState('updated-desc');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
 
@@ -247,6 +247,7 @@ export function ScreensWorkspace() {
   useEffect(() => {
     if (selectedId && screens.some(({ id }) => id === selectedId)) return;
     setSelectedId(screens[0]?.id ?? null);
+    setDetailOpen(false);
   }, [screens, selectedId]);
 
   const selected = screens.find(({ id }) => id === selectedId) ?? null;
@@ -277,15 +278,11 @@ export function ScreensWorkspace() {
           <span aria-hidden="true"><ScreensIcon /></span>
           <div>
             <p>Construir</p>
-            <div>
-              <h2 id="ec-screens-title">Pantallas</h2>
-              <HelpTrigger helpId="help.screens" />
-            </div>
+            <div><h2 id="ec-screens-title">Pantallas</h2><HelpTrigger helpId="help.screens" /></div>
           </div>
         </div>
         <Button size="sm" onClick={() => setWizardOpen(true)} disabled={!snapshot.project || snapshot.state === 'saving'}>
-          <AddIcon aria-hidden="true" />
-          Nueva pantalla
+          <AddIcon aria-hidden="true" />Nueva pantalla
         </Button>
       </header>
 
@@ -323,20 +320,18 @@ export function ScreensWorkspace() {
       ) : screens.length === 0 ? (
         <div className="ec-screens-empty">
           <strong>Todavía no hay Pantallas.</strong>
-          <p>Crea la primera pantalla y ElectroCraft conectará su Ruta al Navigation Graph.</p>
+          <p>Crea la primera Pantalla y ElectroCraft conectará su Ruta al Navigation Graph.</p>
           <Button size="sm" onClick={() => setWizardOpen(true)}><AddIcon aria-hidden="true" />Nueva pantalla</Button>
         </div>
       ) : (
-        <div className="ec-screens-layout">
+        <div className="ec-screens-layout" data-mobile-detail={detailOpen ? 'true' : 'false'}>
           <div className="ec-screens-list-panel" aria-label="Lista de Pantallas">
             {filteredScreens.length === 0 ? <p className="ec-screens-no-results">No hay Pantallas que coincidan con los filtros.</p> : null}
             <div role="listbox" aria-label="Pantallas del proyecto">
               {filteredScreens.map((screen) => {
                 const screenRoute = routeForScreen(snapshot.graph?.routes ?? [], screen.id);
                 const screenNavigator = navigatorForRoute(snapshot.graph?.navigations ?? [], screenRoute?.id ?? null);
-                const isInitial = snapshot.graph?.navigations.some((navigation) =>
-                  navigation.nodes.some((node) => node.kind !== 'screen' && node.initialNodeRef && navigation.nodes.find((candidate) => candidate.id === node.initialNodeRef && candidate.kind === 'screen' && candidate.routeRef === screenRoute?.id)),
-                );
+                const initial = isInitialRoute(snapshot.graph?.navigations ?? [], screenRoute?.id ?? null);
                 return (
                   <button
                     type="button"
@@ -345,7 +340,11 @@ export function ScreensWorkspace() {
                     aria-selected={selectedId === screen.id}
                     data-selected={selectedId === screen.id ? 'true' : 'false'}
                     key={screen.id}
-                    onClick={() => setSelectedId(screen.id)}
+                    onClick={() => {
+                      setSelectedId(screen.id);
+                      setDetailOpen(true);
+                      setActionError(null);
+                    }}
                   >
                     <span className="ec-screen-list-icon" aria-hidden="true"><ScreensIcon /></span>
                     <span className="ec-screen-list-copy">
@@ -353,7 +352,7 @@ export function ScreensWorkspace() {
                       <span>{screenRoute?.path ?? 'Sin Ruta'} · {screenNavigator?.label ?? 'Sin Navigator'}</span>
                     </span>
                     <span className="ec-screen-list-state">
-                      {isInitial ? <em>Pantalla inicial</em> : null}
+                      {initial ? <em>Pantalla inicial</em> : null}
                       <small>{screenStatus(screen)}</small>
                     </span>
                   </button>
@@ -365,11 +364,11 @@ export function ScreensWorkspace() {
           <article className="ec-screen-detail" aria-live="polite">
             {selected ? (
               <>
+                <Button className="ec-screen-mobile-back" size="sm" variant="outline" onClick={() => setDetailOpen(false)}>
+                  ← Pantallas
+                </Button>
                 <div className="ec-screen-detail-heading">
-                  <div>
-                    <p>Pantalla</p>
-                    <h3>{selected.name}</h3>
-                  </div>
+                  <div><p>Pantalla</p><h3>{selected.name}</h3></div>
                   <span>{screenStatus(selected)}</span>
                 </div>
                 <dl>
@@ -387,7 +386,6 @@ export function ScreensWorkspace() {
                     <p>{deleteAnalysis.usages.length} referencia(s) activas impiden eliminarla sin romper el proyecto.</p>
                   </div>
                 ) : null}
-
                 {actionError ? <p className="ec-screen-action-error" role="alert">{actionError}</p> : null}
 
                 <div className="ec-screen-detail-actions">
@@ -414,7 +412,7 @@ export function ScreensWorkspace() {
                     title={!deleteAnalysis?.allowed ? 'Elimina primero las referencias de Ruta, Navegación, Acciones o documentos.' : undefined}
                     onClick={() => {
                       setActionError(null);
-                      void navigationWorkspaceRuntime.deleteScreen(selected.id).catch((cause: unknown) =>
+                      void navigationWorkspaceRuntime.deleteScreen(selected.id).then(() => setDetailOpen(false)).catch((cause: unknown) =>
                         setActionError(cause instanceof Error ? cause.message : 'No se pudo eliminar la Pantalla.'),
                       );
                     }}
@@ -423,9 +421,7 @@ export function ScreensWorkspace() {
                   </Button>
                 </div>
               </>
-            ) : (
-              <p>Selecciona una Pantalla para revisar sus propiedades.</p>
-            )}
+            ) : <p>Selecciona una Pantalla para revisar sus propiedades.</p>}
           </article>
         </div>
       )}
