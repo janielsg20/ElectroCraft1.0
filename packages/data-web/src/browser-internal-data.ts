@@ -18,7 +18,7 @@ export interface BrowserInternalDataRepositoryPort extends InternalDataRepositor
 
 const DEFAULT_DATABASE_NAME = 'electrocraft-studio-storage' as const;
 
-function normalizeDatabaseName(value = DEFAULT_DATABASE_NAME) {
+function normalizeDatabaseName(value: string = DEFAULT_DATABASE_NAME) {
   const normalized = value.trim();
   if (!normalized) throw new TypeError('databaseName must not be empty');
   return normalized;
@@ -73,12 +73,11 @@ export function createBrowserInternalDataRepositoryPort(
   const delegate = async <T>(operation: (active: InternalDataRepository) => Promise<T>) =>
     operation(await initialize());
 
-  return Object.freeze({
-    offlineCapable: true as const,
-    testConnection: (projectId: string) => delegate((active) => active.testConnection(projectId)),
-    listResources: (projectId: string, sourceId: string) =>
-      delegate((active) => active.listResources(projectId, sourceId)),
-    getSchema: (projectId: string, sourceId: string) => delegate((active) => active.getSchema(projectId, sourceId)),
+  const port: BrowserInternalDataRepositoryPort = {
+    offlineCapable: true,
+    testConnection: (projectId) => delegate((active) => active.testConnection(projectId)),
+    listResources: (projectId, sourceId) => delegate((active) => active.listResources(projectId, sourceId)),
+    getSchema: (projectId, sourceId) => delegate((active) => active.getSchema(projectId, sourceId)),
     queryRecords: (projectId, modelId, query) => delegate((active) => active.queryRecords(projectId, modelId, query)),
     createRecord: (projectId, modelId, input) => delegate((active) => active.createRecord(projectId, modelId, input)),
     updateRecord: (projectId, modelId, input) => delegate((active) => active.updateRecord(projectId, modelId, input)),
@@ -91,5 +90,7 @@ export function createBrowserInternalDataRepositoryPort(
       repository = null;
       await active?.close();
     },
-  });
+  };
+
+  return Object.freeze(port);
 }
