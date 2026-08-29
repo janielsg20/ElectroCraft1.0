@@ -21,7 +21,7 @@ function fixture(name: string): unknown {
 }
 
 describe('M02.4 canonical action/state/navigation/permission contracts', () => {
-  it('round-trips every new persisted contract as plain canonical data', () => {
+  it('round-trips every persisted contract as plain canonical data, including migrated route/navigation v1', () => {
     const action = electroCraftActionGraphSchema.parse(fixture('action-graph-v1'));
     const state = electroCraftStateDefinitionSchema.parse(fixture('state-v1'));
     const route = electroCraftRouteDefinitionSchema.parse(fixture('route-v1'));
@@ -29,6 +29,8 @@ describe('M02.4 canonical action/state/navigation/permission contracts', () => {
     const role = electroCraftRoleSchema.parse(fixture('role-v1'));
     const policy = electroCraftPermissionPolicySchema.parse(fixture('permission-policy-v1'));
 
+    expect(route.schemaVersion).toBe(2);
+    expect(navigation.schemaVersion).toBe(2);
     expect(canonicalActionGraphRoundTrip(action)).toEqual(action);
     expect(canonicalStateDefinitionRoundTrip(state)).toEqual(state);
     expect(canonicalRouteDefinitionRoundTrip(route)).toEqual(route);
@@ -70,13 +72,10 @@ describe('M02.4 canonical action/state/navigation/permission contracts', () => {
     );
   });
 
-  it('rejects duplicate navigation item IDs across a nested tree', () => {
+  it('rejects duplicate Navigation Graph node IDs', () => {
     const navigation = electroCraftNavigationDefinitionSchema.parse(fixture('navigation-v1'));
-    const item = navigation.items[0];
-    const invalid = {
-      ...navigation,
-      items: [{ ...item, children: [{ ...item, children: [] }] }],
-    };
+    const duplicate = { ...navigation.nodes[0] };
+    const invalid = { ...navigation, nodes: [...navigation.nodes, duplicate] };
     expect(electroCraftNavigationDefinitionSchema.safeParse(invalid).success).toBe(false);
   });
 
