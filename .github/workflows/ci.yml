@@ -40,6 +40,68 @@ jobs:
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Verify documentation conventions
         run: npm run test:docs
+      - name: Prepare F07 formatting artifact
+        if: github.event_name == 'pull_request' && github.head_ref == 'codex/m07-1-navigation-model'
+        run: |
+          npx prettier --write \
+            apps/studio/src/App.tsx \
+            apps/studio/src/features/navigation/editor-screen-selection-runtime.ts \
+            apps/studio/src/features/navigation/editor-screen-selector.tsx \
+            apps/studio/src/features/navigation/navigation-builder.tsx \
+            apps/studio/src/features/navigation/navigation-preview.tsx \
+            apps/studio/src/features/navigation/navigation-workspace-runtime.ts \
+            apps/studio/src/features/navigation/navigation-workspace.tsx \
+            apps/studio/src/features/navigation/route-action-editor.tsx \
+            apps/studio/src/features/navigation/route-guard-editor.tsx \
+            apps/studio/src/features/navigation/route-guard-runtime.ts \
+            apps/studio/src/features/navigation/route-navigation-action-runtime.ts \
+            apps/studio/src/features/navigation/screens-workspace.tsx \
+            apps/studio/src/features/editor/use-puck-editor-runtime.ts \
+            apps/studio/src/help/help-registry.ts \
+            apps/studio/src/shell/studio-topbar.tsx \
+            packages/application/src/app-behavior-service.ts \
+            packages/application/src/navigation/navigation-action-service.ts \
+            packages/application/src/navigation/navigation-builder-service.ts \
+            packages/application/src/navigation/navigation-compiler-service.ts \
+            packages/application/src/navigation/navigation-guard-service.ts \
+            packages/application/src/navigation/navigation-service.ts \
+            packages/domain/src/navigation/actions.ts \
+            packages/domain/src/navigation/builder.ts \
+            packages/domain/src/navigation/guards.ts \
+            packages/domain/src/navigation/index.ts \
+            tooling/playwright/m07-8-navigation-e2e.spec.ts
+      - name: Upload F07 formatting artifact
+        if: github.event_name == 'pull_request' && github.head_ref == 'codex/m07-1-navigation-model'
+        uses: actions/upload-artifact@v4
+        with:
+          name: f07-prettier-formatted-${{ github.run_id }}
+          path: |
+            apps/studio/src/App.tsx
+            apps/studio/src/features/navigation/editor-screen-selection-runtime.ts
+            apps/studio/src/features/navigation/editor-screen-selector.tsx
+            apps/studio/src/features/navigation/navigation-builder.tsx
+            apps/studio/src/features/navigation/navigation-preview.tsx
+            apps/studio/src/features/navigation/navigation-workspace-runtime.ts
+            apps/studio/src/features/navigation/navigation-workspace.tsx
+            apps/studio/src/features/navigation/route-action-editor.tsx
+            apps/studio/src/features/navigation/route-guard-editor.tsx
+            apps/studio/src/features/navigation/route-guard-runtime.ts
+            apps/studio/src/features/navigation/route-navigation-action-runtime.ts
+            apps/studio/src/features/navigation/screens-workspace.tsx
+            apps/studio/src/features/editor/use-puck-editor-runtime.ts
+            apps/studio/src/help/help-registry.ts
+            apps/studio/src/shell/studio-topbar.tsx
+            packages/application/src/app-behavior-service.ts
+            packages/application/src/navigation/navigation-action-service.ts
+            packages/application/src/navigation/navigation-builder-service.ts
+            packages/application/src/navigation/navigation-compiler-service.ts
+            packages/application/src/navigation/navigation-guard-service.ts
+            packages/application/src/navigation/navigation-service.ts
+            packages/domain/src/navigation/actions.ts
+            packages/domain/src/navigation/builder.ts
+            packages/domain/src/navigation/guards.ts
+            packages/domain/src/navigation/index.ts
+            tooling/playwright/m07-8-navigation-e2e.spec.ts
       - name: Lint
         run: npm run lint
       - name: Typecheck
