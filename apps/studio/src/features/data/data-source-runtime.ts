@@ -3,7 +3,8 @@ import {
   dataSourceConnectorRegistry,
   type StoredProjectDefinition,
 } from '@electrocraft/application';
-import { webDataSourceRepository } from '@electrocraft/data-web';
+import { createInternalDataSourceAdapter, INTERNAL_DATA_ADAPTER_ID } from '@electrocraft/connectors';
+import { createBrowserInternalDataRepositoryPort, webDataSourceRepository } from '@electrocraft/data-web';
 import {
   createDeterministicObjectId,
   electroCraftDataSourceDefinitionSchema,
@@ -17,7 +18,6 @@ import {
   type JsonValue,
 } from '@electrocraft/domain';
 import { projectStorageRuntime } from '../projects/project-storage-runtime';
-import { workspacePreferencesRuntime } from '../projects/workspace-preferences-runtime';
 
 export type DataSourceWorkspaceState = 'initial' | 'loading' | 'ready' | 'saving' | 'testing' | 'error';
 
@@ -43,7 +43,20 @@ export interface CreateDataSourceInput {
   readonly schemaDiscovery?: ElectroCraftDataSourceSchemaDiscoveryPolicy;
 }
 
+const INTERNAL_CAPABILITIES = Object.freeze([
+  'read',
+  'create',
+  'update',
+  'delete',
+  'pagination',
+  'filtering',
+  'sort',
+  'transactions',
+] as const satisfies readonly ElectroCraftCanonicalDataSourceCapability[]);
+
 const listeners = new Set<() => void>();
+const internalDataRepository = createBrowserInternalDataRepositoryPort();
+let registeredInternalProjectId: string | null = null;
 let loadPromise: Promise<DataSourceWorkspaceSnapshot> | null = null;
 let sourceUpdatedAt = new Map<string, string>();
 let snapshot: DataSourceWorkspaceSnapshot = Object.freeze({
@@ -62,7 +75,23 @@ function publish(next: DataSourceWorkspaceSnapshot) {
 }
 
 function activeProjectId() {
-  return projectStorageRuntime.currentProjectId() ?? workspacePreferencesRuntime.getSnapshot().layout.lastDocumentId;
+  return projectStorageRuntime.currentProjectId();
+}
+
+function registerInternalAdapter(projectId: string) {
+  if (registeredInternalProjectId === projectId) return;
+  dataSourceConnectorRegistry.registerAdapter(
+    createInternalDataSourceAdapter({
+      projectId,
+      repository: internalDataRepository,
+      permissions: {
+        authorize(request) {
+          return request.projectId === projectStorageRuntime.currentProjectId();
+        },
+      },
+    }),
+  );
+  registeredInternalProjectId = projectId;
 }
 
 function normalizeKey(value: string) {
@@ -78,10 +107,10 @@ function normalizeKey(value: string) {
 async function loadWorkspace(): Promise<DataSourceWorkspaceSnapshot> {
   publish({ ...snapshot, state: 'loading', message: 'Cargando fuentes de datos…', lastOperation: null });
   await projectStorageRuntime.initialize();
-  await workspacePreferencesRuntime.initialize();
   const projectId = activeProjectId();
   if (!projectId) {
     sourceUpdatedAt = new Map();
+    registeredInternalProjectId = null;
     return publish({
       state: 'ready',
       project: null,
@@ -104,6 +133,7 @@ async function loadWorkspace(): Promise<DataSourceWorkspaceSnapshot> {
     });
   }
 
+  registerInternalAdapter(projectId);
   const parsed = opened.objects
     .filter(({ kind }) => kind === 'data-source')
     .flatMap((object) => {
@@ -170,21 +200,22 @@ export const dataSourceWorkspaceRuntime = Object.freeze({
   },
   async createSource(input: CreateDataSourceInput) {
     const seed = globalThis.crypto.randomUUID();
+    const isInternal = input.type === 'internal';
     const source = electroCraftDataSourceDefinitionSchema.parse({
       schemaVersion: 1,
       id: createDeterministicObjectId('data-source', seed),
       version: 1,
-      key: normalizeKey(input.key || input.name),
-      label: input.name.trim(),
+      key: normalizeKey(input.key || (isInternal ? 'electroCraftData' : input.name)),
+      label: isInternal ? 'ElectroCraft Data' : input.name.trim(),
       kind: input.type,
-      adapterId: input.adapter.trim(),
-      authRef: input.authRef ?? null,
-      config: { ...(input.config ?? {}) },
+      adapterId: isInternal ? INTERNAL_DATA_ADAPTER_ID : input.adapter.trim(),
+      authRef: isInternal ? null : (input.authRef ?? null),
+      config: isInternal ? { storage: 'content_records', offlineCapable: true } : { ...(input.config ?? {}) },
       environmentScope: [...(input.environmentScope ?? ['development', 'preview', 'production'])],
-      environmentOverrides: input.environmentOverrides ?? {},
-      schemaDiscovery: input.schemaDiscovery ?? 'on-demand',
-      capabilities: [...(input.capabilities ?? ['read'])],
-      metadata: {},
+      environmentOverrides: isInternal ? {} : (input.environmentOverrides ?? {}),
+      schemaDiscovery: isInternal ? 'on-demand' : (input.schemaDiscovery ?? 'on-demand'),
+      capabilities: [...(isInternal ? INTERNAL_CAPABILITIES : (input.capabilities ?? ['read']))],
+      metadata: isInternal ? { offlineCapable: true, owner: 'PGlite+Drizzle' } : {},
     });
     await persistSource(source, `Fuente ${source.label} creada.`);
     return source;
@@ -210,6 +241,31 @@ export const dataSourceWorkspaceRuntime = Object.freeze({
   },
   canonicalCapabilities(source: ElectroCraftDataSourceDefinition) {
     return normalizeDataSourceCapabilities(source.capabilities);
+  },
+  async internalStats(source: ElectroCraftDataSourceDefinition) {
+    const projectId = activeProjectId();
+    if (!projectId || source.kind !== 'internal') return null;
+    return internalDataRepository.getStats(projectId, source.id);
+  },
+  async listResources(source: ElectroCraftDataSourceDefinition, environment: ElectroCraftDataSourceEnvironment) {
+    return webDataSourceRepository.listResources(source, environment);
+  },
+  async query(
+    source: ElectroCraftDataSourceDefinition,
+    environment: ElectroCraftDataSourceEnvironment,
+    resourceId: string,
+    input?: JsonValue,
+  ) {
+    return webDataSourceRepository.query(source, environment, { resourceId, input });
+  },
+  async mutate(
+    source: ElectroCraftDataSourceDefinition,
+    environment: ElectroCraftDataSourceEnvironment,
+    resourceId: string,
+    operation: 'create' | 'update' | 'delete',
+    input?: JsonValue,
+  ) {
+    return webDataSourceRepository.mutate(source, environment, { resourceId, operation, input });
   },
   async testConnection(source: ElectroCraftDataSourceDefinition, environment: ElectroCraftDataSourceEnvironment) {
     const current = snapshot;
@@ -242,8 +298,8 @@ export const dataSourceWorkspaceRuntime = Object.freeze({
         ...current,
         state: 'ready',
         discoveredSchema: schema,
-        message: schema ? `Esquema ${schema.name} detectado.` : 'El adapter no devolvió un esquema.',
-        lastOperation: schema ? 'Esquema inspeccionado.' : 'Sin esquema detectable.',
+        message: schema ? `Esquema ${schema.name} detectado.` : 'No hay modelos definidos todavía.',
+        lastOperation: schema ? 'Esquema inspeccionado.' : 'Sin modelos todavía.',
       });
       return schema;
     } catch (error) {
@@ -255,5 +311,9 @@ export const dataSourceWorkspaceRuntime = Object.freeze({
       });
       throw error;
     }
+  },
+  async close() {
+    registeredInternalProjectId = null;
+    await internalDataRepository.close();
   },
 });
