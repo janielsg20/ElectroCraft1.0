@@ -127,7 +127,11 @@ test('M03.5 structural gate keeps exact editor dimensions and ownership', () => 
   const phaseComplete = /F03[^\n]*COMPLETADA[^\n]*GREEN/.test(state);
   const active = /M03\.5[^\n]*ACTIVE/.test(state);
   const complete = /M03\.5[^\n]*COMPLETADA[^\n]*GREEN/.test(state);
-  assert.equal(active || complete || phaseComplete, true, 'M03.5 must remain covered by an ACTIVE or GREEN F03 state');
+  assert.equal(
+    active || complete || phaseComplete,
+    true,
+    'M03.5 must remain covered by an ACTIVE or GREEN F03 state',
+  );
 
   if (complete || phaseComplete) {
     const closure = read(closurePath);
@@ -146,5 +150,9 @@ test('M03.5 structural gate keeps exact editor dimensions and ownership', () => 
     true,
     'M03.4 verifier must support post-closure regression mode',
   );
-  assert.equal(m034Verifier.includes('32278183037'), true, 'M03.4 verifier must pin the real GREEN closure run');
+  assert.equal(
+    m034Verifier.includes('32278183037'),
+    true,
+    'M03.4 verifier must pin the real GREEN closure run',
+  );
 });
