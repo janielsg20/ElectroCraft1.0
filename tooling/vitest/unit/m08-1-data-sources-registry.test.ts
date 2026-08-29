@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   ConnectorRegistry,
@@ -12,6 +13,16 @@ import {
   resolveDataSourceConfig,
   type ElectroCraftDataSourceDefinition,
 } from '@electrocraft/domain';
+
+const workspaceSource = readFileSync(
+  new URL('../../../apps/studio/src/features/data-sources/data-sources-workspace.tsx', import.meta.url),
+  'utf8',
+);
+const runtimeSource = readFileSync(
+  new URL('../../../apps/studio/src/features/data-sources/data-source-runtime.ts', import.meta.url),
+  'utf8',
+);
+const routeSource = readFileSync(new URL('../../../apps/studio/src/shell/app-shell-route.tsx', import.meta.url), 'utf8');
 
 function source(overrides: Partial<ElectroCraftDataSourceDefinition> = {}) {
   return electroCraftDataSourceDefinitionSchema.parse({
@@ -97,12 +108,9 @@ describe('M08.1 DataSources registry', () => {
   });
 
   it('normalizes legacy capability aliases to the eight canonical capability names', () => {
-    expect(normalizeDataSourceCapabilities(['read', 'create', 'update', 'delete', 'paginate', 'subscribe', 'aggregate'])).toEqual([
-      'read',
-      'write',
-      'pagination',
-      'realtime',
-    ]);
+    expect(
+      normalizeDataSourceCapabilities(['read', 'create', 'update', 'delete', 'paginate', 'subscribe', 'aggregate']),
+    ).toEqual(['read', 'write', 'pagination', 'realtime']);
   });
 
   it('keeps portable environment config separate from secret references', () => {
@@ -124,6 +132,8 @@ describe('M08.1 DataSources registry', () => {
     expect(stored.kind).toBe('data-source');
     expect(stored.schemaVersion).toBe(1);
     expect(stored.payload).toEqual(definition);
+    expect(runtimeSource).toContain('projectStorageRuntime.queueAutosave');
+    expect(runtimeSource).toContain("kind: 'data-source'");
   });
 
   it('delegates connection testing and schema introspection to the registered adapter', async () => {
@@ -133,5 +143,17 @@ describe('M08.1 DataSources registry', () => {
 
     await expect(registry.testConnection(definition, 'development')).resolves.toEqual({ ok: true, message: 'connected' });
     await expect(registry.introspectSchema(definition, 'development')).resolves.toBeNull();
+  });
+
+  it('exposes the canonical /data-sources desktop and mobile list-detail UX', () => {
+    expect(routeSource).toContain("pathname === '/data-sources'");
+    expect(workspaceSource).toContain('data-data-sources-workspace');
+    expect(workspaceSource).toContain('data-mobile-detail');
+    expect(workspaceSource).toContain('Añadir fuente de datos');
+    expect(workspaceSource).toContain('Probar conexión');
+    expect(workspaceSource).toContain('Inspeccionar esquema');
+    expect(workspaceSource).toContain('help.section.data-sources');
+    expect(workspaceSource).not.toContain('password');
+    expect(workspaceSource).not.toContain('apiKey');
   });
 });
