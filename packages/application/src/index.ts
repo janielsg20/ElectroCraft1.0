@@ -9,6 +9,7 @@ export * from './editor-visual-history-preferences';
 export * from './engine-payload-compatibility';
 export * from './export-ir-service';
 export * from './model-ownership-service';
+export * from './navigation';
 export * from './ownership-registry-service';
 export * from './project-document-service';
 export * from './project-import-service';
