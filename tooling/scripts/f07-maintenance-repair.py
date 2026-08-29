@@ -63,6 +63,17 @@ replace_between(
 """,
 )
 
+replace_exact(
+    'packages/domain/src/navigation/actions.ts',
+    "    .refine((value) => {\n      const protocol = new URL(value).protocol;\n      return protocol === 'https:' || protocol === 'http:';\n    }, 'external URL must use http or https'),",
+    "    .refine((value) => /^https?:\\/\\//i.test(value), 'external URL must use http or https'),",
+)
+replace_exact(
+    'packages/domain/src/navigation/index.ts',
+    "export function cloneJsonValue<T extends JsonValue>(value: T): T {\n  return structuredClone(value);\n}",
+    "export function cloneJsonValue<T extends JsonValue>(value: T): T {\n  return JSON.parse(JSON.stringify(value)) as T;\n}",
+)
+
 export_replacement = r'''/**
  * ExportIR keeps formatVersion=1 while Route/Navigation evolve independently.
  * The F02 object shape is reused, while Route/Navigation move to the M07
