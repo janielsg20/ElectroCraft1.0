@@ -31,110 +31,139 @@ jobs:
         run: |
           python <<'PY'
           from pathlib import Path
-          import re
 
-          def replace_once(path_str: str, pattern: str, replacement: str) -> None:
+          def replace_exact(path_str: str, old: str, new: str) -> None:
               path = Path(path_str)
               text = path.read_text()
-              next_text, count = re.subn(pattern, replacement, text, count=1, flags=re.S)
+              count = text.count(old)
               if count != 1:
-                  raise SystemExit(f'{path_str}: expected one replacement, found {count}')
-              path.write_text(next_text)
+                  raise SystemExit(f'{path_str}: expected one exact replacement, found {count}')
+              path.write_text(text.replace(old, new, 1))
 
-          replace_once(
+          def replace_between(path_str: str, start_marker: str, end_marker: str, replacement: str) -> None:
+              path = Path(path_str)
+              text = path.read_text()
+              start = text.find(start_marker)
+              if start < 0:
+                  raise SystemExit(f'{path_str}: start marker not found')
+              end = text.find(end_marker, start)
+              if end < 0:
+                  raise SystemExit(f'{path_str}: end marker not found')
+              path.write_text(text[:start] + replacement + text[end:])
+
+          replace_exact(
               'apps/studio/src/features/navigation/navigation-builder.tsx',
-              r"  const parent =\s*selectedParent && selectedParent\.kind !== 'screen'\s*\? selectedParent\s*:\s*\(navigation\.nodes\.find\(\(node\) => node\.id === navigation\.rootNodeRef && node\.kind !== 'screen'\) \?\? null\);",
+              "  const parent = selectedParent && selectedParent.kind !== 'screen'\n    ? selectedParent\n    : navigation.nodes.find((node) => node.id === navigation.rootNodeRef && node.kind !== 'screen') ?? null;",
               "  const parent =\n    selectedParent ??\n    navigation.nodes.find((node) => node.id === navigation.rootNodeRef && node.kind !== 'screen') ??\n    null;",
           )
-          replace_once(
+          replace_exact(
               'apps/studio/src/features/navigation/navigation-builder.tsx',
-              r"    const draggedIndex = parent\.childRefs\.indexOf\(draggedId as never\);\s*const targetIndex = parent\.childRefs\.indexOf\(targetId as never\);",
+              "  const nodesById = new Map(navigation.nodes.map((node) => [node.id, node] as const));",
+              "  const nodesById = new Map<string, ElectroCraftNavigationNode>(\n    navigation.nodes.map((node) => [node.id, node] as const),\n  );",
+          )
+          replace_exact(
+              'apps/studio/src/features/navigation/navigation-builder.tsx',
+              "    const draggedIndex = parent.childRefs.indexOf(draggedId as never);\n    const targetIndex = parent.childRefs.indexOf(targetId as never);",
               "    const draggedIndex = parent.childRefs.findIndex((childRef) => childRef === draggedId);\n    const targetIndex = parent.childRefs.findIndex((childRef) => childRef === targetId);",
           )
-          replace_once(
+          replace_exact(
               'apps/studio/src/features/navigation/route-action-editor.tsx',
-              r"  const \[destinationRouteId, setDestinationRouteId\] = useState\(routes\[0\]\?\.id \?\? sourceRoute\.id\);",
+              "  const [destinationRouteId, setDestinationRouteId] = useState(routes[0]?.id ?? sourceRoute.id);",
               "  const [destinationRouteId, setDestinationRouteId] = useState<string>(routes[0]?.id ?? sourceRoute.id);",
           )
-          replace_once(
+
+          replace_between(
               'packages/application/src/navigation/navigation-action-service.ts',
-              r"  if \(config\.mode === 'back' \|\| config\.destination === null\) return null;\s*if \(config\.destination\.kind === 'route'\) \{\s*const route = routes\.find\(\(\{ id \}\) => id === config\.destination!\.routeRef\);\s*if \(!route\) diagnostics\.push\(\{ code: 'destination-route-missing', ref: config\.destination\.routeRef \}\);\s*return route \?\? null;\s*\}\s*const screen = documents\.find\(\(\{ id \}\) => id === config\.destination!\.screenRef && screen\.kind === 'screen'\);\s*if \(!screen\) \{\s*diagnostics\.push\(\{ code: 'destination-screen-missing', ref: config\.destination\.screenRef \}\);\s*return null;\s*\}",
-              "  if (config.mode === 'back' || config.destination === null) return null;\n  const destination = config.destination;\n  if (destination.kind === 'route') {\n    const route = routes.find(({ id }) => id === destination.routeRef);\n    if (!route) diagnostics.push({ code: 'destination-route-missing', ref: destination.routeRef });\n    return route ?? null;\n  }\n\n  const screen = documents.find(({ id, kind }) => id === destination.screenRef && kind === 'screen');\n  if (!screen) {\n    diagnostics.push({ code: 'destination-screen-missing', ref: destination.screenRef });\n    return null;\n  }",
+              "  if (config.mode === 'back' || config.destination === null) return null;",
+              "  const matching = routes.filter(({ screenRef }) => screenRef === screen.id);",
+              """  if (config.mode === 'back' || config.destination === null) return null;
+  const destination = config.destination;
+  if (destination.kind === 'route') {
+    const route = routes.find(({ id }) => id === destination.routeRef);
+    if (!route) diagnostics.push({ code: 'destination-route-missing', ref: destination.routeRef });
+    return route ?? null;
+  }
+
+  const screen = documents.find(({ id, kind }) => id === destination.screenRef && kind === 'screen');
+  if (!screen) {
+    diagnostics.push({ code: 'destination-screen-missing', ref: destination.screenRef });
+    return null;
+  }
+""",
           )
 
-          export_replacement = r'''const forbiddenIrKeyNames = new Set([
-            'workspacestate',
-            'puckhistory',
-            'retehistory',
-            'tanstackcache',
-            'aihistory',
-            'aiprompts',
-            'prompts',
-            'slimroutes',
-            'wpblocks',
-            'wordpressblocks',
-            'exporoutefiles',
-            'capacitorconfig',
-            'secretvalue',
-            'password',
-            'passwd',
-            'clientsecret',
-            'accesstoken',
-            'refreshtoken',
-            'apikey',
-            'authorization',
-            'credential',
-          ]);
+          export_replacement = r'''/**
+ * ExportIR keeps formatVersion=1 while Route/Navigation evolve independently.
+ * The F02 object shape is reused, while Route/Navigation move to the M07
+ * schemas and the original forbidden-internals validation is preserved.
+ */
+const forbiddenIrKeyNames = new Set([
+  'workspacestate',
+  'puckhistory',
+  'retehistory',
+  'tanstackcache',
+  'aihistory',
+  'aiprompts',
+  'prompts',
+  'slimroutes',
+  'wpblocks',
+  'wordpressblocks',
+  'exporoutefiles',
+  'capacitorconfig',
+  'secretvalue',
+  'password',
+  'passwd',
+  'clientsecret',
+  'accesstoken',
+  'refreshtoken',
+  'apikey',
+  'authorization',
+  'credential',
+]);
 
-          function normalizeKey(key: string): string {
-            return key.replace(/[-_.\s]/g, '').toLowerCase();
-          }
+function normalizeKey(key: string): string {
+  return key.replace(/[-_.\s]/g, '').toLowerCase();
+}
 
-          function findForbiddenIrPath(
-            value: unknown,
-            path: Array<string | number> = [],
-          ): Array<string | number> | null {
-            if (Array.isArray(value)) {
-              for (let index = 0; index < value.length; index += 1) {
-                const found = findForbiddenIrPath(value[index], [...path, index]);
-                if (found) return found;
-              }
-              return null;
-            }
-            if (value === null || typeof value !== 'object') return null;
-            for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
-              if (forbiddenIrKeyNames.has(normalizeKey(key))) return [...path, key];
-              const found = findForbiddenIrPath(child, [...path, key]);
-              if (found) return found;
-            }
-            return null;
-          }
+function findForbiddenIrPath(value: unknown, path: Array<string | number> = []): Array<string | number> | null {
+  if (Array.isArray(value)) {
+    for (let index = 0; index < value.length; index += 1) {
+      const found = findForbiddenIrPath(value[index], [...path, index]);
+      if (found) return found;
+    }
+    return null;
+  }
+  if (value === null || typeof value !== 'object') return null;
+  for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
+    if (forbiddenIrKeyNames.has(normalizeKey(key))) return [...path, key];
+    const found = findForbiddenIrPath(child, [...path, key]);
+    if (found) return found;
+  }
+  return null;
+}
 
-          /**
-           * ExportIR keeps formatVersion=1 while Route/Navigation evolve independently.
-           * The F02 object shape is reused, while Route/Navigation move to the M07
-           * schemas and the original forbidden-internals validation is preserved.
-           */
-          export const electroCraftExportIrSchema = z
-            .strictObject({
-              ...legacyElectroCraftExportIrSchema.shape,
-              routes: z.array(electroCraftRouteDefinitionSchema),
-              navigations: z.array(electroCraftNavigationDefinitionSchema),
-            })
-            .superRefine((ir, context) => {
-              const forbiddenPath = findForbiddenIrPath(ir);
-              if (forbiddenPath) {
-                context.addIssue({
-                  code: 'custom',
-                  path: forbiddenPath,
-                  message:
-                    'ExportIR cannot contain Studio/engine history, target-specific internals, prompts, caches, or secret values',
-                });
-              }
-            });'''
-          replace_once(
+export const electroCraftExportIrSchema = z
+  .strictObject({
+    ...legacyElectroCraftExportIrSchema.shape,
+    routes: z.array(electroCraftRouteDefinitionSchema),
+    navigations: z.array(electroCraftNavigationDefinitionSchema),
+  })
+  .superRefine((ir, context) => {
+    const forbiddenPath = findForbiddenIrPath(ir);
+    if (forbiddenPath) {
+      context.addIssue({
+        code: 'custom',
+        path: forbiddenPath,
+        message:
+          'ExportIR cannot contain Studio/engine history, target-specific internals, prompts, caches, or secret values',
+      });
+    }
+  });
+'''
+          replace_between(
               'packages/domain/src/navigation/export-ir.ts',
-              r"/\*\*\s*\* ExportIR keeps formatVersion=1 while Route/Navigation evolve independently\.\s*\* The refined F02 envelope is preserved and only these two canonical object\s*\* collections are upgraded to their M07\.1 schemas\.\s*\*/\s*export const electroCraftExportIrSchema = legacyElectroCraftExportIrSchema\.safeExtend\(\{\s*routes: z\.array\(electroCraftRouteDefinitionSchema\),\s*navigations: z\.array\(electroCraftNavigationDefinitionSchema\),\s*\}\);",
+              '/**\n * ExportIR keeps formatVersion=1 while Route/Navigation evolve independently.',
+              'export type ElectroCraftExportIR',
               export_replacement,
           )
           PY
