@@ -72,6 +72,7 @@
     "@tiptap/html": "3.29.2",
     "@tiptap/pm": "3.29.2",
     "@tiptap/react": "3.29.2",
+    "ajv": "8.20.0",
     "eslint": "10.8.0",
     "prettier": "3.9.6",
     "typescript": "7.0.2",
