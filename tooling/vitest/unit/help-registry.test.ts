@@ -13,6 +13,9 @@ const studioScopedHelpIds = [
   'help.studio.language',
   'help.projects',
   'help.editor.advanced',
+  'help.editor.screens',
+  'help.navigation',
+  'help.screens',
 ] as const;
 
 describe('M03.11 typed HelpRegistry', () => {
@@ -38,6 +41,7 @@ describe('M03.11 typed HelpRegistry', () => {
     expect(searchStudioHelp('Puck').some((entry) => entry.id === 'help.section.components')).toBe(true);
     expect(searchStudioHelp('List/Detail').some((entry) => entry.id === 'help.section.records')).toBe(true);
     expect(searchStudioHelp('Construir').some((entry) => entry.id === 'help.section.editor')).toBe(true);
+    expect(searchStudioHelp('screen composer').some((entry) => entry.id === 'help.editor.screens')).toBe(true);
   });
 
   it('keeps related concepts inside the same registry', () => {
