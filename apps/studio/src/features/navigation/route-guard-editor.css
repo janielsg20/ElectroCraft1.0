@@ -7,6 +7,13 @@
   background: color-mix(in srgb, var(--muted) 30%, transparent);
 }
 
+.ec-route-guard-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .ec-route-guard-editor h4 {
   margin: 0;
   font-size: var(--ec-text-sm);
