@@ -17,6 +17,8 @@ const studioScopedHelpIds = [
   'help.navigation',
   'help.navigation.builder',
   'help.navigation.routes',
+  'help.navigation.guards',
+  'help.navigation.compiler',
   'help.screens',
 ] as const;
 
@@ -46,6 +48,8 @@ describe('M03.11 typed HelpRegistry', () => {
     expect(searchStudioHelp('screen composer').some((entry) => entry.id === 'help.editor.screens')).toBe(true);
     expect(searchStudioHelp('reordenar').some((entry) => entry.id === 'help.navigation.builder')).toBe(true);
     expect(searchStudioHelp('enlace profundo').some((entry) => entry.id === 'help.navigation.routes')).toBe(true);
+    expect(searchStudioHelp('iniciar sesión').some((entry) => entry.id === 'help.navigation.guards')).toBe(true);
+    expect(searchStudioHelp('expo router').some((entry) => entry.id === 'help.navigation.compiler')).toBe(true);
   });
 
   it('keeps related concepts inside the same registry', () => {
