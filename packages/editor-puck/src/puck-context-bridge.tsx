@@ -63,7 +63,10 @@ function resolveBreadcrumbs(
   getItemById: (id: string) => ComponentData | null | undefined,
   getSelectorForId: (id: string) => { index: number; zone: string } | null | undefined,
 ): readonly PuckContextBreadcrumb[] {
-  const breadcrumbs: PuckContextBreadcrumb[] = [{ id: 'root', label: 'Página' }];
+  const breadcrumbs: PuckContextBreadcrumb[] = [
+    { id: 'app', label: 'App' },
+    { id: 'root', label: 'Pantalla' },
+  ];
   const lineage: PuckContextBreadcrumb[] = [];
   const seen = new Set<string>();
   let currentId: string | null = selectedId;
