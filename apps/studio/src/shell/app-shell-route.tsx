@@ -10,8 +10,10 @@ import { StudioRouteSkeleton } from './loading-ui';
 import { resolveSidebarActiveItem, studioSidebarNavigation } from './sidebar-navigation';
 import { StudioTopbar, type StudioTopbarCopy } from './studio-topbar';
 
-const DataSourcesWorkspace = lazy(() =>
-  import('../features/data/data-sources-workspace').then((module) => ({ default: module.DataSourcesWorkspace })),
+const DataSourcesFeatureWorkspace = lazy(() =>
+  import('../features/data/data-sources-feature-workspace').then((module) => ({
+    default: module.DataSourcesFeatureWorkspace,
+  })),
 );
 
 export const studioDesignSystemOwner: DesignSystemPackageDescriptor['name'] = '@electrocraft/design-system';
@@ -107,7 +109,7 @@ function resolveFeatureWorkspace(pathname: string, children: ReactNode) {
   if (pathname === '/data-sources') {
     return (
       <Suspense fallback={<StudioRouteSkeleton kind="generic" label="Cargando fuentes de datos" />}>
-        <DataSourcesWorkspace />
+        <DataSourcesFeatureWorkspace />
       </Suspense>
     );
   }
