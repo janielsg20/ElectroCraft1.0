@@ -413,7 +413,9 @@ export function importElectroCraftNavigationDefinition(input: unknown): ElectroC
 export function collectNavigationRouteRefs(
   input: ElectroCraftNavigationDefinition | readonly ElectroCraftNavigationNode[],
 ): ElectroCraftObjectId[] {
-  const nodes = Array.isArray(input) ? input : input.nodes;
+  const nodes: readonly ElectroCraftNavigationNode[] = Array.isArray(input)
+    ? input
+    : (input as ElectroCraftNavigationDefinition).nodes;
   return nodes.filter((node): node is ElectroCraftNavigationScreenNode => node.kind === 'screen').map(({ routeRef }) => routeRef);
 }
 
