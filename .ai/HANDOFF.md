@@ -2,68 +2,60 @@
 
 ## Current
 
-F08 / M08.1 — Fuentes de datos y ConnectorRegistry — `ACTIVE`.
+F08 / M08.3 — REST API Connector y OpenAPI import — `ACTIVE`.
 
 Rama activa: `codex/m08-1-data-sources`.
 
-F07 está cerrada y fusionada. M08.1 tiene implementación funcional preparada y evidencia; la suite completa se reserva para el Gate F08 para evitar Actions por microfase.
+F07 está `GREEN` y fusionada. M08.1 y M08.2 están implementadas con evidencia; la suite ejecutable completa se reserva para Gate F08 para no usar Actions por microfase.
 
 ## Gate de entrada F08
 
-- Base CI F07: run `33262949215` (#795), `success` completo.
+- Base CI F07: `33262949215` (#795), success completo.
 - PR F07: `#68`.
-- merge a `main`: `e697a42546d23f89412e6dd616018759e719e448`.
-- las reparaciones Playwright heredadas de F06 quedaron certificadas dentro de este gate.
+- merge: `e697a42546d23f89412e6dd616018759e719e448`.
 
-## M08.1 implementada
+## M08.1 — implementada / pendiente Gate F08
 
-### Contrato
+- DataSourceDefinition canónico en `packages/domain/src/data/source-definition.ts`.
+- 11 capability flags canónicos.
+- secrets excluidos; `authRef` portable.
+- DataSourceAdapter + único ConnectorRegistry.
+- `packages/connectors` paquete estable #20.
+- `/data-sources` responsive + `help.data.sources`.
 
-- Owner único de DataSource: `packages/domain/src/data/source-definition.ts`.
-- Capabilities canónicas: `read/create/update/delete/pagination/filtering/sort/aggregate/realtime/file/transactions`.
-- Aliases legacy se normalizan al importar; no crean una segunda semántica.
-- `environmentScope` + overrides por development/preview/production.
-- config portable rechaza passwords, API keys, tokens, Authorization y credenciales; usar `authRef`.
+## M08.2 — implementada / pendiente Gate F08
 
-### Runtime
+- `InternalDataSourceAdapter` `internal.pglite`.
+- CRUD/query/stats sobre la tabla genérica F04 `content_records`.
+- No hay segunda DB ni tablas por modelo.
+- schema discovery desde `ElectroCraftDataSchema`.
+- companion browser sobre el mismo `electrocraft-studio-storage`/worker/migrations.
+- permission port fail-closed limitado al proyecto abierto.
+- UX `ElectroCraft Data`, `Local`, `Disponible sin conexión`, `Modelos`, `Registros`, `Copia de seguridad`.
+- `help.data.internal`.
+- fixtures, unit test e integración PGlite real preparados.
 
-- `packages/application/src/connector-registry.ts` conserva el único singleton `dataSourceConnectorRegistry`.
-- `DataSourceAdapter`: `testConnection`, `listResources`, `getSchema`, `query`, `mutate`.
-- Registry bloquea adapter/kind/capability/environment incompatibles antes de ejecutar.
-- `packages/connectors` registra adapters sobre el registry de aplicación; no posee otro registry runtime.
-- `packages/data-web` consume el registry mediante `WebDataSourceRepository` y reutiliza PGlite/Drizzle existente.
-- `tooling/package-boundaries.json` reconoce `@electrocraft/connectors` como paquete estable #20.
+## M08.3 — owner y reglas
 
-### Studio
+Owner: Web Fetch API + DataSourceAdapter + `@scalar/openapi-parser@0.28.11`, parser aprobado en F00.
 
-`/data-sources` carga directamente `apps/studio/src/features/data/data-sources-workspace.tsx`.
+Debe producir:
 
-- Desktop: lista 300px + detalle + inspector seguridad/compatibilidad.
-- Tablet: inspector a Sheet.
-- Mobile: list → detail.
-- Secciones: Resumen, Configuración, Autenticación, Esquema, Prueba.
-- Copy: Fuentes de datos, Nueva fuente, Interna, REST API, GraphQL, Probar conexión, Esquema, Credenciales, Requiere gateway.
-- Help: `help.data.sources`.
-- adapters aún no implementados se muestran como no registrados y acciones dependientes quedan deshabilitadas con motivo.
+1. `RestDataSourceAdapter`;
+2. OpenAPI import adapter;
+3. REST source wizard: URL base → Autenticación → OpenAPI/Manual → Operaciones → Probar → Guardar;
+4. fixtures REST/OpenAPI;
+5. normalización de response/error/pagination;
+6. fallback explícito a ConnectorGateway cuando browser/CORS/security no permita ejecución directa.
 
-## Tests preparados
+No guardar bearer tokens/API keys en source config. No arbitrary JS transforms.
 
-- `tooling/vitest/unit/m08-1-data-sources-registry.test.ts`
-- `tooling/vitest/unit/help-registry.test.ts`
-- `tooling/vitest/integration/app-shell-e2e-matrix.test.ts`
+## Deuda de gate visible
 
-Cubren registry register/unregister, compatibilidad, 11 capabilities, unsupported operation, secret exclusion, round-trip, facade data-web y responsive/copy.
-
-## Validación pendiente de fase
-
-`packages/connectors` es un workspace nuevo y obliga a regenerar `package-lock.json` antes del Gate F08. También se aplicará Prettier y la suite completa en ese único gate. No abrir PR mientras se desarrollen las microfases de F08 para no disparar CI en cada commit.
-
-## Siguiente microfase exacta
-
-`M08.2 — Fuente interna ElectroCraft Data sobre PGlite`.
-
-No crear una segunda base local: reutilizar PGlite + Drizzle + generic record store existente. No exponer SQL a beginner. El adapter interno debe vivir detrás del mismo ConnectorRegistry.
+- `package-lock.json` debe regenerarse por `packages/connectors` y la dependencia Studio.
+- root `format/format:check` debe incluir connectors/data-web.
+- no abrir PR ni ejecutar Actions hasta Gate F08 salvo blocker excepcional.
 
 ## Read set
 
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/phases/F08.md → .ai/microphases/M08_1.md → .ai/microphases/M08_2.md → .ai/evidence/F08/ → packages/domain/src/data → packages/application/src/data + connector-registry → packages/connectors → packages/data-web → apps/studio/src/features/data → tooling/vitest`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/phases/F08.md → M08_1.md → M08_2.md → M08_3.md → evidence/F08 → packages/domain/src/data → packages/application/src/data + connector-registry → packages/connectors → packages/data-web → apps/studio/src/features/data → tooling/vitest`.
