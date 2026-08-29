@@ -13,6 +13,8 @@ export type StudioHelpId =
   | 'help.navigation'
   | 'help.navigation.builder'
   | 'help.navigation.routes'
+  | 'help.navigation.guards'
+  | 'help.navigation.compiler'
   | 'help.screens'
   | `help.section.${SidebarNavigationItemId}`;
 
@@ -159,7 +161,7 @@ const studioDefinitions = Object.freeze([
     shortKey: helpKey('help.section.navigation.short'),
     longKey: helpKey('help.section.navigation.long'),
     exampleKeys: [helpKey('help.section.navigation.example')],
-    relatedIds: ['help.navigation.builder', 'help.navigation.routes', 'help.screens'],
+    relatedIds: ['help.navigation.builder', 'help.navigation.routes', 'help.navigation.guards', 'help.navigation.compiler'],
     keywords: [
       'navigation graph',
       'pantallas',
@@ -171,6 +173,7 @@ const studioDefinitions = Object.freeze([
       'parámetros',
       'deep link',
       'guards',
+      'compiler',
     ],
     learnMoreRef: '.ai/microphases/M07_1.md',
   },
@@ -204,7 +207,7 @@ const studioDefinitions = Object.freeze([
     shortKey: helpKey('help.section.navigation.short'),
     longKey: helpKey('help.section.navigation.long'),
     exampleKeys: [helpKey('help.section.navigation.example')],
-    relatedIds: ['help.navigation.builder', 'help.navigation', 'help.section.workflows'],
+    relatedIds: ['help.navigation.builder', 'help.navigation.guards', 'help.section.workflows'],
     keywords: [
       'rutas',
       'parámetros',
@@ -217,6 +220,52 @@ const studioDefinitions = Object.freeze([
       'binding',
     ],
     learnMoreRef: '.ai/microphases/M07_5.md',
+  },
+  {
+    id: 'help.navigation.guards',
+    sectionId: 'navigation-guards',
+    navigationItemId: 'navigation',
+    titleKey: helpKey('help.section.navigation.title'),
+    shortKey: helpKey('help.section.navigation.short'),
+    longKey: helpKey('help.section.navigation.long'),
+    exampleKeys: [helpKey('help.section.navigation.example')],
+    relatedIds: ['help.navigation.routes', 'help.navigation', 'help.section.users'],
+    keywords: [
+      'acceso',
+      'público',
+      'autenticado',
+      'iniciar sesión',
+      'permiso',
+      'condición',
+      'redirect',
+      'redirigir',
+      'guards',
+      'seguridad',
+    ],
+    learnMoreRef: '.ai/microphases/M07_6.md',
+  },
+  {
+    id: 'help.navigation.compiler',
+    sectionId: 'navigation-compiler',
+    navigationItemId: 'navigation',
+    titleKey: helpKey('help.section.navigation.title'),
+    shortKey: helpKey('help.section.navigation.short'),
+    longKey: helpKey('help.section.navigation.long'),
+    exampleKeys: [helpKey('help.section.navigation.example')],
+    relatedIds: ['help.navigation', 'help.section.compatibility', 'help.section.export'],
+    keywords: [
+      'compiler',
+      'react router',
+      'expo router',
+      'wordpress',
+      'capacitor',
+      'static web',
+      'lamp',
+      'slim',
+      'compatibilidad',
+      'diagnóstico',
+    ],
+    learnMoreRef: '.ai/microphases/M07_7.md',
   },
   {
     id: 'help.screens',
