@@ -7,7 +7,7 @@ import {
   SelectValue,
   getStudioIcon,
 } from '@electrocraft/design-system';
-import { useEffect, useMemo, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useSyncExternalStore, type ReactNode } from 'react';
 import { HelpTrigger } from '../../help/help-ui';
 import { editorScreenSelectionRuntime } from './editor-screen-selection-runtime';
 import './editor-screen-selector.css';
@@ -78,6 +78,28 @@ export function EditorScreenTopbarSelect({ fallbackLabel }: { readonly fallbackL
   );
 }
 
+function EditorScreensContextShell({ count, children }: { readonly count: number; readonly children: ReactNode }) {
+  return (
+    <div className="ec-editor-screen-context" data-editor-screen-context>
+      <div className="ec-editor-screen-context-heading">
+        <div>
+          <strong>Pantallas</strong>
+          <span>{count} en el proyecto</span>
+        </div>
+        <div className="ec-editor-screen-context-actions">
+          <HelpTrigger helpId="help.editor.screens" />
+          <Button variant="ghost" size="icon" asChild aria-label="Administrar Pantallas" title="Administrar Pantallas">
+            <a href="/screens">
+              <OpenIcon aria-hidden="true" />
+            </a>
+          </Button>
+        </div>
+      </div>
+      {children}
+    </div>
+  );
+}
+
 export function EditorScreensContextPanel() {
   const navigation = useSyncExternalStore(
     navigationWorkspaceRuntime.subscribe,
@@ -98,50 +120,42 @@ export function EditorScreensContextPanel() {
 
   if (navigation.state === 'loading' && screens.length === 0) {
     return (
-      <p className="ec-editor-screen-context-state" role="status">
-        Cargando Pantallas…
-      </p>
+      <EditorScreensContextShell count={0}>
+        <p className="ec-editor-screen-context-state" role="status">
+          Cargando Pantallas…
+        </p>
+      </EditorScreensContextShell>
     );
   }
   if (navigation.state === 'error' && screens.length === 0) {
     return (
-      <div className="ec-editor-screen-context-state" role="alert">
-        <strong>No se pudieron cargar las Pantallas.</strong>
-        <p>{navigation.message}</p>
-        <Button size="sm" variant="outline" onClick={() => void navigationWorkspaceRuntime.load()}>
-          Reintentar
-        </Button>
-      </div>
+      <EditorScreensContextShell count={0}>
+        <div className="ec-editor-screen-context-state" role="alert">
+          <strong>No se pudieron cargar las Pantallas.</strong>
+          <p>{navigation.message}</p>
+          <Button size="sm" variant="outline" onClick={() => void navigationWorkspaceRuntime.load()}>
+            Reintentar
+          </Button>
+        </div>
+      </EditorScreensContextShell>
     );
   }
   if (screens.length === 0) {
     return (
-      <div className="ec-editor-screen-context-state">
-        <strong>No hay Pantallas en este proyecto.</strong>
-        <p>Crea una Pantalla desde Construir para comenzar a editarla.</p>
-        <Button size="sm" variant="outline" asChild>
-          <a href="/screens">Abrir Pantallas</a>
-        </Button>
-      </div>
+      <EditorScreensContextShell count={0}>
+        <div className="ec-editor-screen-context-state">
+          <strong>No hay Pantallas en este proyecto.</strong>
+          <p>Crea una Pantalla desde Construir para comenzar a editarla.</p>
+          <Button size="sm" variant="outline" asChild>
+            <a href="/screens">Abrir Pantallas</a>
+          </Button>
+        </div>
+      </EditorScreensContextShell>
     );
   }
 
   return (
-    <div className="ec-editor-screen-context" data-editor-screen-context>
-      <div className="ec-editor-screen-context-heading">
-        <div>
-          <strong>Pantallas</strong>
-          <span>{screens.length} en el proyecto</span>
-        </div>
-        <div className="ec-editor-screen-context-actions">
-          <HelpTrigger helpId="help.editor.screens" />
-          <Button variant="ghost" size="icon" asChild aria-label="Administrar Pantallas" title="Administrar Pantallas">
-            <a href="/screens">
-              <OpenIcon aria-hidden="true" />
-            </a>
-          </Button>
-        </div>
-      </div>
+    <EditorScreensContextShell count={screens.length}>
       <div className="ec-editor-screen-context-list" role="listbox" aria-label="Seleccionar Pantalla">
         {screens.map((screen) => {
           const selected = selection.screenId === screen.id || (!selection.screenId && screens[0]?.id === screen.id);
@@ -166,6 +180,6 @@ export function EditorScreensContextPanel() {
           );
         })}
       </div>
-    </div>
+    </EditorScreensContextShell>
   );
 }
