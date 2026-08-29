@@ -17,6 +17,7 @@ export type StudioHelpId =
   | 'help.navigation.compiler'
   | 'help.screens'
   | 'help.data.sources'
+  | 'help.data.internal'
   | `help.section.${SidebarNavigationItemId}`;
 
 export interface HelpDescriptor {
@@ -293,7 +294,7 @@ const studioDefinitions = Object.freeze([
     shortKey: helpKey('help.section.data-sources.short'),
     longKey: helpKey('help.section.data-sources.long'),
     exampleKeys: [helpKey('help.section.data-sources.example')],
-    relatedIds: ['help.section.queries', 'help.section.records', 'help.projects'],
+    relatedIds: ['help.data.internal', 'help.section.queries', 'help.section.records', 'help.projects'],
     keywords: [
       'fuentes de datos',
       'data sources',
@@ -308,6 +309,29 @@ const studioDefinitions = Object.freeze([
       'seguridad',
     ],
     learnMoreRef: '.ai/microphases/M08_1.md',
+  },
+  {
+    id: 'help.data.internal',
+    sectionId: 'data-internal',
+    navigationItemId: 'data-sources',
+    titleKey: helpKey('help.section.data-sources.title'),
+    shortKey: helpKey('help.section.data-sources.short'),
+    longKey: helpKey('help.section.data-sources.long'),
+    exampleKeys: [helpKey('help.section.data-sources.example')],
+    relatedIds: ['help.data.sources', 'help.section.models', 'help.section.records', 'help.projects'],
+    keywords: [
+      'electrocraft data',
+      'pglite',
+      'drizzle',
+      'local',
+      'offline',
+      'disponible sin conexión',
+      'modelos',
+      'registros',
+      'content_records',
+      'copia de seguridad',
+    ],
+    learnMoreRef: '.ai/microphases/M08_2.md',
   },
 ] as const satisfies readonly HelpDefinition[]);
 
@@ -345,7 +369,7 @@ const navigationRelated: Partial<Record<SidebarNavigationItemId, readonly Studio
   components: ['help.section.editor', 'help.section.templates'],
   records: ['help.section.models', 'help.section.queries', 'help.section.forms'],
   models: ['help.section.records', 'help.section.forms'],
-  'data-sources': ['help.data.sources', 'help.section.queries'],
+  'data-sources': ['help.data.sources', 'help.data.internal', 'help.section.queries'],
   queries: ['help.section.records', 'help.data.sources'],
   forms: ['help.section.models', 'help.section.workflows'],
   themes: ['help.studio.appearance', 'help.section.tokens'],
