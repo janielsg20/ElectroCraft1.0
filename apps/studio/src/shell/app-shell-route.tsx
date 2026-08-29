@@ -11,7 +11,7 @@ import { resolveSidebarActiveItem, studioSidebarNavigation } from './sidebar-nav
 import { StudioTopbar, type StudioTopbarCopy } from './studio-topbar';
 
 const DataSourcesWorkspace = lazy(() =>
-  import('../features/data-sources/data-sources-workspace').then((module) => ({ default: module.DataSourcesWorkspace })),
+  import('../features/data/data-sources-workspace').then((module) => ({ default: module.DataSourcesWorkspace })),
 );
 
 export const studioDesignSystemOwner: DesignSystemPackageDescriptor['name'] = '@electrocraft/design-system';
