@@ -16,6 +16,7 @@ export type StudioHelpId =
   | 'help.navigation.guards'
   | 'help.navigation.compiler'
   | 'help.screens'
+  | 'help.data.sources'
   | `help.section.${SidebarNavigationItemId}`;
 
 export interface HelpDescriptor {
@@ -284,6 +285,30 @@ const studioDefinitions = Object.freeze([
     keywords: ['pantallas', 'screen', 'ruta', 'navigator', 'plantilla', 'estado', 'duplicar', 'abrir en editor'],
     learnMoreRef: '.ai/microphases/M07_2.md',
   },
+  {
+    id: 'help.data.sources',
+    sectionId: 'data-sources-management',
+    navigationItemId: 'data-sources',
+    titleKey: helpKey('help.section.data-sources.title'),
+    shortKey: helpKey('help.section.data-sources.short'),
+    longKey: helpKey('help.section.data-sources.long'),
+    exampleKeys: [helpKey('help.section.data-sources.example')],
+    relatedIds: ['help.section.queries', 'help.section.records', 'help.projects'],
+    keywords: [
+      'fuentes de datos',
+      'data sources',
+      'connector registry',
+      'adapter',
+      'capabilities',
+      'authref',
+      'credenciales',
+      'gateway',
+      'esquema',
+      'entornos',
+      'seguridad',
+    ],
+    learnMoreRef: '.ai/microphases/M08_1.md',
+  },
 ] as const satisfies readonly HelpDefinition[]);
 
 const navigationKeywords: Readonly<Record<SidebarNavigationItemId, readonly string[]>> = Object.freeze({
@@ -320,7 +345,8 @@ const navigationRelated: Partial<Record<SidebarNavigationItemId, readonly Studio
   components: ['help.section.editor', 'help.section.templates'],
   records: ['help.section.models', 'help.section.queries', 'help.section.forms'],
   models: ['help.section.records', 'help.section.forms'],
-  queries: ['help.section.records', 'help.section.data-sources'],
+  'data-sources': ['help.data.sources', 'help.section.queries'],
+  queries: ['help.section.records', 'help.data.sources'],
   forms: ['help.section.models', 'help.section.workflows'],
   themes: ['help.studio.appearance', 'help.section.tokens'],
   preview: ['help.section.compatibility', 'help.section.export'],
@@ -369,6 +395,7 @@ export function getHelpIdForNavigationItem(itemId: SidebarNavigationItemId): Stu
   if (itemId === 'editor') return 'help.editor.screens';
   if (itemId === 'screens') return 'help.screens';
   if (itemId === 'navigation') return 'help.navigation.builder';
+  if (itemId === 'data-sources') return 'help.data.sources';
   return `help.section.${itemId}`;
 }
 
