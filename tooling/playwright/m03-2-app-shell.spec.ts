@@ -12,7 +12,7 @@ test.describe('M03.2 AppShell', () => {
     const statusbar = page.locator('.ec-app-shell-statusbar');
 
     await expect(shell).toBeVisible();
-    await expect(page.locator('[data-help-id="help.studio.shell"]')).toBeVisible();
+    await expect(page.locator('[data-help-id="help.editor.screens"]')).toBeVisible();
     await expect(page.getByRole('link', { name: 'Editor' })).toBeVisible();
 
     const [sidebarBox, topbarBox, statusbarBox, workspaceBox] = await Promise.all([
