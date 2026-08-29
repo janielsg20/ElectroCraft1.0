@@ -6,7 +6,7 @@ import {
   type ElectroCraftNavigationNode,
   type ElectroCraftRouteDefinition,
 } from '@electrocraft/domain';
-import { assertNavigationGraphIntegrity, type ElectroCraftNavigationCompilerSource } from './navigation-service';
+import type { ElectroCraftNavigationCompilerSource } from './navigation-service';
 
 export interface NavigationCompilerPort<TTargetOutput> {
   readonly target: ElectroCraftNavigationCompilerTarget;
