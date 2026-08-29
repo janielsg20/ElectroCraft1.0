@@ -9,6 +9,7 @@ import {
 } from '@electrocraft/design-system';
 import { useEffect, useMemo, useSyncExternalStore } from 'react';
 import { editorScreenSelectionRuntime } from './editor-screen-selection-runtime';
+import './editor-screen-selector.css';
 import { navigationWorkspaceRuntime } from './navigation-workspace-runtime';
 
 const ScreenIcon = getStudioIcon('studio.sidebar.screens');
