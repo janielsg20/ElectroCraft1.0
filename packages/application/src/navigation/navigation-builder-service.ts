@@ -100,6 +100,24 @@ export function reorderNavigationChild(input: {
   return replaceNode(navigation, { ...parent, childRefs });
 }
 
+export function moveNavigationChild(input: {
+  readonly navigation: ElectroCraftNavigationDefinition;
+  readonly parentNavigatorRef: string;
+  readonly childRef: string;
+  readonly targetChildRef: string;
+}): ElectroCraftNavigationDefinition {
+  const navigation = canonicalNavigation(input.navigation);
+  const parent = requireNavigator(navigation, input.parentNavigatorRef);
+  const sourceIndex = parent.childRefs.indexOf(input.childRef as never);
+  const targetIndex = parent.childRefs.indexOf(input.targetChildRef as never);
+  if (sourceIndex < 0 || targetIndex < 0) throw new TypeError('Los nodos a reordenar deben ser hermanos.');
+  if (sourceIndex === targetIndex) return navigation;
+  const childRefs = [...parent.childRefs];
+  const [moved] = childRefs.splice(sourceIndex, 1);
+  childRefs.splice(targetIndex, 0, moved);
+  return replaceNode(navigation, { ...parent, childRefs });
+}
+
 export function setNavigationInitialChild(input: {
   readonly navigation: ElectroCraftNavigationDefinition;
   readonly navigatorRef: string;
