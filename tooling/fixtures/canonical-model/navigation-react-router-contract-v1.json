@@ -1,0 +1,19 @@
+{
+  "target": "react-router",
+  "routes": [
+    {
+      "routeRef": "ec_route_0000000000005",
+      "path": "/productos/:productId",
+      "name": "Producto",
+      "screenRef": "ec_document_0000000000002",
+      "params": ["productId", "preview"],
+      "guardCount": 1
+    }
+  ],
+  "navigators": [
+    {
+      "nodeRef": "ec_nav-node_000000000000m",
+      "kind": "stack"
+    }
+  ]
+}
