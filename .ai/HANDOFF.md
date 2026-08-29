@@ -2,11 +2,11 @@
 
 ## Current
 
-F07 — Pantallas, navegación y rutas — `IMPLEMENTADA / PENDIENTE GATE`.
+F07 / M07.8 — Navigation E2E y UX — `ACTIVE`.
 
 Rama activa: `codex/m07-1-navigation-model`.
 
-Siguiente acción exacta: **Gate F07**.
+M07.8 mantiene activo el cierre de F07: la implementación funcional ya está completa, pero no se cierra hasta que Base CI certifique documentación, lint, typecheck, test, build y Playwright.
 
 ## Heredado
 
@@ -39,8 +39,8 @@ Guards Público/Auth/Permiso/Condición, redirect sin loops y Preview fail-close
 ### M07.7
 `NavigationCompilerPort` y contratos React Router, Expo Router, LAMP/Slim, WordPress, Capacitor y Static Web sin persistir objetos target.
 
-### M07.8
-`/preview` contractual, integración de cuatro Pantallas y Playwright de flujo UX/responsive preparado.
+### M07.8 — ACTIVE
+`/preview` contractual, integración de cuatro Pantallas y Playwright de flujo UX/responsive preparados. La actividad restante de esta microfase es exclusivamente cerrar el Gate F07.
 
 ## Reparaciones QA heredadas incluidas
 
@@ -52,7 +52,7 @@ Guards Público/Auth/Permiso/Condición, redirect sin loops y Preview fail-close
 
 ## Gate requerido
 
-Abrir PR `codex/m07-1-navigation-model` → `main` y dejar que `ElectroCraft Base CI` ejecute una sola validación de fase:
+PR `#68`, `codex/m07-1-navigation-model` → `main`, es el gate de fase. Base CI debe ejecutar:
 
 1. documentación;
 2. lint/Prettier;
@@ -62,7 +62,7 @@ Abrir PR `codex/m07-1-navigation-model` → `main` y dejar que `ElectroCraft Bas
 6. Playwright repository gate;
 7. fixtures/artifacts base.
 
-Si falla, corregir solo errores reales y rerun únicamente el job/failed jobs necesarios. No activar F08 hasta GREEN.
+El primer intento `33230853322` se bloqueó únicamente porque los documentos no marcaban ninguna microfase `ACTIVE`; esta corrección mantiene M07.8 como única activa. Si el siguiente run falla, corregir solo errores reales. No activar F08 hasta GREEN.
 
 ## Read set
 
