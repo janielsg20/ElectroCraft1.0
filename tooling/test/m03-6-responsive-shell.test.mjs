@@ -81,6 +81,10 @@ test('M03.6 structural gate preserves capabilities across responsive modes', asy
   const phaseComplete = /F03[^\n]*COMPLETADA[^\n]*GREEN/.test(state);
   const active = /M03\.6[^\n]*ACTIVE/.test(state);
   const complete = /M03\.6[^\n]*COMPLETADA[^\n]*GREEN/.test(state);
-  assert.equal(active || complete || phaseComplete, true, 'M03.6 must remain covered by an ACTIVE or GREEN F03 state');
+  assert.equal(
+    active || complete || phaseComplete,
+    true,
+    'M03.6 must remain covered by an ACTIVE or GREEN F03 state',
+  );
   assert.equal((state.match(/`ACTIVE`/g) ?? []).length, 1, 'Exactly one microphase must remain ACTIVE');
 });
