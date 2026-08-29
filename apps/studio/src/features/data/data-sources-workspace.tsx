@@ -14,33 +14,19 @@ import {
   getStudioIcon,
 } from '@electrocraft/design-system';
 import type {
-  ElectroCraftCanonicalDataSourceCapability,
   ElectroCraftDataSourceDefinition,
   ElectroCraftDataSourceEnvironment,
   ElectroCraftDataSourceKind,
-  JsonValue,
 } from '@electrocraft/domain';
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { HelpTrigger } from '../../help/help-ui';
 import { dataSourceWorkspaceRuntime } from './data-source-runtime';
+import { RestSourceWizardSheet } from './rest-source-wizard';
+import './studio-data-source-adapters';
 import './data-sources-workspace.css';
 
 const DataSourceIcon = getStudioIcon('studio.sidebar.data-sources');
 const AddIcon = getStudioIcon('action.add');
-
-const capabilityOptions: readonly ElectroCraftCanonicalDataSourceCapability[] = [
-  'read',
-  'create',
-  'update',
-  'delete',
-  'pagination',
-  'filtering',
-  'sort',
-  'aggregate',
-  'realtime',
-  'file',
-  'transactions',
-];
 
 const sourceKindOptions = Object.freeze([
   { value: 'internal' as const, label: 'Interna', adapterId: 'internal.pglite' },
@@ -50,146 +36,6 @@ const sourceKindOptions = Object.freeze([
 
 function sourceKindLabel(kind: ElectroCraftDataSourceKind) {
   return sourceKindOptions.find((option) => option.value === kind)?.label ?? kind;
-}
-
-function parseConfig(value: string): Record<string, JsonValue> {
-  const parsed: unknown = JSON.parse(value || '{}');
-  if (!parsed || Array.isArray(parsed) || typeof parsed !== 'object') {
-    throw new TypeError('La configuración debe ser un objeto JSON.');
-  }
-  return parsed as Record<string, JsonValue>;
-}
-
-function AddDataSourceSheet({ open, onOpenChange }: { readonly open: boolean; readonly onOpenChange: (open: boolean) => void }) {
-  const [name, setName] = useState('');
-  const [key, setKey] = useState('');
-  const [kind, setKind] = useState<ElectroCraftDataSourceKind>('rest');
-  const [adapter, setAdapter] = useState('rest.fetch');
-  const [config, setConfig] = useState('{\n  "baseUrl": "https://api.example.com"\n}');
-  const [capabilities, setCapabilities] = useState<readonly ElectroCraftCanonicalDataSourceCapability[]>(['read']);
-  const [error, setError] = useState<string | null>(null);
-
-  function reset() {
-    setName('');
-    setKey('');
-    setKind('rest');
-    setAdapter('rest.fetch');
-    setConfig('{\n  "baseUrl": "https://api.example.com"\n}');
-    setCapabilities(['read']);
-    setError(null);
-  }
-
-  return (
-    <Sheet
-      open={open}
-      onOpenChange={(next) => {
-        if (!next) reset();
-        onOpenChange(next);
-      }}
-    >
-      <SheetContent side="right" className="ec-data-source-sheet">
-        <SheetHeader>
-          <SheetTitle>Nueva fuente</SheetTitle>
-          <SheetDescription>
-            Define configuración portable. Las Credenciales se resolverán por SecretRef/Gateway y nunca se guardan dentro del proyecto.
-          </SheetDescription>
-        </SheetHeader>
-        <form
-          className="ec-data-source-form"
-          onSubmit={(event) => {
-            event.preventDefault();
-            setError(null);
-            try {
-              const portableConfig = parseConfig(config);
-              void dataSourceWorkspaceRuntime
-                .createSource({
-                  name,
-                  key: key || name,
-                  type: kind,
-                  adapter,
-                  config: portableConfig,
-                  capabilities,
-                  schemaDiscovery: 'on-demand',
-                })
-                .then(() => {
-                  reset();
-                  onOpenChange(false);
-                })
-                .catch((cause: unknown) => setError(cause instanceof Error ? cause.message : 'No se pudo crear la fuente.'));
-            } catch (cause) {
-              setError(cause instanceof Error ? cause.message : 'Configuración JSON inválida.');
-            }
-          }}
-        >
-          <label>
-            <span>Nombre</span>
-            <Input autoFocus required value={name} onChange={(event) => setName(event.target.value)} placeholder="Catálogo" />
-          </label>
-          <label>
-            <span>Clave</span>
-            <Input value={key} onChange={(event) => setKey(event.target.value)} placeholder="catalogApi" />
-          </label>
-          <label>
-            <span>Tipo</span>
-            <Select
-              value={kind}
-              onValueChange={(value) => {
-                const next = sourceKindOptions.find((option) => option.value === value);
-                if (!next) return;
-                setKind(next.value);
-                setAdapter(next.adapterId);
-              }}
-            >
-              <SelectTrigger aria-label="Tipo de fuente de datos"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {sourceKindOptions.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </label>
-          <label>
-            <span>Adapter</span>
-            <Input readOnly value={adapter} aria-label="Adapter de la fuente" />
-            <small>El adapter concreto se registra en la microfase propietaria del tipo de fuente.</small>
-          </label>
-          <fieldset>
-            <legend>Capacidades</legend>
-            <div className="ec-data-source-capability-picker">
-              {capabilityOptions.map((capability) => (
-                <label key={capability}>
-                  <input
-                    type="checkbox"
-                    checked={capabilities.includes(capability)}
-                    onChange={(event) =>
-                      setCapabilities((current) =>
-                        event.target.checked
-                          ? [...current, capability]
-                          : current.filter((candidate) => candidate !== capability),
-                      )
-                    }
-                  />
-                  <span>{capability}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
-          <label>
-            <span>Configuración portable</span>
-            <textarea value={config} onChange={(event) => setConfig(event.target.value)} rows={7} spellCheck={false} />
-            <small>Guarda endpoints y opciones no sensibles. Los secretos se referencian por authRef.</small>
-          </label>
-          <div className="ec-data-source-gateway-note">
-            <strong>Credenciales</strong>
-            <span>Requiere gateway cuando la fuente necesita autenticación.</span>
-          </div>
-          {error ? <p className="ec-data-source-error" role="alert">{error}</p> : null}
-          <div className="ec-data-source-form-actions">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-            <Button type="submit" disabled={!name.trim() || capabilities.length === 0}>Guardar fuente</Button>
-          </div>
-        </form>
-      </SheetContent>
-    </Sheet>
-  );
 }
 
 function InspectorContent({
@@ -311,8 +157,8 @@ export function DataSourcesWorkspace() {
       ) : snapshot.sources.length === 0 ? (
         <div className="ec-data-sources-empty">
           <strong>Todavía no hay fuentes de datos.</strong>
-          <p>Crea la definición portable ahora; cada adapter concreto se incorpora en su microfase propietaria.</p>
-          <Button size="sm" onClick={() => setAddOpen(true)}><AddIcon aria-hidden="true" /> Nueva fuente</Button>
+          <p>Crea una fuente REST desde el wizard o configura ElectroCraft Data desde el panel superior.</p>
+          <Button size="sm" onClick={() => setAddOpen(true)}><AddIcon aria-hidden="true" /> Nueva fuente REST</Button>
         </div>
       ) : (
         <div className="ec-data-sources-layout" data-mobile-detail={detailOpen ? 'true' : 'false'}>
@@ -451,7 +297,7 @@ export function DataSourcesWorkspace() {
         </div>
       )}
 
-      <AddDataSourceSheet open={addOpen} onOpenChange={setAddOpen} />
+      <RestSourceWizardSheet open={addOpen} onOpenChange={setAddOpen} />
       <Sheet open={inspectorOpen} onOpenChange={setInspectorOpen}>
         <SheetContent side="right" className="ec-data-source-inspector-sheet">
           <SheetHeader>

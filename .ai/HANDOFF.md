@@ -6,7 +6,7 @@ F08 / M08.3 — REST API Connector y OpenAPI import — `ACTIVE`.
 
 Rama activa: `codex/m08-1-data-sources`.
 
-F07 está `GREEN` y fusionada. M08.1 y M08.2 están implementadas con evidencia; la suite ejecutable completa se reserva para Gate F08 para no usar Actions por microfase.
+F07 está `GREEN` y fusionada. M08.1 y M08.2 están implementadas con evidencia. M08.3 ya contiene core REST/OpenAPI, wizard, fixtures y tests preparados, pero no se declara DONE sin Help exacto y validación ejecutable.
 
 ## Gate de entrada F08
 
@@ -35,22 +35,31 @@ F07 está `GREEN` y fusionada. M08.1 y M08.2 están implementadas con evidencia;
 - `help.data.internal`.
 - fixtures, unit test e integración PGlite real preparados.
 
-## M08.3 — owner y reglas
+## M08.3 — implementado hasta ahora
 
-Owner: Web Fetch API + DataSourceAdapter + `@scalar/openapi-parser@0.28.11`, parser aprobado en F00.
+Owner: Web Fetch API + DataSourceAdapter + `@scalar/openapi-parser@0.28.11`.
 
-Debe producir:
+Disponible en la rama:
 
-1. `RestDataSourceAdapter`;
-2. OpenAPI import adapter;
-3. REST source wizard: URL base → Autenticación → OpenAPI/Manual → Operaciones → Probar → Guardar;
-4. fixtures REST/OpenAPI;
-5. normalización de response/error/pagination;
-6. fallback explícito a ConnectorGateway cuando browser/CORS/security no permita ejecución directa.
+1. `RestDataSourceAdapter` con Fetch, timeout, typed params/body, result/error/pagination y gateway fallback;
+2. OpenAPI import adapter Scalar para JSON/YAML/Swagger;
+3. exports públicos de ambos adapters desde `@electrocraft/connectors`;
+4. registro `rest.fetch` en el ConnectorRegistry real del Studio;
+5. wizard REST: URL base → Autenticación → OpenAPI/Manual → Operaciones → Probar → Guardar;
+6. SecretRef-only; no bearer/API key/password en source config;
+7. fixtures REST/OpenAPI;
+8. tests M08.3 para import, GET/POST, pagination, auth missing, Gateway, 4xx/5xx, timeout y security.
 
-No guardar bearer tokens/API keys en source config. No arbitrary JS transforms.
+Evidencia: `.ai/evidence/F08/M08.3/IMPLEMENTATION_2026-08-29.md`.
 
-## Deuda de gate visible
+## Pendiente exacto para cerrar M08.3
+
+1. Añadir el HelpRegistry específico `help.data.rest` y sustituir el help genérico del wizard.
+2. Ejecutar lint/typecheck/Vitest/build en un workspace ejecutable; no usar Actions solo para una microfase.
+3. Corregir fallos reales si aparecen.
+4. Solo entonces cambiar M08.3 a DONE y activar M08.4.
+
+## Deuda de gate F08 visible
 
 - `package-lock.json` debe regenerarse por `packages/connectors` y la dependencia Studio.
 - root `format/format:check` debe incluir connectors/data-web.

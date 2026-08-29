@@ -14,7 +14,7 @@ Date: 2026-08-29.
 | F07 / M07.1–M07.8 | COMPLETADA / GREEN | PR `#68`; Base CI `33262949215`; merge `e697a42546d23f89412e6dd616018759e719e448` |
 | F08 / M08.1 | IMPLEMENTADA / PENDIENTE GATE F08 | `.ai/evidence/F08/M08.1/IMPLEMENTATION_2026-08-29.md` |
 | F08 / M08.2 | IMPLEMENTADA / PENDIENTE GATE F08 | `.ai/evidence/F08/M08.2/IMPLEMENTATION_2026-08-29.md` |
-| F08 / M08.3 | ACTIVE | `.ai/microphases/M08_3.md` |
+| F08 / M08.3 | ACTIVE — implementación funcional avanzada | `.ai/evidence/F08/M08.3/IMPLEMENTATION_2026-08-29.md` |
 
 ## Rama activa
 
@@ -43,10 +43,21 @@ Base CI run `33262949215` (#795) terminó `success`; PR `#68` fue fusionada a `m
 - Help `help.data.internal`.
 - Unit tests, fixture y integración PGlite real preparados.
 
+## F08 / M08.3
+
+- REST config/operation contracts, OpenAPI import y `RestDataSourceAdapter` reales.
+- Exports públicos de `@electrocraft/connectors` completados.
+- `rest.fetch` registrado en Studio sobre el mismo ConnectorRegistry.
+- Wizard REST: Endpoint base → Autenticación → OpenAPI/Manual → Operaciones → Probar → Guardar.
+- JSON/YAML OpenAPI, manual operations, SecretRef-only, browser/gateway behavior y resultado normalizado.
+- Fixtures `rest-data-source-v1.json` + `openapi/products-v1.yaml`.
+- Test suite M08.3 preparada para import, GET/POST, pagination, auth, gateway, 4xx/5xx, timeout y security.
+- M08.3 permanece `ACTIVE`: falta `help.data.rest` exacto y validación ejecutable antes de declarar DONE.
+
 ## Validación
 
-No se ejecuta Actions por microfase. El Gate F08 regenerará lockfile/formato y certificará lint/typecheck/tests/build/Playwright en una sola ejecución final de fase.
+No se ejecuta Actions por microfase. El contenedor actual no resuelve `github.com`, así que solo se realizó parseo sintáctico TypeScript de los nuevos TS/TSX. El Gate F08 regenerará lockfile/formato y certificará lint/typecheck/tests/build/Playwright en una sola ejecución final de fase.
 
 ## Siguiente acción exacta
 
-Implementar `M08.3 — REST API Connector y OpenAPI import` con Web Fetch API + `@scalar/openapi-parser@0.28.11`, parser aprobado en F00.
+Añadir `help.data.rest`, ejecutar validación real cuando el workspace sea accesible y corregir únicamente fallos reales. Mantener M08.3 como única microfase `ACTIVE` hasta ese cierre.

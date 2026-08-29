@@ -44,21 +44,35 @@ F07 cerró con Base CI run `33262949215` (#795) completamente verde y PR `#68` f
 - Help `help.data.internal`.
 - Fixtures + unit tests + integración PGlite real preparados.
 
+## M08.3 implementación actual
+
+- `RestDataSourceAdapter` implementado con Fetch, timeout, params tipados, normalización 4xx/5xx/pagination y fallback a ConnectorGateway.
+- `OpenAPI import adapter` implementado con `@scalar/openapi-parser@0.28.11`.
+- `packages/connectors` expone públicamente REST/OpenAPI.
+- Studio registra `rest.fetch` en el mismo `ConnectorRegistry`.
+- Wizard REST funcional de seis pasos: Endpoint base → Autenticación → OpenAPI/Manual → Operaciones → Probar → Guardar.
+- Fixtures REST/OpenAPI y tests M08.3 preparados.
+- Evidencia: `.ai/evidence/F08/M08.3/IMPLEMENTATION_2026-08-29.md`.
+
 ## Microfase activa
 
 `M08.3 — REST API Connector y OpenAPI import` — `ACTIVE`.
 
-Owner aprobado: Web Fetch API + DataSourceAdapter + `@scalar/openapi-parser@0.28.11`, elegido/certificado en F00.
+Owner aprobado: Web Fetch API + DataSourceAdapter + `@scalar/openapi-parser@0.28.11`.
 
-## Validación pendiente de fase
+## Validación pendiente de microfase/fase
 
-No se ejecutan Actions por microfase. Antes del Gate F08 deben regenerarse `package-lock.json`, ampliar `format/format:check` a connectors/data-web y ejecutar una sola vez lint + typecheck + tests + build + Playwright.
+- El contenedor de esta sesión no resuelve `github.com`; no se pudo clonar/instalar el workspace para ejecutar la suite real.
+- No se ejecutan Actions por microfase.
+- Antes de cerrar M08.3 falta el descriptor exacto `help.data.rest` y una validación ejecutable lint/typecheck/Vitest/build.
+- Antes del Gate F08 deben regenerarse `package-lock.json`, ampliar `format/format:check` a connectors/data-web y ejecutar el gate transversal una sola vez.
 
 ## Evidencia F08
 
 - `.ai/evidence/F08/M08.1/IMPLEMENTATION_2026-08-29.md`
 - `.ai/evidence/F08/M08.2/IMPLEMENTATION_2026-08-29.md`
+- `.ai/evidence/F08/M08.3/IMPLEMENTATION_2026-08-29.md`
 
 ## Siguiente transición
 
-Implementar `M08.3 — REST API Connector y OpenAPI import` reutilizando `@scalar/openapi-parser@0.28.11`, sin guardar bearer tokens ni permitir transforms JS arbitrarios.
+Cerrar los dos pendientes reales de M08.3: `help.data.rest` + validación ejecutable. Corregir solo errores reales y mantener M08.3 como única `ACTIVE`; no activar M08.4 antes de evidencia verde.

@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "id": "ec_source_0000000000083",
+  "version": 1,
+  "key": "catalogRest",
+  "label": "Catálogo REST",
+  "kind": "rest",
+  "adapterId": "rest.fetch",
+  "authRef": null,
+  "config": {
+    "baseUrl": "https://api.example.test",
+    "defaultHeaders": {
+      "Accept": "application/json"
+    },
+    "timeoutMs": 1000,
+    "executionMode": "browser",
+    "operations": [
+      {
+        "id": "listProducts",
+        "label": "Listar productos",
+        "kind": "read",
+        "method": "GET",
+        "path": "/products",
+        "requiresAuth": false,
+        "parameters": [
+          { "name": "page", "location": "query", "required": false, "valueType": "number" },
+          { "name": "pageSize", "location": "query", "required": false, "valueType": "number" }
+        ],
+        "inputSchema": null,
+        "outputSchema": null,
+        "pagination": { "kind": "page", "pageParam": "page", "pageSizeParam": "pageSize" }
+      },
+      {
+        "id": "getProduct",
+        "label": "Obtener producto",
+        "kind": "read",
+        "method": "GET",
+        "path": "/products/{id}",
+        "requiresAuth": true,
+        "parameters": [
+          { "name": "id", "location": "path", "required": true, "valueType": "string" }
+        ],
+        "inputSchema": null,
+        "outputSchema": null,
+        "pagination": { "kind": "none" }
+      },
+      {
+        "id": "createProduct",
+        "label": "Crear producto",
+        "kind": "create",
+        "method": "POST",
+        "path": "/products",
+        "requiresAuth": false,
+        "parameters": [],
+        "inputSchema": null,
+        "outputSchema": null,
+        "pagination": { "kind": "none" }
+      }
+    ]
+  },
+  "environmentScope": ["development", "preview", "production"],
+  "environmentOverrides": {},
+  "schemaDiscovery": "manual",
+  "capabilities": ["read", "create", "pagination"],
+  "metadata": {
+    "owner": "Web Fetch API",
+    "definitionMode": "openapi"
+  }
+}
