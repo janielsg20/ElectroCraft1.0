@@ -58,3 +58,15 @@ El changelog histórico original hasta M00.8 se preserva sin modificaciones en `
 - Studio añadió `/data-sources` en `apps/studio/src/features/data/` con List/Detail/Inspector responsive, estados honestos y Help `help.data.sources`.
 - Se añadieron tests de registry, security, operation capability, round-trip, repository facade, Help y responsive contract.
 - M08.1 queda implementada con evidencia `.ai/evidence/F08/M08.1/IMPLEMENTATION_2026-08-29.md`; la ejecución completa, regeneración del lockfile y formato se reservan para el Gate F08, sin Actions por microfase.
+
+## 2026-08-29 — F08 / M08.2 ElectroCraft Data sobre PGlite
+- Se añadió `InternalDataSourceAdapter` `internal.pglite` detrás del mismo ConnectorRegistry.
+- `InternalDataRepository` usa la tabla genérica F04 `content_records` para CRUD/query/stats; no crea otra DB ni tablas por modelo.
+- Schema discovery lee `ElectroCraftDataSchema` canónico por `sourceRef` en lugar de introspección física.
+- Browser companion reutiliza `electrocraft-studio-storage`, `pglite.worker.ts`, migraciones y leader-election pattern de F04 y declara `offlineCapable`.
+- Permission boundary inyectable falla cerrado; Studio lo limita al proyecto actualmente abierto sin implementar auth F12.
+- Studio añadió creación directa de `ElectroCraft Data`, estado Local/Disponible sin conexión, Modelos, Registros, almacenamiento aproximado y Copia de seguridad reutilizando F04.
+- Help `help.data.internal`, fixtures, unit test e integración con PGlite real quedaron preparados.
+- Se corrigió el fallback incorrecto que trataba `lastDocumentId` como `projectId`.
+- Evidencia: `.ai/evidence/F08/M08.2/IMPLEMENTATION_2026-08-29.md`.
+- M08.3 queda como siguiente microfase activa; Actions siguen reservadas para Gate F08.
