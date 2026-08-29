@@ -12,7 +12,7 @@ import type {
 } from '@electrocraft/application';
 import type { JsonValue } from '@electrocraft/domain';
 
-export const INTERNAL_DATA_ADAPTER_ID = 'electrocraft.internal' as const;
+export const INTERNAL_DATA_ADAPTER_ID = 'internal.pglite' as const;
 
 export class InternalDataPermissionError extends Error {
   constructor(
