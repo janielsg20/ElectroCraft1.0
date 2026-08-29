@@ -14,6 +14,7 @@ async function seedProject(page: Page, projectId: string) {
   await page.evaluate(async (id) => {
     const { projectStorageRuntime } = await import('/src/features/projects/project-storage-runtime.ts');
     const { workspacePreferencesRuntime } = await import('/src/features/projects/workspace-preferences-runtime.ts');
+    const { navigationWorkspaceRuntime } = await import('/src/features/navigation/navigation-workspace-runtime.ts');
     await projectStorageRuntime.initialize();
     await projectStorageRuntime.saveProject({
       project: { id, name: 'Advanced editor QA M06.8', metadata: { source: 'm06.8-e2e' } },
@@ -22,6 +23,8 @@ async function seedProject(page: Page, projectId: string) {
     });
     await workspacePreferencesRuntime.initialize();
     await workspacePreferencesRuntime.patchLayout({ lastDocumentId: id, lastTabs: [] });
+    await navigationWorkspaceRuntime.load();
+    await navigationWorkspaceRuntime.createScreen({ name: 'Inicio', path: '/' });
   }, projectId);
 }
 
