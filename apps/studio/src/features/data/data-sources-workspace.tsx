@@ -147,11 +147,7 @@ export function DataSourcesWorkspace() {
   }
 
   return (
-    <section
-      className="ec-data-sources-workspace"
-      data-data-sources-workspace
-      aria-labelledby="ec-data-sources-title"
-    >
+    <section className="ec-data-sources-workspace" data-data-sources-workspace aria-labelledby="ec-data-sources-title">
       <header className="ec-data-sources-header">
         <div className="ec-data-sources-title">
           <span aria-hidden="true">
@@ -165,11 +161,7 @@ export function DataSourcesWorkspace() {
             </div>
           </div>
         </div>
-        <Button
-          size="sm"
-          onClick={() => setAddOpen(true)}
-          disabled={!snapshot.project || snapshot.state === 'saving'}
-        >
+        <Button size="sm" onClick={() => setAddOpen(true)} disabled={!snapshot.project || snapshot.state === 'saving'}>
           <AddIcon aria-hidden="true" /> Nueva fuente
         </Button>
       </header>
@@ -185,9 +177,9 @@ export function DataSourcesWorkspace() {
       ) : snapshot.sources.length === 0 ? (
         <div className="ec-data-sources-empty">
           <strong>Todavía no hay fuentes de datos.</strong>
-          <p>Crea la definición portable ahora; cada adapter concreto se incorpora en su microfase propietaria.</p>
+          <p>Crea una fuente REST desde el wizard o configura ElectroCraft Data desde el panel superior.</p>
           <Button size="sm" onClick={() => setAddOpen(true)}>
-            <AddIcon aria-hidden="true" /> Nueva fuente
+            <AddIcon aria-hidden="true" /> Nueva fuente REST
           </Button>
         </div>
       ) : (
@@ -306,7 +298,11 @@ export function DataSourcesWorkspace() {
                     </Select>
                   </div>
                   <pre>
-                    {JSON.stringify({ ...selected.config, ...(selected.environmentOverrides[environment] ?? {}) }, null, 2)}
+                    {JSON.stringify(
+                      { ...selected.config, ...(selected.environmentOverrides[environment] ?? {}) },
+                      null,
+                      2,
+                    )}
                   </pre>
                   <small>
                     {environmentEnabled
@@ -324,7 +320,9 @@ export function DataSourcesWorkspace() {
                     </div>
                     <div>
                       <span>Gateway</span>
-                      <strong>{selected.kind === 'internal' ? 'No requerido' : 'Requiere gateway si usa secretos'}</strong>
+                      <strong>
+                        {selected.kind === 'internal' ? 'No requerido' : 'Requiere gateway si usa secretos'}
+                      </strong>
                     </div>
                   </div>
                 </section>
@@ -337,17 +335,25 @@ export function DataSourcesWorkspace() {
                   <Button
                     size="sm"
                     variant="outline"
-                    disabled={!adapterUsable || !adapterDescriptor?.supportsSchemaDiscovery || snapshot.state === 'testing'}
+                    disabled={
+                      !adapterUsable || !adapterDescriptor?.supportsSchemaDiscovery || snapshot.state === 'testing'
+                    }
                     onClick={() => {
                       setActionError(null);
-                      void dataSourceWorkspaceRuntime.introspectSchema(selected, environment).catch((cause: unknown) =>
-                        setActionError(cause instanceof Error ? cause.message : 'No se pudo inspeccionar el esquema.'),
-                      );
+                      void dataSourceWorkspaceRuntime
+                        .introspectSchema(selected, environment)
+                        .catch((cause: unknown) =>
+                          setActionError(
+                            cause instanceof Error ? cause.message : 'No se pudo inspeccionar el esquema.',
+                          ),
+                        );
                     }}
                   >
                     Inspeccionar esquema
                   </Button>
-                  {!adapterRegistered ? <small>Disponible cuando el adapter de esta fuente esté registrado.</small> : null}
+                  {!adapterRegistered ? (
+                    <small>Disponible cuando el adapter de esta fuente esté registrado.</small>
+                  ) : null}
                   {snapshot.discoveredSchema ? (
                     <p>
                       Esquema detectado: <strong>{snapshot.discoveredSchema.name}</strong>
@@ -370,9 +376,11 @@ export function DataSourcesWorkspace() {
                       disabled={!adapterUsable || snapshot.state === 'testing'}
                       onClick={() => {
                         setActionError(null);
-                        void dataSourceWorkspaceRuntime.testConnection(selected, environment).catch((cause: unknown) =>
-                          setActionError(cause instanceof Error ? cause.message : 'No se pudo probar la conexión.'),
-                        );
+                        void dataSourceWorkspaceRuntime
+                          .testConnection(selected, environment)
+                          .catch((cause: unknown) =>
+                            setActionError(cause instanceof Error ? cause.message : 'No se pudo probar la conexión.'),
+                          );
                       }}
                     >
                       Probar conexión
@@ -408,11 +416,7 @@ export function DataSourcesWorkspace() {
 
           {selected ? (
             <aside className="ec-data-source-inspector" aria-label="Seguridad y compatibilidad">
-              <InspectorContent
-                source={selected}
-                adapterRegistered={adapterRegistered}
-                compatibility={compatibility}
-              />
+              <InspectorContent source={selected} adapterRegistered={adapterRegistered} compatibility={compatibility} />
             </aside>
           ) : null}
         </div>
