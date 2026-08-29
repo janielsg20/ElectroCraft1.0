@@ -19,9 +19,9 @@ test.describe('M03.11 contextual Help system', () => {
     expect(ordering).toBe(true);
 
     await help.click();
-    const drawer = page.getByRole('dialog', { name: 'AppShell del Studio' });
+    const drawer = page.getByRole('dialog', { name: 'Editor' });
     await expect(drawer).toBeVisible();
-    await expect(drawer).toContainText('WorkspacePreferencesPort');
+    await expect(drawer).toContainText('pantalla activa');
 
     const search = drawer.getByLabel('Buscar en la ayuda');
     await search.fill('Puck');
@@ -90,7 +90,7 @@ test.describe('M03.11 contextual Help system', () => {
   }) => {
     await page.setViewportSize({ width: 1280, height: 820 });
     await page.goto('/screens');
-    await expect(page.locator('[data-help-trigger="help.section.screens"]')).toBeVisible();
+    await expect(page.locator('[data-help-trigger="help.screens"]')).toBeVisible();
     await expect(page.locator('body')).not.toContainText('Taxonomías');
     await expect(page.locator('body')).not.toContainText('Relaciones');
   });
