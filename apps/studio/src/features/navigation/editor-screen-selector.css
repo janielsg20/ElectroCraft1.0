@@ -1,0 +1,131 @@
+.ec-topbar-screen-select {
+  min-width: 148px;
+  max-width: 210px;
+  height: 28px;
+  border: 0;
+  background: transparent;
+  color: var(--foreground);
+  font-size: var(--ec-text-xs);
+  box-shadow: none;
+}
+
+.ec-topbar-screen-select:hover,
+.ec-topbar-screen-select:focus-visible {
+  background: var(--surface-raised);
+}
+
+.ec-editor-screen-context,
+.ec-editor-screen-context-state {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+  padding: 8px;
+}
+
+.ec-editor-screen-context-heading {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 2px 2px 6px;
+}
+
+.ec-editor-screen-context-heading > div:first-child {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+
+.ec-editor-screen-context-actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 2px;
+}
+
+.ec-editor-screen-context-heading strong,
+.ec-editor-screen-context-item strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ec-editor-screen-context-heading span,
+.ec-editor-screen-context-item small,
+.ec-editor-screen-context-state p {
+  color: var(--muted-foreground);
+  font-size: var(--ec-text-xs);
+}
+
+.ec-editor-screen-context-list {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.ec-editor-screen-context-item {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: var(--ec-radius-md);
+  padding: 7px 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ec-editor-screen-context-item:hover,
+.ec-editor-screen-context-item[data-selected='true'] {
+  background: var(--accent);
+}
+
+.ec-editor-screen-context-item:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -1px;
+}
+
+.ec-editor-screen-context-item > span:last-child {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.ec-editor-screen-context-icon {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  flex: 0 0 30px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--ec-radius-md);
+  background: color-mix(in srgb, var(--primary) 9%, var(--surface));
+  color: var(--primary);
+}
+
+.ec-editor-screen-context-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.ec-editor-screen-context-state p {
+  margin: 0;
+  line-height: 1.45;
+}
+
+@media (max-width: 767px) {
+  .ec-editor-screen-context,
+  .ec-editor-screen-context-state {
+    padding: 4px 0 8px;
+  }
+
+  .ec-editor-screen-context-item {
+    min-height: 52px;
+  }
+}

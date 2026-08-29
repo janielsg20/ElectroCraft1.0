@@ -44,6 +44,9 @@ const designSystemRoute = '/__design-system';
 const editorRoute = '/editor';
 const historyRoute = '/history';
 const contentRoute = '/content';
+const screensRoute = '/screens';
+const navigationRoute = '/navigation';
+const previewRoute = '/preview';
 const canonicalEmptyModuleRoutes = new Set(['/queries', '/forms', '/admin', '/media', '/export']);
 
 const ProjectHome = lazy(() =>
@@ -51,6 +54,15 @@ const ProjectHome = lazy(() =>
 );
 const RevisionHistoryPanel = lazy(() =>
   import('./features/projects/revision-history-panel').then((module) => ({ default: module.RevisionHistoryPanel })),
+);
+const ScreensWorkspace = lazy(() =>
+  import('./features/navigation/screens-workspace').then((module) => ({ default: module.ScreensWorkspace })),
+);
+const NavigationWorkspace = lazy(() =>
+  import('./features/navigation/navigation-workspace').then((module) => ({ default: module.NavigationWorkspace })),
+);
+const NavigationPreview = lazy(() =>
+  import('./features/navigation/navigation-preview').then((module) => ({ default: module.NavigationPreview })),
 );
 const StudioEditorWorkspace = lazy(() =>
   import('./shell/editor-workspace').then((module) => ({ default: module.StudioEditorWorkspace })),
@@ -298,6 +310,27 @@ function resolveStudioWorkspace(pathname: string, health: ReturnType<typeof eval
     return (
       <Suspense fallback={<StudioRouteSkeleton kind="editor" label="Cargando editor" />}>
         <WorkspaceAwareEditor />
+      </Suspense>
+    );
+  }
+  if (pathname === screensRoute) {
+    return (
+      <Suspense fallback={<StudioRouteSkeleton kind="generic" label="Cargando Pantallas" />}>
+        <ScreensWorkspace />
+      </Suspense>
+    );
+  }
+  if (pathname === navigationRoute) {
+    return (
+      <Suspense fallback={<StudioRouteSkeleton kind="generic" label="Cargando Navegación" />}>
+        <NavigationWorkspace mode="navigation" />
+      </Suspense>
+    );
+  }
+  if (pathname === previewRoute) {
+    return (
+      <Suspense fallback={<StudioRouteSkeleton kind="generic" label="Cargando Preview" />}>
+        <NavigationPreview />
       </Suspense>
     );
   }

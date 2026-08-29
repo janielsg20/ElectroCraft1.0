@@ -1,0 +1,55 @@
+.ec-route-guard-editor {
+  display: grid;
+  gap: 9px;
+  margin-top: 12px;
+  border-radius: var(--ec-radius-md);
+  padding: 10px;
+  background: color-mix(in srgb, var(--muted) 30%, transparent);
+}
+
+.ec-route-guard-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ec-route-guard-editor h4 {
+  margin: 0;
+  font-size: var(--ec-text-sm);
+}
+
+.ec-route-guard-editor label {
+  display: grid;
+  gap: 5px;
+}
+
+.ec-route-guard-editor label > span,
+.ec-route-guard-editor label > small,
+.ec-route-guard-warning {
+  color: var(--muted-foreground);
+  font-size: var(--ec-text-xs);
+}
+
+.ec-route-guard-warning {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.ec-route-guard-error,
+.ec-route-guard-success {
+  margin: 0;
+  border-radius: var(--ec-radius-sm);
+  padding: 7px 9px;
+  font-size: var(--ec-text-xs);
+}
+
+.ec-route-guard-error {
+  background: color-mix(in srgb, var(--destructive) 9%, transparent);
+  color: var(--destructive);
+}
+
+.ec-route-guard-success {
+  background: color-mix(in srgb, var(--primary) 9%, transparent);
+  color: var(--primary);
+}

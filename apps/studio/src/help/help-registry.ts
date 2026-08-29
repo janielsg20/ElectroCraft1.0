@@ -1,13 +1,6 @@
 import { translateStrict, type ElectroCraftResourceKey } from '@electrocraft/i18n';
 import { studioSidebarNavigation, type SidebarNavigationItemId } from '../shell/sidebar-navigation';
 
-// M03.4 continuity: Configuración usa overlays Radix y restaura el foco al trigger al cerrar.
-// M03.5 continuity: el workspace desktop conserva Contexto 288px, Lienzo flexible e Inspector 320px.
-// M03.6 continuity: tablet conserva un rail global de 56px; móvil usa navegación inferior, Sheets inferiores y Más abre Capas/Outline a altura completa.
-// M03.7 continuity: Progressive Disclosure clasifica información como primary, contextual, advanced o diagnostic; los diagnósticos críticos permanecen fuera de Advanced.
-// M03.10 continuity: ElectroCraft se entrega en español. La infraestructura de idiomas permite añadir traducciones futuras sin cambiar la lógica de la aplicación.
-// F04 continuity: almacenamiento, autosave, checkpoints, recovery y preferencias del workspace comparten help.projects.
-
 type HelpMessageKey = ElectroCraftResourceKey<'help'>;
 
 export type StudioHelpId =
@@ -16,6 +9,13 @@ export type StudioHelpId =
   | 'help.studio.language'
   | 'help.projects'
   | 'help.editor.advanced'
+  | 'help.editor.screens'
+  | 'help.navigation'
+  | 'help.navigation.builder'
+  | 'help.navigation.routes'
+  | 'help.navigation.guards'
+  | 'help.navigation.compiler'
+  | 'help.screens'
   | `help.section.${SidebarNavigationItemId}`;
 
 export interface HelpDescriptor {
@@ -122,11 +122,8 @@ const studioDefinitions = Object.freeze([
       'restaurar',
       'reparar',
       'workspace',
-      'espacio de trabajo',
       'preferencias',
       'layout',
-      'diseño guardado',
-      'panel lateral',
       'sidebar',
       'multi-tab',
     ],
@@ -143,6 +140,149 @@ const studioDefinitions = Object.freeze([
     relatedIds: ['help.section.editor', 'help.section.tokens'],
     keywords: ['layout', 'diseño', 'estilo', 'fila', 'columna', 'cuadrícula', 'tokens', 'restablecer', 'heredado'],
     learnMoreRef: '.ai/microphases/M06_1.md',
+  },
+  {
+    id: 'help.editor.screens',
+    sectionId: 'editor-screens',
+    navigationItemId: 'editor',
+    titleKey: helpKey('help.section.editor.title'),
+    shortKey: helpKey('help.section.editor.short'),
+    longKey: helpKey('help.section.editor.long'),
+    exampleKeys: [helpKey('help.section.editor.example')],
+    relatedIds: ['help.screens', 'help.navigation.builder', 'help.editor.advanced'],
+    keywords: ['editor', 'pantalla', 'pantallas', 'screen composer', 'puck', 'plataforma', 'dispositivo', 'breakpoint'],
+    learnMoreRef: '.ai/microphases/M07_3.md',
+  },
+  {
+    id: 'help.navigation',
+    sectionId: 'navigation-graph',
+    navigationItemId: 'navigation',
+    titleKey: helpKey('help.section.navigation.title'),
+    shortKey: helpKey('help.section.navigation.short'),
+    longKey: helpKey('help.section.navigation.long'),
+    exampleKeys: [helpKey('help.section.navigation.example')],
+    relatedIds: [
+      'help.navigation.builder',
+      'help.navigation.routes',
+      'help.navigation.guards',
+      'help.navigation.compiler',
+    ],
+    keywords: [
+      'navigation graph',
+      'pantallas',
+      'rutas',
+      'stack',
+      'tabs',
+      'drawer',
+      'modal',
+      'parámetros',
+      'deep link',
+      'guards',
+      'compiler',
+    ],
+    learnMoreRef: '.ai/microphases/M07_1.md',
+  },
+  {
+    id: 'help.navigation.builder',
+    sectionId: 'navigation-builder',
+    navigationItemId: 'navigation',
+    titleKey: helpKey('help.section.navigation.title'),
+    shortKey: helpKey('help.section.navigation.short'),
+    longKey: helpKey('help.section.navigation.long'),
+    exampleKeys: [helpKey('help.section.navigation.example')],
+    relatedIds: ['help.navigation', 'help.navigation.routes', 'help.screens'],
+    keywords: [
+      'navigation builder',
+      'reordenar',
+      'pila',
+      'pestañas',
+      'menú lateral',
+      'modal',
+      'pantalla inicial',
+      'header',
+      'atrás',
+    ],
+    learnMoreRef: '.ai/microphases/M07_4.md',
+  },
+  {
+    id: 'help.navigation.routes',
+    sectionId: 'navigation-routes',
+    navigationItemId: 'navigation',
+    titleKey: helpKey('help.section.navigation.title'),
+    shortKey: helpKey('help.section.navigation.short'),
+    longKey: helpKey('help.section.navigation.long'),
+    exampleKeys: [helpKey('help.section.navigation.example')],
+    relatedIds: ['help.navigation.builder', 'help.navigation.guards', 'help.section.workflows'],
+    keywords: [
+      'rutas',
+      'parámetros',
+      'enlace profundo',
+      'deep link',
+      'destino',
+      'reemplazar',
+      'volver',
+      'enlace externo',
+      'binding',
+    ],
+    learnMoreRef: '.ai/microphases/M07_5.md',
+  },
+  {
+    id: 'help.navigation.guards',
+    sectionId: 'navigation-guards',
+    navigationItemId: 'navigation',
+    titleKey: helpKey('help.section.navigation.title'),
+    shortKey: helpKey('help.section.navigation.short'),
+    longKey: helpKey('help.section.navigation.long'),
+    exampleKeys: [helpKey('help.section.navigation.example')],
+    relatedIds: ['help.navigation.routes', 'help.navigation', 'help.section.users'],
+    keywords: [
+      'acceso',
+      'público',
+      'autenticado',
+      'iniciar sesión',
+      'permiso',
+      'condición',
+      'redirect',
+      'redirigir',
+      'guards',
+      'seguridad',
+    ],
+    learnMoreRef: '.ai/microphases/M07_6.md',
+  },
+  {
+    id: 'help.navigation.compiler',
+    sectionId: 'navigation-compiler',
+    navigationItemId: 'navigation',
+    titleKey: helpKey('help.section.navigation.title'),
+    shortKey: helpKey('help.section.navigation.short'),
+    longKey: helpKey('help.section.navigation.long'),
+    exampleKeys: [helpKey('help.section.navigation.example')],
+    relatedIds: ['help.navigation', 'help.section.compatibility', 'help.section.export'],
+    keywords: [
+      'compiler',
+      'react router',
+      'expo router',
+      'wordpress',
+      'capacitor',
+      'static web',
+      'lamp',
+      'slim',
+      'compatibilidad',
+      'diagnóstico',
+    ],
+    learnMoreRef: '.ai/microphases/M07_7.md',
+  },
+  {
+    id: 'help.screens',
+    sectionId: 'screens-management',
+    navigationItemId: 'screens',
+    titleKey: helpKey('help.section.screens.title'),
+    shortKey: helpKey('help.section.screens.short'),
+    longKey: helpKey('help.section.screens.long'),
+    exampleKeys: [helpKey('help.section.screens.example')],
+    relatedIds: ['help.navigation.builder', 'help.editor.screens'],
+    keywords: ['pantallas', 'screen', 'ruta', 'navigator', 'plantilla', 'estado', 'duplicar', 'abrir en editor'],
+    learnMoreRef: '.ai/microphases/M07_2.md',
   },
 ] as const satisfies readonly HelpDefinition[]);
 
@@ -174,7 +314,9 @@ const navigationKeywords: Readonly<Record<SidebarNavigationItemId, readonly stri
 });
 
 const navigationRelated: Partial<Record<SidebarNavigationItemId, readonly StudioHelpId[]>> = Object.freeze({
-  editor: ['help.section.components', 'help.section.screens'],
+  editor: ['help.editor.screens', 'help.section.components', 'help.screens'],
+  screens: ['help.screens', 'help.navigation.builder', 'help.editor.screens'],
+  navigation: ['help.navigation.builder', 'help.navigation.routes', 'help.navigation'],
   components: ['help.section.editor', 'help.section.templates'],
   records: ['help.section.models', 'help.section.queries', 'help.section.forms'],
   models: ['help.section.records', 'help.section.forms'],
@@ -213,9 +355,6 @@ export const studioHelpRegistry = Object.freeze(
 );
 
 export const studioHelpDescriptors = Object.freeze(resolvedDescriptors);
-
-// Compatibility aliases: older F03 gates import these names directly, but all three
-// resolve to entries owned by the single typed registry above.
 export const studioShellHelpDescriptor = studioHelpRegistry['help.studio.shell'];
 export const studioAppearanceHelpDescriptor = studioHelpRegistry['help.studio.appearance'];
 export const studioLanguageHelpDescriptor = studioHelpRegistry['help.studio.language'];
@@ -227,6 +366,9 @@ export function getStudioHelpDescriptor(helpId: StudioHelpId): HelpDescriptor {
 }
 
 export function getHelpIdForNavigationItem(itemId: SidebarNavigationItemId): StudioHelpId {
+  if (itemId === 'editor') return 'help.editor.screens';
+  if (itemId === 'screens') return 'help.screens';
+  if (itemId === 'navigation') return 'help.navigation.builder';
   return `help.section.${itemId}`;
 }
 

@@ -49,10 +49,14 @@ describe('M05.6 Puck inline editing ownership boundary', () => {
     const composition = read('packages/editor-puck/src/puck-editor-composition.ts');
 
     expect(runtime).toContain('createStudioPuckActionSync');
+    expect(runtime).toContain('createStudioPuckDocumentPersistenceBridge');
     expect(actionSync).toContain('appState.data');
     expect(actionSync).toContain('prevAppState.data');
     expect(composition).toContain('api.history.back');
     expect(composition).toContain('api.history.forward');
-    expect(runtime).not.toContain('queueAutosave');
+    expect(runtime).toContain('puckContextControls.connectBlockSaver');
+    expect(runtime).toContain('runtime.queueAutosave');
+    expect(runtime).toContain("kind: 'document'");
+    expect(runtime).not.toContain('inlineEditingAutosave');
   });
 });

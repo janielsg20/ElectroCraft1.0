@@ -65,7 +65,7 @@ function declarationStyle(
     breakpointId,
   );
   const declaration = resolvePlatformStyleDeclaration(style, responsive, platform);
-  return {
+  const resolved: CSSProperties = {
     width: length(declaration.width),
     height: length(declaration.height),
     minWidth: length(declaration.minWidth),
@@ -79,8 +79,9 @@ function declarationStyle(
     color: color(declaration.foreground),
     background: color(declaration.background),
     opacity: declaration.opacity ?? undefined,
-    display: declaration.visibility === 'hidden' ? 'none' : undefined,
   };
+  if (declaration.visibility === 'hidden') resolved.display = 'none';
+  return resolved;
 }
 
 export function resolveStudioPresentationStyle(

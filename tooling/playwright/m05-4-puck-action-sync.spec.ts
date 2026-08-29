@@ -15,7 +15,7 @@ test.describe('M05.4 Puck actions canonical synchronization', () => {
         metadata: { source: 'm05.4-browser' },
       };
       const document = {
-        schemaVersion: 3 as const,
+        schemaVersion: 4 as const,
         id: 'ec_document_0000000000001',
         version: 1,
         name: 'Acciones',
@@ -177,7 +177,7 @@ test.describe('M05.4 Puck actions canonical synchronization', () => {
     expect(result.persisted).toMatchObject({
       objectId: 'ec_document_0000000000001',
       kind: 'document',
-      schemaVersion: 3,
+      schemaVersion: 4,
       payload: expect.objectContaining({
         root: expect.objectContaining({
           children: [

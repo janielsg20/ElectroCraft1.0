@@ -68,13 +68,18 @@ export function validateAppBehaviorGraph(graph: AppBehaviorGraph): AppBehaviorRe
     for (const ref of route.stateRefs) {
       if (!stateIds.has(ref)) diagnostics.push({ code: 'missing-route-state-ref', ownerId: route.id, ref });
     }
-    for (const ref of route.permissionPolicyRefs) {
-      if (!policyIds.has(ref)) diagnostics.push({ code: 'missing-route-policy-ref', ownerId: route.id, ref });
+    for (const guard of route.guards) {
+      if (guard.policyRef !== null && !policyIds.has(guard.policyRef)) {
+        diagnostics.push({ code: 'missing-route-policy-ref', ownerId: route.id, ref: guard.policyRef });
+      }
+      if (guard.actionRef !== null && !actionIds.has(guard.actionRef)) {
+        diagnostics.push({ code: 'missing-route-action-ref', ownerId: route.id, ref: guard.actionRef });
+      }
     }
   }
 
   for (const navigation of graph.navigations) {
-    for (const ref of collectNavigationRouteRefs(navigation.items)) {
+    for (const ref of collectNavigationRouteRefs(navigation)) {
       if (!routeIds.has(ref)) diagnostics.push({ code: 'missing-navigation-route-ref', ownerId: navigation.id, ref });
     }
   }

@@ -18,6 +18,7 @@ import { puckEditorHistoryControls, puckPlatformControls, puckResponsiveControls
 import { useEffect, useSyncExternalStore } from 'react';
 import { editorHistoryPreferencesRuntime } from '../features/editor/editor-history-preferences-runtime';
 import { EditorSettings } from '../features/editor/editor-settings';
+import { EditorScreenTopbarSelect } from '../features/navigation/editor-screen-selector';
 import { projectStorageRuntime } from '../features/projects/project-storage-runtime';
 import { StorageSettings } from '../features/projects/storage-settings';
 import { WorkspaceSettings } from '../features/projects/workspace-settings';
@@ -95,6 +96,12 @@ const AppearanceIcon = getStudioIcon('studio.theme');
 const CloseIcon = getStudioIcon('window.close');
 const HistoryIcon = getStudioIcon('studio.history');
 
+const platformLabels = Object.freeze({
+  web: 'Web',
+  android: 'Android',
+  ios: 'iOS',
+} as const);
+
 function subscribeViewport(listener: () => void) {
   if (typeof window === 'undefined') return () => undefined;
   window.addEventListener('resize', listener, { passive: true });
@@ -133,9 +140,9 @@ function TopbarToolCluster({
 
   return (
     <div className="ec-topbar-tool-cluster" aria-label={copy.toolsTitle}>
-      <span className="ec-topbar-tool" data-topbar-tool="document" aria-label={`${copy.documentLabel}: ${activeLabel}`}>
+      <span className="ec-topbar-tool" data-topbar-tool="document" aria-label={copy.documentLabel}>
         <DocumentIcon aria-hidden="true" />
-        <span>{activeLabel}</span>
+        <EditorScreenTopbarSelect fallbackLabel={activeLabel} />
       </span>
       <div className="ec-topbar-tool ec-topbar-breakpoint-select" data-topbar-tool="platform">
         <PlatformIcon aria-hidden="true" />
@@ -144,7 +151,7 @@ function TopbarToolCluster({
           onValueChange={(value) => puckPlatformControls.select(value as 'web' | 'android' | 'ios')}
         >
           <SelectTrigger aria-label={copy.platformLabel}>
-            <SelectValue placeholder={copy.platformValue} />
+            <SelectValue placeholder={copy.platformValue}>{platformLabels[platform.current]}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="web">Web</SelectItem>
@@ -259,7 +266,7 @@ export function StudioTopbar({ copy, activeLabel, status, preferencesPort, help 
         <TopbarToolCluster copy={copy} activeLabel={activeLabel} breakpoint={breakpoint} />
       </div>
 
-      <div className="ec-topbar-right">
+      <div className="ec-topbar-right" style={{ flexShrink: 0 }}>
         <Sheet>
           <SheetTrigger asChild>
             <Button className="ec-topbar-tools-trigger" variant="ghost" size="icon" aria-label={copy.toolsLabel}>

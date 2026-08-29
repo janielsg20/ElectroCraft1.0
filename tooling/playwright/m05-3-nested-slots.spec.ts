@@ -19,7 +19,7 @@ test.describe('M05.3 nested Slots and migration browser contract', () => {
       const containerId = 'ec_node_0000000000001';
       const textId = 'ec_node_0000000000002';
       const document = {
-        schemaVersion: 3 as const,
+        schemaVersion: 4 as const,
         id: 'ec_document_0000000000003',
         version: 1,
         name: 'Slots legacy',
@@ -147,7 +147,7 @@ test.describe('M05.3 nested Slots and migration browser contract', () => {
     ]);
     expect(result.persisted).toMatchObject({
       kind: 'document',
-      schemaVersion: 3,
+      schemaVersion: 4,
       payload: expect.objectContaining({
         root: expect.objectContaining({
           children: [expect.objectContaining({ componentRef: 'Container' })],

@@ -13,7 +13,9 @@ describe('M03.5 editor ownership contract', () => {
     expect(studio).not.toContain('@puckeditor/core');
     expect(studio).toContain("from '@electrocraft/editor-puck'");
     expect(adapter).toContain("from '@puckeditor/core'");
-    expect(adapter).toContain('PuckEditorPreview = Puck.Preview');
+    expect(adapter).toContain('export function PuckEditorPreview');
+    expect(adapter).toContain('createElement(Puck.Preview, props)');
+    expect(adapter).toContain('PuckCanvasGuideOverlay');
     expect(adapter).toContain('PuckEditorFields = Puck.Fields');
   });
 

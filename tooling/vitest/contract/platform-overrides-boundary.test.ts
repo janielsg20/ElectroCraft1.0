@@ -20,7 +20,9 @@ describe('M06.3 platform override boundaries', () => {
 
     expect(controls).not.toContain('localStorage');
     expect(controls).not.toContain('workspace_preferences');
-    expect(controls).not.toContain('ElectroCraftDocument');
+    expect(controls).not.toContain('queueAutosave');
+    expect(controls).not.toContain('projectStorageRuntime');
+    expect(controls).not.toContain('electroCraftDocumentSchema');
     expect(contracts).toContain('setPlatformStyleOverride');
     expect(contracts).toContain('resetPlatformStyleOverride');
   });

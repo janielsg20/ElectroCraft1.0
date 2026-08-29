@@ -26,6 +26,7 @@ import { useRef, useState, useSyncExternalStore, type CSSProperties, type ReactN
 import '../features/editor/puck-action-sync.css';
 import { LayoutStyleInspector } from '../features/editor/advanced/layout-style-inspector';
 import { useStudioPuckEditorRuntime } from '../features/editor/use-puck-editor-runtime';
+import { EditorScreensContextPanel } from '../features/navigation/editor-screen-selector';
 import { workspacePreferencesRuntime } from '../features/projects/workspace-preferences-runtime';
 import { editorT } from '../i18n/editor.es';
 import { iaT } from '../i18n/information-architecture.es';
@@ -38,7 +39,6 @@ import {
 } from './editor-layout-model';
 import { ProgressiveDisclosure, StudioEmptyState } from './information-architecture-ui';
 import { StudioPalette } from './palette-panel';
-import { getStudioSidebarNavigationItem } from './sidebar-navigation';
 import { useEditorViewportWidth } from './use-editor-layout-mode';
 
 const ContextIcon = getStudioIcon('studio.sidebar.components');
@@ -63,10 +63,9 @@ const LayersTabIcon = getStudioIcon('studio.mobile.outline');
 const ContentTabIcon = getStudioIcon('studio.topbar.document');
 const DesignTabIcon = getStudioIcon('studio.theme');
 const ActionsTabIcon = getStudioIcon('studio.sidebar.workflows');
-const screensDestination = getStudioSidebarNavigationItem('screens');
 
 type SecondaryTool = 'context' | 'inspector';
-type MobileTool = 'components' | 'properties' | 'outline';
+type MobileTool = 'components' | 'screens' | 'properties' | 'outline';
 type ContextTab = 'components' | 'screens' | 'layers';
 type InspectorTab = 'content' | 'design' | 'actions';
 type DesktopRegion = 'context' | 'canvas' | 'inspector';
@@ -343,13 +342,7 @@ function ContextRegion({ controls }: { readonly controls?: EditorRegionControls 
           </>
         </TabsContent>
         <TabsContent className="ec-editor-tab-panel" value="screens">
-          <div className="ec-editor-panel-empty">
-            <strong>{editorT('studio.editor.context.screensTitle')}</strong>
-            <p>{editorT('studio.editor.context.screensSummary')}</p>
-            <Button variant="outline" size="sm" asChild>
-              <a href={screensDestination.href}>{editorT('studio.editor.context.openScreens')}</a>
-            </Button>
-          </div>
+          <EditorScreensContextPanel />
         </TabsContent>
         <TabsContent className="ec-editor-tab-panel" value="layers">
           <OutlineContent />
@@ -558,15 +551,35 @@ function MobileEditorLayout() {
           </SheetContent>
         </Sheet>
 
-        <a
-          className="ec-editor-mobile-action"
-          href={screensDestination.href}
-          aria-label={screensDestination.label}
-          data-mobile-destination="screens"
-        >
-          <MobileScreensIcon aria-hidden="true" />
-          <span>{editorT('studio.editor.mobile.screens')}</span>
-        </a>
+        <Sheet open={activeTool === 'screens'} onOpenChange={(open) => setMobileTool('screens', open)}>
+          <SheetTrigger asChild>
+            <button
+              className="ec-editor-mobile-action"
+              type="button"
+              aria-pressed={activeTool === 'screens'}
+              data-mobile-destination="screens"
+            >
+              <MobileScreensIcon aria-hidden="true" />
+              <span>{editorT('studio.editor.mobile.screens')}</span>
+            </button>
+          </SheetTrigger>
+          <SheetContent side="bottom" className="ec-editor-mobile-bottom-sheet" data-editor-mobile-sheet="screens">
+            <SheetHeader className="ec-editor-mobile-sheet-header">
+              <div>
+                <SheetTitle>{editorT('studio.editor.mobile.screens')}</SheetTitle>
+                <SheetDescription>Cambia de Pantalla sin salir del Screen Composer.</SheetDescription>
+              </div>
+              <SheetClose asChild>
+                <Button variant="ghost" size="icon" aria-label="Cerrar Pantallas">
+                  <CloseIcon aria-hidden="true" />
+                </Button>
+              </SheetClose>
+            </SheetHeader>
+            <div className="ec-editor-mobile-sheet-body">
+              <EditorScreensContextPanel />
+            </div>
+          </SheetContent>
+        </Sheet>
 
         <button
           className="ec-editor-mobile-action"
@@ -721,6 +734,8 @@ export function StudioEditorWorkspace() {
           style={editorStyle}
           data-editor-layout={mode}
           data-editor-sync-state={runtime.state}
+          data-editor-screen-id={runtime.screenId ?? undefined}
+          data-editor-screen-name={runtime.screenName ?? undefined}
           data-expanded-region={expandedRegion ?? 'none'}
           data-context-collapsed={collapsedRegions.context ? 'true' : 'false'}
           data-inspector-collapsed={collapsedRegions.inspector ? 'true' : 'false'}

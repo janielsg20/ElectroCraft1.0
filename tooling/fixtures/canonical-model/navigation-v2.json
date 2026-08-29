@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 2,
+  "id": "ec_navigation_0000000000004",
+  "version": 2,
+  "key": "mainNavigation",
+  "label": "Navegación principal",
+  "rootNodeRef": "ec_nav-node_0000000000001",
+  "nodes": [
+    {
+      "id": "ec_nav-node_0000000000001",
+      "kind": "stack",
+      "label": "Principal",
+      "childRefs": ["ec_nav-node_0000000000002"],
+      "initialNodeRef": "ec_nav-node_0000000000002",
+      "metadata": {}
+    },
+    {
+      "id": "ec_nav-node_0000000000002",
+      "kind": "screen",
+      "label": "Producto",
+      "routeRef": "ec_route_0000000000005",
+      "metadata": {}
+    }
+  ],
+  "metadata": {
+    "fixture": "m07.1"
+  }
+}

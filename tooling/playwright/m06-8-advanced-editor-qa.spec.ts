@@ -48,6 +48,20 @@ async function selectRootItem(page: Page, index: number) {
   }, index);
 }
 
+async function selectPlatform(page: Page, platform: 'Web' | 'Android' | 'iOS') {
+  const toolsTrigger = page.getByRole('button', { name: 'Abrir herramientas contextuales' });
+  await toolsTrigger.click();
+  const tools = page.getByRole('dialog', { name: 'Herramientas contextuales' });
+  await expect(tools).toBeVisible();
+  const platformSelect = tools.locator('[data-topbar-tool="platform"]').getByRole('combobox');
+  await platformSelect.click();
+  await page.getByRole('option', { name: platform, exact: true }).click();
+  await expect(platformSelect).toContainText(platform);
+  await page.keyboard.press('Escape');
+  await expect(tools).toHaveCount(0);
+  await expect(toolsTrigger).toBeFocused();
+}
+
 test.describe('M06.8 advanced editor QA', () => {
   test('keeps the same advanced Puck session usable from desktop to mobile', async ({ page }) => {
     test.setTimeout(180_000);
@@ -71,10 +85,7 @@ test.describe('M06.8 advanced editor QA', () => {
       'Contenedor',
     );
 
-    const platformTool = page.locator('[data-topbar-tool="platform"]');
-    await platformTool.getByRole('combobox').click();
-    await page.getByRole('option', { name: 'Android', exact: true }).click();
-    await expect(platformTool.getByRole('combobox')).toContainText('Android');
+    await selectPlatform(page, 'Android');
 
     await page.setViewportSize({ width: 430, height: 932 });
     await expect(workspace).toHaveAttribute('data-editor-layout', 'mobile');

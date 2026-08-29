@@ -64,7 +64,7 @@ export const puckAdvancedSelectionControls = Object.freeze({
     return () => {
       if (delegates !== nextDelegates) return;
       delegates = null;
-      publish({ ...snapshot, connected: false, primaryId: null, selectedIds: [], message: null });
+      publish({ ...snapshot, connected: false, message: null });
     };
   },
   syncPrimary(id: string | null) {

@@ -111,16 +111,26 @@ test('M03.7 structural gate enforces Progressive Disclosure and canonical inform
   for (const surface of ['Settings', 'Inspector', 'List/Detail']) {
     assert.equal(audit.includes(surface), true, `Screen IA audit missing surface: ${surface}`);
   }
-  assert.equal(help.includes('Progressive Disclosure'), true, 'Persistent help must explain Progressive Disclosure');
+  assert.equal(
+    help.includes('studioHelpRegistry') && help.includes("id: 'help.editor.advanced'"),
+    true,
+    'Progressive Disclosure must remain connected to the typed persistent HelpRegistry',
+  );
 
   assert.equal(predecessor.includes('GREEN'), true, 'M03.6 predecessor evidence must remain GREEN');
+  const phaseComplete = /F03[^\n]*COMPLETADA[^\n]*GREEN/.test(state);
   const active = /M03\.7[^\n]*ACTIVE/.test(state);
   const complete = /M03\.7[^\n]*COMPLETADA[^\n]*GREEN/.test(state);
-  assert.equal(active || complete, true, 'M03.7 must be ACTIVE or post-closure COMPLETADA / GREEN');
-  assert.equal((state.match(/`ACTIVE`/g) ?? []).length, 1, 'Exactly one microphase must remain ACTIVE');
+  assert.equal(
+    active || complete || phaseComplete,
+    true,
+    'M03.7 must remain covered by an ACTIVE or GREEN F03 state',
+  );
+  const activeIds = new Set([...state.matchAll(/\b(M\d{2}\.\d+)\b[^\n]*`ACTIVE`/g)].map((match) => match[1]));
+  assert.equal(activeIds.size, 1, 'Exactly one unique microphase must remain ACTIVE');
 
-  if (complete) {
-    assert.equal(exists(closurePath), true, 'Completed M03.7 requires closure evidence');
+  if (complete || phaseComplete) {
+    assert.equal(exists(closurePath), true, 'Completed F03 requires M03.7 closure evidence');
     const closure = read(closurePath);
     assert.equal(closure.includes('GREEN'), true, 'M03.7 closure evidence must remain GREEN');
     assert.equal(

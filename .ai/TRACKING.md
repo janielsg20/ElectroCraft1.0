@@ -9,95 +9,50 @@ Date: 2026-08-28.
 | F02 | COMPLETADA / GREEN | `.ai/evidence/F02/` |
 | F03 / M03.1–M03.12 | COMPLETADA / GREEN | `.ai/evidence/F03/CLOSURE_2026-08-20.md` |
 | F04 / M04.1–M04.8 | COMPLETADA / GREEN | `.ai/evidence/F04/CLOSURE_2026-08-25.md` |
-| F05 / M05.1–M05.8 | COMPLETADA / GREEN | PR `#60`; Base CI `33101434587` (#742) |
-| F06 / M06.1 | COMPLETADA / GREEN | `.ai/evidence/F06/M06.1/CLOSURE_2026-08-27.md` |
-| F06 / M06.2 | IMPLEMENTADA / GATE F06 | `main` `97486d53b591f4d71cc848828e5f0a6929a870d8` |
-| F06 / M06.3 | IMPLEMENTADA / GATE F06 | Platform overrides + diagnostics |
-| F06 / M06.4 | IMPLEMENTADA / GATE F06 | Guides/snapping + editor preferences |
-| F06 / M06.5 | IMPLEMENTADA / GATE F06 | Multi-select + group/ungroup + resize |
-| F06 / M06.6 | IMPLEMENTADA / GATE F06 | Breadcrumbs + context actions + reusable block |
-| F06 / M06.7 | IMPLEMENTADA / GATE F06 | Mobile/tablet tools 360/430/768 |
-| F06 / M06.8 | ACTIVE | QA integral y gate final de F06 |
+| F05 / M05.1–M05.8 | COMPLETADA / GREEN | PR `#60`; Base CI `33101434587` |
+| F06 / M06.1–M06.8 | IMPLEMENTACIÓN FUSIONADA; cierre CI heredado con reparación pendiente | `main` PR `#64`; correction PR `#67`; run `33203881217` |
+| F07 / M07.1 | IMPLEMENTADA / PENDIENTE GATE F07 | `.ai/evidence/F07/M07.1/IMPLEMENTATION_2026-08-28.md` |
+| F07 / M07.2 | IMPLEMENTADA / PENDIENTE GATE F07 | `.ai/evidence/F07/M07.2/IMPLEMENTATION_2026-08-28.md` |
+| F07 / M07.3 | IMPLEMENTADA / PENDIENTE GATE F07 | `.ai/evidence/F07/M07.3/IMPLEMENTATION_2026-08-28.md` |
+| F07 / M07.4 | IMPLEMENTADA / PENDIENTE GATE F07 | `.ai/evidence/F07/M07.4/IMPLEMENTATION_2026-08-28.md` |
+| F07 / M07.5 | IMPLEMENTADA / PENDIENTE GATE F07 | `.ai/evidence/F07/M07.5/IMPLEMENTATION_2026-08-28.md` |
+| F07 / M07.6 | IMPLEMENTADA / PENDIENTE GATE F07 | `.ai/evidence/F07/M07.6/IMPLEMENTATION_2026-08-28.md` |
+| F07 / M07.7 | IMPLEMENTADA / PENDIENTE GATE F07 | `.ai/evidence/F07/M07.7/IMPLEMENTATION_2026-08-28.md` |
+| F07 / M07.8 | ACTIVE | `.ai/evidence/F07/M07.8/IMPLEMENTATION_2026-08-28.md` |
 
-## F06 — implementación consolidada
+## Rama activa
 
-Rama de cierre: `codex/f06-advanced-editor`.
+`codex/m07-1-navigation-model`
 
-Base de la rama: `97486d53b591f4d71cc848828e5f0a6929a870d8` (`feat(M06.2): add responsive inheritance and breakpoint authoring`).
+La rama parte de la corrección F06 y contiene toda F07. No se ejecutaron Actions por microfase; M07.8 permanece `ACTIVE` mientras ejecuta el único Gate F07.
 
-### M06.2 — Responsive inheritance y reset
+## F06 — estado de verificación heredado
 
-- Presets Desktop/Laptop/Tablet/Mobile y custom breakpoints canónicos.
-- `viewports` público de Puck para la superficie visible; viewport transitorio queda fuera del documento.
-- Base + overrides por breakpoint con origen Base/Heredado/Anulado y reset por propiedad.
-- `ELECTROCRAFT_STYLE_PROPERTIES` centraliza traversal para compatibilidad con propiedades opcionales legacy.
-- Tests: `responsive-inheritance.test.ts`, `responsive-canvas-style.test.ts`, adapter/round-trip y E2E de M06.2 heredados de `main`.
+El rerun `33203881217`, job `99035169190`, terminó `failure` únicamente en `Playwright repository gate` después de que documentación, lint, typecheck, Vitest y build terminaran `success`.
 
-### M06.3 — Platform overrides y diagnostics
+La revisión de logs identificó blockers E2E heredados y esta rama ya contiene reparaciones para:
 
-- `puckPlatformControls` mantiene Web/Android/iOS como contexto session-only.
-- Orden efectivo: responsive → native → plataforma específica.
-- `platform-capabilities.ts` declara capacidades en Studio; `puck-platform-capabilities.ts` solo las proyecta a metadata del Config Puck.
-- Inspector muestra origen, Anular/Restablecer, badges y diagnostics recuperables.
-- Tests: `platform-overrides.test.ts`, `platform-canvas-style.test.ts`, `platform-overrides-boundary.test.ts`, `m06-3-platform-overrides.spec.ts`.
+- Inspector avanzado sin selección: el test valida ahora el estado vacío accesible; M06.1 conserva tests de controles reales con selección.
+- metadata responsive transitoria de Puck: el test valida que no se persista en el documento canónico.
+- topbar a 1600px: herramientas secundarias se compactan al Sheet sin invadir Undo/Redo.
+- Lock contextual: la reconexión por `refreshPermissions()` ya no elimina locks; el cambio real de Pantalla sí reinicia los locks de sesión.
+- breadcrumbs de F06 se alinean con M07.3: `App > Pantalla > Node`.
 
-### M06.4 — Advanced canvas guides/snapping
+Estas reparaciones todavía no están certificadas por un nuevo gate.
 
-- Reglas y guías editor-only alrededor de `Puck.Preview`.
-- Prioridad de snap: guía > sibling > parent > grid.
-- Geometría/feedback transient; preferencias de Regla/Guías/Ajuste/grid se guardan como preferencias locales del Studio, no como documento.
-- Alternativa de teclado para mover/eliminar guías.
-- Tests: `canvas-guides.test.ts`, `m06-4-canvas-guides.spec.ts`.
+## F07 — implementación consolidada
 
-### M06.5 — Multi-select, Group/Ungroup y Resize
+- M07.1: Route v2 + Navigation Graph v2, migrations y validación de refs/ciclos.
+- M07.2: Pantallas CRUD, detalle responsive, rutas/navegación y delete blocker.
+- M07.3: Screen Composer con selector de Pantalla, history aislado y un solo Puck.
+- M07.4: Navigation Builder tree + Stack/Tabs/Drawer/Modal + reorder accesible.
+- M07.5: params/deep links/binding de Ruta + ActionGraph Navegar + URL externa segura.
+- M07.6: Guards Público/Auth/Permiso/Condición + redirects sin loops + Preview fail-closed.
+- M07.7: compiler boundaries React Router/Expo/LAMP-Slim/WordPress/Capacitor/Static.
+- M07.8: `ACTIVE` para ejecutar QA integral: flujo integrado, `/preview` contractual y Playwright desktop/tablet/mobile.
 
-- La selección única de Puck sigue siendo engine-owned; ElectroCraft conserva únicamente IDs extra session-only para multi-select.
-- `Ctrl/Cmd/Shift+clic` y `Shift+Enter` alternan multiselección.
-- Agrupar inserta `Container` y mueve hermanos mediante `insert/move`; Desagrupar usa `move/remove` públicos Puck.
-- Resize escribe `ElectroCraftStyle` canónico solo para definiciones con `metadata.resizable=true`; no depende de `componentOverlay` experimental.
-- Tests: `puck-advanced-selection.test.ts`, `puck-advanced-selection-boundary.test.ts`, `m06-5-advanced-selection.spec.ts`.
+## Siguiente acción exacta
 
-### M06.6 — Breadcrumbs y context actions
+Completar `M07.8 — Navigation E2E y UX` mediante el Gate F07.
 
-- Breadcrumbs `Página > ... > Seleccionado` derivados de `getItemById/getSelectorForId`.
-- Copy/Paste usa `ElectroCraftDocumentNode`; Paste regenera IDs y materializa el subárbol con acciones públicas Puck.
-- Visibilidad se expresa como `style.base.visibility`; lock permanece session-only y se aplica con `resolvePermissions` + `refreshPermissions`.
-- Guardar como bloque crea `ElectroCraftDocument(kind="reusable-component")` mediante el autosave existente.
-- Runtime prioriza una `screen` al abrir proyecto para que reusable blocks no sustituyan el documento principal.
-- Tests: `puck-context-controls.test.ts`, `puck-context-actions-boundary.test.ts`, `m06-6-context-actions.spec.ts`.
-
-### M06.7 — Mobile/tablet editor tools
-
-- Existe un solo `PuckEditorRoot` para todos los breakpoints.
-- Tablet/laptop reutilizan Sheets; mobile conserva `Componentes / Pantallas / Lienzo / Propiedades / Más`.
-- Preview y overlays avanzadas quedan ancladas al mismo Puck; no hay editor móvil alternativo.
-- Tests: `mobile-tablet-editor-tools-boundary.test.ts`, `m06-7-mobile-tablet-tools.spec.ts` con 360/430/768.
-
-### M06.8 — QA integral
-
-- Se eliminó `packages/design-system/src/styles/editor-guides.css`; `puck-composition.css` queda como único owner visual de la overlay avanzada.
-- `visibility` opcional legacy usa una lista canónica única de propiedades tanto para responsive como para plataforma.
-- Contract QA: `advanced-editor-qa.test.ts` bloquea segundo runtime, uso release-critical de overrides experimentales, persistencia de session state y ownership duplicado; incluye workload mediano.
-- E2E transversal: `m06-8-advanced-editor-qa.spec.ts` valida una misma sesión Puck al cambiar desktop → 430px mobile, plataforma Android, Properties Sheet y ausencia de overflow.
-- El contenedor de ejecución local no puede resolver `github.com`; no se registra un falso gate local. El gate ejecutable oficial será `ElectroCraft Base CI` al abrir la PR final F06.
-
-## Gate final pendiente
-
-`ElectroCraft Base CI` debe ejecutar una vez abierta la PR de `codex/f06-advanced-editor` hacia `main`:
-
-1. docs conventions;
-2. lint/Prettier;
-3. typecheck;
-4. Node + Vitest;
-5. build;
-6. Playwright repository gate;
-7. empty repository fixture;
-8. artifacts base.
-
-F06 no se marcará `GREEN` hasta que ese gate termine `success`.
-
-Blockers funcionales P0/P1 conocidos: `0`.
-
-## Siguiente microfase después del gate F06
-
-`M07.1 — Modelo de Pantalla, Ruta y Navigation Graph`.
+El gate valida una sola vez la rama completa: docs conventions, lint/Prettier, typecheck, Vitest/integración, build y Playwright repository gate. F07 no se marcará GREEN hasta resultado `success`.

@@ -90,7 +90,6 @@ export const puckContextControls = Object.freeze({
       if (delegates !== nextDelegates) return;
       delegates = null;
       clipboard = null;
-      lockedIds.clear();
       publish({ connected: false, selectedId: null, breadcrumbs: [], hidden: false, message: null });
     };
   },
@@ -118,8 +117,8 @@ export const puckContextControls = Object.freeze({
     return run(() => {
       if (lockedIds.has(id)) lockedIds.delete(id);
       else lockedIds.add(id);
-      requireDelegates().refreshPermissions();
       publish({ message: null });
+      requireDelegates().refreshPermissions();
       return lockedIds.has(id);
     });
   },
@@ -165,5 +164,10 @@ export const puckContextControls = Object.freeze({
       requireDelegates().setHidden(id, !visible);
       publish({ hidden: !visible, message: null });
     });
+  },
+  clearSessionLocks() {
+    if (lockedIds.size === 0) return;
+    lockedIds.clear();
+    publish({ message: null });
   },
 });

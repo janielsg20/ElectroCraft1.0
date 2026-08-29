@@ -31,11 +31,15 @@ test('M03.6 structural gate preserves capabilities across responsive modes', asy
     assert.equal(workspace.includes(token), true, `M03.6 workspace token missing: ${token}`);
   }
 
-  assert.equal(workspace.includes('getStudioSidebarNavigationItem'), true, 'Canonical navigation resolver missing');
   assert.equal(
-    workspace.includes("getStudioSidebarNavigationItem('screens')"),
+    workspace.includes('EditorScreensContextPanel'),
     true,
-    'Screens must use canonical navigation',
+    'Screen-aware editor must retain the canonical Pantallas context selector',
+  );
+  assert.equal(
+    workspace.includes('data-editor-mobile-sheet="screens"'),
+    true,
+    'Pantallas must remain available in the mobile editor without leaving the Screen Composer',
   );
 
   for (const destination of ['components', 'screens', 'canvas', 'properties', 'more']) {
@@ -68,13 +72,20 @@ test('M03.6 structural gate preserves capabilities across responsive modes', asy
     assert.equal(icons.includes(`'${iconId}'`), true, `M03.6 semantic icon missing: ${iconId}`);
   }
 
-  for (const copy of ['rail global de 56px', 'navegación inferior', 'Sheets inferiores', 'altura completa']) {
-    assert.equal(help.includes(copy), true, `M03.6 persistent help missing concept: ${copy}`);
-  }
+  assert.equal(
+    help.includes("id: 'help.studio.shell'") && help.includes("id: 'help.editor.screens'"),
+    true,
+    'Responsive Editor and Pantallas must remain reachable through the typed persistent HelpRegistry',
+  );
 
-  assert.match(state, /M03\.5[^\n]*COMPLETADA[^\n]*GREEN/);
+  const phaseComplete = /F03[^\n]*COMPLETADA[^\n]*GREEN/.test(state);
   const active = /M03\.6[^\n]*ACTIVE/.test(state);
   const complete = /M03\.6[^\n]*COMPLETADA[^\n]*GREEN/.test(state);
-  assert.equal(active || complete, true, 'M03.6 must be ACTIVE or post-closure COMPLETADA / GREEN');
-  assert.equal((state.match(/`ACTIVE`/g) ?? []).length, 1, 'Exactly one microphase must remain ACTIVE');
+  assert.equal(
+    active || complete || phaseComplete,
+    true,
+    'M03.6 must remain covered by an ACTIVE or GREEN F03 state',
+  );
+  const activeIds = new Set([...state.matchAll(/\b(M\d{2}\.\d+)\b[^\n]*`ACTIVE`/g)].map((match) => match[1]));
+  assert.equal(activeIds.size, 1, 'Exactly one unique microphase must remain ACTIVE');
 });

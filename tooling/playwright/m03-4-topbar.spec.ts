@@ -37,14 +37,14 @@ test.describe('M03.4 Topbar global + Settings', () => {
     await expect(settings).toBeFocused();
   });
 
-  test('opens persistent AppShell help instead of hiding critical help in a tooltip', async ({ page }) => {
+  test('opens persistent contextual editor help instead of hiding critical help in a tooltip', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/editor');
 
     await page.getByRole('button', { name: 'Ayuda' }).click();
-    const dialog = page.getByRole('dialog', { name: 'AppShell del Studio' });
+    const dialog = page.getByRole('dialog', { name: 'Editor' });
     await expect(dialog).toBeVisible();
-    await expect(dialog).toContainText('WorkspacePreferencesPort');
+    await expect(dialog).toContainText('pantalla activa');
     await dialog.getByRole('button', { name: 'Cerrar ayuda' }).click();
     await expect(page.getByRole('button', { name: 'Ayuda' })).toBeFocused();
   });
@@ -58,7 +58,11 @@ test.describe('M03.4 Topbar global + Settings', () => {
     await expect(tools).toBeVisible();
     await tools.click();
     const toolsDialog = page.getByRole('dialog', { name: 'Herramientas contextuales' });
-    await expect(toolsDialog).toContainText('Tablet');
+    const breakpoint = toolsDialog.locator('[data-topbar-tool="breakpoint"]').getByRole('combobox');
+    await expect(breakpoint).toBeVisible();
+    await expect(breakpoint).toContainText(
+      /Móvil pequeño|Móvil grande|Tablet vertical|Tablet horizontal|Portátil|Escritorio/,
+    );
     await page.keyboard.press('Escape');
     await expect(tools).toBeFocused();
 

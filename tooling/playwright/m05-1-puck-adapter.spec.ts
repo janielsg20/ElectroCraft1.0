@@ -18,7 +18,7 @@ test.describe('M05.1 Puck adapter browser contract', () => {
         metadata: { source: 'm05.1-browser' },
       };
       const document = {
-        schemaVersion: 3 as const,
+        schemaVersion: 4 as const,
         id: 'ec_document_0000000000002',
         version: 1,
         name: 'Compatibilidad',
@@ -67,7 +67,7 @@ test.describe('M05.1 Puck adapter browser contract', () => {
       };
     });
 
-    expect(result.rootProps).toEqual({ props: { label: 'Inicio' } });
+    expect(result.rootProps).toMatchObject({ props: { label: 'Inicio' } });
     expect(result.projectedType).toBe('__ElectroCraftDiagnostic');
     expect(result.diagnostics).toContainEqual(
       expect.objectContaining({ code: 'unknown-component', componentRef: 'LegacyWidget' }),
@@ -84,14 +84,15 @@ test.describe('M05.1 Puck adapter browser contract', () => {
         }),
       ],
     });
+    expect(result.document.root.props).toEqual({ label: 'Inicio' });
     expect(result.persisted).toMatchObject({
       objectId: 'ec_document_0000000000002',
       kind: 'document',
-      schemaVersion: 3,
+      schemaVersion: 4,
       payload: expect.objectContaining({
-        schemaVersion: 3,
+        schemaVersion: 4,
         id: 'ec_document_0000000000002',
-        root: expect.objectContaining({ componentRef: 'core.root' }),
+        root: expect.objectContaining({ componentRef: 'core.root', props: { label: 'Inicio' } }),
       }),
     });
     expect(result.leakedInternalKey).toBe(false);

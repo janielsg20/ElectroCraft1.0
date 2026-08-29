@@ -89,7 +89,8 @@ test.describe('M06.6 breadcrumbs and context actions', () => {
     });
 
     const breadcrumbs = page.getByRole('navigation', { name: 'Jerarquía del componente seleccionado' });
-    await expect(breadcrumbs).toContainText('Página');
+    await expect(breadcrumbs).toContainText('App');
+    await expect(breadcrumbs).toContainText('Pantalla');
     await expect(breadcrumbs).toContainText('Contenedor');
     await expect(breadcrumbs).toContainText('Texto');
 

@@ -124,7 +124,13 @@ test.describe('M03.6 responsive AppShell and editor', () => {
     await expect(page.locator('[data-editor-canvas-stage]')).toBeFocused();
 
     const screens = dock.locator('[data-mobile-destination="screens"]');
-    await expect(screens).toHaveAttribute('href', '/screens');
+    await expect(screens).not.toHaveAttribute('href', '/screens');
+    await screens.click();
+    const screensDialog = page.locator('[data-editor-mobile-sheet="screens"]');
+    await expect(screensDialog).toBeVisible();
+    await expect(screensDialog).toContainText('No hay Pantallas en este proyecto.', { timeout: 60_000 });
+    await page.keyboard.press('Escape');
+    await expect(screens).toBeFocused();
 
     const metrics = await page.evaluate(() => ({
       scrollWidth: document.documentElement.scrollWidth,

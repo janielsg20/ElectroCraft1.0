@@ -2,7 +2,7 @@ import type { DesignSystemPackageDescriptor } from '@electrocraft/design-system'
 import { translateStrict, type ElectroCraftResourceKey } from '@electrocraft/i18n';
 import type { ReactNode } from 'react';
 import { workspacePreferencesPort } from '../features/projects/workspace-preferences-runtime';
-import { getStudioHelpDescriptor } from '../help/help-registry';
+import { getHelpIdForNavigationItem, getStudioHelpDescriptor } from '../help/help-registry';
 import { iaT } from '../i18n/information-architecture.es';
 import { StudioAppearanceProvider } from '../theme-provider';
 import { AppShell, type AppShellCopy, type AppShellStatus } from './app-shell';
@@ -105,8 +105,8 @@ export function StudioAppShellRoute({
   readonly status: AppShellStatus;
   readonly children?: ReactNode;
 }) {
-  const help = getStudioHelpDescriptor('help.studio.shell');
   const activeItemId = resolveSidebarActiveItem(window.location.pathname);
+  const help = getStudioHelpDescriptor(activeItemId ? getHelpIdForNavigationItem(activeItemId) : 'help.studio.shell');
   const activeLabel = resolveActiveLabel(activeItemId, window.location.pathname);
 
   return (

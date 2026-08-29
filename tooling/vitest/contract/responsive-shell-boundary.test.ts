@@ -27,11 +27,12 @@ describe('M03.6 responsive shell boundaries', () => {
     }
   });
 
-  it('keeps Puck owned by editor-puck and resolves Screens from canonical Studio navigation', () => {
+  it('keeps Puck owned by editor-puck and resolves Screens through the Screen Composer selector', () => {
     const workspace = read('apps/studio/src/shell/editor-workspace.tsx');
     expect(workspace).toContain("from '@electrocraft/editor-puck'");
     expect(workspace).not.toContain("from '@puckeditor/core'");
-    expect(workspace).toContain("getStudioSidebarNavigationItem('screens')");
+    expect(workspace).toContain('EditorScreensContextPanel');
+    expect(workspace).toContain('data-editor-mobile-sheet="screens"');
     expect(workspace).not.toContain('href="/screens"');
   });
 

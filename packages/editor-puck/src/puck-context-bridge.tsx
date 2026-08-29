@@ -63,7 +63,10 @@ function resolveBreadcrumbs(
   getItemById: (id: string) => ComponentData | null | undefined,
   getSelectorForId: (id: string) => { index: number; zone: string } | null | undefined,
 ): readonly PuckContextBreadcrumb[] {
-  const breadcrumbs: PuckContextBreadcrumb[] = [{ id: 'root', label: 'Página' }];
+  const breadcrumbs: PuckContextBreadcrumb[] = [
+    { id: 'app', label: 'App' },
+    { id: 'root', label: 'Pantalla' },
+  ];
   const lineage: PuckContextBreadcrumb[] = [];
   const seen = new Set<string>();
   let currentId: string | null = selectedId;
@@ -132,16 +135,6 @@ export function PuckContextBridge() {
             if (current.children.length > 0 && !slot) {
               throw new Error(`El componente ${current.componentRef} no admite hijos en el registry activo.`);
             }
-            dispatch({
-              type: 'insert',
-              componentType: current.componentRef,
-              destinationIndex: index,
-              destinationZone: zone,
-              id: current.id,
-            });
-            const inserted = getItemById(current.id);
-            const selector = getSelectorForId(current.id);
-            if (!inserted || !selector) throw new Error(`Puck no pudo materializar ${current.id} desde el clipboard.`);
             const props = projectPuckNodePresentation(
               {
                 ...current.props,
@@ -151,10 +144,17 @@ export function PuckContextBridge() {
               current,
             );
             dispatch({
+              type: 'insert',
+              componentType: current.componentRef,
+              destinationIndex: index,
+              destinationZone: zone,
+              id: current.id,
+            });
+            dispatch({
               type: 'replace',
-              destinationIndex: selector.index,
-              destinationZone: selector.zone,
-              data: { ...inserted, props: props as typeof inserted.props },
+              destinationIndex: index,
+              destinationZone: zone,
+              data: { type: current.componentRef, props } as ComponentData,
             });
             if (slot) {
               current.children.forEach((child, childIndex) => insertNode(child, `${current.id}:${slot}`, childIndex));
@@ -162,8 +162,7 @@ export function PuckContextBridge() {
           };
 
           insertNode(cloned, destinationZone, destinationIndex);
-          const selector = getSelectorForId(cloned.id);
-          if (selector) dispatch({ type: 'setUi', ui: { itemSelector: selector } });
+          dispatch({ type: 'setUi', ui: { itemSelector: { index: destinationIndex, zone: destinationZone } } });
           return cloned.id;
         },
         duplicate(id) {
