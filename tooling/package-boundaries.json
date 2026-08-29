@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "packageVersion": "0.0.0-m08.1",
+  "packageVersion": "0.0.0-m08.2",
   "packages": {
     "@electrocraft/domain": [],
     "@electrocraft/application": ["@electrocraft/domain"],
@@ -49,6 +49,7 @@
     "@electrocraft/studio": [
       "@electrocraft/domain",
       "@electrocraft/application",
+      "@electrocraft/connectors",
       "@electrocraft/design-system",
       "@electrocraft/i18n",
       "@electrocraft/editor-puck",
