@@ -16,6 +16,7 @@ export type StudioHelpId =
   | 'help.studio.language'
   | 'help.projects'
   | 'help.editor.advanced'
+  | 'help.navigation'
   | `help.section.${SidebarNavigationItemId}`;
 
 export interface HelpDescriptor {
@@ -144,6 +145,18 @@ const studioDefinitions = Object.freeze([
     keywords: ['layout', 'diseño', 'estilo', 'fila', 'columna', 'cuadrícula', 'tokens', 'restablecer', 'heredado'],
     learnMoreRef: '.ai/microphases/M06_1.md',
   },
+  {
+    id: 'help.navigation',
+    sectionId: 'navigation-graph',
+    navigationItemId: 'navigation',
+    titleKey: helpKey('help.section.navigation.title'),
+    shortKey: helpKey('help.section.navigation.short'),
+    longKey: helpKey('help.section.navigation.long'),
+    exampleKeys: [helpKey('help.section.navigation.example')],
+    relatedIds: ['help.section.screens', 'help.section.navigation', 'help.section.workflows'],
+    keywords: ['navigation graph', 'pantallas', 'rutas', 'ruta', 'stack', 'tabs', 'drawer', 'modal', 'parámetros', 'deep link', 'guards'],
+    learnMoreRef: '.ai/microphases/M07_1.md',
+  },
 ] as const satisfies readonly HelpDefinition[]);
 
 const navigationKeywords: Readonly<Record<SidebarNavigationItemId, readonly string[]>> = Object.freeze({
@@ -175,6 +188,8 @@ const navigationKeywords: Readonly<Record<SidebarNavigationItemId, readonly stri
 
 const navigationRelated: Partial<Record<SidebarNavigationItemId, readonly StudioHelpId[]>> = Object.freeze({
   editor: ['help.section.components', 'help.section.screens'],
+  screens: ['help.navigation', 'help.section.editor'],
+  navigation: ['help.navigation', 'help.section.screens'],
   components: ['help.section.editor', 'help.section.templates'],
   records: ['help.section.models', 'help.section.queries', 'help.section.forms'],
   models: ['help.section.records', 'help.section.forms'],
