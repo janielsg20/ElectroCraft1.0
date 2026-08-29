@@ -18,6 +18,7 @@ import { puckEditorHistoryControls, puckPlatformControls, puckResponsiveControls
 import { useEffect, useSyncExternalStore } from 'react';
 import { editorHistoryPreferencesRuntime } from '../features/editor/editor-history-preferences-runtime';
 import { EditorSettings } from '../features/editor/editor-settings';
+import { EditorScreenTopbarSelect } from '../features/navigation/editor-screen-selector';
 import { projectStorageRuntime } from '../features/projects/project-storage-runtime';
 import { StorageSettings } from '../features/projects/storage-settings';
 import { WorkspaceSettings } from '../features/projects/workspace-settings';
@@ -139,9 +140,9 @@ function TopbarToolCluster({
 
   return (
     <div className="ec-topbar-tool-cluster" aria-label={copy.toolsTitle}>
-      <span className="ec-topbar-tool" data-topbar-tool="document" aria-label={`${copy.documentLabel}: ${activeLabel}`}>
+      <span className="ec-topbar-tool" data-topbar-tool="document" aria-label={copy.documentLabel}>
         <DocumentIcon aria-hidden="true" />
-        <span>{activeLabel}</span>
+        <EditorScreenTopbarSelect fallbackLabel={activeLabel} />
       </span>
       <div className="ec-topbar-tool ec-topbar-breakpoint-select" data-topbar-tool="platform">
         <PlatformIcon aria-hidden="true" />
