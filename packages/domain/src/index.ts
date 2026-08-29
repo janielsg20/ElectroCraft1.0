@@ -36,6 +36,7 @@ export {
 } from './navigation';
 export * from './navigation/actions';
 export * from './navigation/builder';
+export * from './navigation/compiler';
 export * from './navigation/guards';
 export * from './contracts/canonical-json';
 export * from './contracts/capability-report';
