@@ -171,4 +171,25 @@ describe('M08.2 InternalDataSourceAdapter', () => {
     expect(schemaSource.match(/pgTable\('content_records'/g)).toHaveLength(1);
     expect(migrationSource.match(/CREATE TABLE IF NOT EXISTS content_records/g)).toHaveLength(1);
   });
+
+  it('keeps the beginner UX local/offline and never exposes a SQL console', () => {
+    const workspace = readFileSync(resolve('apps/studio/src/features/data/data-sources-feature-workspace.tsx'), 'utf8');
+    const runtime = readFileSync(resolve('apps/studio/src/features/data/data-source-runtime.ts'), 'utf8');
+
+    for (const copy of [
+      'ElectroCraft Data',
+      'Local',
+      'Disponible sin conexión',
+      'Modelos',
+      'Registros',
+      'Copia de seguridad',
+      'help.data.internal',
+    ]) {
+      expect(workspace).toContain(copy);
+    }
+    expect(workspace).not.toMatch(/consola SQL|SQL console|textarea[^>]*sql/i);
+    expect(runtime).toContain("storage: 'content_records'");
+    expect(runtime).toContain('offlineCapable: true');
+    expect(runtime).not.toContain('lastDocumentId');
+  });
 });
