@@ -1,11 +1,22 @@
 import {
-  createInitialNavigationGraph,
+  addScreenRouteToNavigation,
+  analyzeScreenDelete,
+  createNavigationForScreenRoute,
+  createRouteForScreen,
+  createScreenDocument,
+  duplicateScreenDocument,
   navigationGraphStoredObjects,
   parseNavigationWorkspaceGraph,
   type NavigationWorkspaceGraph,
+  type ScreenDeleteAnalysis,
   type StoredProjectDefinition,
 } from '@electrocraft/application';
-import { type ElectroCraftDocument } from '@electrocraft/domain';
+import {
+  electroCraftActionGraphSchema,
+  type ElectroCraftActionGraph,
+  type ElectroCraftDocument,
+  type JsonValue,
+} from '@electrocraft/domain';
 import { projectStorageRuntime } from '../projects/project-storage-runtime';
 import { workspacePreferencesRuntime } from '../projects/workspace-preferences-runtime';
 
@@ -19,6 +30,13 @@ export interface NavigationWorkspaceSnapshot {
   readonly lastSavedMessage: string | null;
 }
 
+export interface CreateScreenWorkspaceInput {
+  readonly name: string;
+  readonly path: string;
+  readonly templateRef?: string | null;
+  readonly navigatorRef?: string | null;
+}
+
 const listeners = new Set<() => void>();
 let snapshot: NavigationWorkspaceSnapshot = Object.freeze({
   state: 'initial',
@@ -28,6 +46,8 @@ let snapshot: NavigationWorkspaceSnapshot = Object.freeze({
   lastSavedMessage: null,
 });
 let loadPromise: Promise<NavigationWorkspaceSnapshot> | null = null;
+let actionGraphs: readonly ElectroCraftActionGraph[] = Object.freeze([]);
+let screenUpdatedAt = new Map<string, string>();
 
 function publish(next: NavigationWorkspaceSnapshot) {
   snapshot = Object.freeze(next);
@@ -45,6 +65,15 @@ function screenDocuments(graph: NavigationWorkspaceGraph): readonly ElectroCraft
 
 function cyclicNavigationDiagnostic(graph: NavigationWorkspaceGraph) {
   return graph.diagnostics.find(({ code }) => code === 'navigation-cycle') ?? null;
+}
+
+function documentStoredObject(document: ElectroCraftDocument) {
+  return {
+    objectId: document.id,
+    kind: 'document',
+    schemaVersion: document.schemaVersion,
+    payload: structuredClone(document) as unknown as JsonValue,
+  } as const;
 }
 
 async function persistCanonicalMigrations(project: StoredProjectDefinition, graph: NavigationWorkspaceGraph) {
@@ -66,6 +95,8 @@ async function loadWorkspace(): Promise<NavigationWorkspaceSnapshot> {
   await projectStorageRuntime.initialize();
   const projectId = activeProjectId();
   if (!projectId) {
+    actionGraphs = Object.freeze([]);
+    screenUpdatedAt = new Map();
     return publish({
       state: 'ready',
       graph: null,
@@ -92,6 +123,17 @@ async function loadWorkspace(): Promise<NavigationWorkspaceSnapshot> {
       routes: opened.objects.filter(({ kind }) => kind === 'route').map(({ payload }) => payload),
       navigations: opened.objects.filter(({ kind }) => kind === 'navigation').map(({ payload }) => payload),
     });
+    actionGraphs = Object.freeze(
+      opened.objects
+        .filter(({ kind }) => kind === 'action-graph')
+        .map(({ payload }) => electroCraftActionGraphSchema.safeParse(payload))
+        .filter((result) => result.success)
+        .map((result) => result.data),
+    );
+    screenUpdatedAt = new Map(
+      opened.objects.filter(({ kind }) => kind === 'document').map((object) => [object.objectId, object.updatedAt] as const),
+    );
+
     const cycle = cyclicNavigationDiagnostic(graph);
     if (cycle) {
       return publish({
@@ -124,6 +166,11 @@ async function loadWorkspace(): Promise<NavigationWorkspaceSnapshot> {
   }
 }
 
+async function reloadAfterSave(message: string) {
+  await loadWorkspace();
+  return publish({ ...snapshot, lastSavedMessage: message });
+}
+
 export const navigationWorkspaceRuntime = Object.freeze({
   subscribe(listener: () => void) {
     listeners.add(listener);
@@ -133,6 +180,9 @@ export const navigationWorkspaceRuntime = Object.freeze({
   screenDocuments() {
     return snapshot.graph ? screenDocuments(snapshot.graph) : [];
   },
+  screenUpdatedAt(screenId: string) {
+    return screenUpdatedAt.get(screenId) ?? null;
+  },
   load() {
     if (!loadPromise) {
       loadPromise = loadWorkspace().finally(() => {
@@ -140,6 +190,102 @@ export const navigationWorkspaceRuntime = Object.freeze({
       });
     }
     return loadPromise;
+  },
+  async createScreen(input: CreateScreenWorkspaceInput) {
+    const current = snapshot;
+    if (!current.project || !current.graph) throw new Error('Abre un proyecto antes de crear una pantalla.');
+    const path = input.path.trim();
+    if (current.graph.routes.some((route) => route.path === path)) throw new Error(`La Ruta ${path} ya existe.`);
+
+    publish({ ...current, state: 'saving', message: 'Creando Pantalla…', lastSavedMessage: null });
+    try {
+      const seed = globalThis.crypto.randomUUID();
+      const screen = createScreenDocument({ name: input.name, idSeed: seed, templateRef: input.templateRef });
+      const route = createRouteForScreen({ screen, path, idSeed: seed });
+      const currentNavigation = current.graph.navigations[0] ?? null;
+      const navigation = currentNavigation
+        ? addScreenRouteToNavigation({
+            navigation: currentNavigation,
+            route,
+            screenName: screen.name,
+            navigatorRef: input.navigatorRef,
+          })
+        : createNavigationForScreenRoute({ screen, route, idSeed: seed });
+
+      projectStorageRuntime.queueAutosave({
+        project: current.project,
+        dirtyObjects: [documentStoredObject(screen), ...navigationGraphStoredObjects({ routes: [route], navigations: [navigation] })],
+      });
+      await projectStorageRuntime.flushAutosave();
+      await reloadAfterSave(`Pantalla “${screen.name}” creada y conectada a Navegación.`);
+      return screen;
+    } catch (error) {
+      publish({
+        ...current,
+        state: 'error',
+        message: error instanceof Error ? error.message : 'No se pudo crear la Pantalla.',
+        lastSavedMessage: null,
+      });
+      throw error;
+    }
+  },
+  async duplicateScreen(screenId: string) {
+    const current = snapshot;
+    if (!current.project || !current.graph) throw new Error('Abre un proyecto antes de duplicar una pantalla.');
+    const source = screenDocuments(current.graph).find(({ id }) => id === screenId);
+    if (!source) throw new Error('La Pantalla seleccionada ya no existe.');
+
+    publish({ ...current, state: 'saving', message: 'Duplicando Pantalla…', lastSavedMessage: null });
+    try {
+      const result = duplicateScreenDocument({ source, idSeed: globalThis.crypto.randomUUID() });
+      projectStorageRuntime.queueAutosave({ project: current.project, dirtyObjects: [documentStoredObject(result.screen)] });
+      await projectStorageRuntime.flushAutosave();
+      await reloadAfterSave(`Pantalla duplicada. Ruta sugerida: ${result.routeSuggestion}`);
+      return result;
+    } catch (error) {
+      publish({
+        ...current,
+        state: 'error',
+        message: error instanceof Error ? error.message : 'No se pudo duplicar la Pantalla.',
+        lastSavedMessage: null,
+      });
+      throw error;
+    }
+  },
+  analyzeDelete(screenId: string): ScreenDeleteAnalysis {
+    if (!snapshot.graph) return { allowed: false, usages: [] };
+    return analyzeScreenDelete({
+      screenId,
+      documents: snapshot.graph.documents,
+      routes: snapshot.graph.routes,
+      navigations: snapshot.graph.navigations,
+      actionGraphs,
+    });
+  },
+  async deleteScreen(screenId: string) {
+    const current = snapshot;
+    if (!current.project || !current.graph) throw new Error('Abre un proyecto antes de eliminar una pantalla.');
+    const analysis = this.analyzeDelete(screenId);
+    if (!analysis.allowed) {
+      throw new Error(`No se puede eliminar: la Pantalla tiene ${analysis.usages.length} referencia(s) activas.`);
+    }
+    const screen = screenDocuments(current.graph).find(({ id }) => id === screenId);
+    if (!screen) throw new Error('La Pantalla seleccionada ya no existe.');
+
+    publish({ ...current, state: 'saving', message: 'Eliminando Pantalla…', lastSavedMessage: null });
+    try {
+      projectStorageRuntime.queueAutosave({ project: current.project, dirtyObjects: [], deletedObjectIds: [screenId] });
+      await projectStorageRuntime.flushAutosave();
+      await reloadAfterSave(`Pantalla “${screen.name}” eliminada.`);
+    } catch (error) {
+      publish({
+        ...current,
+        state: 'error',
+        message: error instanceof Error ? error.message : 'No se pudo eliminar la Pantalla.',
+        lastSavedMessage: null,
+      });
+      throw error;
+    }
   },
   async createInitialNavigation() {
     const current = snapshot;
@@ -152,22 +298,15 @@ export const navigationWorkspaceRuntime = Object.freeze({
 
     publish({ ...current, state: 'saving', message: 'Guardando navegación inicial…', lastSavedMessage: null });
     try {
-      const created = createInitialNavigationGraph(screen);
-      const objects = navigationGraphStoredObjects({ routes: [created.route], navigations: [created.navigation] });
-      projectStorageRuntime.queueAutosave({ project: current.project, dirtyObjects: objects });
-      await projectStorageRuntime.flushAutosave();
-      const graph = parseNavigationWorkspaceGraph({
-        documents: current.graph.documents,
-        routes: [created.route],
-        navigations: [created.navigation],
-      });
-      return publish({
-        state: 'ready',
-        graph,
+      const seed = globalThis.crypto.randomUUID();
+      const route = createRouteForScreen({ screen, path: '/', idSeed: `${seed}:initial`, name: 'Inicio' });
+      const navigation = createNavigationForScreenRoute({ screen, route, idSeed: seed });
+      projectStorageRuntime.queueAutosave({
         project: current.project,
-        message: 'Navigation Graph listo.',
-        lastSavedMessage: 'Ruta inicial y navegación principal guardadas.',
+        dirtyObjects: navigationGraphStoredObjects({ routes: [route], navigations: [navigation] }),
       });
+      await projectStorageRuntime.flushAutosave();
+      return reloadAfterSave('Ruta inicial y navegación principal guardadas.');
     } catch (error) {
       publish({
         ...current,
