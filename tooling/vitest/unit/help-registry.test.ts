@@ -21,6 +21,7 @@ const studioScopedHelpIds = [
   'help.navigation.compiler',
   'help.screens',
   'help.data.sources',
+  'help.data.internal',
 ] as const;
 
 describe('M03.11 typed HelpRegistry', () => {
@@ -52,6 +53,8 @@ describe('M03.11 typed HelpRegistry', () => {
     expect(searchStudioHelp('iniciar sesión').some((entry) => entry.id === 'help.navigation.guards')).toBe(true);
     expect(searchStudioHelp('expo router').some((entry) => entry.id === 'help.navigation.compiler')).toBe(true);
     expect(searchStudioHelp('connector registry').some((entry) => entry.id === 'help.data.sources')).toBe(true);
+    expect(searchStudioHelp('electrocraft data').some((entry) => entry.id === 'help.data.internal')).toBe(true);
+    expect(searchStudioHelp('disponible sin conexión').some((entry) => entry.id === 'help.data.internal')).toBe(true);
   });
 
   it('maps Fuentes de datos to its M08 contextual descriptor', () => {
@@ -59,6 +62,10 @@ describe('M03.11 typed HelpRegistry', () => {
     expect(getStudioHelpDescriptor('help.data.sources')).toMatchObject({
       sectionId: 'data-sources-management',
       learnMoreRef: '.ai/microphases/M08_1.md',
+    });
+    expect(getStudioHelpDescriptor('help.data.internal')).toMatchObject({
+      sectionId: 'data-internal',
+      learnMoreRef: '.ai/microphases/M08_2.md',
     });
   });
 
