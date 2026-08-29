@@ -95,6 +95,10 @@ test('M03.8 continuity remains GREEN after F03 phase closure', () => {
     true,
     'M03.8 must remain covered by F03 GREEN closure or its explicit microphase state',
   );
-  assert.equal(existsSync('.ai/evidence/F03/CLOSURE_2026-08-20.md'), true, 'F03 closure evidence must remain present');
+  assert.equal(
+    existsSync('.ai/evidence/F03/CLOSURE_2026-08-20.md'),
+    true,
+    'F03 closure evidence must remain present',
+  );
   assert.match(read('.ai/evidence/F03/CLOSURE_2026-08-20.md'), /GREEN/);
 });
