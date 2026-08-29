@@ -8,6 +8,7 @@ import {
   getStudioIcon,
 } from '@electrocraft/design-system';
 import { useEffect, useMemo, useSyncExternalStore } from 'react';
+import { HelpTrigger } from '../../help/help-ui';
 import { editorScreenSelectionRuntime } from './editor-screen-selection-runtime';
 import './editor-screen-selector.css';
 import { navigationWorkspaceRuntime } from './navigation-workspace-runtime';
@@ -127,9 +128,12 @@ export function EditorScreensContextPanel() {
           <strong>Pantallas</strong>
           <span>{screens.length} en el proyecto</span>
         </div>
-        <Button variant="ghost" size="icon" asChild aria-label="Administrar Pantallas" title="Administrar Pantallas">
-          <a href="/screens"><OpenIcon aria-hidden="true" /></a>
-        </Button>
+        <div className="ec-editor-screen-context-actions">
+          <HelpTrigger helpId="help.editor.screens" />
+          <Button variant="ghost" size="icon" asChild aria-label="Administrar Pantallas" title="Administrar Pantallas">
+            <a href="/screens"><OpenIcon aria-hidden="true" /></a>
+          </Button>
+        </div>
       </div>
       <div className="ec-editor-screen-context-list" role="listbox" aria-label="Seleccionar Pantalla">
         {screens.map((screen) => {
