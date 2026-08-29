@@ -5,6 +5,7 @@ import {
   type ElectroCraftDataConnector,
 } from '@electrocraft/application';
 
+export * from './internal-data-source-adapter';
 export { dataSourceConnectorRegistry };
 
 export function registerDataSourceAdapter(adapter: DataSourceAdapter) {
