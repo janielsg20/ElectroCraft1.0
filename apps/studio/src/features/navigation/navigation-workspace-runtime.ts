@@ -106,6 +106,7 @@ async function loadWorkspace(): Promise<NavigationWorkspaceSnapshot> {
     lastSavedMessage: null,
   });
   await projectStorageRuntime.initialize();
+  await workspacePreferencesRuntime.initialize();
   const projectId = activeProjectId();
   if (!projectId) {
     actionGraphs = Object.freeze([]);
