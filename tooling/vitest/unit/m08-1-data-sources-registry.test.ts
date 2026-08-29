@@ -6,6 +6,7 @@ import {
   createStoredDataSourceObject,
   type DataSourceAdapter,
 } from '@electrocraft/application';
+import { WebDataSourceRepository } from '@electrocraft/data-web';
 import {
   createDeterministicObjectId,
   electroCraftDataSourceDefinitionSchema,
@@ -15,11 +16,15 @@ import {
 } from '@electrocraft/domain';
 
 const workspaceSource = readFileSync(
-  new URL('../../../apps/studio/src/features/data-sources/data-sources-workspace.tsx', import.meta.url),
+  new URL('../../../apps/studio/src/features/data/data-sources-workspace.tsx', import.meta.url),
+  'utf8',
+);
+const workspaceCss = readFileSync(
+  new URL('../../../apps/studio/src/features/data/data-sources-workspace.css', import.meta.url),
   'utf8',
 );
 const runtimeSource = readFileSync(
-  new URL('../../../apps/studio/src/features/data-sources/data-source-runtime.ts', import.meta.url),
+  new URL('../../../apps/studio/src/features/data/data-source-runtime.ts', import.meta.url),
   'utf8',
 );
 const routeSource = readFileSync(new URL('../../../apps/studio/src/shell/app-shell-route.tsx', import.meta.url), 'utf8');
@@ -35,17 +40,20 @@ function source(overrides: Partial<ElectroCraftDataSourceDefinition> = {}) {
     adapterId: 'rest.fetch',
     authRef: null,
     config: { baseUrl: 'https://example.test/api' },
+    environmentScope: ['development', 'preview', 'production'],
     environmentOverrides: {
       development: { baseUrl: 'http://localhost:8787/api' },
     },
     schemaDiscovery: 'on-demand',
-    capabilities: ['read', 'filter', 'sort', 'pagination'],
+    capabilities: ['read', 'filtering', 'sort', 'pagination'],
     metadata: {},
     ...overrides,
   });
 }
 
-function adapter(capabilities: DataSourceAdapter['capabilities'] = ['read', 'filter', 'sort', 'pagination']): DataSourceAdapter {
+function adapter(
+  capabilities: DataSourceAdapter['capabilities'] = ['read', 'filtering', 'sort', 'pagination'],
+): DataSourceAdapter {
   return {
     adapterId: 'rest.fetch',
     displayName: 'REST Fetch',
@@ -55,26 +63,23 @@ function adapter(capabilities: DataSourceAdapter['capabilities'] = ['read', 'fil
     async testConnection() {
       return { ok: true, message: 'connected' };
     },
+    async listResources() {
+      return [{ id: 'products', label: 'Products', kind: 'collection' }];
+    },
     async getSchema() {
       return null;
     },
-    async read() {
-      return [];
+    async query(_context, request) {
+      return request.input ?? [];
     },
-    async create(_context, input) {
-      return input;
-    },
-    async update(_context, input) {
-      return input;
-    },
-    async remove(_context, input) {
-      return input;
+    async mutate(_context, request) {
+      return request.input ?? null;
     },
   };
 }
 
 describe('M08.1 DataSources registry', () => {
-  it('registers and resolves one backend-agnostic DataSourceAdapter through the existing registry owner', () => {
+  it('registers, resolves and unregisters one backend-agnostic adapter through one registry owner', () => {
     const registry = new ConnectorRegistry();
     const registered = adapter();
     registry.registerAdapter(registered);
@@ -87,6 +92,8 @@ describe('M08.1 DataSources registry', () => {
         supportsSchemaDiscovery: true,
       }),
     ]);
+    expect(registry.unregister('rest.fetch')).toBe(true);
+    expect(registry.has('rest.fetch')).toBe(false);
   });
 
   it('validates declared capabilities and unknown adapters without deriving hidden support', () => {
@@ -95,8 +102,9 @@ describe('M08.1 DataSources registry', () => {
 
     expect(registry.validateCompatibility(source())).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ code: 'UNSUPPORTED_CAPABILITY', capability: 'filter' }),
+        expect.objectContaining({ code: 'UNSUPPORTED_CAPABILITY', capability: 'filtering' }),
         expect.objectContaining({ code: 'UNSUPPORTED_CAPABILITY', capability: 'pagination' }),
+        expect.objectContaining({ code: 'UNSUPPORTED_CAPABILITY', capability: 'sort' }),
       ]),
     );
 
@@ -107,10 +115,46 @@ describe('M08.1 DataSources registry', () => {
     expect(() => registry.resolveAdapter(unknown)).toThrow(ConnectorRegistryError);
   });
 
-  it('normalizes legacy capability aliases to the eight canonical capability names', () => {
+  it('normalizes legacy aliases to the eleven canonical M08.1 capability flags', () => {
     expect(
-      normalizeDataSourceCapabilities(['read', 'create', 'update', 'delete', 'paginate', 'subscribe', 'aggregate']),
-    ).toEqual(['read', 'write', 'pagination', 'realtime']);
+      normalizeDataSourceCapabilities([
+        'read',
+        'write',
+        'paginate',
+        'filter',
+        'sort',
+        'aggregate',
+        'subscribe',
+        'files',
+        'transactions',
+      ]),
+    ).toEqual([
+      'read',
+      'create',
+      'update',
+      'delete',
+      'pagination',
+      'filtering',
+      'sort',
+      'aggregate',
+      'realtime',
+      'file',
+      'transactions',
+    ]);
+  });
+
+  it('blocks operations not declared by the source before the adapter executes', async () => {
+    const registry = new ConnectorRegistry();
+    registry.registerAdapter(adapter(['read', 'create']));
+    const readOnlySource = source({ capabilities: ['read'] });
+
+    await expect(
+      registry.mutate(readOnlySource, 'development', {
+        resourceId: 'products',
+        operation: 'create',
+        input: { name: 'Blocked' },
+      }),
+    ).rejects.toMatchObject({ code: 'UNSUPPORTED_OPERATION' });
   });
 
   it('keeps portable environment config separate from secret references', () => {
@@ -124,10 +168,12 @@ describe('M08.1 DataSources registry', () => {
     ).toThrow(/secrets are not allowed/);
   });
 
-  it('persists the canonical source through the generic F04 project object contract', () => {
+  it('round-trips only the canonical project payload and persists it through the F04 object contract', () => {
     const definition = source();
+    const roundTrip = electroCraftDataSourceDefinitionSchema.parse(JSON.parse(JSON.stringify(definition)));
     const stored = createStoredDataSourceObject(definition);
 
+    expect(roundTrip).toEqual(definition);
     expect(stored.objectId).toBe(definition.id);
     expect(stored.kind).toBe('data-source');
     expect(stored.schemaVersion).toBe(1);
@@ -136,23 +182,39 @@ describe('M08.1 DataSources registry', () => {
     expect(runtimeSource).toContain('createStoredDataSourceObject');
   });
 
-  it('delegates connection testing and schema introspection to the registered adapter', async () => {
+  it('consumes test, resource and schema operations through the data-web repository facade', async () => {
     const registry = new ConnectorRegistry();
     registry.registerAdapter(adapter());
+    const repository = new WebDataSourceRepository(registry);
     const definition = source();
 
-    await expect(registry.testConnection(definition, 'development')).resolves.toEqual({ ok: true, message: 'connected' });
-    await expect(registry.introspectSchema(definition, 'development')).resolves.toBeNull();
+    await expect(repository.testConnection(definition, 'development')).resolves.toEqual({
+      ok: true,
+      message: 'connected',
+    });
+    await expect(repository.listResources(definition, 'development')).resolves.toEqual([
+      { id: 'products', label: 'Products', kind: 'collection' },
+    ]);
+    await expect(repository.getSchema(definition, 'development')).resolves.toBeNull();
   });
 
-  it('exposes the canonical /data-sources desktop and mobile list-detail UX', () => {
+  it('exposes the canonical Spanish responsive /data-sources list-detail-inspector UX', () => {
     expect(routeSource).toContain("pathname === '/data-sources'");
     expect(workspaceSource).toContain('data-data-sources-workspace');
     expect(workspaceSource).toContain('data-mobile-detail');
-    expect(workspaceSource).toContain('Añadir fuente de datos');
+    expect(workspaceSource).toContain('Fuentes de datos');
+    expect(workspaceSource).toContain('Nueva fuente');
+    expect(workspaceSource).toContain('Interna');
+    expect(workspaceSource).toContain('REST API');
+    expect(workspaceSource).toContain('GraphQL');
     expect(workspaceSource).toContain('Probar conexión');
-    expect(workspaceSource).toContain('Inspeccionar esquema');
+    expect(workspaceSource).toContain('Esquema');
+    expect(workspaceSource).toContain('Credenciales');
+    expect(workspaceSource).toContain('Requiere gateway');
     expect(workspaceSource).toContain('help.data.sources');
     expect(workspaceSource).not.toContain('type="password"');
+    expect(workspaceCss).toContain('grid-template-columns: 300px minmax(0, 1fr) 280px');
+    expect(workspaceCss).toContain('@media (max-width: 1180px)');
+    expect(workspaceCss).toContain('@media (max-width: 760px)');
   });
 });
