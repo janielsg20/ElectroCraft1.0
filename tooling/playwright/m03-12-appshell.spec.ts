@@ -129,7 +129,7 @@ test.describe('M03.12 AppShell E2E closure matrix', () => {
 
     await help.focus();
     await page.keyboard.press('Enter');
-    const drawer = page.getByRole('dialog', { name: 'AppShell del Studio' });
+    const drawer = page.getByRole('dialog', { name: 'Editor' });
     await expect(drawer).toBeVisible();
     const search = drawer.getByLabel('Buscar en la ayuda');
     await search.fill('ExportIR');
