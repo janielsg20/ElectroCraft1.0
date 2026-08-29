@@ -24,29 +24,26 @@ El changelog histórico original hasta M00.8 se preserva sin modificaciones en `
 - M04.7: workspace preferences y saved layouts sobre el mismo storage multi-tab.
 - M04.8: `project_object_versions` deduplicado, Project Revision Service, diff/history y restore no destructivo.
 - Base CI `32859794266` cerró `GREEN`; PR `#48` se fusionó mediante squash a `main` en `ad64c0e5468b13a3fa3a712adb6621fa33d22fd0`.
-- El workflow dedicado M04.7 se archivó al cerrar F04 para evitar CI duplicado; Base CI queda como gate transversal por defecto.
-
-## 2026-08-25 — F05 iniciada
-- M05.1 activa: `PuckAdapter` y component mapping canónico detrás de `@electrocraft/editor-puck`, preservando IDs/Slots, diagnostics recuperables y separación entre editor history y Project Revisions.
 
 ## 2026-08-27 — F05 completada
 - M05.1–M05.8 integraron Puck como único Screen Composer con mapping/Slots, composition pública, action sync, history visual, inline editing, extensiones mínimas y Editor core E2E real.
-- Base CI `33101434587` (#742) cerró `GREEN`; PR `#60` se fusionó mediante squash a `main` en `a81ca149c17391b9fe77aaaf57b125d229320173`.
-- F06 inició con M06.1 para `ElectroCraftLayout/Style inspector`.
+- Base CI `33101434587` cerró `GREEN`; PR `#60` se fusionó mediante squash a `main` en `a81ca149c17391b9fe77aaaf57b125d229320173`.
 
-## 2026-08-27 — M06.1 completada
-- `ElectroCraftDocument` avanzó a v4 con Layout/Style por nodo y migración recursiva desde v3.
-- El adapter `@electrocraft/editor-puck` integra selección/replace públicos de Puck sin persistir internals ni CSS crudo.
-- Inspector Diseño/Estilo, presets/tokens/reset/herencia, ayuda persistente y Canvas semántico quedaron funcionales y verificados.
-- Gate local: lint, typecheck, Node 41/41, Vitest 415/415, build Studio/PWA y Playwright M06.1 GREEN.
-- M06.2 quedó habilitada para responsive inheritance y reset.
+## 2026-08-28 — F06 implementación fusionada y cierre correctivo
+- M06.1–M06.8 implementaron Layout/Style, responsive, platform overrides, guides/snapping, multiselección, context actions y QA avanzada.
+- La implementación F06 se fusionó a `main` mediante PR `#64`.
+- La PR correctiva `#67` ejecutó Base CI `33203881217`: docs/lint/typecheck/Vitest/build terminaron `success`; Playwright terminó `failure` con seis E2E heredados.
+- La rama F07 posterior incorporó reparaciones para estado vacío de Inspector avanzado, metadata responsive transitoria, solapamiento de topbar, lock contextual y breadcrumbs `App > Pantalla > Node`.
+- Estas reparaciones quedan pendientes de certificación en el siguiente gate de fase; no se registra un GREEN ficticio para el run fallido.
 
-## 2026-08-28 — F06 closure candidate
-- M06.2 consolidó responsive inheritance/reset y viewports Puck con breakpoints canónicos.
-- M06.3 añadió overrides Web/Android/iOS y capability diagnostics.
-- M06.4 añadió rulers/guides/snapping editor-only con preferencias locales y alternativa de teclado.
-- M06.5 añadió multiselección session-only, Group/Ungroup mediante acciones Puck y resize canónico compatible.
-- M06.6 añadió breadcrumbs, copy/paste de subárbol canónico, visibilidad, lock por permisos y reusable blocks reales.
-- M06.7 confirmó un único Puck para desktop/tablet/mobile con Sheets y dock móvil existente.
-- M06.8 consolidó ownership, eliminó CSS duplicado, reforzó compatibilidad legacy de `visibility` y añadió QA contractual/E2E transversal.
-- El gate `ElectroCraft Base CI` queda reservado para la PR final de F06; M06.8 permanece `ACTIVE` hasta resultado GREEN.
+## 2026-08-28 — F07 implementada, candidata a gate
+- M07.1 introdujo Route/Navigation v2, migración legacy, graph validation, params, guards y deep links.
+- M07.2 añadió Pantallas CRUD, propiedades, Ruta/Navigator, apertura exacta en Editor y delete blocker por refs.
+- M07.3 convirtió el Editor en Screen Composer orientado a Pantallas con selector compartido, un solo Puck e historial aislado.
+- M07.4 añadió Navigation Builder tree con Pila/Pestañas/Menú lateral/Modal, reorder accesible y presentación portable.
+- M07.5 añadió Route Params/deep links/bindings y ActionGraph Navegar `push|replace|back`, más URL externa http/https separada.
+- M07.6 añadió Acceso Público/Auth/Permiso/Condición, redirects sin loops y Preview fail-closed sin implementar auth real antes de F12.
+- M07.7 añadió `NavigationCompilerPort` y contratos React Router, Expo Router, LAMP/Slim, WordPress, Capacitor y Static Web sin persistir objetos target.
+- M07.8 añadió `/preview` contractual, integración de cuatro Pantallas y Playwright de flujo completo desktop/tablet/mobile.
+- Se registró evidencia para M07.1–M07.8 en `.ai/evidence/F07/`.
+- No se ejecutaron Actions por microfase. La siguiente transición exacta es `Gate F07` sobre `codex/m07-1-navigation-model`.
