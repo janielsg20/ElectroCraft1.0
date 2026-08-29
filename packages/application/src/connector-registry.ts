@@ -1,4 +1,5 @@
 import {
+  isDataSourceEnvironmentEnabled,
   normalizeDataSourceCapabilities,
   resolveDataSourceConfig,
   type ElectroCraftCanonicalDataSourceCapability,
@@ -9,7 +10,13 @@ import {
   type ElectroCraftQueryResult,
   type JsonValue,
 } from '@electrocraft/domain';
-import type { DataSourceAdapter, DataSourceAdapterContext } from './data';
+import type {
+  DataSourceAdapter,
+  DataSourceAdapterContext,
+  DataSourceMutationRequest,
+  DataSourceQueryRequest,
+  DataSourceResourceDescriptor,
+} from './data';
 
 export interface DataConnectorExecutionRequest {
   source: ElectroCraftDataSourceDefinition;
@@ -31,7 +38,8 @@ export type ConnectorRegistryBlockedCode =
   | 'ADAPTER_NOT_REGISTERED'
   | 'ADAPTER_ID_MISMATCH'
   | 'CONNECTOR_EXECUTION_FAILED'
-  | 'ADAPTER_INCOMPATIBLE';
+  | 'ADAPTER_INCOMPATIBLE'
+  | 'UNSUPPORTED_OPERATION';
 
 export type ConnectorCompatibilityDiagnosticCode =
   | 'UNKNOWN_ADAPTER'
@@ -187,29 +195,79 @@ export class ConnectorRegistry {
     }
   }
 
+  assertOperation(source: ElectroCraftDataSourceDefinition, capability: ElectroCraftCanonicalDataSourceCapability): void {
+    const declared = normalizeDataSourceCapabilities(source.capabilities);
+    if (!declared.includes(capability)) {
+      throw new ConnectorRegistryError('UNSUPPORTED_OPERATION', 'data source does not declare the requested capability', {
+        sourceId: source.id,
+        adapterId: source.adapterId,
+        capability,
+      });
+    }
+    const adapter = this.resolveAdapter(source);
+    if (!adapter.capabilities.includes(capability)) {
+      throw new ConnectorRegistryError('UNSUPPORTED_OPERATION', 'data source adapter does not support the requested capability', {
+        sourceId: source.id,
+        adapterId: source.adapterId,
+        capability,
+      });
+    }
+  }
+
   createAdapterContext(
     source: ElectroCraftDataSourceDefinition,
     environment: ElectroCraftDataSourceEnvironment,
   ): DataSourceAdapterContext {
     this.assertCompatibility(source);
+    if (!isDataSourceEnvironmentEnabled(source, environment)) {
+      throw new ConnectorRegistryError('ADAPTER_INCOMPATIBLE', 'data source is disabled for the requested environment', {
+        sourceId: source.id,
+        adapterId: source.adapterId,
+        environment,
+      });
+    }
     return Object.freeze({ source, environment, config: resolveDataSourceConfig(source, environment) });
   }
 
-  async testConnection(
-    source: ElectroCraftDataSourceDefinition,
-    environment: ElectroCraftDataSourceEnvironment,
-  ) {
+  async testConnection(source: ElectroCraftDataSourceDefinition, environment: ElectroCraftDataSourceEnvironment) {
     const adapter = this.resolveAdapter(source);
     return adapter.testConnection(this.createAdapterContext(source, environment));
   }
 
-  async introspectSchema(
+  async listResources(
     source: ElectroCraftDataSourceDefinition,
     environment: ElectroCraftDataSourceEnvironment,
-  ) {
+  ): Promise<readonly DataSourceResourceDescriptor[]> {
+    this.assertOperation(source, 'read');
+    const adapter = this.resolveAdapter(source);
+    return adapter.listResources(this.createAdapterContext(source, environment));
+  }
+
+  async introspectSchema(source: ElectroCraftDataSourceDefinition, environment: ElectroCraftDataSourceEnvironment) {
     const adapter = this.resolveAdapter(source);
     if (!adapter.supportsSchemaDiscovery) return null;
     return adapter.getSchema(this.createAdapterContext(source, environment));
+  }
+
+  async query(
+    source: ElectroCraftDataSourceDefinition,
+    environment: ElectroCraftDataSourceEnvironment,
+    request: DataSourceQueryRequest,
+  ): Promise<JsonValue> {
+    const required = new Set<ElectroCraftCanonicalDataSourceCapability>(['read', ...(request.requiredCapabilities ?? [])]);
+    for (const capability of required) this.assertOperation(source, capability);
+    const adapter = this.resolveAdapter(source);
+    return adapter.query(this.createAdapterContext(source, environment), request);
+  }
+
+  async mutate(
+    source: ElectroCraftDataSourceDefinition,
+    environment: ElectroCraftDataSourceEnvironment,
+    request: DataSourceMutationRequest,
+  ): Promise<JsonValue> {
+    this.assertOperation(source, request.operation);
+    const adapter = this.resolveAdapter(source);
+    return adapter.mutate(this.createAdapterContext(source, environment), request);
   }
 
   async execute(request: DataConnectorExecutionRequest): Promise<ElectroCraftQueryResult> {
