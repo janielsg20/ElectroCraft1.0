@@ -41,6 +41,18 @@ export * from './contracts/data-definition';
 export * from './contracts/document';
 export * from './contracts/engine-payload';
 export * from './contracts/export-ir';
+export {
+  createElectroCraftExportIR,
+  createElectroCraftExportIRChecksum,
+  createElectroCraftExportIREnvelope,
+  electroCraftExportIrEnvelopeSchema,
+  electroCraftExportIrSchema,
+  serializeElectroCraftExportIR,
+  serializeElectroCraftExportIREnvelope,
+  verifyElectroCraftExportIREnvelope,
+  type ElectroCraftExportIR,
+  type ElectroCraftExportIREnvelope,
+} from './navigation/export-ir';
 export * from './contracts/json-value';
 export * from './contracts/migration-registry';
 export * from './contracts/model-ownership';
@@ -51,6 +63,16 @@ export * from './contracts/project-snapshot';
 export * from './contracts/query-definition';
 export * from './contracts/responsive';
 export * from './contracts/serialization';
+export {
+  canonicalNavigationDefinitionRoundTrip,
+  canonicalRouteDefinitionRoundTrip,
+  deserializeElectroCraftNavigationDefinition,
+  deserializeElectroCraftNavigationDefinitionWithMigration,
+  deserializeElectroCraftRouteDefinition,
+  deserializeElectroCraftRouteDefinitionWithMigration,
+  serializeElectroCraftNavigationDefinition,
+  serializeElectroCraftRouteDefinition,
+} from './navigation/serialization';
 export * from './contracts/theme-blueprint';
 
 export const packageDescriptor = Object.freeze({
