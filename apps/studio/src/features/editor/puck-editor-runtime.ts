@@ -30,6 +30,7 @@ export interface StudioPuckProjectRuntimePort extends PuckDocumentAutosavePort {
 
 export interface LoadStudioPuckEditorOptions {
   readonly projectId: string;
+  readonly documentId?: string;
   readonly definitions?: readonly ElectroCraftComponentDefinition[];
   readonly renderers?: PuckRendererRegistry;
   readonly projectRuntime?: StudioPuckProjectRuntimePort;
@@ -81,7 +82,19 @@ function documentPriority(payload: unknown) {
   }
 }
 
-function resolveProjectDocument(opened: OpenProjectResult): { document: ElectroCraftDocument; created: boolean } {
+function parseProjectDocument(object: OpenProjectResult['objects'][number]): ElectroCraftDocument {
+  try {
+    return importElectroCraftDocument(object.payload).document;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'documento canónico inválido';
+    throw new TypeError(`No se pudo abrir el documento ${object.objectId}: ${message}`);
+  }
+}
+
+function resolveProjectDocument(
+  opened: OpenProjectResult,
+  preferredDocumentId?: string,
+): { document: ElectroCraftDocument; created: boolean } {
   const documentObjects = opened.objects
     .filter((object) => object.kind === 'document')
     .sort((left, right) => {
@@ -89,17 +102,19 @@ function resolveProjectDocument(opened: OpenProjectResult): { document: ElectroC
       return priority === 0 ? left.objectId.localeCompare(right.objectId) : priority;
     });
 
+  if (preferredDocumentId) {
+    const preferred = documentObjects.find(({ objectId }) => objectId === preferredDocumentId);
+    if (!preferred) throw new Error('La Pantalla seleccionada ya no existe en este proyecto.');
+    const document = parseProjectDocument(preferred);
+    if (document.kind !== 'screen') throw new Error('El documento seleccionado no es una Pantalla editable.');
+    return { document, created: false };
+  }
+
   if (documentObjects.length === 0) {
     return { document: createInitialScreen(opened.project), created: true };
   }
 
-  const object = documentObjects[0];
-  try {
-    return { document: importElectroCraftDocument(object.payload).document, created: false };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'documento canónico inválido';
-    throw new TypeError(`No se pudo abrir el documento ${object.objectId}: ${message}`);
-  }
+  return { document: parseProjectDocument(documentObjects[0]), created: false };
 }
 
 function cloneReusableNode(
@@ -136,10 +151,8 @@ function createReusableComponentDocument(node: ElectroCraftDocumentNode): Electr
 /**
  * Opens the current local project, establishes one canonical Puck session and
  * wires Puck onAction -> canonical reconstruction -> F04 incremental autosave.
- * The real Studio defaults to its deterministic built-in core registry so
- * Palette and Puck.Components can insert Container/Text/Image/Button in a fresh
- * project. Definitions/renderers remain injectable for tests and later packs
- * without introducing a second registry or persisting editor-only internals.
+ * A preferred documentId lets Pantallas open the exact canonical screen while
+ * preserving the existing deterministic fallback for direct Editor visits.
  */
 export async function loadStudioPuckEditor(options: LoadStudioPuckEditorOptions) {
   const runtime = options.projectRuntime ?? projectStorageRuntime;
@@ -155,7 +168,7 @@ export async function loadStudioPuckEditor(options: LoadStudioPuckEditorOptions)
   const opened = await runtime.openProject(options.projectId);
   if (!opened) throw new Error('El proyecto seleccionado ya no está disponible.');
 
-  const { document, created } = resolveProjectDocument(opened);
+  const { document, created } = resolveProjectDocument(opened, options.documentId);
   const definitions = options.definitions ?? studioCoreEditorDefinitions;
   const renderers = options.renderers ?? studioCoreEditorRenderers;
   const session = createStudioPuckDocumentSession(document, definitions, renderers);
