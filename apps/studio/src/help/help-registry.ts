@@ -16,6 +16,7 @@ export type StudioHelpId =
   | 'help.studio.language'
   | 'help.projects'
   | 'help.editor.advanced'
+  | 'help.editor.screens'
   | 'help.navigation'
   | 'help.screens'
   | `help.section.${SidebarNavigationItemId}`;
@@ -147,6 +148,18 @@ const studioDefinitions = Object.freeze([
     learnMoreRef: '.ai/microphases/M06_1.md',
   },
   {
+    id: 'help.editor.screens',
+    sectionId: 'editor-screens',
+    navigationItemId: 'editor',
+    titleKey: helpKey('help.section.editor.title'),
+    shortKey: helpKey('help.section.editor.short'),
+    longKey: helpKey('help.section.editor.long'),
+    exampleKeys: [helpKey('help.section.editor.example')],
+    relatedIds: ['help.screens', 'help.navigation', 'help.editor.advanced'],
+    keywords: ['editor', 'pantalla', 'pantallas', 'screen composer', 'puck', 'plataforma', 'dispositivo', 'breakpoint'],
+    learnMoreRef: '.ai/microphases/M07_3.md',
+  },
+  {
     id: 'help.navigation',
     sectionId: 'navigation-graph',
     navigationItemId: 'navigation',
@@ -166,7 +179,7 @@ const studioDefinitions = Object.freeze([
     shortKey: helpKey('help.section.screens.short'),
     longKey: helpKey('help.section.screens.long'),
     exampleKeys: [helpKey('help.section.screens.example')],
-    relatedIds: ['help.navigation', 'help.section.editor'],
+    relatedIds: ['help.navigation', 'help.editor.screens'],
     keywords: ['pantallas', 'screen', 'ruta', 'navigator', 'plantilla', 'estado', 'duplicar', 'abrir en editor'],
     learnMoreRef: '.ai/microphases/M07_2.md',
   },
@@ -200,8 +213,8 @@ const navigationKeywords: Readonly<Record<SidebarNavigationItemId, readonly stri
 });
 
 const navigationRelated: Partial<Record<SidebarNavigationItemId, readonly StudioHelpId[]>> = Object.freeze({
-  editor: ['help.section.components', 'help.screens'],
-  screens: ['help.screens', 'help.navigation', 'help.section.editor'],
+  editor: ['help.editor.screens', 'help.section.components', 'help.screens'],
+  screens: ['help.screens', 'help.navigation', 'help.editor.screens'],
   navigation: ['help.navigation', 'help.screens'],
   components: ['help.section.editor', 'help.section.templates'],
   records: ['help.section.models', 'help.section.queries', 'help.section.forms'],
@@ -255,6 +268,7 @@ export function getStudioHelpDescriptor(helpId: StudioHelpId): HelpDescriptor {
 }
 
 export function getHelpIdForNavigationItem(itemId: SidebarNavigationItemId): StudioHelpId {
+  if (itemId === 'editor') return 'help.editor.screens';
   if (itemId === 'screens') return 'help.screens';
   if (itemId === 'navigation') return 'help.navigation';
   return `help.section.${itemId}`;
