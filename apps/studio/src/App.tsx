@@ -46,6 +46,7 @@ const historyRoute = '/history';
 const contentRoute = '/content';
 const screensRoute = '/screens';
 const navigationRoute = '/navigation';
+const previewRoute = '/preview';
 const canonicalEmptyModuleRoutes = new Set(['/queries', '/forms', '/admin', '/media', '/export']);
 
 const ProjectHome = lazy(() =>
@@ -59,6 +60,9 @@ const ScreensWorkspace = lazy(() =>
 );
 const NavigationWorkspace = lazy(() =>
   import('./features/navigation/navigation-workspace').then((module) => ({ default: module.NavigationWorkspace })),
+);
+const NavigationPreview = lazy(() =>
+  import('./features/navigation/navigation-preview').then((module) => ({ default: module.NavigationPreview })),
 );
 const StudioEditorWorkspace = lazy(() =>
   import('./shell/editor-workspace').then((module) => ({ default: module.StudioEditorWorkspace })),
@@ -320,6 +324,13 @@ function resolveStudioWorkspace(pathname: string, health: ReturnType<typeof eval
     return (
       <Suspense fallback={<StudioRouteSkeleton kind="generic" label="Cargando Navegación" />}>
         <NavigationWorkspace mode="navigation" />
+      </Suspense>
+    );
+  }
+  if (pathname === previewRoute) {
+    return (
+      <Suspense fallback={<StudioRouteSkeleton kind="generic" label="Cargando Preview" />}>
+        <NavigationPreview />
       </Suspense>
     );
   }
