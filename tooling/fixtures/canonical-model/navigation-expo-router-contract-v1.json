@@ -1,0 +1,17 @@
+{
+  "target": "expo-router",
+  "screens": [
+    {
+      "routeRef": "ec_route_0000000000005",
+      "path": "/productos/:productId",
+      "screenRef": "ec_document_0000000000002",
+      "deepLinks": ["/productos/:productId", "/p/:productId"]
+    }
+  ],
+  "navigators": [
+    {
+      "nodeRef": "ec_nav-node_000000000000m",
+      "kind": "stack"
+    }
+  ]
+}
