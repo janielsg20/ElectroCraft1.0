@@ -50,9 +50,10 @@ Base CI run `33262949215` (#795) terminó `success`; PR `#68` fue fusionada a `m
 - `rest.fetch` registrado en Studio sobre el mismo ConnectorRegistry.
 - Wizard REST: Endpoint base → Autenticación → OpenAPI/Manual → Operaciones → Probar → Guardar.
 - JSON/YAML OpenAPI, manual operations, SecretRef-only, browser/gateway behavior y resultado normalizado.
+- HelpRegistry específico `help.data.rest` enlazado a `.ai/microphases/M08_3.md`.
 - Fixtures `rest-data-source-v1.json` + `openapi/products-v1.yaml`.
 - Test suite M08.3 preparada para import, GET/POST, pagination, auth, gateway, 4xx/5xx, timeout y security.
-- M08.3 permanece `ACTIVE`: falta `help.data.rest` exacto y validación ejecutable antes de declarar DONE.
+- M08.3 permanece `ACTIVE`: falta validación ejecutable antes de declarar DONE.
 
 ## Validación
 
@@ -60,4 +61,4 @@ No se ejecuta Actions por microfase. El contenedor actual no resuelve `github.co
 
 ## Siguiente acción exacta
 
-Añadir `help.data.rest`, ejecutar validación real cuando el workspace sea accesible y corregir únicamente fallos reales. Mantener M08.3 como única microfase `ACTIVE` hasta ese cierre.
+Ejecutar validación real cuando el workspace sea accesible y corregir únicamente fallos reales. Mantener M08.3 como única microfase `ACTIVE` hasta ese cierre.

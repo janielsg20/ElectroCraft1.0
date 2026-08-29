@@ -6,7 +6,7 @@ F08 / M08.3 — REST API Connector y OpenAPI import — `ACTIVE`.
 
 Rama activa: `codex/m08-1-data-sources`.
 
-F07 está `GREEN` y fusionada. M08.1 y M08.2 están implementadas con evidencia. M08.3 ya contiene core REST/OpenAPI, wizard, fixtures y tests preparados, pero no se declara DONE sin Help exacto y validación ejecutable.
+F07 está `GREEN` y fusionada. M08.1 y M08.2 están implementadas con evidencia. M08.3 ya contiene core REST/OpenAPI, wizard, Help específico, fixtures y tests preparados, pero no se declara DONE sin validación ejecutable.
 
 ## Gate de entrada F08
 
@@ -46,18 +46,18 @@ Disponible en la rama:
 3. exports públicos de ambos adapters desde `@electrocraft/connectors`;
 4. registro `rest.fetch` en el ConnectorRegistry real del Studio;
 5. wizard REST: URL base → Autenticación → OpenAPI/Manual → Operaciones → Probar → Guardar;
-6. SecretRef-only; no bearer/API key/password en source config;
-7. fixtures REST/OpenAPI;
-8. tests M08.3 para import, GET/POST, pagination, auth missing, Gateway, 4xx/5xx, timeout y security.
+6. HelpRegistry específico `help.data.rest`;
+7. SecretRef-only; no bearer/API key/password en source config;
+8. fixtures REST/OpenAPI;
+9. tests M08.3 para import, GET/POST, pagination, auth missing, Gateway, 4xx/5xx, timeout y security.
 
 Evidencia: `.ai/evidence/F08/M08.3/IMPLEMENTATION_2026-08-29.md`.
 
 ## Pendiente exacto para cerrar M08.3
 
-1. Añadir el HelpRegistry específico `help.data.rest` y sustituir el help genérico del wizard.
-2. Ejecutar lint/typecheck/Vitest/build en un workspace ejecutable; no usar Actions solo para una microfase.
-3. Corregir fallos reales si aparecen.
-4. Solo entonces cambiar M08.3 a DONE y activar M08.4.
+1. Ejecutar lint/typecheck/Vitest/build en un workspace ejecutable; no usar Actions solo para una microfase.
+2. Corregir fallos reales si aparecen.
+3. Solo entonces cambiar M08.3 a DONE y activar M08.4.
 
 ## Deuda de gate F08 visible
 

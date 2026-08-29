@@ -51,6 +51,7 @@ F07 cerró con Base CI run `33262949215` (#795) completamente verde y PR `#68` f
 - `packages/connectors` expone públicamente REST/OpenAPI.
 - Studio registra `rest.fetch` en el mismo `ConnectorRegistry`.
 - Wizard REST funcional de seis pasos: Endpoint base → Autenticación → OpenAPI/Manual → Operaciones → Probar → Guardar.
+- Help específico `help.data.rest` enlazado al wizard.
 - Fixtures REST/OpenAPI y tests M08.3 preparados.
 - Evidencia: `.ai/evidence/F08/M08.3/IMPLEMENTATION_2026-08-29.md`.
 
@@ -64,7 +65,7 @@ Owner aprobado: Web Fetch API + DataSourceAdapter + `@scalar/openapi-parser@0.28
 
 - El contenedor de esta sesión no resuelve `github.com`; no se pudo clonar/instalar el workspace para ejecutar la suite real.
 - No se ejecutan Actions por microfase.
-- Antes de cerrar M08.3 falta el descriptor exacto `help.data.rest` y una validación ejecutable lint/typecheck/Vitest/build.
+- El descriptor específico `help.data.rest` ya está integrado; antes de cerrar M08.3 falta una validación ejecutable lint/typecheck/Vitest/build.
 - Antes del Gate F08 deben regenerarse `package-lock.json`, ampliar `format/format:check` a connectors/data-web y ejecutar el gate transversal una sola vez.
 
 ## Evidencia F08
@@ -75,4 +76,4 @@ Owner aprobado: Web Fetch API + DataSourceAdapter + `@scalar/openapi-parser@0.28
 
 ## Siguiente transición
 
-Cerrar los dos pendientes reales de M08.3: `help.data.rest` + validación ejecutable. Corregir solo errores reales y mantener M08.3 como única `ACTIVE`; no activar M08.4 antes de evidencia verde.
+Cerrar el pendiente real de M08.3: validación ejecutable lint/typecheck/Vitest/build. Corregir solo errores reales y mantener M08.3 como única `ACTIVE`; no activar M08.4 antes de evidencia verde.

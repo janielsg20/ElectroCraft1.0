@@ -47,6 +47,9 @@ Estado: `ACTIVE` — implementación funcional avanzada; cierre/gate todavía pe
   - prueba mediante `RestDataSourceAdapter` real;
   - aviso explícito para operaciones de escritura;
   - guarda mediante el runtime canónico del proyecto.
+- `apps/studio/src/help/help-registry.ts`
+  - añade `help.data.rest`, keywords REST/OpenAPI/CORS/Gateway y enlace a M08.3;
+  - integra el concepto en relaciones y búsqueda global de ayuda.
 - `apps/studio/src/features/data/rest-source-wizard.css`
   - desktop hasta 820px;
   - mobile full-screen;
@@ -86,8 +89,7 @@ No se declara `GREEN` ni `DONE` sin lint/typecheck/Vitest/build reales.
 
 ## Pendiente antes de cerrar M08.3
 
-1. Crear el descriptor Help exacto `help.data.rest` y usarlo en el wizard.
-2. Ejecutar lint/typecheck/Vitest/build cuando el workspace sea ejecutable o dentro del gate acordado sin duplicar CI.
-3. Corregir cualquier error real hallado por esa validación.
-4. Mantener `M08.3` como única microfase `ACTIVE` hasta evidencia verde.
-5. No activar M08.4 antes del cierre real de M08.3.
+1. Ejecutar lint/typecheck/Vitest/build cuando el workspace sea ejecutable o dentro del gate acordado sin duplicar CI.
+2. Corregir cualquier error real hallado por esa validación.
+3. Mantener `M08.3` como única microfase `ACTIVE` hasta evidencia verde.
+4. No activar M08.4 antes del cierre real de M08.3.

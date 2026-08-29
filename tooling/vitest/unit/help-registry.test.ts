@@ -22,6 +22,7 @@ const studioScopedHelpIds = [
   'help.screens',
   'help.data.sources',
   'help.data.internal',
+  'help.data.rest',
 ] as const;
 
 describe('M03.11 typed HelpRegistry', () => {
@@ -55,6 +56,8 @@ describe('M03.11 typed HelpRegistry', () => {
     expect(searchStudioHelp('connector registry').some((entry) => entry.id === 'help.data.sources')).toBe(true);
     expect(searchStudioHelp('electrocraft data').some((entry) => entry.id === 'help.data.internal')).toBe(true);
     expect(searchStudioHelp('disponible sin conexión').some((entry) => entry.id === 'help.data.internal')).toBe(true);
+    expect(searchStudioHelp('openapi').some((entry) => entry.id === 'help.data.rest')).toBe(true);
+    expect(searchStudioHelp('connectorgateway').some((entry) => entry.id === 'help.data.rest')).toBe(true);
   });
 
   it('maps Fuentes de datos to its M08 contextual descriptor', () => {
@@ -66,6 +69,10 @@ describe('M03.11 typed HelpRegistry', () => {
     expect(getStudioHelpDescriptor('help.data.internal')).toMatchObject({
       sectionId: 'data-internal',
       learnMoreRef: '.ai/microphases/M08_2.md',
+    });
+    expect(getStudioHelpDescriptor('help.data.rest')).toMatchObject({
+      sectionId: 'data-rest',
+      learnMoreRef: '.ai/microphases/M08_3.md',
     });
   });
 
