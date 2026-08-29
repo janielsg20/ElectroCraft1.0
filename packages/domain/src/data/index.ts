@@ -1,4 +1,5 @@
 export * from './source-definition';
+export * from './rest';
 export {
   electroCraftDataFieldSchema,
   electroCraftDataFieldTypeSchema,
