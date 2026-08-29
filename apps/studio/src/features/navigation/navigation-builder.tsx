@@ -92,7 +92,9 @@ function NavigationTreeNode({
         }}
       >
         <button type="button" className="ec-nav-builder-select" onClick={() => onSelect(node.id)}>
-          <span className="ec-nav-builder-kind">{node.kind === 'screen' ? 'Pantalla' : navigatorLabels[node.kind]}</span>
+          <span className="ec-nav-builder-kind">
+            {node.kind === 'screen' ? 'Pantalla' : navigatorLabels[node.kind]}
+          </span>
           <strong>{node.label}</strong>
           {route ? <code>{route}</code> : null}
           {node.id === navigation.rootNodeRef ? <em>Raíz</em> : null}
@@ -149,13 +151,20 @@ function NavigationTreeNode({
   );
 }
 
-function AddNavigatorControls({ navigation, selected }: { readonly navigation: ElectroCraftNavigationDefinition; readonly selected: ElectroCraftNavigationNode | null }) {
+function AddNavigatorControls({
+  navigation,
+  selected,
+}: {
+  readonly navigation: ElectroCraftNavigationDefinition;
+  readonly selected: ElectroCraftNavigationNode | null;
+}) {
   const [kind, setKind] = useState<ElectroCraftNavigatorKind>('stack');
   const [label, setLabel] = useState('Nueva Pila');
   const selectedParent = selected?.kind === 'screen' ? findNavigationParent(navigation, selected.id) : selected;
-  const parent = selectedParent && selectedParent.kind !== 'screen'
-    ? selectedParent
-    : navigation.nodes.find((node) => node.id === navigation.rootNodeRef && node.kind !== 'screen') ?? null;
+  const parent =
+    selectedParent ??
+    navigation.nodes.find((node) => node.id === navigation.rootNodeRef && node.kind !== 'screen') ??
+    null;
 
   useEffect(() => {
     setLabel(`Nuevo ${navigatorLabels[kind]}`);
@@ -164,7 +173,9 @@ function AddNavigatorControls({ navigation, selected }: { readonly navigation: E
   return (
     <div className="ec-nav-builder-add">
       <Select value={kind} onValueChange={(value) => setKind(value as ElectroCraftNavigatorKind)}>
-        <SelectTrigger aria-label="Tipo de navegador"><SelectValue /></SelectTrigger>
+        <SelectTrigger aria-label="Tipo de navegador">
+          <SelectValue />
+        </SelectTrigger>
         <SelectContent>
           <SelectItem value="stack">Pila</SelectItem>
           <SelectItem value="tabs">Pestañas</SelectItem>
@@ -203,7 +214,8 @@ function NodeInspector({
     setPresentation(node ? readNavigationBuilderPresentation(node) : null);
   }, [node]);
 
-  if (!node || !presentation) return <p className="ec-nav-builder-inspector-empty">Selecciona un nodo para editar sus propiedades.</p>;
+  if (!node || !presentation)
+    return <p className="ec-nav-builder-inspector-empty">Selecciona un nodo para editar sus propiedades.</p>;
   const parent = findNavigationParent(navigation, node.id);
   const isNavigator = node.kind !== 'screen';
 
@@ -221,7 +233,9 @@ function NodeInspector({
       <label className="ec-nav-builder-check">
         <Checkbox
           checked={presentation.item.visible}
-          onCheckedChange={(checked) => patchPresentation({ item: { ...presentation.item, visible: checked === true } })}
+          onCheckedChange={(checked) =>
+            patchPresentation({ item: { ...presentation.item, visible: checked === true } })
+          }
         />
         <span>Visible en navegación</span>
       </label>
@@ -231,7 +245,9 @@ function NodeInspector({
         <Input
           value={presentation.item.icon ?? ''}
           placeholder="Opcional"
-          onChange={(event) => patchPresentation({ item: { ...presentation.item, icon: event.target.value.trim() || null } })}
+          onChange={(event) =>
+            patchPresentation({ item: { ...presentation.item, icon: event.target.value.trim() || null } })
+          }
         />
       </label>
 
@@ -240,7 +256,9 @@ function NodeInspector({
         <label className="ec-nav-builder-check">
           <Checkbox
             checked={presentation.header.visible}
-            onCheckedChange={(checked) => patchPresentation({ header: { ...presentation.header, visible: checked === true } })}
+            onCheckedChange={(checked) =>
+              patchPresentation({ header: { ...presentation.header, visible: checked === true } })
+            }
           />
           <span>Mostrar header</span>
         </label>
@@ -249,16 +267,24 @@ function NodeInspector({
           <Input
             value={presentation.header.title ?? ''}
             placeholder={node.label}
-            onChange={(event) => patchPresentation({ header: { ...presentation.header, title: event.target.value.trim() || null } })}
+            onChange={(event) =>
+              patchPresentation({ header: { ...presentation.header, title: event.target.value.trim() || null } })
+            }
           />
         </label>
         <label>
           <span>Comportamiento Atrás</span>
           <Select
             value={presentation.header.backBehavior}
-            onValueChange={(value) => patchPresentation({ header: { ...presentation.header, backBehavior: value as 'auto' | 'hidden' | 'parent' } })}
+            onValueChange={(value) =>
+              patchPresentation({
+                header: { ...presentation.header, backBehavior: value as 'auto' | 'hidden' | 'parent' },
+              })
+            }
           >
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="auto">Automático</SelectItem>
               <SelectItem value="parent">Volver al padre</SelectItem>
@@ -275,16 +301,25 @@ function NodeInspector({
             <span>Posición</span>
             <Select
               value={presentation.tabs.placement}
-              onValueChange={(value) => patchPresentation({ tabs: { ...presentation.tabs!, placement: value as 'top' | 'bottom' } })}
+              onValueChange={(value) =>
+                patchPresentation({ tabs: { ...presentation.tabs!, placement: value as 'top' | 'bottom' } })
+              }
             >
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent><SelectItem value="top">Arriba</SelectItem><SelectItem value="bottom">Abajo</SelectItem></SelectContent>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="top">Arriba</SelectItem>
+                <SelectItem value="bottom">Abajo</SelectItem>
+              </SelectContent>
             </Select>
           </label>
           <label className="ec-nav-builder-check">
             <Checkbox
               checked={presentation.tabs.showLabels}
-              onCheckedChange={(checked) => patchPresentation({ tabs: { ...presentation.tabs!, showLabels: checked === true } })}
+              onCheckedChange={(checked) =>
+                patchPresentation({ tabs: { ...presentation.tabs!, showLabels: checked === true } })
+              }
             />
             <span>Mostrar etiquetas</span>
           </label>
@@ -298,10 +333,17 @@ function NodeInspector({
             <span>Lado</span>
             <Select
               value={presentation.drawer.side}
-              onValueChange={(value) => patchPresentation({ drawer: { ...presentation.drawer!, side: value as 'left' | 'right' } })}
+              onValueChange={(value) =>
+                patchPresentation({ drawer: { ...presentation.drawer!, side: value as 'left' | 'right' } })
+              }
             >
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent><SelectItem value="left">Izquierda</SelectItem><SelectItem value="right">Derecha</SelectItem></SelectContent>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="left">Izquierda</SelectItem>
+                <SelectItem value="right">Derecha</SelectItem>
+              </SelectContent>
             </Select>
           </label>
           <label>
@@ -311,7 +353,9 @@ function NodeInspector({
               min={220}
               max={520}
               value={presentation.drawer.width}
-              onChange={(event) => patchPresentation({ drawer: { ...presentation.drawer!, width: Number(event.target.value) || 300 } })}
+              onChange={(event) =>
+                patchPresentation({ drawer: { ...presentation.drawer!, width: Number(event.target.value) || 300 } })
+              }
             />
           </label>
         </fieldset>
@@ -324,9 +368,13 @@ function NodeInspector({
             <span>Presentación</span>
             <Select
               value={presentation.modal.presentation}
-              onValueChange={(value) => patchPresentation({ modal: { presentation: value as 'dialog' | 'sheet' | 'fullscreen' } })}
+              onValueChange={(value) =>
+                patchPresentation({ modal: { presentation: value as 'dialog' | 'sheet' | 'fullscreen' } })
+              }
             >
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="dialog">Diálogo</SelectItem>
                 <SelectItem value="sheet">Hoja</SelectItem>
@@ -344,10 +392,14 @@ function NodeInspector({
             value={node.initialNodeRef ?? ''}
             onValueChange={(value) => void navigationWorkspaceRuntime.setInitialNode(node.id, value)}
           >
-            <SelectTrigger><SelectValue placeholder="Seleccionar" /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue placeholder="Seleccionar" />
+            </SelectTrigger>
             <SelectContent>
               {node.childRefs.map((childRef) => (
-                <SelectItem key={childRef} value={childRef}>{navigation.nodes.find(({ id }) => id === childRef)?.label ?? childRef}</SelectItem>
+                <SelectItem key={childRef} value={childRef}>
+                  {navigation.nodes.find(({ id }) => id === childRef)?.label ?? childRef}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -380,21 +432,23 @@ export function NavigationBuilder() {
 
   useEffect(() => {
     if (!navigation) return;
-    if (!selectedNodeId || !navigation.nodes.some(({ id }) => id === selectedNodeId)) setSelectedNodeId(navigation.rootNodeRef);
+    if (!selectedNodeId || !navigation.nodes.some(({ id }) => id === selectedNodeId))
+      setSelectedNodeId(navigation.rootNodeRef);
   }, [navigation, selectedNodeId]);
 
   if (!navigation || !snapshot.graph) return null;
-  const nodesById = new Map(navigation.nodes.map((node) => [node.id, node] as const));
+  const nodesById = new Map<string, ElectroCraftNavigationNode>(
+    navigation.nodes.map((node) => [node.id, node] as const),
+  );
   const root = nodesById.get(navigation.rootNodeRef);
-  const selected = selectedNodeId ? nodesById.get(selectedNodeId) ?? null : null;
-  const selectedRoute = selected?.kind === 'screen'
-    ? snapshot.graph.routes.find(({ id }) => id === selected.routeRef) ?? null
-    : null;
+  const selected = selectedNodeId ? (nodesById.get(selectedNodeId) ?? null) : null;
+  const selectedRoute =
+    selected?.kind === 'screen' ? (snapshot.graph.routes.find(({ id }) => id === selected.routeRef) ?? null) : null;
   const previewRows = createNavigationPreviewRows(navigation);
 
   function dropSibling(parent: ElectroCraftNavigationNavigatorNode, draggedId: string, targetId: string) {
-    const draggedIndex = parent.childRefs.indexOf(draggedId as never);
-    const targetIndex = parent.childRefs.indexOf(targetId as never);
+    const draggedIndex = parent.childRefs.findIndex((childRef) => childRef === draggedId);
+    const targetIndex = parent.childRefs.findIndex((childRef) => childRef === targetId);
     if (draggedIndex < 0 || targetIndex < 0 || draggedIndex === targetIndex) return;
     void navigationWorkspaceRuntime.reorderNode(parent.id, draggedId, draggedIndex < targetIndex ? 'down' : 'up');
     setDraggedNodeId(null);
@@ -404,7 +458,10 @@ export function NavigationBuilder() {
     <div className="ec-nav-builder" data-navigation-builder>
       <section className="ec-nav-builder-tree-panel" aria-labelledby="nav-builder-tree-title">
         <div className="ec-nav-builder-panel-heading">
-          <div><p>Navigation Graph</p><h3 id="nav-builder-tree-title">{navigation.label}</h3></div>
+          <div>
+            <p>Navigation Graph</p>
+            <h3 id="nav-builder-tree-title">{navigation.label}</h3>
+          </div>
           <span>{navigation.nodes.length} nodos</span>
         </div>
         <AddNavigatorControls navigation={navigation} selected={selected} />
@@ -423,12 +480,21 @@ export function NavigationBuilder() {
               onDropSibling={dropSibling}
             />
           </ul>
-        ) : <p role="alert">El Navigator raíz no existe.</p>}
+        ) : (
+          <p role="alert">El Navigator raíz no existe.</p>
+        )}
       </section>
 
       <section className="ec-nav-builder-preview" aria-labelledby="nav-builder-preview-title">
-        <div className="ec-nav-builder-panel-heading"><div><p>Vista derivada</p><h3 id="nav-builder-preview-title">Estructura de la app</h3></div></div>
-        <p className="ec-nav-builder-preview-summary">Esta representación se deriva del árbol; no guarda coordenadas ni un segundo modelo.</p>
+        <div className="ec-nav-builder-panel-heading">
+          <div>
+            <p>Vista derivada</p>
+            <h3 id="nav-builder-preview-title">Estructura de la app</h3>
+          </div>
+        </div>
+        <p className="ec-nav-builder-preview-summary">
+          Esta representación se deriva del árbol; no guarda coordenadas ni un segundo modelo.
+        </p>
         <div className="ec-nav-builder-preview-list">
           {previewRows.map((row) => (
             <button
@@ -455,14 +521,22 @@ export function NavigationBuilder() {
             </Button>
           </SheetTrigger>
           <SheetContent side="right" className="ec-nav-builder-mobile-sheet">
-            <SheetHeader><SheetTitle>Propiedades de Navegación</SheetTitle><SheetDescription>Edita el nodo seleccionado.</SheetDescription></SheetHeader>
+            <SheetHeader>
+              <SheetTitle>Propiedades de Navegación</SheetTitle>
+              <SheetDescription>Edita el nodo seleccionado.</SheetDescription>
+            </SheetHeader>
             <NodeInspector navigation={navigation} node={selected} />
           </SheetContent>
         </Sheet>
       </section>
 
       <aside className="ec-nav-builder-inspector" aria-label="Propiedades de Navegación">
-        <div className="ec-nav-builder-panel-heading"><div><p>Inspector</p><h3>{selected?.label ?? 'Nodo'}</h3></div></div>
+        <div className="ec-nav-builder-panel-heading">
+          <div>
+            <p>Inspector</p>
+            <h3>{selected?.label ?? 'Nodo'}</h3>
+          </div>
+        </div>
         <NodeInspector navigation={navigation} node={selected} />
       </aside>
     </div>

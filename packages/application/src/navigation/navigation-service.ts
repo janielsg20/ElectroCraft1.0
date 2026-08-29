@@ -229,7 +229,11 @@ export function addScreenRouteToNavigation(input: {
   });
 }
 
-function cloneScreenNodeTree(node: ElectroCraftDocument['root'], documentId: string, path: string): ElectroCraftDocument['root'] {
+function cloneScreenNodeTree(
+  node: ElectroCraftDocument['root'],
+  documentId: string,
+  path: string,
+): ElectroCraftDocument['root'] {
   const id = createDeterministicObjectId('node', `${documentId}:${path}:${node.id}`);
   return {
     ...structuredClone(node),

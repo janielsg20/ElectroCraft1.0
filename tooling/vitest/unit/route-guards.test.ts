@@ -182,7 +182,14 @@ describe('M07.6 route guards', () => {
 
   it('explains in Spanish that menu visibility is not security enforcement', () => {
     const ui = readFileSync(resolve('apps/studio/src/features/navigation/route-guard-editor.tsx'), 'utf8');
-    for (const label of ['Acceso', 'Público', 'Requiere iniciar sesión', 'Permiso', 'Si no tiene acceso', 'Redirigir a']) {
+    for (const label of [
+      'Acceso',
+      'Público',
+      'Requiere iniciar sesión',
+      'Permiso',
+      'Si no tiene acceso',
+      'Redirigir a',
+    ]) {
       expect(ui).toContain(label);
     }
     expect(ui).toContain('Ocultar un elemento de Navegación no es control de seguridad');

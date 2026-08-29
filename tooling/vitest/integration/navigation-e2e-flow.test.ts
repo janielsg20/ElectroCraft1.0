@@ -172,7 +172,9 @@ describe('M07.8 Navigation E2E flow', () => {
       actionGraphs: [navigateGraph],
     });
     expect(deleteAnalysis.allowed).toBe(false);
-    expect(deleteAnalysis.usages.map(({ kind }) => kind)).toEqual(expect.arrayContaining(['route', 'navigation', 'action']));
+    expect(deleteAnalysis.usages.map(({ kind }) => kind)).toEqual(
+      expect.arrayContaining(['route', 'navigation', 'action']),
+    );
 
     const compilerSource = createNavigationCompilerSource(graph);
     expect(compilerSource.routes).toHaveLength(4);

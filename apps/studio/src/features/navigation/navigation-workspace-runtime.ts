@@ -99,7 +99,12 @@ async function persistCanonicalMigrations(project: StoredProjectDefinition, grap
 }
 
 async function loadWorkspace(): Promise<NavigationWorkspaceSnapshot> {
-  publish({ ...snapshot, state: 'loading', message: 'Cargando Pantallas, Rutas y Navegación…', lastSavedMessage: null });
+  publish({
+    ...snapshot,
+    state: 'loading',
+    message: 'Cargando Pantallas, Rutas y Navegación…',
+    lastSavedMessage: null,
+  });
   await projectStorageRuntime.initialize();
   const projectId = activeProjectId();
   if (!projectId) {
@@ -139,7 +144,9 @@ async function loadWorkspace(): Promise<NavigationWorkspaceSnapshot> {
         .map((result) => result.data),
     );
     screenUpdatedAt = new Map(
-      opened.objects.filter(({ kind }) => kind === 'document').map((object) => [object.objectId, object.updatedAt] as const),
+      opened.objects
+        .filter(({ kind }) => kind === 'document')
+        .map((object) => [object.objectId, object.updatedAt] as const),
     );
 
     const cycle = cyclicNavigationDiagnostic(graph);
@@ -190,7 +197,8 @@ async function persistNavigationMutation(
   publish({ ...current, state: 'saving', message: 'Aplicando cambios de Navegación…', lastSavedMessage: null });
   try {
     const next = mutate(navigation);
-    if (next === navigation) return publish({ ...current, state: 'ready', message: 'Sin cambios.', lastSavedMessage: null });
+    if (next === navigation)
+      return publish({ ...current, state: 'ready', message: 'Sin cambios.', lastSavedMessage: null });
     projectStorageRuntime.queueAutosave({
       project: current.project,
       dirtyObjects: navigationGraphStoredObjects({ navigations: [next] }),
@@ -252,7 +260,10 @@ export const navigationWorkspaceRuntime = Object.freeze({
 
       projectStorageRuntime.queueAutosave({
         project: current.project,
-        dirtyObjects: [documentStoredObject(screen), ...navigationGraphStoredObjects({ routes: [route], navigations: [navigation] })],
+        dirtyObjects: [
+          documentStoredObject(screen),
+          ...navigationGraphStoredObjects({ routes: [route], navigations: [navigation] }),
+        ],
       });
       await projectStorageRuntime.flushAutosave();
       await reloadAfterSave(`Pantalla “${screen.name}” creada y conectada a Navegación.`);
@@ -276,7 +287,10 @@ export const navigationWorkspaceRuntime = Object.freeze({
     publish({ ...current, state: 'saving', message: 'Duplicando Pantalla…', lastSavedMessage: null });
     try {
       const result = duplicateScreenDocument({ source, idSeed: globalThis.crypto.randomUUID() });
-      projectStorageRuntime.queueAutosave({ project: current.project, dirtyObjects: [documentStoredObject(result.screen)] });
+      projectStorageRuntime.queueAutosave({
+        project: current.project,
+        dirtyObjects: [documentStoredObject(result.screen)],
+      });
       await projectStorageRuntime.flushAutosave();
       await reloadAfterSave(`Pantalla duplicada. Ruta sugerida: ${result.routeSuggestion}`);
       return result;

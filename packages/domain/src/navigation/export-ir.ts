@@ -1,7 +1,5 @@
 import * as z from 'zod';
-import {
-  electroCraftExportIrSchema as legacyElectroCraftExportIrSchema,
-} from '../contracts/export-ir';
+import { electroCraftExportIrSchema as legacyElectroCraftExportIrSchema } from '../contracts/export-ir';
 import { stableCanonicalStringify } from '../contracts/canonical-json';
 import {
   createElectroCraftCanonicalSnapshotChecksum,
@@ -11,13 +9,71 @@ import { electroCraftNavigationDefinitionSchema, electroCraftRouteDefinitionSche
 
 /**
  * ExportIR keeps formatVersion=1 while Route/Navigation evolve independently.
- * The refined F02 envelope is preserved and only these two canonical object
- * collections are upgraded to their M07.1 schemas.
+ * The F02 object shape is reused, while Route/Navigation move to the M07
+ * schemas and the original forbidden-internals validation is preserved.
  */
-export const electroCraftExportIrSchema = legacyElectroCraftExportIrSchema.safeExtend({
-  routes: z.array(electroCraftRouteDefinitionSchema),
-  navigations: z.array(electroCraftNavigationDefinitionSchema),
-});
+const forbiddenIrKeyNames = new Set([
+  'workspacestate',
+  'puckhistory',
+  'retehistory',
+  'tanstackcache',
+  'aihistory',
+  'aiprompts',
+  'prompts',
+  'slimroutes',
+  'wpblocks',
+  'wordpressblocks',
+  'exporoutefiles',
+  'capacitorconfig',
+  'secretvalue',
+  'password',
+  'passwd',
+  'clientsecret',
+  'accesstoken',
+  'refreshtoken',
+  'apikey',
+  'authorization',
+  'credential',
+]);
+
+function normalizeKey(key: string): string {
+  return key.replace(/[-_.\s]/g, '').toLowerCase();
+}
+
+function findForbiddenIrPath(value: unknown, path: Array<string | number> = []): Array<string | number> | null {
+  if (Array.isArray(value)) {
+    for (let index = 0; index < value.length; index += 1) {
+      const found = findForbiddenIrPath(value[index], [...path, index]);
+      if (found) return found;
+    }
+    return null;
+  }
+  if (value === null || typeof value !== 'object') return null;
+  for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
+    if (forbiddenIrKeyNames.has(normalizeKey(key))) return [...path, key];
+    const found = findForbiddenIrPath(child, [...path, key]);
+    if (found) return found;
+  }
+  return null;
+}
+
+export const electroCraftExportIrSchema = z
+  .strictObject({
+    ...legacyElectroCraftExportIrSchema.shape,
+    routes: z.array(electroCraftRouteDefinitionSchema),
+    navigations: z.array(electroCraftNavigationDefinitionSchema),
+  })
+  .superRefine((ir, context) => {
+    const forbiddenPath = findForbiddenIrPath(ir);
+    if (forbiddenPath) {
+      context.addIssue({
+        code: 'custom',
+        path: forbiddenPath,
+        message:
+          'ExportIR cannot contain Studio/engine history, target-specific internals, prompts, caches, or secret values',
+      });
+    }
+  });
 export type ElectroCraftExportIR = Readonly<z.infer<typeof electroCraftExportIrSchema>>;
 
 export const electroCraftExportIrEnvelopeSchema = z.strictObject({

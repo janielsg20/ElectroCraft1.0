@@ -14,9 +14,7 @@ export function serializeElectroCraftRouteDefinition(input: unknown): string {
   return stableCanonicalStringify(electroCraftRouteDefinitionSchema.parse(input));
 }
 
-export function deserializeElectroCraftRouteDefinitionWithMigration(
-  serialized: string,
-): ElectroCraftRouteImportResult {
+export function deserializeElectroCraftRouteDefinitionWithMigration(serialized: string): ElectroCraftRouteImportResult {
   return importElectroCraftRouteDefinition(parseCanonicalJson(serialized));
 }
 

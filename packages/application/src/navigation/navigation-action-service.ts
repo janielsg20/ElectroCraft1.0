@@ -16,9 +16,7 @@ import {
 } from '@electrocraft/domain';
 
 export type RouteParamBindingDiagnosticCode =
-  | 'binding-route-mismatch'
-  | 'binding-param-missing'
-  | 'binding-type-mismatch';
+  'binding-route-mismatch' | 'binding-param-missing' | 'binding-type-mismatch';
 
 export interface RouteParamBindingDiagnostic {
   readonly code: RouteParamBindingDiagnosticCode;
@@ -35,7 +33,8 @@ export function validateRouteParamBinding(
   if (binding.routeRef !== route.id) diagnostics.push({ code: 'binding-route-mismatch', param: binding.param });
   const param = route.params.find(({ name }) => name === binding.param);
   if (!param) diagnostics.push({ code: 'binding-param-missing', param: binding.param });
-  else if (param.valueType !== binding.valueType) diagnostics.push({ code: 'binding-type-mismatch', param: binding.param });
+  else if (param.valueType !== binding.valueType)
+    diagnostics.push({ code: 'binding-type-mismatch', param: binding.param });
   return Object.freeze(diagnostics);
 }
 
@@ -63,15 +62,16 @@ function destinationRoute(
   diagnostics: NavigateActionDiagnostic[],
 ) {
   if (config.mode === 'back' || config.destination === null) return null;
-  if (config.destination.kind === 'route') {
-    const route = routes.find(({ id }) => id === config.destination!.routeRef);
-    if (!route) diagnostics.push({ code: 'destination-route-missing', ref: config.destination.routeRef });
+  const destination = config.destination;
+  if (destination.kind === 'route') {
+    const route = routes.find(({ id }) => id === destination.routeRef);
+    if (!route) diagnostics.push({ code: 'destination-route-missing', ref: destination.routeRef });
     return route ?? null;
   }
 
-  const screen = documents.find(({ id }) => id === config.destination!.screenRef && screen.kind === 'screen');
+  const screen = documents.find(({ id, kind }) => id === destination.screenRef && kind === 'screen');
   if (!screen) {
-    diagnostics.push({ code: 'destination-screen-missing', ref: config.destination.screenRef });
+    diagnostics.push({ code: 'destination-screen-missing', ref: destination.screenRef });
     return null;
   }
   const matching = routes.filter(({ screenRef }) => screenRef === screen.id);
@@ -135,7 +135,8 @@ export function validateNavigateActionConfig(input: {
     }
   }
   for (const param of route.params) {
-    if (param.required && !mappings.has(param.name)) diagnostics.push({ code: 'required-param-missing', param: param.name });
+    if (param.required && !mappings.has(param.name))
+      diagnostics.push({ code: 'required-param-missing', param: param.name });
   }
   return Object.freeze(diagnostics);
 }
@@ -144,7 +145,8 @@ function actionGraphRouteRefs(config: ElectroCraftNavigateActionConfig): string[
   const refs = new Set<string>();
   if (config.destination?.kind === 'route') refs.add(config.destination.routeRef);
   for (const mapping of config.params) {
-    if (mapping.value.source === 'binding' && mapping.value.binding.source === 'route') refs.add(mapping.value.binding.ref);
+    if (mapping.value.source === 'binding' && mapping.value.binding.source === 'route')
+      refs.add(mapping.value.binding.ref);
   }
   return [...refs];
 }
@@ -186,9 +188,7 @@ export function createRouteNavigateActionGraph(input: {
         metadata: { source: 'm07.5-route-action' },
       },
     ],
-    edges: [
-      { id: edgeId, sourceNodeRef: triggerId, targetNodeRef: actionId, sourcePort: 'next', targetPort: 'exec' },
-    ],
+    edges: [{ id: edgeId, sourceNodeRef: triggerId, targetNodeRef: actionId, sourcePort: 'next', targetPort: 'exec' }],
     metadata: { source: 'm07.5-route-action', sourceRouteRef: input.sourceRoute.id },
   });
 }
@@ -230,9 +230,7 @@ export function createExternalUrlActionGraph(input: {
         metadata: { source: 'm07.5-external-action' },
       },
     ],
-    edges: [
-      { id: edgeId, sourceNodeRef: triggerId, targetNodeRef: actionId, sourcePort: 'next', targetPort: 'exec' },
-    ],
+    edges: [{ id: edgeId, sourceNodeRef: triggerId, targetNodeRef: actionId, sourcePort: 'next', targetPort: 'exec' }],
     metadata: { source: 'm07.5-external-action', sourceRouteRef: input.sourceRoute.id },
   });
 }

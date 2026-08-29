@@ -40,7 +40,9 @@ describe('M07.4 Navigation Builder', () => {
     });
     const drawer = nested.nodes.find((node) => node.kind === 'drawer');
     expect(drawer).toBeTruthy();
-    expect(nested.nodes.find((node) => node.id === tabs!.id && node.kind !== 'screen')?.childRefs).toContain(drawer!.id);
+    expect(nested.nodes.find((node) => node.id === tabs!.id && node.kind !== 'screen')?.childRefs).toContain(
+      drawer!.id,
+    );
 
     const preview = createNavigationPreviewRows(nested);
     expect(preview.map(({ kind }) => kind)).toContain('tabs');
@@ -83,7 +85,9 @@ describe('M07.4 Navigation Builder', () => {
       navigatorRef: base.rootNodeRef,
       childRef: modal.id,
     });
-    expect(initial.nodes.find((node) => node.id === base.rootNodeRef && node.kind !== 'screen')?.initialNodeRef).toBe(modal.id);
+    expect(initial.nodes.find((node) => node.id === base.rootNodeRef && node.kind !== 'screen')?.initialNodeRef).toBe(
+      modal.id,
+    );
   });
 
   it('stores target-neutral presentation semantics on node metadata', () => {

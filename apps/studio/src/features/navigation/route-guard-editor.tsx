@@ -69,7 +69,9 @@ export function RouteGuardEditor({
       <label>
         <span>Acceso</span>
         <Select value={mode} onValueChange={(value) => setMode(value as ElectroCraftRouteAccessMode)}>
-          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="public">Público</SelectItem>
             <SelectItem value="authenticated">Requiere iniciar sesión</SelectItem>
@@ -107,12 +109,16 @@ export function RouteGuardEditor({
         <label>
           <span>Si no tiene acceso · Redirigir a</span>
           <Select value={redirectRouteRef} onValueChange={setRedirectRouteRef}>
-            <SelectTrigger><SelectValue placeholder="Seleccionar Ruta" /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue placeholder="Seleccionar Ruta" />
+            </SelectTrigger>
             <SelectContent>
               {routes
                 .filter(({ id }) => id !== route.id)
                 .map((candidate) => (
-                  <SelectItem key={candidate.id} value={candidate.id}>{candidate.name} · {candidate.path}</SelectItem>
+                  <SelectItem key={candidate.id} value={candidate.id}>
+                    {candidate.name} · {candidate.path}
+                  </SelectItem>
                 ))}
             </SelectContent>
           </Select>
@@ -120,13 +126,22 @@ export function RouteGuardEditor({
       ) : null}
 
       <p className="ec-route-guard-warning">
-        Ocultar un elemento de Navegación no es control de seguridad. El enforcement usa Guards y, desde F12, el evaluador real de autenticación/permisos.
+        Ocultar un elemento de Navegación no es control de seguridad. El enforcement usa Guards y, desde F12, el
+        evaluador real de autenticación/permisos.
       </p>
       <Button onClick={() => void save()} disabled={mode !== 'public' && !redirectRouteRef}>
         Guardar Acceso
       </Button>
-      {error ? <p className="ec-route-guard-error" role="alert">{error}</p> : null}
-      {message ? <p className="ec-route-guard-success" role="status">{message}</p> : null}
+      {error ? (
+        <p className="ec-route-guard-error" role="alert">
+          {error}
+        </p>
+      ) : null}
+      {message ? (
+        <p className="ec-route-guard-success" role="status">
+          {message}
+        </p>
+      ) : null}
     </section>
   );
 }

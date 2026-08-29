@@ -52,7 +52,11 @@ export const electroCraftNavigateActionConfigSchema = z
   .superRefine((config, context) => {
     if (config.mode === 'back') {
       if (config.destination !== null) {
-        context.addIssue({ code: 'custom', path: ['destination'], message: 'back navigation cannot define a destination' });
+        context.addIssue({
+          code: 'custom',
+          path: ['destination'],
+          message: 'back navigation cannot define a destination',
+        });
       }
       if (config.params.length > 0) {
         context.addIssue({ code: 'custom', path: ['params'], message: 'back navigation cannot define params' });
@@ -60,12 +64,20 @@ export const electroCraftNavigateActionConfigSchema = z
       return;
     }
     if (config.destination === null) {
-      context.addIssue({ code: 'custom', path: ['destination'], message: 'push/replace navigation requires a destination' });
+      context.addIssue({
+        code: 'custom',
+        path: ['destination'],
+        message: 'push/replace navigation requires a destination',
+      });
     }
     const seen = new Set<string>();
     for (const [index, mapping] of config.params.entries()) {
       if (seen.has(mapping.param)) {
-        context.addIssue({ code: 'custom', path: ['params', index, 'param'], message: `duplicate navigation param: ${mapping.param}` });
+        context.addIssue({
+          code: 'custom',
+          path: ['params', index, 'param'],
+          message: `duplicate navigation param: ${mapping.param}`,
+        });
       }
       seen.add(mapping.param);
     }
@@ -75,12 +87,7 @@ export type ElectroCraftNavigateActionConfig = z.infer<typeof electroCraftNaviga
 export const electroCraftExternalUrlActionConfigSchema = z.strictObject({
   schemaVersion: z.literal(1),
   action: z.literal('external-url'),
-  url: z
-    .url()
-    .refine((value) => {
-      const protocol = new URL(value).protocol;
-      return protocol === 'https:' || protocol === 'http:';
-    }, 'external URL must use http or https'),
+  url: z.url().refine((value) => /^https?:\/\//i.test(value), 'external URL must use http or https'),
   mode: z.enum(['same-context', 'new-context']),
 });
 export type ElectroCraftExternalUrlActionConfig = z.infer<typeof electroCraftExternalUrlActionConfigSchema>;

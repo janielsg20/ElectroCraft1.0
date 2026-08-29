@@ -26,7 +26,9 @@ function actionGraphStoredObject(graph: ReturnType<typeof createRouteNavigateAct
 
 async function persistAction(
   routeId: string,
-  build: (sourceRoute: NonNullable<ReturnType<typeof sourceRouteById>>) => ReturnType<typeof createRouteNavigateActionGraph>,
+  build: (
+    sourceRoute: NonNullable<ReturnType<typeof sourceRouteById>>,
+  ) => ReturnType<typeof createRouteNavigateActionGraph>,
   successMessage: string,
 ) {
   const snapshot = navigationWorkspaceRuntime.getSnapshot();
@@ -37,10 +39,7 @@ async function persistAction(
   const nextRoute = attachActionGraphToRoute(route, graph);
   projectStorageRuntime.queueAutosave({
     project: snapshot.project,
-    dirtyObjects: [
-      ...navigationGraphStoredObjects({ routes: [nextRoute] }),
-      actionGraphStoredObject(graph),
-    ],
+    dirtyObjects: [...navigationGraphStoredObjects({ routes: [nextRoute] }), actionGraphStoredObject(graph)],
   });
   await projectStorageRuntime.flushAutosave();
   await navigationWorkspaceRuntime.load();

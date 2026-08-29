@@ -24,6 +24,4 @@ export const electroCraftNavigationCompilerDiagnosticSchema = z.strictObject({
   feature: z.string().trim().min(1).max(120),
   message: z.string().trim().min(1).max(500),
 });
-export type ElectroCraftNavigationCompilerDiagnostic = z.infer<
-  typeof electroCraftNavigationCompilerDiagnosticSchema
->;
+export type ElectroCraftNavigationCompilerDiagnostic = z.infer<typeof electroCraftNavigationCompilerDiagnosticSchema>;

@@ -30,7 +30,9 @@ export function NavigationWorkspace({ mode }: { readonly mode: NavigationWorkspa
     <section className="ec-navigation-workspace" data-navigation-workspace={mode} aria-labelledby="ec-navigation-title">
       <header className="ec-navigation-workspace-header">
         <div className="ec-navigation-workspace-title">
-          <span aria-hidden="true"><NavigationIcon /></span>
+          <span aria-hidden="true">
+            <NavigationIcon />
+          </span>
           <div>
             <p>App</p>
             <div className="ec-navigation-title-row">
@@ -67,7 +69,9 @@ export function NavigationWorkspace({ mode }: { readonly mode: NavigationWorkspa
         <div className="ec-navigation-empty">
           <strong>Abre un proyecto para configurar Navegación.</strong>
           <p>El Navigation Graph se guarda junto con los demás objetos canónicos del proyecto.</p>
-          <Button asChild size="sm"><a href="/">Abrir Proyectos</a></Button>
+          <Button asChild size="sm">
+            <a href="/">Abrir Proyectos</a>
+          </Button>
         </div>
       ) : null}
 
@@ -94,7 +98,9 @@ export function NavigationWorkspace({ mode }: { readonly mode: NavigationWorkspa
       {snapshot.state !== 'loading' && snapshot.state !== 'error' && hasNavigation ? <NavigationBuilder /> : null}
 
       {snapshot.lastSavedMessage ? (
-        <p className="ec-navigation-success" role="status" aria-live="polite">{snapshot.lastSavedMessage}</p>
+        <p className="ec-navigation-success" role="status" aria-live="polite">
+          {snapshot.lastSavedMessage}
+        </p>
       ) : null}
 
       {snapshot.graph && snapshot.graph.diagnostics.length > 0 ? (
@@ -103,7 +109,8 @@ export function NavigationWorkspace({ mode }: { readonly mode: NavigationWorkspa
           <ul>
             {snapshot.graph.diagnostics.map((diagnostic, index) => (
               <li key={`${diagnostic.code}-${diagnostic.ref ?? index}`}>
-                <code>{diagnostic.code}</code>{diagnostic.ref ? ` · ${diagnostic.ref}` : ''}
+                <code>{diagnostic.code}</code>
+                {diagnostic.ref ? ` · ${diagnostic.ref}` : ''}
               </li>
             ))}
           </ul>

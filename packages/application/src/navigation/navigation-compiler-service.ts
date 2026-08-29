@@ -101,7 +101,7 @@ function routeContract(route: ElectroCraftRouteDefinition) {
 
 function navigatorContracts(navigations: readonly ElectroCraftNavigationDefinition[]) {
   return navigations.flatMap(({ nodes }) =>
-    nodes.filter((node) => node.kind !== 'screen').map((node) => ({ nodeRef: node.id, kind: node.kind } as const)),
+    nodes.filter((node) => node.kind !== 'screen').map((node) => ({ nodeRef: node.id, kind: node.kind }) as const),
   );
 }
 

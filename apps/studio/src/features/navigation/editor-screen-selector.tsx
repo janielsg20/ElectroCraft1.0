@@ -54,9 +54,10 @@ export function EditorScreenTopbarSelect({ fallbackLabel }: { readonly fallbackL
   }
 
   const screens = screenDocuments();
-  const selectedId = selection.screenId && screens.some(({ id }) => id === selection.screenId)
-    ? selection.screenId
-    : screens[0]?.id ?? '';
+  const selectedId =
+    selection.screenId && screens.some(({ id }) => id === selection.screenId)
+      ? selection.screenId
+      : (screens[0]?.id ?? '');
 
   if (navigation.state === 'loading' && screens.length === 0) return <span>Cargando Pantalla…</span>;
   if (screens.length === 0) return <span>{fallbackLabel}</span>;
@@ -96,7 +97,11 @@ export function EditorScreensContextPanel() {
   const screens = useMemo(() => screenDocuments(), [navigation.graph, navigation.lastSavedMessage]);
 
   if (navigation.state === 'loading' && screens.length === 0) {
-    return <p className="ec-editor-screen-context-state" role="status">Cargando Pantallas…</p>;
+    return (
+      <p className="ec-editor-screen-context-state" role="status">
+        Cargando Pantallas…
+      </p>
+    );
   }
   if (navigation.state === 'error' && screens.length === 0) {
     return (
@@ -131,7 +136,9 @@ export function EditorScreensContextPanel() {
         <div className="ec-editor-screen-context-actions">
           <HelpTrigger helpId="help.editor.screens" />
           <Button variant="ghost" size="icon" asChild aria-label="Administrar Pantallas" title="Administrar Pantallas">
-            <a href="/screens"><OpenIcon aria-hidden="true" /></a>
+            <a href="/screens">
+              <OpenIcon aria-hidden="true" />
+            </a>
           </Button>
         </div>
       </div>
@@ -148,7 +155,9 @@ export function EditorScreensContextPanel() {
               key={screen.id}
               onClick={() => editorScreenSelectionRuntime.select(screen.id)}
             >
-              <span className="ec-editor-screen-context-icon" aria-hidden="true"><ScreenIcon /></span>
+              <span className="ec-editor-screen-context-icon" aria-hidden="true">
+                <ScreenIcon />
+              </span>
               <span>
                 <strong>{screen.name}</strong>
                 <small>{routePathForScreen(screen.id)}</small>

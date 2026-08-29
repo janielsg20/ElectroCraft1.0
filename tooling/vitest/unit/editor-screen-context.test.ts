@@ -16,7 +16,7 @@ describe('M07.3 screen-aware editor context', () => {
     expect(workspace.match(/<PuckEditorRoot/g)).toHaveLength(1);
     expect(workspace).toContain('key={runtime.sessionKey}');
     expect(workspace).toContain('data-editor-screen-id={runtime.screenId ?? undefined}');
-    expect(hook).toContain("sessionKey: runtime?.document.id");
+    expect(hook).toContain('sessionKey: runtime?.document.id');
     expect(hook).toContain('documentId: screenId ?? undefined');
   });
 
@@ -26,7 +26,7 @@ describe('M07.3 screen-aware editor context', () => {
     const selector = source('apps/studio/src/features/navigation/editor-screen-selector.tsx');
 
     expect(workspace).toContain('<EditorScreensContextPanel />');
-    expect(workspace).toContain("data-editor-mobile-sheet=\"screens\"");
+    expect(workspace).toContain('data-editor-mobile-sheet="screens"');
     expect(topbar).toContain('<EditorScreenTopbarSelect fallbackLabel={activeLabel} />');
     expect(topbar).toContain('puckPlatformControls.select');
     expect(topbar).toContain('puckResponsiveControls.select');

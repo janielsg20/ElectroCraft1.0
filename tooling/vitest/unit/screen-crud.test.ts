@@ -23,9 +23,7 @@ describe('M07.2 screen CRUD use cases', () => {
     expect(route).toMatchObject({ schemaVersion: 2, path: '/', screenRef: screen.id });
     expect(navigation.schemaVersion).toBe(2);
     expect(navigation.nodes.some((node) => node.kind === 'stack')).toBe(true);
-    expect(
-      navigation.nodes.some((node) => node.kind === 'screen' && node.routeRef === route.id),
-    ).toBe(true);
+    expect(navigation.nodes.some((node) => node.kind === 'screen' && node.routeRef === route.id)).toBe(true);
   });
 
   it('duplicates screen and every node identity while suggesting a new route', () => {

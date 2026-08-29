@@ -161,7 +161,12 @@ const studioDefinitions = Object.freeze([
     shortKey: helpKey('help.section.navigation.short'),
     longKey: helpKey('help.section.navigation.long'),
     exampleKeys: [helpKey('help.section.navigation.example')],
-    relatedIds: ['help.navigation.builder', 'help.navigation.routes', 'help.navigation.guards', 'help.navigation.compiler'],
+    relatedIds: [
+      'help.navigation.builder',
+      'help.navigation.routes',
+      'help.navigation.guards',
+      'help.navigation.compiler',
+    ],
     keywords: [
       'navigation graph',
       'pantallas',

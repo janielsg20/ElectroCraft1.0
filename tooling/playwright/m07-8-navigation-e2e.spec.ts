@@ -35,7 +35,9 @@ function hasHorizontalOverflow(page: Page) {
 }
 
 test.describe.serial('M07.8 Navigation E2E y UX', () => {
-  test('create, edit, navigation builder, Preview y delete blocker funcionan como una experiencia', async ({ page }) => {
+  test('create, edit, navigation builder, Preview y delete blocker funcionan como una experiencia', async ({
+    page,
+  }) => {
     test.setTimeout(240_000);
     await createNavigationProject(page);
 
@@ -115,7 +117,10 @@ test.describe.serial('M07.8 Navigation E2E y UX', () => {
     await page.goto('/editor');
     await expect(page.locator('[data-editor-responsive-mode="mobile"]')).toBeVisible({ timeout: 60_000 });
     expect(await hasHorizontalOverflow(page)).toBe(false);
-    await page.getByRole('button', { name: /Pantallas/ }).first().click();
+    await page
+      .getByRole('button', { name: /Pantallas/ })
+      .first()
+      .click();
     await expect(page.locator('[data-editor-screen-context]')).toBeVisible();
     await expect(page.locator('[data-help-trigger="help.editor.screens"]')).toBeVisible();
 

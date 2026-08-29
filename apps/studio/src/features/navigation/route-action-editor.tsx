@@ -39,7 +39,7 @@ export function RouteActionEditor({
 }) {
   const [actionType, setActionType] = useState<'navigate' | 'external-url'>('navigate');
   const [mode, setMode] = useState<'push' | 'replace' | 'back'>('push');
-  const [destinationRouteId, setDestinationRouteId] = useState(routes[0]?.id ?? sourceRoute.id);
+  const [destinationRouteId, setDestinationRouteId] = useState<string>(routes[0]?.id ?? sourceRoute.id);
   const [paramValues, setParamValues] = useState<Record<string, string>>({});
   const [externalUrl, setExternalUrl] = useState('https://');
   const [externalMode, setExternalMode] = useState<'same-context' | 'new-context'>('new-context');

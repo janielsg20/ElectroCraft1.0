@@ -245,7 +245,11 @@ export const electroCraftNavigationNavigatorNodeSchema = z
   })
   .superRefine((node, context) => {
     for (const duplicate of duplicateValues(node.childRefs)) {
-      context.addIssue({ code: 'custom', path: ['childRefs'], message: `duplicate navigation child ref: ${duplicate}` });
+      context.addIssue({
+        code: 'custom',
+        path: ['childRefs'],
+        message: `duplicate navigation child ref: ${duplicate}`,
+      });
     }
     if (node.initialNodeRef !== null && !node.childRefs.includes(node.initialNodeRef)) {
       context.addIssue({
@@ -289,9 +293,17 @@ export const electroCraftNavigationDefinitionV2Schema = z
     const nodesById = new Map(navigation.nodes.map((node) => [node.id, node] as const));
     const root = nodesById.get(navigation.rootNodeRef);
     if (!root) {
-      context.addIssue({ code: 'custom', path: ['rootNodeRef'], message: 'rootNodeRef must reference a navigation node' });
+      context.addIssue({
+        code: 'custom',
+        path: ['rootNodeRef'],
+        message: 'rootNodeRef must reference a navigation node',
+      });
     } else if (root.kind === 'screen') {
-      context.addIssue({ code: 'custom', path: ['rootNodeRef'], message: 'rootNodeRef must reference a navigator node' });
+      context.addIssue({
+        code: 'custom',
+        path: ['rootNodeRef'],
+        message: 'rootNodeRef must reference a navigator node',
+      });
     }
     for (const [index, node] of navigation.nodes.entries()) {
       if (node.kind === 'screen') continue;
@@ -416,7 +428,9 @@ export function collectNavigationRouteRefs(
   const nodes: readonly ElectroCraftNavigationNode[] = Array.isArray(input)
     ? input
     : (input as ElectroCraftNavigationDefinition).nodes;
-  return nodes.filter((node): node is ElectroCraftNavigationScreenNode => node.kind === 'screen').map(({ routeRef }) => routeRef);
+  return nodes
+    .filter((node): node is ElectroCraftNavigationScreenNode => node.kind === 'screen')
+    .map(({ routeRef }) => routeRef);
 }
 
 export type ElectroCraftNavigationDiagnosticCode =
@@ -554,7 +568,10 @@ export function validateElectroCraftNavigationGraph(
           diagnostics.push({ code: 'missing-navigation-node-ref', ownerId: navigation.id, ref: childRef });
         }
       }
-      if (node.childRefs.length > 0 && (node.initialNodeRef === null || !node.childRefs.includes(node.initialNodeRef))) {
+      if (
+        node.childRefs.length > 0 &&
+        (node.initialNodeRef === null || !node.childRefs.includes(node.initialNodeRef))
+      ) {
         diagnostics.push({
           code: 'invalid-initial-route',
           ownerId: navigation.id,
@@ -572,5 +589,5 @@ export function validateElectroCraftNavigationGraph(
 }
 
 export function cloneJsonValue<T extends JsonValue>(value: T): T {
-  return structuredClone(value);
+  return JSON.parse(JSON.stringify(value)) as T;
 }

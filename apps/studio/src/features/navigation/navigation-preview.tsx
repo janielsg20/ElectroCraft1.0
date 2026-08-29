@@ -1,4 +1,12 @@
-import { Button, Checkbox, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@electrocraft/design-system';
+import {
+  Button,
+  Checkbox,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@electrocraft/design-system';
 import { createNavigationPreviewRows, evaluateRouteAccessPreview } from '@electrocraft/application';
 import type { ElectroCraftRouteDefinition } from '@electrocraft/domain';
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
@@ -57,7 +65,7 @@ export function NavigationPreview() {
       })
     : null;
   const redirectRoute = decision?.redirectRouteRef
-    ? routes.find(({ id }) => id === decision.redirectRouteRef) ?? null
+    ? (routes.find(({ id }) => id === decision.redirectRouteRef) ?? null)
     : null;
 
   function selectRoute(routeRef: string) {
@@ -78,7 +86,9 @@ export function NavigationPreview() {
       <section className="ec-navigation-preview" data-navigation-preview>
         <h1>Preview</h1>
         <p>Abre un proyecto para probar sus Pantallas y Rutas.</p>
-        <Button asChild><a href="/">Abrir Proyectos</a></Button>
+        <Button asChild>
+          <a href="/">Abrir Proyectos</a>
+        </Button>
       </section>
     );
   }
@@ -90,7 +100,9 @@ export function NavigationPreview() {
         <div className="ec-navigation-preview-error" role="alert">
           <strong>No se pudo cargar la Navegación.</strong>
           <p>{snapshot.message}</p>
-          <Button variant="outline" onClick={() => void navigationWorkspaceRuntime.load()}>Reintentar</Button>
+          <Button variant="outline" onClick={() => void navigationWorkspaceRuntime.load()}>
+            Reintentar
+          </Button>
         </div>
       </section>
     );
@@ -101,7 +113,9 @@ export function NavigationPreview() {
       <section className="ec-navigation-preview" data-navigation-preview>
         <h1>Preview</h1>
         <p>No hay Rutas y Navegación suficientes para ejecutar el Preview.</p>
-        <Button asChild><a href="/navigation">Configurar Navegación</a></Button>
+        <Button asChild>
+          <a href="/navigation">Configurar Navegación</a>
+        </Button>
       </section>
     );
   }
@@ -117,17 +131,23 @@ export function NavigationPreview() {
           </div>
           <span>Stub contractual de F07. No ejecuta autenticación real ni routers de target.</span>
         </div>
-        <Button variant="outline" asChild><a href="/navigation">Editar Navegación</a></Button>
+        <Button variant="outline" asChild>
+          <a href="/navigation">Editar Navegación</a>
+        </Button>
       </header>
 
       <div className="ec-navigation-preview-toolbar" role="group" aria-label="Contexto del Preview">
         <label>
           <span>Ruta</span>
           <Select value={route.id} onValueChange={selectRoute}>
-            <SelectTrigger aria-label="Ruta del Preview"><SelectValue /></SelectTrigger>
+            <SelectTrigger aria-label="Ruta del Preview">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               {routes.map((candidate) => (
-                <SelectItem key={candidate.id} value={candidate.id}>{candidate.name} · {candidate.path}</SelectItem>
+                <SelectItem key={candidate.id} value={candidate.id}>
+                  {candidate.name} · {candidate.path}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -137,10 +157,7 @@ export function NavigationPreview() {
           <span>Simular usuario autenticado</span>
         </label>
         <label className="ec-navigation-preview-check">
-          <Checkbox
-            checked={allowProtectedRefs}
-            onCheckedChange={(value) => setAllowProtectedRefs(value === true)}
-          />
+          <Checkbox checked={allowProtectedRefs} onCheckedChange={(value) => setAllowProtectedRefs(value === true)} />
           <span>Simular permiso/condición aprobada</span>
         </label>
       </div>
@@ -150,7 +167,11 @@ export function NavigationPreview() {
           <h2>Navegación</h2>
           <ol>
             {previewRows.map((row) => (
-              <li key={row.id} data-initial={row.initial ? 'true' : 'false'} data-visible={row.visible ? 'true' : 'false'}>
+              <li
+                key={row.id}
+                data-initial={row.initial ? 'true' : 'false'}
+                data-visible={row.visible ? 'true' : 'false'}
+              >
                 <span style={{ paddingInlineStart: `${row.depth * 14}px` }}>
                   {row.kind === 'screen' ? 'Pantalla' : row.kind} · {row.label}
                 </span>
@@ -175,11 +196,16 @@ export function NavigationPreview() {
                   {route.params.map((param) => (
                     <div key={param.name}>
                       <dt>{param.name}</dt>
-                      <dd>{param.valueType} · {param.source}{param.required ? ' · requerido' : ''}</dd>
+                      <dd>
+                        {param.valueType} · {param.source}
+                        {param.required ? ' · requerido' : ''}
+                      </dd>
                     </div>
                   ))}
                 </dl>
-              ) : <p>Sin Parámetros.</p>}
+              ) : (
+                <p>Sin Parámetros.</p>
+              )}
             </div>
           ) : (
             <div className="ec-navigation-preview-blocked" role="alert">
@@ -187,7 +213,9 @@ export function NavigationPreview() {
               <p>El Preview aplica Guards en modo fail-closed.</p>
               {redirectRoute ? (
                 <Button onClick={() => selectRoute(redirectRoute.id)}>Redirigir a {redirectRoute.name}</Button>
-              ) : <span>Sin Ruta de redirección configurada.</span>}
+              ) : (
+                <span>Sin Ruta de redirección configurada.</span>
+              )}
             </div>
           )}
         </main>

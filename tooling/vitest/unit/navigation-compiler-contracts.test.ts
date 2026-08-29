@@ -25,12 +25,8 @@ function source() {
 describe('M07.7 navigation compiler boundaries', () => {
   it('maps the same canonical model to React Router and Expo Router contract fixtures', () => {
     const { compiler } = source();
-    expect(compileNavigationContract(compiler, 'react-router')).toEqual(
-      fixture('navigation-react-router-contract-v1'),
-    );
-    expect(compileNavigationContract(compiler, 'expo-router')).toEqual(
-      fixture('navigation-expo-router-contract-v1'),
-    );
+    expect(compileNavigationContract(compiler, 'react-router')).toEqual(fixture('navigation-react-router-contract-v1'));
+    expect(compileNavigationContract(compiler, 'expo-router')).toEqual(fixture('navigation-expo-router-contract-v1'));
   });
 
   it('derives LAMP/Slim, WordPress, Capacitor and Static contracts without persisting router objects', () => {
@@ -87,7 +83,10 @@ describe('M07.7 navigation compiler boundaries', () => {
 
   it('keeps domain/application boundaries free of concrete router imports', () => {
     const domain = readFileSync(resolve('packages/domain/src/navigation/compiler.ts'), 'utf8');
-    const application = readFileSync(resolve('packages/application/src/navigation/navigation-compiler-service.ts'), 'utf8');
+    const application = readFileSync(
+      resolve('packages/application/src/navigation/navigation-compiler-service.ts'),
+      'utf8',
+    );
     expect(domain).not.toMatch(/from ['\"]react-router|from ['\"]expo-router|@react-navigation/);
     expect(application).not.toMatch(/from ['\"]react-router|from ['\"]expo-router|@react-navigation/);
   });

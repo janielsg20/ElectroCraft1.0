@@ -20,24 +20,44 @@ export const electroCraftRouteAccessConfigSchema = z
   .superRefine((config, context) => {
     if (config.mode === 'public') {
       if (config.policyRef !== null || config.conditionActionRef !== null) {
-        context.addIssue({ code: 'custom', path: ['mode'], message: 'public access cannot reference permission/condition guards' });
+        context.addIssue({
+          code: 'custom',
+          path: ['mode'],
+          message: 'public access cannot reference permission/condition guards',
+        });
       }
       return;
     }
     if (config.redirectRouteRef === null) {
-      context.addIssue({ code: 'custom', path: ['redirectRouteRef'], message: 'protected access requires a redirect route' });
+      context.addIssue({
+        code: 'custom',
+        path: ['redirectRouteRef'],
+        message: 'protected access requires a redirect route',
+      });
     }
     if (config.mode === 'permission' && config.policyRef === null) {
       context.addIssue({ code: 'custom', path: ['policyRef'], message: 'permission access requires policyRef' });
     }
     if (config.mode !== 'permission' && config.policyRef !== null) {
-      context.addIssue({ code: 'custom', path: ['policyRef'], message: 'policyRef is only valid for permission access' });
+      context.addIssue({
+        code: 'custom',
+        path: ['policyRef'],
+        message: 'policyRef is only valid for permission access',
+      });
     }
     if (config.mode === 'condition' && config.conditionActionRef === null) {
-      context.addIssue({ code: 'custom', path: ['conditionActionRef'], message: 'condition access requires conditionActionRef' });
+      context.addIssue({
+        code: 'custom',
+        path: ['conditionActionRef'],
+        message: 'condition access requires conditionActionRef',
+      });
     }
     if (config.mode !== 'condition' && config.conditionActionRef !== null) {
-      context.addIssue({ code: 'custom', path: ['conditionActionRef'], message: 'conditionActionRef is only valid for condition access' });
+      context.addIssue({
+        code: 'custom',
+        path: ['conditionActionRef'],
+        message: 'conditionActionRef is only valid for condition access',
+      });
     }
   });
 export type ElectroCraftRouteAccessConfig = z.infer<typeof electroCraftRouteAccessConfigSchema>;
@@ -126,7 +146,8 @@ export function routeGuardFromAccessConfig(
   guardId: string,
 ): ElectroCraftRouteGuard | null {
   if (config.mode === 'public') return null;
-  const kind = config.mode === 'authenticated' ? 'authentication' : config.mode === 'permission' ? 'permission' : 'custom';
+  const kind =
+    config.mode === 'authenticated' ? 'authentication' : config.mode === 'permission' ? 'permission' : 'custom';
   return {
     id: guardId as ElectroCraftRouteGuard['id'],
     kind,
