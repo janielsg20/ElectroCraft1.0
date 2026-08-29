@@ -1,4 +1,5 @@
 import {
+  puckContextControls,
   structuralPuckConfig,
   structuralPuckData,
   type PuckEditorConfig,
@@ -51,6 +52,7 @@ export function useStudioPuckEditorRuntime() {
   useEffect(() => {
     let active = true;
     let loadedRuntime: StudioPuckEditorRuntime | null = null;
+    puckContextControls.clearSessionLocks();
     if (!projectId) {
       setSnapshot(emptySnapshot);
       return () => {
