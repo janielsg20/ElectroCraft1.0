@@ -27,7 +27,7 @@ async function createScreen(page: Page, name: string, path: string) {
   await page.getByRole('button', { name: 'Crear y abrir' }).click();
   await expect(page).toHaveURL(/\/editor\?screen=/, { timeout: 60_000 });
   await expect(page.locator('[data-editor-sync-state="ready"]')).toBeVisible({ timeout: 60_000 });
-  await expect(page.getByLabel('Pantalla')).toContainText(name);
+  await expect(page.getByLabel('Pantalla', { exact: true })).toContainText(name);
 }
 
 function hasHorizontalOverflow(page: Page) {
@@ -58,7 +58,7 @@ test.describe.serial('M07.8 Navigation E2E y UX', () => {
     await page.getByRole('button', { name: 'Abrir en Editor' }).click();
     await expect(page).toHaveURL(/\/editor\?screen=/, { timeout: 60_000 });
     await expect(page.locator('[data-editor-sync-state="ready"]')).toBeVisible({ timeout: 60_000 });
-    await expect(page.getByLabel('Pantalla')).toContainText('Detalle');
+    await expect(page.getByLabel('Pantalla', { exact: true })).toContainText('Detalle');
     await page.getByRole('tab', { name: 'Pantallas' }).click();
     await expect(page.locator('[data-editor-screen-context]')).toBeVisible();
     await expect(page.locator('[data-help-trigger="help.editor.screens"]')).toBeVisible();
