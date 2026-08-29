@@ -16,6 +16,7 @@ const studioScopedHelpIds = [
   'help.editor.screens',
   'help.navigation',
   'help.navigation.builder',
+  'help.navigation.routes',
   'help.screens',
 ] as const;
 
@@ -44,6 +45,7 @@ describe('M03.11 typed HelpRegistry', () => {
     expect(searchStudioHelp('Construir').some((entry) => entry.id === 'help.section.editor')).toBe(true);
     expect(searchStudioHelp('screen composer').some((entry) => entry.id === 'help.editor.screens')).toBe(true);
     expect(searchStudioHelp('reordenar').some((entry) => entry.id === 'help.navigation.builder')).toBe(true);
+    expect(searchStudioHelp('enlace profundo').some((entry) => entry.id === 'help.navigation.routes')).toBe(true);
   });
 
   it('keeps related concepts inside the same registry', () => {
