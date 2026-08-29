@@ -19,7 +19,9 @@ describe('M06.6 context actions boundary', () => {
   it('derives breadcrumbs and materializes clipboard content through public Puck APIs', () => {
     const bridge = read('packages/editor-puck/src/puck-context-bridge.tsx');
 
-    expect(bridge).toContain("{ id: 'root', label: 'Página' }");
+    expect(bridge).toContain("{ id: 'app', label: 'App' }");
+    expect(bridge).toContain("{ id: 'root', label: 'Pantalla' }");
+    expect(bridge).not.toContain("{ id: 'root', label: 'Página' }");
     expect(bridge).toContain('getItemById');
     expect(bridge).toContain('getSelectorForId');
     expect(bridge).toContain("type: 'insert'");
