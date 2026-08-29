@@ -171,7 +171,7 @@ describe('M08.2 InternalDataSourceAdapter', () => {
     expect(browserPort).toContain('offlineCapable: true');
     expect(browserPort).toContain('electrocraft-studio-storage');
     expect(browserPort).not.toMatch(/fetch\(|XMLHttpRequest|WebSocket/);
-    expect(schemaSource.match(/pgTable\('content_records'/g)).toHaveLength(1);
+    expect(schemaSource.match(/pgTable\(\s*'content_records'/g)).toHaveLength(1);
     expect(migrationSource.match(/CREATE TABLE IF NOT EXISTS content_records/g)).toHaveLength(1);
   });
 
