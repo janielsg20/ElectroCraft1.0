@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "ec_source_0000000000082",
+  "version": 1,
+  "key": "electroCraftData",
+  "label": "ElectroCraft Data",
+  "kind": "internal",
+  "adapterId": "internal.pglite",
+  "authRef": null,
+  "config": {
+    "storage": "content_records",
+    "offlineCapable": true
+  },
+  "environmentScope": ["development", "preview", "production"],
+  "environmentOverrides": {},
+  "schemaDiscovery": "on-demand",
+  "capabilities": [
+    "read",
+    "create",
+    "update",
+    "delete",
+    "pagination",
+    "filtering",
+    "sort",
+    "transactions"
+  ],
+  "metadata": {
+    "offlineCapable": true,
+    "owner": "PGlite+Drizzle"
+  }
+}
