@@ -8,62 +8,52 @@
 - F03 — Design System, AppShell, español y ayuda: `COMPLETADA / GREEN`.
 - F04 — Persistencia local, proyectos y revisiones: `COMPLETADA / GREEN`.
 - F05 — Screen Composer con Puck: `COMPLETADA / GREEN`.
-- F06 — Layout, responsive y edición avanzada: implementación fusionada a `main`; el cierre de corrección PR `#67` terminó con fallo Playwright heredado y las reparaciones están incluidas en la rama F07 actual.
-- F07 — Pantallas, navegación y rutas: `IN_PROGRESS`; M07.8 ejecuta el gate de cierre.
-- M07.1–M07.7 — Implementación funcional: `IMPLEMENTADA / PENDIENTE GATE F07`.
-- M07.8 — Navigation E2E y UX: `ACTIVE`.
+- F06 — Layout, responsive y edición avanzada: implementación fusionada; reparaciones heredadas certificadas dentro del gate F07.
+- F07 — Pantallas, navegación y rutas: `COMPLETADA / GREEN`.
+- F08 — Fuentes de datos, modelos, registros y conectores: `IN_PROGRESS`.
+- M08.1 — Fuentes de datos y ConnectorRegistry: `ACTIVE`.
 
 ## Rama activa
 
-`codex/m07-1-navigation-model`
+`codex/m08-1-data-sources`
+
+## Gate de entrada F08
+
+F07 cerró con Base CI run `33262949215` (#795) completamente verde: documentación, lint, typecheck, Vitest, build, Playwright, empty-repo y artefactos. PR `#68` fue fusionada a `main` en `e697a42546d23f89412e6dd616018759e719e448`.
 
 ## Microfase activa
 
-`M07.8 — Navigation E2E y UX` permanece `ACTIVE` mientras se ejecuta el Gate F07. Su implementación está completa, pero la microfase no se cierra hasta que la fase obtenga `docs + lint + typecheck + test + build + Playwright` en verde.
+`M08.1 — Fuentes de datos y ConnectorRegistry` tiene implementación funcional preparada y evidencia en `.ai/evidence/F08/M08.1/IMPLEMENTATION_2026-08-29.md`. Permanece `ACTIVE` hasta completar su revisión estática de continuidad y abrir la transición a M08.2; la certificación ejecutable completa se reserva para el Gate F08 conforme a la política de no usar Actions por microfase.
 
-## Capacidades F07 implementadas
+## Capacidades M08.1 implementadas
 
-1. `ElectroCraftRoute` y `ElectroCraftNavigation` v2 con migración legacy, params, guards, deep links y graph validation.
-2. Pantallas CRUD en `Construir > Pantallas`, rutas/navigator asociados, duplicación con IDs nuevos y delete blocker por referencias.
-3. Screen Composer orientado a Pantallas con selector compartido topbar/context/mobile, un único Puck e historial aislado por documento.
-4. Navigation Builder tree para Pila/Pestañas/Menú lateral/Modal, reordenación drag + teclado, Pantalla inicial y presentación portable.
-5. Bindings de Route Param, acciones Navegar `push|replace|back`, ActionGraph real y URL externa http/https separada.
-6. Guards Público/Autenticado/Permiso/Condición, redirects sin ciclos y Preview fail-closed sin implementar auth real antes de F12.
-7. `NavigationCompilerPort` con contratos React Router, Expo Router, LAMP/Slim, WordPress, Capacitor y Static Web sin persistir objetos target.
-8. `/preview` consume el mismo Navigation Graph; integración y Playwright F07 cubren desktop/tablet/mobile y el flujo crear → navegar → proteger → preview → bloquear delete.
+1. `ElectroCraftDataSourceDefinition` con owner único en `packages/domain/src/data/source-definition.ts`.
+2. Capabilities canónicas `read/create/update/delete/pagination/filtering/sort/aggregate/realtime/file/transactions`, con aliases legacy solo para migración.
+3. Configuración portable por entorno y bloqueo recursivo de passwords/API keys/tokens/credentials; secretos solo por `authRef`.
+4. `DataSourceAdapter` con `testConnection`, `listResources`, `getSchema`, `query` y `mutate`.
+5. Un único `ConnectorRegistry` de aplicación con validación de adapter/kind/capability/environment y operaciones fail-closed.
+6. `packages/connectors` registrado como paquete estable #20 sin crear un registry paralelo.
+7. `packages/data-web` consume el registry mediante `WebDataSourceRepository`, reutilizando el owner PGlite/Drizzle existente sin crear otro store.
+8. `/data-sources` usa `apps/studio/src/features/data/`: lista 300px, detalle central, inspector seguridad/compatibilidad, Sheet tablet y flujo list→detail móvil.
+9. Help contextual `help.data.sources` y tests de registry/security/responsive preparados.
 
-## QA heredado F06
+## Límites de fase preservados
 
-Run de corrección: `33203881217`, job `99035169190`.
+- Internal/PGlite adapter: M08.2.
+- REST/OpenAPI: M08.3.
+- GraphQL: M08.4.
+- Gateway/SecretStore: M08.5.
 
-Resultado histórico:
-- docs: success;
-- lint: success;
-- typecheck: success;
-- Vitest: success;
-- build: success;
-- Playwright: failure.
+M08.1 no adelanta estas responsabilidades.
 
-Reparaciones incluidas en la rama actual antes de Gate F07:
-- advanced inspector sin selección valida estado vacío en lugar de exigir controles imposibles;
-- metadata responsive transitoria de Puck se permite en la sesión pero se comprueba que no llegue al documento canónico;
-- topbar compacta herramientas secundarias a 1536–1700px y conserva Undo/Redo sin solapamiento;
-- lock contextual sobrevive `refreshPermissions()` y se reinicia solo al cambiar la sesión de Pantalla;
-- breadcrumbs actualizados a `App > Pantalla > Node`.
+## Validación pendiente de fase
 
-Ninguna de estas reparaciones se declara GREEN hasta completar M07.8 mediante Gate F07.
+El nuevo workspace `packages/connectors` requiere regeneración reproducible de `package-lock.json` y certificación de formato/toolchain antes del Gate F08. No se ejecuta GitHub Actions por microfase.
 
-## Evidencia F07
+## Evidencia activa
 
-- `.ai/evidence/F07/M07.1/IMPLEMENTATION_2026-08-28.md`
-- `.ai/evidence/F07/M07.2/IMPLEMENTATION_2026-08-28.md`
-- `.ai/evidence/F07/M07.3/IMPLEMENTATION_2026-08-28.md`
-- `.ai/evidence/F07/M07.4/IMPLEMENTATION_2026-08-28.md`
-- `.ai/evidence/F07/M07.5/IMPLEMENTATION_2026-08-28.md`
-- `.ai/evidence/F07/M07.6/IMPLEMENTATION_2026-08-28.md`
-- `.ai/evidence/F07/M07.7/IMPLEMENTATION_2026-08-28.md`
-- `.ai/evidence/F07/M07.8/IMPLEMENTATION_2026-08-28.md`
+- `.ai/evidence/F08/M08.1/IMPLEMENTATION_2026-08-29.md`
 
-## Regla de cierre
+## Siguiente transición
 
-No marcar M07.8 ni F07 `COMPLETADA / GREEN` ni activar F08 hasta que el gate de fase termine `success` y blockers P0/P1 = 0.
+Cerrar la revisión documental de M08.1 y continuar con `M08.2 — Fuente interna ElectroCraft Data sobre PGlite`, manteniendo una sola microfase `ACTIVE`.
