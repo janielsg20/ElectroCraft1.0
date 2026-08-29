@@ -1,6 +1,11 @@
-import { ConnectorRegistry, type DataSourceAdapter, type ElectroCraftDataConnector } from '@electrocraft/application';
+import {
+  ConnectorRegistry,
+  dataSourceConnectorRegistry,
+  type DataSourceAdapter,
+  type ElectroCraftDataConnector,
+} from '@electrocraft/application';
 
-export const dataSourceConnectorRegistry = new ConnectorRegistry();
+export { dataSourceConnectorRegistry };
 
 export function registerDataSourceAdapter(adapter: DataSourceAdapter) {
   dataSourceConnectorRegistry.registerAdapter(adapter);
