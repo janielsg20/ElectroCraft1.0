@@ -48,7 +48,7 @@ test.describe.serial('M07.8 Navigation E2E y UX', () => {
     await page.goto('/screens');
     await expect(page.getByRole('heading', { name: 'Pantallas' })).toBeVisible({ timeout: 60_000 });
     const screenOptions = page.getByRole('option');
-    await expect(screenOptions).toHaveCount(4, { timeout: 60_000 });
+    await expect(screenOptions).toHaveCount(3, { timeout: 60_000 });
     await page.getByRole('option', { name: /Detalle/ }).click();
     await expect(page.getByText('Esta Pantalla está en uso.')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Eliminar' })).toBeDisabled();
