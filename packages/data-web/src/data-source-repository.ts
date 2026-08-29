@@ -4,10 +4,7 @@ import {
   type DataSourceMutationRequest,
   type DataSourceQueryRequest,
 } from '@electrocraft/application';
-import type {
-  ElectroCraftDataSourceDefinition,
-  ElectroCraftDataSourceEnvironment,
-} from '@electrocraft/domain';
+import type { ElectroCraftDataSourceDefinition, ElectroCraftDataSourceEnvironment } from '@electrocraft/domain';
 
 export class WebDataSourceRepository {
   constructor(private readonly registry: ConnectorRegistry = dataSourceConnectorRegistry) {}

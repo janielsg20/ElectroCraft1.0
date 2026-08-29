@@ -2,15 +2,8 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { ConnectorRegistry } from '@electrocraft/application';
-import {
-  createRestDataSourceAdapter,
-  importOpenApiDocument,
-  REST_DATA_ADAPTER_ID,
-} from '@electrocraft/connectors';
-import {
-  electroCraftDataSourceDefinitionSchema,
-  electroCraftRestDataSourceConfigSchema,
-} from '@electrocraft/domain';
+import { createRestDataSourceAdapter, importOpenApiDocument, REST_DATA_ADAPTER_ID } from '@electrocraft/connectors';
+import { electroCraftDataSourceDefinitionSchema, electroCraftRestDataSourceConfigSchema } from '@electrocraft/domain';
 
 function fixture(name: string): unknown {
   return JSON.parse(readFileSync(resolve(`tooling/fixtures/canonical-model/${name}.json`), 'utf8')) as unknown;
@@ -36,7 +29,9 @@ describe('M08.3 REST API Connector y OpenAPI import', () => {
     });
     expect(imported.operations[1]).toMatchObject({ method: 'POST', kind: 'create', requiresAuth: true });
     expect(imported.operations[2]).toMatchObject({ method: 'GET', path: '/products/{id}', requiresAuth: true });
-    expect(imported.operations.flatMap(({ parameters }) => parameters.map(({ name }) => name))).not.toContain('X-Api-Key');
+    expect(imported.operations.flatMap(({ parameters }) => parameters.map(({ name }) => name))).not.toContain(
+      'X-Api-Key',
+    );
     expect(imported.warnings.join(' ')).toContain('X-Api-Key');
   });
 
@@ -149,7 +144,12 @@ describe('M08.3 REST API Connector y OpenAPI import', () => {
     const source = sourceFixture();
     const responseFetch = vi
       .fn()
-      .mockResolvedValueOnce(new Response(JSON.stringify({ message: 'bad request' }), { status: 400, headers: { 'content-type': 'application/json' } }))
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ message: 'bad request' }), {
+          status: 400,
+          headers: { 'content-type': 'application/json' },
+        }),
+      )
       .mockResolvedValueOnce(new Response('upstream failed', { status: 503 }));
     const registry = new ConnectorRegistry();
     registry.registerAdapter(createRestDataSourceAdapter({ fetch: responseFetch as unknown as typeof fetch }));
@@ -168,7 +168,9 @@ describe('M08.3 REST API Connector y OpenAPI import', () => {
     const timeoutFetch = vi.fn(
       (_input: RequestInfo | URL, init?: RequestInit) =>
         new Promise<Response>((_resolve, reject) => {
-          init?.signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')), { once: true });
+          init?.signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')), {
+            once: true,
+          });
         }),
     ) as unknown as typeof fetch;
     const timeoutSource = electroCraftDataSourceDefinitionSchema.parse({
@@ -178,7 +180,9 @@ describe('M08.3 REST API Connector y OpenAPI import', () => {
     const timeoutRegistry = new ConnectorRegistry();
     timeoutRegistry.registerAdapter(createRestDataSourceAdapter({ fetch: timeoutFetch }));
 
-    await expect(timeoutRegistry.query(timeoutSource, 'development', { resourceId: 'listProducts' })).resolves.toMatchObject({
+    await expect(
+      timeoutRegistry.query(timeoutSource, 'development', { resourceId: 'listProducts' }),
+    ).resolves.toMatchObject({
       ok: false,
       status: null,
       error: { code: 'TIMEOUT' },

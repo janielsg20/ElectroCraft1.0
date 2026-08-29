@@ -134,7 +134,11 @@ export class InternalDataSourceAdapter implements DataSourceAdapter {
     if (!options.projectId.trim()) throw new TypeError('projectId must not be empty');
   }
 
-  private async authorize(context: DataSourceAdapterContext, resourceId: string, operation: InternalDataPermissionOperation) {
+  private async authorize(
+    context: DataSourceAdapterContext,
+    resourceId: string,
+    operation: InternalDataPermissionOperation,
+  ) {
     const allowed = await this.options.permissions.authorize({
       projectId: this.options.projectId,
       sourceId: context.source.id,

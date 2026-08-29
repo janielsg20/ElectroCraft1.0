@@ -11,10 +11,7 @@ import {
   type InternalDataRecordUpdate,
   type InternalDataRepository,
 } from '@electrocraft/application';
-import {
-  createInternalDataSourceAdapter,
-  InternalDataPermissionError,
-} from '@electrocraft/connectors';
+import { createInternalDataSourceAdapter, InternalDataPermissionError } from '@electrocraft/connectors';
 import {
   electroCraftDataSchemaSchema,
   electroCraftDataSourceDefinitionSchema,
@@ -43,7 +40,11 @@ function createMemoryRepository(dataSchema: ElectroCraftDataSchema): InternalDat
     async getSchema() {
       return dataSchema;
     },
-    async queryRecords(_projectId: string, modelId: string, query?: InternalDataQuery): Promise<InternalDataQueryResult> {
+    async queryRecords(
+      _projectId: string,
+      modelId: string,
+      query?: InternalDataQuery,
+    ): Promise<InternalDataQueryResult> {
       const matches = [...rows.values()].filter((row) => row.modelId === modelId);
       const offset = query?.offset ?? 0;
       const limit = query?.limit ?? 50;
@@ -103,7 +104,9 @@ describe('M08.2 InternalDataSourceAdapter', () => {
     await expect(registry.listResources(source, 'development')).resolves.toEqual([
       expect.objectContaining({ id: 'ec_model_0000000000082', label: 'Producto' }),
     ]);
-    await expect(registry.introspectSchema(source, 'development')).resolves.toMatchObject({ name: 'ElectroCraft Data' });
+    await expect(registry.introspectSchema(source, 'development')).resolves.toMatchObject({
+      name: 'ElectroCraft Data',
+    });
 
     await expect(
       registry.mutate(source, 'development', {

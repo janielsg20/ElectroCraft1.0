@@ -70,7 +70,8 @@ export function createBrowserInternalDataRepositoryPort(
     return initializePromise;
   }
 
-  const delegate = async <T>(operation: (active: InternalDataRepository) => Promise<T>) => operation(await initialize());
+  const delegate = async <T>(operation: (active: InternalDataRepository) => Promise<T>) =>
+    operation(await initialize());
 
   return Object.freeze({
     offlineCapable: true as const,

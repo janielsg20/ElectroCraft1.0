@@ -3,10 +3,7 @@ import { resolve } from 'node:path';
 import { PGlite } from '@electric-sql/pglite';
 import { drizzle } from 'drizzle-orm/pglite';
 import { describe, expect, it } from 'vitest';
-import {
-  applyStudioStorageMigrations,
-  createDrizzleInternalDataRepository,
-} from '@electrocraft/data-web';
+import { applyStudioStorageMigrations, createDrizzleInternalDataRepository } from '@electrocraft/data-web';
 import { electroCraftDataSchemaSchema } from '@electrocraft/domain';
 import * as storageSchema from '../../../packages/data-web/src/schema';
 

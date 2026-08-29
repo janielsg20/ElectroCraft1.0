@@ -239,7 +239,9 @@ export function RestSourceWizardSheet({
     try {
       const imported = await importOpenApiDocument(openApiDocument);
       setOperations(imported.operations);
-      setTestOperationId(imported.operations.find(({ kind }) => kind === 'read')?.id ?? imported.operations[0]?.id ?? '');
+      setTestOperationId(
+        imported.operations.find(({ kind }) => kind === 'read')?.id ?? imported.operations[0]?.id ?? '',
+      );
       if (name === 'REST API') setName(imported.title);
       if (imported.suggestedBaseUrl) setBaseUrl(imported.suggestedBaseUrl);
       setMessage(
@@ -273,7 +275,10 @@ export function RestSourceWizardSheet({
         outputSchema: null,
         pagination: { kind: 'none' as const },
       };
-      const parsed = electroCraftRestDataSourceConfigSchema.parse({ ...config(), operations: [...operations, candidate] });
+      const parsed = electroCraftRestDataSourceConfigSchema.parse({
+        ...config(),
+        operations: [...operations, candidate],
+      });
       setOperations(parsed.operations);
       if (!testOperationId) setTestOperationId(id);
       setManualLabel('');

@@ -8,11 +8,7 @@ import type {
   InternalDataRepository,
   InternalDataSourceStats,
 } from '@electrocraft/application';
-import {
-  electroCraftDataSchemaSchema,
-  type ElectroCraftDataSchema,
-  type JsonValue,
-} from '@electrocraft/domain';
+import { electroCraftDataSchemaSchema, type ElectroCraftDataSchema, type JsonValue } from '@electrocraft/domain';
 import { and, asc, count, desc, eq } from 'drizzle-orm';
 import type { StudioProjectDatabase } from './repository';
 import * as schema from './schema';
@@ -108,7 +104,10 @@ export function createDrizzleInternalDataRepository(db: StudioProjectDatabase): 
     return (await schemasForSource(db, projectId, sourceId))[0] ?? null;
   }
 
-  async function listResources(projectIdInput: string, sourceIdInput: string): Promise<readonly DataSourceResourceDescriptor[]> {
+  async function listResources(
+    projectIdInput: string,
+    sourceIdInput: string,
+  ): Promise<readonly DataSourceResourceDescriptor[]> {
     const dataSchema = await getSchema(projectIdInput, sourceIdInput);
     if (!dataSchema) return Object.freeze([]);
     return Object.freeze(

@@ -37,9 +37,7 @@
         "method": "GET",
         "path": "/products/{id}",
         "requiresAuth": true,
-        "parameters": [
-          { "name": "id", "location": "path", "required": true, "valueType": "string" }
-        ],
+        "parameters": [{ "name": "id", "location": "path", "required": true, "valueType": "string" }],
         "inputSchema": null,
         "outputSchema": null,
         "pagination": { "kind": "none" }

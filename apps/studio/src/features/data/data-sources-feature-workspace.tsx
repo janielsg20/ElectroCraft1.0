@@ -28,7 +28,11 @@ function formatBytes(value: number | null) {
 }
 
 function saveBackup(serialized: string, projectName: string) {
-  const safeName = projectName.trim().replace(/[^A-Za-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '') || 'electrocraft';
+  const safeName =
+    projectName
+      .trim()
+      .replace(/[^A-Za-z0-9_-]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'electrocraft';
   const blob = new Blob([serialized], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement('a');
@@ -50,7 +54,8 @@ export function DataSourcesFeatureWorkspace() {
     projectStorageRuntime.getSnapshot,
   );
   const internalSource = useMemo(
-    () => snapshot.sources.find(({ kind, adapterId }) => kind === 'internal' && adapterId === 'internal.pglite') ?? null,
+    () =>
+      snapshot.sources.find(({ kind, adapterId }) => kind === 'internal' && adapterId === 'internal.pglite') ?? null,
     [snapshot.sources],
   );
   const [summary, setSummary] = useState<InternalSummaryState>(initialSummary);
@@ -115,7 +120,8 @@ export function DataSourcesFeatureWorkspace() {
             </div>
           </div>
           <p className="ec-internal-data-status">
-            Usa el almacenamiento PGlite/Drizzle del proyecto y la tabla genérica de registros existente. No crea una base paralela.
+            Usa el almacenamiento PGlite/Drizzle del proyecto y la tabla genérica de registros existente. No crea una
+            base paralela.
           </p>
           <div className="ec-internal-data-actions">
             <Button
@@ -132,14 +138,20 @@ export function DataSourcesFeatureWorkspace() {
                   })
                   .then(() => setInternalActionMessage('ElectroCraft Data creada.'))
                   .catch((error: unknown) =>
-                    setInternalActionMessage(error instanceof Error ? error.message : 'No se pudo crear ElectroCraft Data.'),
+                    setInternalActionMessage(
+                      error instanceof Error ? error.message : 'No se pudo crear ElectroCraft Data.',
+                    ),
                   );
               }}
             >
               Crear ElectroCraft Data
             </Button>
           </div>
-          {internalActionMessage ? <p className="ec-internal-data-status" role="status">{internalActionMessage}</p> : null}
+          {internalActionMessage ? (
+            <p className="ec-internal-data-status" role="status">
+              {internalActionMessage}
+            </p>
+          ) : null}
         </section>
       ) : null}
 
@@ -197,7 +209,9 @@ export function DataSourcesFeatureWorkspace() {
                     setBackupMessage('Copia de seguridad preparada.');
                   })
                   .catch((error: unknown) =>
-                    setBackupMessage(error instanceof Error ? error.message : 'No se pudo crear la copia de seguridad.'),
+                    setBackupMessage(
+                      error instanceof Error ? error.message : 'No se pudo crear la copia de seguridad.',
+                    ),
                   );
               }}
             >

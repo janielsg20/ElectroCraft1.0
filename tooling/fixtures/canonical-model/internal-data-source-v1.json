@@ -14,16 +14,7 @@
   "environmentScope": ["development", "preview", "production"],
   "environmentOverrides": {},
   "schemaDiscovery": "on-demand",
-  "capabilities": [
-    "read",
-    "create",
-    "update",
-    "delete",
-    "pagination",
-    "filtering",
-    "sort",
-    "transactions"
-  ],
+  "capabilities": ["read", "create", "update", "delete", "pagination", "filtering", "sort", "transactions"],
   "metadata": {
     "offlineCapable": true,
     "owner": "PGlite+Drizzle"

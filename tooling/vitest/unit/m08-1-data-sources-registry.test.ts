@@ -27,7 +27,10 @@ const runtimeSource = readFileSync(
   new URL('../../../apps/studio/src/features/data/data-source-runtime.ts', import.meta.url),
   'utf8',
 );
-const routeSource = readFileSync(new URL('../../../apps/studio/src/shell/app-shell-route.tsx', import.meta.url), 'utf8');
+const routeSource = readFileSync(
+  new URL('../../../apps/studio/src/shell/app-shell-route.tsx', import.meta.url),
+  'utf8',
+);
 
 function source(overrides: Partial<ElectroCraftDataSourceDefinition> = {}) {
   return electroCraftDataSourceDefinitionSchema.parse({
@@ -163,9 +166,9 @@ describe('M08.1 DataSources registry', () => {
     expect(resolveDataSourceConfig(definition, 'production')).toEqual({ baseUrl: 'https://example.test/api' });
 
     expect(() => source({ config: { apiKey: 'must-not-be-persisted' } })).toThrow(/secrets are not allowed/);
-    expect(() =>
-      source({ environmentOverrides: { production: { access_token: 'must-not-be-persisted' } } }),
-    ).toThrow(/secrets are not allowed/);
+    expect(() => source({ environmentOverrides: { production: { access_token: 'must-not-be-persisted' } } })).toThrow(
+      /secrets are not allowed/,
+    );
   });
 
   it('round-trips only the canonical project payload and persists it through the F04 object contract', () => {

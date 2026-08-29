@@ -129,7 +129,8 @@ function requestSchema(operation: UnknownObject): JsonValue | null {
 function responseSchema(operation: UnknownObject): JsonValue | null {
   const responses = object(operation.responses);
   if (!responses) return null;
-  const key = Object.keys(responses).find((candidate) => /^2\d\d$/.test(candidate)) ??
+  const key =
+    Object.keys(responses).find((candidate) => /^2\d\d$/.test(candidate)) ??
     (Object.hasOwn(responses, 'default') ? 'default' : Object.keys(responses)[0]);
   if (!key) return null;
   const response = object(responses[key]);
@@ -140,7 +141,9 @@ function responseSchema(operation: UnknownObject): JsonValue | null {
 }
 
 function paginationHint(parameters: readonly ElectroCraftRestParameter[]): ElectroCraftRestPaginationHint {
-  const queryNames = new Set(parameters.filter(({ location }) => location === 'query').map(({ name }) => name.toLowerCase()));
+  const queryNames = new Set(
+    parameters.filter(({ location }) => location === 'query').map(({ name }) => name.toLowerCase()),
+  );
   const original = (target: string) =>
     parameters.find(({ location, name }) => location === 'query' && name.toLowerCase() === target)?.name ?? target;
   if (queryNames.has('cursor')) {
@@ -205,7 +208,10 @@ function parseOperations(document: UnknownObject, warnings: string[]) {
         pagination: paginationHint(parameters),
       });
       if (parsed.success) output.push(parsed.data);
-      else warnings.push(`${method} ${path} no se importó: ${parsed.error.issues.map(({ message }) => message).join('; ')}`);
+      else
+        warnings.push(
+          `${method} ${path} no se importó: ${parsed.error.issues.map(({ message }) => message).join('; ')}`,
+        );
     }
   }
   return Object.freeze(output);

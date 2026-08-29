@@ -55,12 +55,7 @@ export const projectObjectVersions = pgTable(
   },
   (table) => [
     primaryKey({ columns: [table.projectId, table.versionId] }),
-    index('project_object_versions_checksum_idx').on(
-      table.projectId,
-      table.checksum,
-      table.schemaVersion,
-      table.kind,
-    ),
+    index('project_object_versions_checksum_idx').on(table.projectId, table.checksum, table.schemaVersion, table.kind),
   ],
 );
 

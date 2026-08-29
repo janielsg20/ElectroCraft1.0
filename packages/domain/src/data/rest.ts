@@ -63,7 +63,12 @@ export const electroCraftDataOperationDefinitionSchema = z
     label: z.string().trim().min(1).max(160),
     kind: electroCraftDataOperationKindSchema,
     method: electroCraftRestMethodSchema,
-    path: z.string().trim().min(1).max(500).refine((value) => value.startsWith('/'), 'REST operation path must start with /'),
+    path: z
+      .string()
+      .trim()
+      .min(1)
+      .max(500)
+      .refine((value) => value.startsWith('/'), 'REST operation path must start with /'),
     requiresAuth: z.boolean(),
     parameters: z.array(electroCraftRestParameterSchema).max(100),
     inputSchema: jsonValueSchema.nullable(),
@@ -89,23 +94,28 @@ export const electroCraftDataOperationDefinitionSchema = z
   });
 export type ElectroCraftDataOperationDefinition = z.infer<typeof electroCraftDataOperationDefinitionSchema>;
 
-const restDefaultHeadersSchema = z.record(z.string().trim().min(1).max(120), z.string().max(4000)).superRefine((headers, context) => {
-  for (const name of Object.keys(headers)) {
-    if (isSensitiveRestHeaderName(name)) {
-      context.addIssue({
-        code: 'custom',
-        path: [name],
-        message: 'sensitive authentication headers must use authRef/Gateway',
-      });
+const restDefaultHeadersSchema = z
+  .record(z.string().trim().min(1).max(120), z.string().max(4000))
+  .superRefine((headers, context) => {
+    for (const name of Object.keys(headers)) {
+      if (isSensitiveRestHeaderName(name)) {
+        context.addIssue({
+          code: 'custom',
+          path: [name],
+          message: 'sensitive authentication headers must use authRef/Gateway',
+        });
+      }
     }
-  }
-});
+  });
 
 export const electroCraftRestExecutionModeSchema = z.enum(['auto', 'browser', 'gateway']);
 export type ElectroCraftRestExecutionMode = z.infer<typeof electroCraftRestExecutionModeSchema>;
 
 export const electroCraftRestDataSourceConfigSchema = z.strictObject({
-  baseUrl: z.string().url().refine((value) => /^https?:\/\//i.test(value), 'REST baseUrl must use http or https'),
+  baseUrl: z
+    .string()
+    .url()
+    .refine((value) => /^https?:\/\//i.test(value), 'REST baseUrl must use http or https'),
   defaultHeaders: restDefaultHeadersSchema.default({}),
   timeoutMs: z.number().int().min(100).max(120_000).default(15_000),
   executionMode: electroCraftRestExecutionModeSchema.default('auto'),

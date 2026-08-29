@@ -54,7 +54,10 @@ export interface RestGatewayExecutionRequest {
 
 export interface RestGatewayPort {
   execute(request: RestGatewayExecutionRequest): Promise<ElectroCraftRestDataResult>;
-  testConnection?(context: DataSourceAdapterContext, config: ElectroCraftRestDataSourceConfig): Promise<DataSourceConnectionResult>;
+  testConnection?(
+    context: DataSourceAdapterContext,
+    config: ElectroCraftRestDataSourceConfig,
+  ): Promise<DataSourceConnectionResult>;
 }
 
 export interface RestDataSourceAdapterOptions {
@@ -99,7 +102,9 @@ function configFor(context: DataSourceAdapterContext) {
 function operationFor(config: ElectroCraftRestDataSourceConfig, resourceId: string) {
   const operation = config.operations.find(({ id }) => id === resourceId);
   if (!operation) {
-    throw new RestDataSourceError('REST_OPERATION_MISSING', `Operación REST no encontrada: ${resourceId}.`, { resourceId });
+    throw new RestDataSourceError('REST_OPERATION_MISSING', `Operación REST no encontrada: ${resourceId}.`, {
+      resourceId,
+    });
   }
   return operation;
 }
@@ -115,7 +120,8 @@ function applyParameters(
   const headers: Record<string, string> = { ...config.defaultHeaders };
 
   for (const parameter of operation.parameters) {
-    const source = parameter.location === 'path' ? input.path : parameter.location === 'query' ? input.query : input.headers;
+    const source =
+      parameter.location === 'path' ? input.path : parameter.location === 'query' ? input.query : input.headers;
     const raw = source[parameter.name];
     if ((raw === undefined || raw === null || raw === '') && parameter.required) {
       throw new RestDataSourceError('REST_INPUT_INVALID', `Falta el parámetro obligatorio ${parameter.name}.`, {
@@ -127,7 +133,10 @@ function applyParameters(
 
     if (parameter.location === 'header') {
       if (isSensitiveRestHeaderName(parameter.name)) {
-        throw new RestDataSourceError('REST_INPUT_INVALID', `El header ${parameter.name} debe resolverse por authRef/Gateway.`);
+        throw new RestDataSourceError(
+          'REST_INPUT_INVALID',
+          `El header ${parameter.name} debe resolverse por authRef/Gateway.`,
+        );
       }
       const value = scalar(raw, `headers.${parameter.name}`);
       if (value !== null) headers[parameter.name] = value;
@@ -300,7 +309,9 @@ export class RestDataSourceAdapter implements DataSourceAdapter {
     const result = await browserExecute(this.fetchImpl, probeConfig, operation, undefined);
     return Object.freeze({
       ok: result.ok,
-      message: result.ok ? 'REST API disponible.' : (result.error?.message ?? 'La REST API no respondió correctamente.'),
+      message: result.ok
+        ? 'REST API disponible.'
+        : (result.error?.message ?? 'La REST API no respondió correctamente.'),
     });
   }
 
@@ -312,7 +323,11 @@ export class RestDataSourceAdapter implements DataSourceAdapter {
           id: operation.id,
           label: operation.label,
           kind: `rest:${operation.kind}`,
-          metadata: Object.freeze({ method: operation.method, path: operation.path, requiresAuth: operation.requiresAuth }),
+          metadata: Object.freeze({
+            method: operation.method,
+            path: operation.path,
+            requiresAuth: operation.requiresAuth,
+          }),
         }),
       ),
     );
@@ -335,7 +350,10 @@ export class RestDataSourceAdapter implements DataSourceAdapter {
     const requiresGateway = config.executionMode === 'gateway' || Boolean(context.source.authRef);
     if (requiresGateway) {
       if (!this.options.gateway) {
-        throw new RestDataSourceError('GATEWAY_UNAVAILABLE', 'La solicitud requiere ConnectorGateway y no está disponible.');
+        throw new RestDataSourceError(
+          'GATEWAY_UNAVAILABLE',
+          'La solicitud requiere ConnectorGateway y no está disponible.',
+        );
       }
       return this.options.gateway.execute({
         sourceId: context.source.id,
@@ -379,7 +397,10 @@ export class RestDataSourceAdapter implements DataSourceAdapter {
   query(context: DataSourceAdapterContext, request: DataSourceQueryRequest): Promise<JsonValue> {
     const operation = operationFor(configFor(context), request.resourceId);
     if (operation.kind !== 'read') {
-      throw new RestDataSourceError('REST_OPERATION_KIND_MISMATCH', `${operation.label} no es una operación de lectura.`);
+      throw new RestDataSourceError(
+        'REST_OPERATION_KIND_MISMATCH',
+        `${operation.label} no es una operación de lectura.`,
+      );
     }
     return this.executeOperation(context, operation, request.input) as Promise<unknown> as Promise<JsonValue>;
   }
