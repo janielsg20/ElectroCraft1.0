@@ -28,6 +28,11 @@ function activeProjectId(lastProjectId: string | null) {
   return projectStorageRuntime.currentProjectId() ?? lastProjectId;
 }
 
+function selectedScreenId() {
+  if (typeof window === 'undefined') return null;
+  return new URLSearchParams(window.location.search).get('screen');
+}
+
 export function useStudioPuckEditorRuntime() {
   const preferences = useSyncExternalStore(
     workspacePreferencesRuntime.subscribe,
@@ -35,6 +40,7 @@ export function useStudioPuckEditorRuntime() {
     workspacePreferencesRuntime.getSnapshot,
   );
   const projectId = activeProjectId(preferences.layout.lastDocumentId);
+  const screenId = selectedScreenId();
   const [snapshot, setSnapshot] = useState<RuntimeSnapshot>(() =>
     projectId
       ? Object.freeze({ state: 'loading', runtime: null, message: 'Cargando documento del editor…' })
@@ -54,6 +60,7 @@ export function useStudioPuckEditorRuntime() {
     setSnapshot(Object.freeze({ state: 'loading', runtime: null, message: 'Cargando documento del editor…' }));
     void loadStudioPuckEditor({
       projectId,
+      documentId: screenId ?? undefined,
       onSynchronized: () => {
         if (!active) return;
         setSnapshot((current) =>
@@ -96,7 +103,7 @@ export function useStudioPuckEditorRuntime() {
       active = false;
       loadedRuntime?.dispose();
     };
-  }, [projectId]);
+  }, [projectId, screenId]);
 
   const runtime = snapshot.runtime;
   return Object.freeze({
