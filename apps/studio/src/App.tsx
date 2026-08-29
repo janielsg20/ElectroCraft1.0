@@ -44,6 +44,8 @@ const designSystemRoute = '/__design-system';
 const editorRoute = '/editor';
 const historyRoute = '/history';
 const contentRoute = '/content';
+const screensRoute = '/screens';
+const navigationRoute = '/navigation';
 const canonicalEmptyModuleRoutes = new Set(['/queries', '/forms', '/admin', '/media', '/export']);
 
 const ProjectHome = lazy(() =>
@@ -51,6 +53,9 @@ const ProjectHome = lazy(() =>
 );
 const RevisionHistoryPanel = lazy(() =>
   import('./features/projects/revision-history-panel').then((module) => ({ default: module.RevisionHistoryPanel })),
+);
+const NavigationWorkspace = lazy(() =>
+  import('./features/navigation/navigation-workspace').then((module) => ({ default: module.NavigationWorkspace })),
 );
 const StudioEditorWorkspace = lazy(() =>
   import('./shell/editor-workspace').then((module) => ({ default: module.StudioEditorWorkspace })),
@@ -298,6 +303,13 @@ function resolveStudioWorkspace(pathname: string, health: ReturnType<typeof eval
     return (
       <Suspense fallback={<StudioRouteSkeleton kind="editor" label="Cargando editor" />}>
         <WorkspaceAwareEditor />
+      </Suspense>
+    );
+  }
+  if (pathname === screensRoute || pathname === navigationRoute) {
+    return (
+      <Suspense fallback={<StudioRouteSkeleton kind="generic" label="Cargando navegación" />}>
+        <NavigationWorkspace mode={pathname === screensRoute ? 'screens' : 'navigation'} />
       </Suspense>
     );
   }
