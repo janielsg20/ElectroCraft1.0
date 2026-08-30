@@ -24,7 +24,7 @@ function hasHorizontalOverflow(page: Page) {
 async function openRestWizard(page: Page) {
   await page.goto('/data-sources');
   await expect(page.getByRole('heading', { name: 'Fuentes de datos' })).toBeVisible({ timeout: 60_000 });
-  await page.getByRole('button', { name: /Nueva fuente/ }).click();
+  await page.getByRole('button', { name: 'Nueva fuente', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'REST API' })).toBeVisible();
   await expect(page.locator('[data-help-trigger="help.data.rest"]')).toBeVisible();
   await expect(page.getByLabel('Pasos de configuración REST')).toBeVisible();
