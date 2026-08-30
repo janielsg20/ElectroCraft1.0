@@ -106,7 +106,8 @@ test.describe.serial('M08.3 REST API Connector y OpenAPI UX', () => {
 
     const sheetBox = await page.locator('.ec-rest-source-sheet').boundingBox();
     expect(sheetBox).not.toBeNull();
-    expect(sheetBox?.width ?? 0).toBeLessThanOrEqual(375);
+    // Chromium can report harmless floating-point subpixel noise around an exact 100vw box.
+    expect(sheetBox?.width ?? 0).toBeLessThanOrEqual(375.5);
     expect(sheetBox?.height ?? 0).toBeLessThanOrEqual(812);
 
     await page.screenshot({ path: '.ai/evidence/F08/M08.3/rest-wizard-mobile.png', fullPage: true });
