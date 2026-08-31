@@ -1,8 +1,8 @@
-# M08.4 — GraphQL Connector — implementación candidata
+# M08.4 — GraphQL Connector — cierre certificado
 
 Fecha: 2026-08-31
-Rama: `codex/m08-4-graphql`
-Estado: `ACTIVE` — implementación completa candidata a gate PR.
+Rama de implementación: `codex/m08-4-graphql`
+Estado: `IMPLEMENTADA / GREEN MICROFASE`.
 
 ## Engine/API
 
@@ -13,64 +13,41 @@ Estado: `ACTIVE` — implementación completa candidata a gate PR.
 
 ## Implementación
 
-- `packages/domain/src/data/graphql.ts`
-  - endpoint HTTP(S), headers no sensibles, timeout y execution mode;
-  - Query/Mutation operations;
-  - variables tipadas string/number/boolean/array/json;
-  - bloqueo de Authorization/API keys/cookies en config portable.
-- `packages/connectors/src/graphql-data-source-adapter.ts`
-  - `graphql.fetch`;
-  - browser POST JSON;
-  - timeout;
-  - normalización HTTP + `data/errors` GraphQL;
-  - SecretRef/Gateway fail-closed;
-  - introspection estándar;
-  - generación de operations desde Query/Mutation fields;
-  - conversión de object types a `ElectroCraftDataSchema`.
-- Studio
-  - registro `graphql.fetch` en el mismo ConnectorRegistry;
-  - `Nueva fuente` permite elegir REST API o GraphQL;
-  - wizard: Endpoint → Autenticación → Esquema → Consultas/Mutaciones → Probar → Guardar;
-  - raw document únicamente bajo Advanced;
-  - desktop reutiliza el límite de 820 px y móvil usa Sheet full-screen;
-  - Help `help.data.graphql`.
+- `packages/domain/src/data/graphql.ts`: endpoint, headers no sensibles, timeout, execution mode, Query/Mutation y variables tipadas.
+- `packages/connectors/src/graphql-data-source-adapter.ts`: `graphql.fetch`, browser POST JSON, timeout, normalización HTTP + `data/errors`, SecretRef/Gateway fail-closed, introspection estándar, operations y `ElectroCraftDataSchema`.
+- Studio registra `graphql.fetch` en el mismo ConnectorRegistry y ofrece wizard Endpoint → Autenticación → Esquema → Consultas/Mutaciones → Probar → Guardar.
+- Raw GraphQL vive únicamente bajo Advanced.
+- Help `help.data.graphql`.
+- Fixtures, Vitest y Playwright desktop/mobile incluidos.
 
 ## Seguridad
 
 - No se persisten bearer tokens, API keys, cookies ni passwords.
 - Operaciones `requiresAuth` sin authRef fallan cerradas.
 - authRef fuerza Gateway; Fetch directo se usa solo sin secretos y cuando CORS lo permite.
-- Introspection denegada se reporta como error explícito; no se simula un esquema.
+- Introspection denegada se reporta explícitamente.
 
-## Fixtures/tests
+## Gate real
 
-- `tooling/fixtures/canonical-model/graphql-data-source-v1.json`.
-- `tooling/fixtures/graphql/introspection-products-v1.json`.
-- `tooling/vitest/unit/m08-4-graphql-data-adapter.test.ts`:
-  - Query;
-  - Mutation + variables;
-  - introspection allowed;
-  - introspection denied;
-  - SecretRef/Gateway;
-  - secret headers.
-- `tooling/playwright/m08-4-graphql.spec.ts`:
-  - create project → GraphQL → introspection → Query → test → save;
-  - registro `graphql.fetch`;
-  - responsive móvil/no overflow.
-- M08.3 E2E se adapta al selector de tipo sin alterar el wizard REST certificado.
+ElectroCraft Base CI run `33412562136` (#834), HEAD certificado `f5f8059aaf37958dde7f37c51edd9a69b5daefab`:
 
-## Auditoría UI/React
+- documentación: `success`;
+- lint/Prettier: `success`;
+- typecheck: `success`;
+- Vitest: `success` — 518/518;
+- build: `success`;
+- Playwright repository gate: `success`;
+- empty repository fixture: `success`;
+- CI artifacts: `success`.
 
-- Se reutilizan primitives shadcn/Radix del Design System.
-- No se añade framework UI.
-- Estados inicial/loading/error/test/save se expresan dentro del wizard.
-- Labels persistentes, aria-label en Select, status/error anunciables y touch targets heredados del Sheet/wizard.
-- No se crean componentes React inline ni efectos para estado derivado; capacidades y operación seleccionada se derivan con useMemo/lookup.
+El único fallo observado en el run previo #833 era una expectativa E2E que traducía incorrectamente el nombre remoto `products` a `Productos`. El commit final corrigió únicamente esa expectativa a `Products`; la comparación fue de una línea.
 
-## Validación pendiente
+## Merge
 
-La implementación no se declara GREEN antes del gate. El PR ejecutará documentación, lint, typecheck, Vitest, build y Playwright una sola vez. Cualquier fallo se corregirá por causa observada.
+PR `#70` fusionada mediante squash a `main` en:
 
-## Siguiente microfase tras GREEN
+`6b79ee859c9d0f4f712d897b4cc973bcc388cefb`
 
-`M08.5 — ConnectorGateway y SecretStore`.
+## Siguiente microfase
+
+`M08.5 — ConnectorGateway y SecretStore` activada en `codex/m08-5-connector-gateway-secrets`.
