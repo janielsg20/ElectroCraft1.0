@@ -1,0 +1,42 @@
+{
+  "data": {
+    "__schema": {
+      "queryType": { "name": "Query" },
+      "mutationType": { "name": "Mutation" },
+      "types": [
+        {
+          "kind": "OBJECT",
+          "name": "Query",
+          "fields": [
+            {
+              "name": "products",
+              "args": [],
+              "type": { "kind": "LIST", "name": null, "ofType": { "kind": "OBJECT", "name": "Product", "ofType": null } }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "Mutation",
+          "fields": [
+            {
+              "name": "updateProduct",
+              "args": [
+                { "name": "id", "type": { "kind": "NON_NULL", "name": null, "ofType": { "kind": "SCALAR", "name": "ID", "ofType": null } } }
+              ],
+              "type": { "kind": "OBJECT", "name": "Product", "ofType": null }
+            }
+          ]
+        },
+        {
+          "kind": "OBJECT",
+          "name": "Product",
+          "fields": [
+            { "name": "id", "args": [], "type": { "kind": "SCALAR", "name": "ID", "ofType": null } },
+            { "name": "name", "args": [], "type": { "kind": "SCALAR", "name": "String", "ofType": null } }
+          ]
+        }
+      ]
+    }
+  }
+}

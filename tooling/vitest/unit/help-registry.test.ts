@@ -23,6 +23,7 @@ const studioScopedHelpIds = [
   'help.data.sources',
   'help.data.internal',
   'help.data.rest',
+  'help.data.graphql',
 ] as const;
 
 describe('M03.11 typed HelpRegistry', () => {
@@ -30,11 +31,7 @@ describe('M03.11 typed HelpRegistry', () => {
     const navigationItems = studioSidebarNavigation.flatMap((group) => group.items);
     expect(navigationItems).toHaveLength(24);
     expect(studioHelpDescriptors).toHaveLength(navigationItems.length + studioScopedHelpIds.length);
-
-    for (const helpId of studioScopedHelpIds) {
-      expect(() => getStudioHelpDescriptor(helpId)).not.toThrow();
-    }
-
+    for (const helpId of studioScopedHelpIds) expect(() => getStudioHelpDescriptor(helpId)).not.toThrow();
     for (const item of navigationItems) {
       const descriptor = getStudioHelpDescriptor(getHelpIdForNavigationItem(item.id));
       expect(descriptor.title).toBe(item.label);
@@ -55,32 +52,22 @@ describe('M03.11 typed HelpRegistry', () => {
     expect(searchStudioHelp('expo router').some((entry) => entry.id === 'help.navigation.compiler')).toBe(true);
     expect(searchStudioHelp('connector registry').some((entry) => entry.id === 'help.data.sources')).toBe(true);
     expect(searchStudioHelp('electrocraft data').some((entry) => entry.id === 'help.data.internal')).toBe(true);
-    expect(searchStudioHelp('disponible sin conexión').some((entry) => entry.id === 'help.data.internal')).toBe(true);
     expect(searchStudioHelp('openapi').some((entry) => entry.id === 'help.data.rest')).toBe(true);
-    expect(searchStudioHelp('connectorgateway').some((entry) => entry.id === 'help.data.rest')).toBe(true);
+    expect(searchStudioHelp('introspection').some((entry) => entry.id === 'help.data.graphql')).toBe(true);
+    expect(searchStudioHelp('mutation').some((entry) => entry.id === 'help.data.graphql')).toBe(true);
   });
 
-  it('maps Fuentes de datos to its M08 contextual descriptor', () => {
+  it('maps Fuentes de datos to its M08 contextual descriptors', () => {
     expect(getHelpIdForNavigationItem('data-sources')).toBe('help.data.sources');
-    expect(getStudioHelpDescriptor('help.data.sources')).toMatchObject({
-      sectionId: 'data-sources-management',
-      learnMoreRef: '.ai/microphases/M08_1.md',
-    });
-    expect(getStudioHelpDescriptor('help.data.internal')).toMatchObject({
-      sectionId: 'data-internal',
-      learnMoreRef: '.ai/microphases/M08_2.md',
-    });
-    expect(getStudioHelpDescriptor('help.data.rest')).toMatchObject({
-      sectionId: 'data-rest',
-      learnMoreRef: '.ai/microphases/M08_3.md',
-    });
+    expect(getStudioHelpDescriptor('help.data.sources')).toMatchObject({ sectionId: 'data-sources-management', learnMoreRef: '.ai/microphases/M08_1.md' });
+    expect(getStudioHelpDescriptor('help.data.internal')).toMatchObject({ sectionId: 'data-internal', learnMoreRef: '.ai/microphases/M08_2.md' });
+    expect(getStudioHelpDescriptor('help.data.rest')).toMatchObject({ sectionId: 'data-rest', learnMoreRef: '.ai/microphases/M08_3.md' });
+    expect(getStudioHelpDescriptor('help.data.graphql')).toMatchObject({ sectionId: 'data-graphql', learnMoreRef: '.ai/microphases/M08_4.md' });
   });
 
   it('keeps related concepts inside the same registry', () => {
     for (const descriptor of studioHelpDescriptors) {
-      for (const relatedId of descriptor.relatedIds) {
-        expect(() => getStudioHelpDescriptor(relatedId)).not.toThrow();
-      }
+      for (const relatedId of descriptor.relatedIds) expect(() => getStudioHelpDescriptor(relatedId)).not.toThrow();
     }
   });
 

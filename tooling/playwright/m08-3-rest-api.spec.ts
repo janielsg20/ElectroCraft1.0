@@ -25,6 +25,7 @@ async function openRestWizard(page: Page) {
   await page.goto('/data-sources');
   await expect(page.getByRole('heading', { name: 'Fuentes de datos' })).toBeVisible({ timeout: 60_000 });
   await page.getByRole('button', { name: 'Nueva fuente', exact: true }).click();
+  await page.getByRole('button', { name: 'REST API', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'REST API' })).toBeVisible();
   await expect(page.locator('[data-help-trigger="help.data.rest"]')).toBeVisible();
   await expect(page.getByLabel('Pasos de configuración REST')).toBeVisible();
@@ -74,9 +75,7 @@ test.describe.serial('M08.3 REST API Connector y OpenAPI UX', () => {
     await expect(page.getByLabel('Operación REST de prueba')).toContainText('GET · Listar productos');
     await page.getByRole('button', { name: 'Probar solicitud' }).click();
     await expect(
-      page.locator('.ec-rest-source-sheet').getByText('Prueba completada mediante el adapter REST real.', {
-        exact: true,
-      }),
+      page.locator('.ec-rest-source-sheet').getByText('Prueba completada mediante el adapter REST real.', { exact: true }),
     ).toBeVisible();
     await expect(page.locator('.ec-rest-test-result')).toContainText('Cable USB-C');
     await page.getByRole('button', { name: 'Continuar' }).click();
@@ -106,10 +105,8 @@ test.describe.serial('M08.3 REST API Connector y OpenAPI UX', () => {
 
     const sheetBox = await page.locator('.ec-rest-source-sheet').boundingBox();
     expect(sheetBox).not.toBeNull();
-    // Chromium can report harmless floating-point subpixel noise around an exact 100vw box.
     expect(sheetBox?.width ?? 0).toBeLessThanOrEqual(375.5);
     expect(sheetBox?.height ?? 0).toBeLessThanOrEqual(812);
-
     await page.screenshot({ path: '.ai/evidence/F08/M08.3/rest-wizard-mobile.png', fullPage: true });
   });
 });
