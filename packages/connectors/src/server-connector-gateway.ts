@@ -8,6 +8,7 @@ import type {
 import {
   resolveSecretEnvironment,
   type ElectroCraftGraphQLDataResult,
+  type ElectroCraftGraphQLError,
   type ElectroCraftRestDataResult,
   type ElectroCraftSecretRef,
   type JsonValue,
@@ -58,12 +59,15 @@ function isObject(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && !Array.isArray(value) && typeof value === 'object';
 }
 
-function graphQLErrors(value: unknown) {
+function graphQLErrors(value: unknown): readonly ElectroCraftGraphQLError[] {
   if (!Array.isArray(value)) return Object.freeze([]);
   return Object.freeze(
     value.flatMap((entry) => {
       if (!isObject(entry) || typeof entry.message !== 'string') return [];
-      return [Object.freeze({ message: entry.message })];
+      const path = Array.isArray(entry.path)
+        ? entry.path.filter((segment): segment is string | number => typeof segment === 'string' || typeof segment === 'number')
+        : null;
+      return [Object.freeze({ message: entry.message, path: path ? Object.freeze(path) : null })];
     }),
   );
 }
@@ -175,6 +179,12 @@ export class ServerConnectorGateway implements ConnectorGatewayPort {
           signal,
         });
         const payload = await responseData(response);
+        if (response.ok && !isObject(payload)) {
+          throw new ConnectorGatewayError(
+            'GATEWAY_RESPONSE_INVALID',
+            'GraphQL devolvió una respuesta que no es un objeto JSON.',
+          );
+        }
         const payloadObject = isObject(payload) ? payload : {};
         const errors = graphQLErrors(payloadObject.errors);
         const data = (payloadObject.data ?? null) as JsonValue | null;
