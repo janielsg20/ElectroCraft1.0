@@ -1,8 +1,10 @@
 import type {
+  ElectroCraftObjectId,
   ElectroCraftSecretEnvironment,
   ElectroCraftSecretRef,
-  ElectroCraftObjectId,
+  JsonValue,
 } from '@electrocraft/domain';
+import type { StoredProjectObjectInput } from '../projects/project-storage';
 
 export interface SecretStoreStatus {
   readonly refId: ElectroCraftObjectId;
@@ -26,3 +28,12 @@ export interface SecretStorePort {
 }
 
 export type SecretStoreAdminPort = Pick<SecretStorePort, 'write' | 'status' | 'remove'>;
+
+export function createStoredSecretRefObject(ref: ElectroCraftSecretRef): StoredProjectObjectInput {
+  return Object.freeze({
+    objectId: ref.id,
+    kind: 'secret-ref',
+    schemaVersion: ref.schemaVersion,
+    payload: structuredClone(ref) as unknown as JsonValue,
+  });
+}
