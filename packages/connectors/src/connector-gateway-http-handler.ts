@@ -4,6 +4,7 @@ import { electroCraftSecretEnvironmentSchema, electroCraftSecretRefSchema } from
 export interface ConnectorGatewayHttpHandlerOptions {
   readonly gateway: ConnectorGatewayPort;
   readonly secretStore: SecretStorePort;
+  readonly authorizeRequest?: (request: Request) => boolean | Promise<boolean>;
 }
 
 function json(data: unknown, init?: ResponseInit) {
@@ -34,6 +35,13 @@ export function createConnectorGatewayHttpHandler(options: ConnectorGatewayHttpH
     try {
       if (request.method === 'GET' && url.pathname.endsWith('/status')) {
         return json(await options.gateway.status());
+      }
+
+      if (request.method === 'POST' && !(await options.authorizeRequest?.(request))) {
+        return json(
+          { error: { code: 'GATEWAY_REQUEST_DENIED', message: 'La solicitud al Gateway requiere autorización.' } },
+          { status: 403 },
+        );
       }
 
       if (request.method === 'POST' && url.pathname.endsWith('/execute')) {
