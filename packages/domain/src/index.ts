@@ -81,6 +81,7 @@ export * from './contracts/theme-blueprint';
 export * from './data/source-definition';
 export * from './data/rest';
 export * from './data/graphql';
+export * from './data/secrets';
 
 export const packageDescriptor = Object.freeze({
   name: '@electrocraft/domain',
