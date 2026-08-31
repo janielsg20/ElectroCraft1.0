@@ -1,3 +1,6 @@
+export * from './connector-gateway';
+export * from './secret-store';
+
 import type {
   ElectroCraftCanonicalDataSourceCapability,
   ElectroCraftDataSchema,
