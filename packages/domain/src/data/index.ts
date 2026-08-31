@@ -1,5 +1,6 @@
 export * from './source-definition';
 export * from './rest';
+export * from './graphql';
 export {
   electroCraftDataFieldSchema,
   electroCraftDataFieldTypeSchema,

@@ -1,6 +1,6 @@
 # TRACKING — ElectroCraft current position
 
-Date: 2026-08-29.
+Date: 2026-08-31.
 
 | Scope | Estado | Evidencia |
 | --- | --- | --- |
@@ -11,54 +11,39 @@ Date: 2026-08-29.
 | F04 / M04.1–M04.8 | COMPLETADA / GREEN | `.ai/evidence/F04/CLOSURE_2026-08-25.md` |
 | F05 / M05.1–M05.8 | COMPLETADA / GREEN | PR `#60`; Base CI `33101434587` |
 | F06 / M06.1–M06.8 | IMPLEMENTACIÓN FUSIONADA; reparaciones certificadas en F07 | PR `#64`; Base CI F07 `33262949215` |
-| F07 / M07.1–M07.8 | COMPLETADA / GREEN | PR `#68`; Base CI `33262949215`; merge `e697a42546d23f89412e6dd616018759e719e448` |
+| F07 / M07.1–M07.8 | COMPLETADA / GREEN | PR `#68`; Base CI `33262949215` |
 | F08 / M08.1 | IMPLEMENTADA / PENDIENTE GATE F08 | `.ai/evidence/F08/M08.1/IMPLEMENTATION_2026-08-29.md` |
 | F08 / M08.2 | IMPLEMENTADA / PENDIENTE GATE F08 | `.ai/evidence/F08/M08.2/IMPLEMENTATION_2026-08-29.md` |
-| F08 / M08.3 | ACTIVE — implementación funcional avanzada | `.ai/evidence/F08/M08.3/IMPLEMENTATION_2026-08-29.md` |
+| F08 / M08.3 | IMPLEMENTADA / GREEN MICROFASE | PR `#69`; Base CI `33326524968` (#818); merge `71f750017b0f37775918e26bbab86b63239736e4` |
+| F08 / M08.4 | ACTIVE — candidata a gate | `.ai/evidence/F08/M08.4/IMPLEMENTATION_2026-08-31.md` |
 
 ## Rama activa
 
-`codex/m08-1-data-sources`
+`codex/m08-4-graphql`
 
-## F07 — cierre certificado
+## M08.3 — cierre certificado
 
-Base CI run `33262949215` (#795) terminó `success`; PR `#68` fue fusionada a `main` mediante `e697a42546d23f89412e6dd616018759e719e448`.
+- REST/OpenAPI, SecretRef/Gateway, browser Fetch y wizard responsive certificados.
+- Base CI `33326524968` (#818) terminó completamente verde.
+- PR `#69` fue fusionada a `main` en `71f750017b0f37775918e26bbab86b63239736e4`.
 
-## F08 / M08.1
+## F08 / M08.4 — GraphQL
 
-- DataSourceDefinition canónico + 11 capabilities.
-- Secrets fuera del payload y authRef portable.
-- DataSourceAdapter + único ConnectorRegistry.
-- `packages/connectors` como paquete estable #20.
-- `WebDataSourceRepository` y UI `/data-sources` responsive.
-- Help `help.data.sources`.
-
-## F08 / M08.2
-
-- `InternalDataSourceAdapter` detrás del mismo ConnectorRegistry.
-- `InternalDataRepository` sobre `content_records` PGlite/Drizzle existente.
-- Schema discovery desde ElectroCraftDataSchema; no introspección física.
-- CRUD/query/stats, offline, project permission boundary.
-- UI `ElectroCraft Data · Local · Disponible sin conexión`, Modelos, Registros y backup.
-- Help `help.data.internal`.
-- Unit tests, fixture y integración PGlite real preparados.
-
-## F08 / M08.3
-
-- REST config/operation contracts, OpenAPI import y `RestDataSourceAdapter` reales.
-- Exports públicos de `@electrocraft/connectors` completados.
-- `rest.fetch` registrado en Studio sobre el mismo ConnectorRegistry.
-- Wizard REST: Endpoint base → Autenticación → OpenAPI/Manual → Operaciones → Probar → Guardar.
-- JSON/YAML OpenAPI, manual operations, SecretRef-only, browser/gateway behavior y resultado normalizado.
-- HelpRegistry específico `help.data.rest` enlazado a `.ai/microphases/M08_3.md`.
-- Fixtures `rest-data-source-v1.json` + `openapi/products-v1.yaml`.
-- Test suite M08.3 preparada para import, GET/POST, pagination, auth, gateway, 4xx/5xx, timeout y security.
-- M08.3 permanece `ACTIVE`: falta validación ejecutable antes de declarar DONE.
+- `packages/domain/src/data/graphql.ts`: endpoint, headers no sensibles, timeout, execution mode, operations Query/Mutation y variables tipadas.
+- `packages/connectors/src/graphql-data-source-adapter.ts`: `graphql.fetch`, ejecución browser/Gateway, timeout, GraphQL errors, introspection y conversión a `ElectroCraftDataSchema`.
+- No hay Apollo/Relay/urql ni segunda caché; TanStack Query continúa como owner de cache async y `WebDataSourceRepository` permanece como fachada única.
+- Studio registra GraphQL en el mismo ConnectorRegistry.
+- `Nueva fuente` ofrece REST API o GraphQL sin romper el wizard REST certificado.
+- Wizard: Endpoint → Autenticación → Esquema → Consultas/Mutaciones → Probar → Guardar.
+- Raw document vive exclusivamente en Advanced; el flujo principal usa introspection y operaciones derivadas.
+- Help `help.data.graphql`.
+- Fixtures: `graphql-data-source-v1.json` y `graphql/introspection-products-v1.json`.
+- Tests: Query, Mutation, variables, introspection allowed/denied, SecretRef/Gateway, headers sensibles y E2E desktop/mobile.
 
 ## Validación
 
-No se ejecuta Actions por microfase. El contenedor actual no resuelve `github.com`, así que solo se realizó parseo sintáctico TypeScript de los nuevos TS/TSX. El Gate F08 regenerará lockfile/formato y certificará lint/typecheck/tests/build/Playwright en una sola ejecución final de fase.
+M08.4 no se declara DONE todavía. El PR debe ejecutar un único gate real de documentación + lint + typecheck + Vitest + build + Playwright; se corregirán únicamente fallos observados.
 
 ## Siguiente acción exacta
 
-Ejecutar validación real cuando el workspace sea accesible y corregir únicamente fallos reales. Mantener M08.3 como única microfase `ACTIVE` hasta ese cierre.
+Abrir PR de `codex/m08-4-graphql` a `main`, ejecutar el gate, cerrar M08.4 si queda verde, fusionar y activar `M08.5 — ConnectorGateway y SecretStore`.

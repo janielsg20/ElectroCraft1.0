@@ -19,6 +19,7 @@ export type StudioHelpId =
   | 'help.data.sources'
   | 'help.data.internal'
   | 'help.data.rest'
+  | 'help.data.graphql'
   | `help.section.${SidebarNavigationItemId}`;
 
 export interface HelpDescriptor {
@@ -340,6 +341,26 @@ const studioDefinitions = Object.freeze([
     ],
     learnMoreRef: '.ai/microphases/M08_3.md',
   },
+  {
+    id: 'help.data.graphql',
+    sectionId: 'data-graphql',
+    navigationItemId: 'data-sources',
+    ...dataSourceKeys,
+    relatedIds: ['help.data.sources', 'help.data.rest', 'help.section.queries'],
+    keywords: [
+      'graphql',
+      'introspection',
+      'query',
+      'mutation',
+      'variables',
+      'secretref',
+      'connectorgateway',
+      'cors',
+      'schema',
+      'endpoint',
+    ],
+    learnMoreRef: '.ai/microphases/M08_4.md',
+  },
 ] as const satisfies readonly HelpDefinition[]);
 
 const navigationKeywords: Readonly<Record<SidebarNavigationItemId, readonly string[]>> = Object.freeze({
@@ -376,7 +397,13 @@ const navigationRelated: Partial<Record<SidebarNavigationItemId, readonly Studio
   components: ['help.section.editor', 'help.section.templates'],
   records: ['help.section.models', 'help.section.queries', 'help.section.forms'],
   models: ['help.section.records', 'help.section.forms'],
-  'data-sources': ['help.data.sources', 'help.data.internal', 'help.data.rest', 'help.section.queries'],
+  'data-sources': [
+    'help.data.sources',
+    'help.data.internal',
+    'help.data.rest',
+    'help.data.graphql',
+    'help.section.queries',
+  ],
   queries: ['help.section.records', 'help.data.sources'],
   forms: ['help.section.models', 'help.section.workflows'],
   themes: ['help.studio.appearance', 'help.section.tokens'],

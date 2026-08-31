@@ -13,67 +13,49 @@
 - F08 — Fuentes de datos, modelos, registros y conectores: `IN_PROGRESS`.
 - M08.1 — Fuentes de datos y ConnectorRegistry: `IMPLEMENTADA / PENDIENTE GATE F08`.
 - M08.2 — Fuente interna ElectroCraft Data sobre PGlite: `IMPLEMENTADA / PENDIENTE GATE F08`.
-- M08.3 — REST API Connector y OpenAPI import: `ACTIVE`.
+- M08.3 — REST API Connector y OpenAPI import: `IMPLEMENTADA / GREEN MICROFASE`.
+- M08.4 — GraphQL Connector: `ACTIVE`.
 
 ## Rama activa
 
-`codex/m08-1-data-sources`
+`codex/m08-4-graphql`
 
-## Gate de entrada F08
+## Último cierre certificado
 
-F07 cerró con Base CI run `33262949215` (#795) completamente verde y PR `#68` fusionada a `main` en `e697a42546d23f89412e6dd616018759e719e448`.
+M08.3 fue certificada por Base CI run `33326524968` (#818): documentación, lint, typecheck, Vitest, build, Playwright, empty-repo y artifacts terminaron en `success`. PR `#69` se fusionó a `main` en `71f750017b0f37775918e26bbab86b63239736e4`.
 
-## M08.1 implementada
+## M08.1–M08.3
 
-- Owner único `ElectroCraftDataSourceDefinition` en `packages/domain/src/data/source-definition.ts`.
-- 11 capability flags canónicos y aliases legacy solo para migración.
-- Secrets excluidos recursivamente del payload; `authRef` conserva solo referencia.
-- `DataSourceAdapter` + único `ConnectorRegistry` fail-closed por adapter/kind/capability/environment.
-- `packages/connectors` registrado como paquete estable #20.
-- `packages/data-web` consume el registry mediante `WebDataSourceRepository`.
-- `/data-sources` usa `apps/studio/src/features/data/` con List/Detail/Inspector responsive y `help.data.sources`.
+- DataSourceDefinition canónico + único ConnectorRegistry.
+- ElectroCraft Data usa PGlite/Drizzle y `content_records` existente.
+- REST usa Web Fetch API + `@scalar/openapi-parser@0.28.11` con SecretRef/Gateway, OpenAPI/manual, tests y E2E certificados.
 
-## M08.2 implementada
+## M08.4 implementación candidata
 
-- `InternalDataSourceAdapter` `internal.pglite` sobre PGlite + Drizzle.
-- Reutiliza la tabla genérica F04 `content_records`; no crea otra base ni una tabla por modelo.
-- `InternalDataRepository` expone CRUD/query/stats y schema discovery desde `ElectroCraftDataSchema` canónico.
-- Browser companion usa el mismo `electrocraft-studio-storage`, worker, migraciones y leader-election pattern de F04.
-- Permission port inyectable fail-closed; Studio restringe al proyecto actualmente abierto sin adelantar F12.
-- Studio ofrece `Crear ElectroCraft Data`, `Local`, `Disponible sin conexión`, Modelos, Registros, tamaño aproximado y Copia de seguridad.
-- Help `help.data.internal`.
-- Fixtures + unit tests + integración PGlite real preparados.
+Owner aprobado: `GraphQL over fetch + DataSourceAdapter`.
 
-## M08.3 implementación actual
+- Contratos GraphQL portables en `packages/domain/src/data/graphql.ts`.
+- `GraphQLDataSourceAdapter` `graphql.fetch` detrás del mismo ConnectorRegistry.
+- Query/Mutation, variables tipadas, timeout, normalización `data/errors` y browser/Gateway.
+- Introspection estándar convertida a `ElectroCraftDataSchema` y operaciones canónicas.
+- Studio registra `graphql.fetch` junto a REST sin segundo registry ni segunda caché.
+- `Nueva fuente` permite REST API o GraphQL.
+- Wizard GraphQL: Endpoint → Autenticación → Esquema → Consultas/Mutaciones → Probar → Guardar.
+- Raw GraphQL vive únicamente en `Advanced`.
+- Help `help.data.graphql`.
+- Fixtures, Vitest y Playwright M08.4 incluidos.
 
-- `RestDataSourceAdapter` implementado con Fetch, timeout, params tipados, normalización 4xx/5xx/pagination y fallback a ConnectorGateway.
-- `OpenAPI import adapter` implementado con `@scalar/openapi-parser@0.28.11`.
-- `packages/connectors` expone públicamente REST/OpenAPI.
-- Studio registra `rest.fetch` en el mismo `ConnectorRegistry`.
-- Wizard REST funcional de seis pasos: Endpoint base → Autenticación → OpenAPI/Manual → Operaciones → Probar → Guardar.
-- Help específico `help.data.rest` enlazado al wizard.
-- Fixtures REST/OpenAPI y tests M08.3 preparados.
-- Evidencia: `.ai/evidence/F08/M08.3/IMPLEMENTATION_2026-08-29.md`.
+## Validación pendiente
 
-## Microfase activa
-
-`M08.3 — REST API Connector y OpenAPI import` — `ACTIVE`.
-
-Owner aprobado: Web Fetch API + DataSourceAdapter + `@scalar/openapi-parser@0.28.11`.
-
-## Validación pendiente de microfase/fase
-
-- El contenedor de esta sesión no resuelve `github.com`; no se pudo clonar/instalar el workspace para ejecutar la suite real.
-- No se ejecutan Actions por microfase.
-- El descriptor específico `help.data.rest` ya está integrado; antes de cerrar M08.3 falta una validación ejecutable lint/typecheck/Vitest/build.
-- Antes del Gate F08 deben regenerarse `package-lock.json`, ampliar `format/format:check` a connectors/data-web y ejecutar el gate transversal una sola vez.
+M08.4 permanece `ACTIVE` hasta que el PR ejecute lint/typecheck/Vitest/build/Playwright. No se declara DONE antes de evidencia verde.
 
 ## Evidencia F08
 
 - `.ai/evidence/F08/M08.1/IMPLEMENTATION_2026-08-29.md`
 - `.ai/evidence/F08/M08.2/IMPLEMENTATION_2026-08-29.md`
 - `.ai/evidence/F08/M08.3/IMPLEMENTATION_2026-08-29.md`
+- `.ai/evidence/F08/M08.4/IMPLEMENTATION_2026-08-31.md`
 
 ## Siguiente transición
 
-Cerrar el pendiente real de M08.3: validación ejecutable lint/typecheck/Vitest/build. Corregir solo errores reales y mantener M08.3 como única `ACTIVE`; no activar M08.4 antes de evidencia verde.
+Ejecutar un único gate PR para M08.4. Corregir solo fallos reales. Si queda verde, cerrar M08.4, fusionar a `main` y activar `M08.5 — ConnectorGateway y SecretStore`.

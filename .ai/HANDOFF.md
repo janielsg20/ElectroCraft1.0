@@ -2,69 +2,46 @@
 
 ## Current
 
-F08 / M08.3 — REST API Connector y OpenAPI import — `ACTIVE`.
+F08 / M08.4 — GraphQL Connector — `ACTIVE`.
 
-Rama activa: `codex/m08-1-data-sources`.
+Rama activa: `codex/m08-4-graphql`.
 
-F07 está `GREEN` y fusionada. M08.1 y M08.2 están implementadas con evidencia. M08.3 ya contiene core REST/OpenAPI, wizard, Help específico, fixtures y tests preparados, pero no se declara DONE sin validación ejecutable.
+M08.3 quedó certificada por Base CI `33326524968` (#818) y PR `#69` fusionada a `main` en `71f750017b0f37775918e26bbab86b63239736e4`.
 
-## Gate de entrada F08
+## M08.4 owner y límites
 
-- Base CI F07: `33262949215` (#795), success completo.
-- PR F07: `#68`.
-- merge: `e697a42546d23f89412e6dd616018759e719e448`.
+Owner: `GraphQL over fetch + DataSourceAdapter`.
 
-## M08.1 — implementada / pendiente Gate F08
+- reutiliza `DataSourceAdapter`, `ConnectorRegistry` y `WebDataSourceRepository` existentes;
+- no introduce Apollo/Relay/urql ni una segunda caché GraphQL;
+- TanStack Query mantiene ownership de cache async;
+- secrets siguen siendo `authRef` y requieren ConnectorGateway cuando corresponda;
+- raw GraphQL solo vive en Advanced.
 
-- DataSourceDefinition canónico en `packages/domain/src/data/source-definition.ts`.
-- 11 capability flags canónicos.
-- secrets excluidos; `authRef` portable.
-- DataSourceAdapter + único ConnectorRegistry.
-- `packages/connectors` paquete estable #20.
-- `/data-sources` responsive + `help.data.sources`.
+## Implementación candidata
 
-## M08.2 — implementada / pendiente Gate F08
+1. contratos GraphQL portables y bloqueo de headers sensibles;
+2. `GraphQLDataSourceAdapter` `graphql.fetch`;
+3. Query/Mutation + variables tipadas;
+4. introspection estándar → `ElectroCraftDataSchema` + operation definitions;
+5. browser Fetch, timeout, normalización `data/errors`, Gateway fallback;
+6. registro Studio en el único ConnectorRegistry;
+7. selector `Nueva fuente` REST API / GraphQL;
+8. wizard GraphQL de seis pasos;
+9. Help `help.data.graphql`;
+10. fixtures, Vitest y Playwright desktop/mobile.
 
-- `InternalDataSourceAdapter` `internal.pglite`.
-- CRUD/query/stats sobre la tabla genérica F04 `content_records`.
-- No hay segunda DB ni tablas por modelo.
-- schema discovery desde `ElectroCraftDataSchema`.
-- companion browser sobre el mismo `electrocraft-studio-storage`/worker/migrations.
-- permission port fail-closed limitado al proyecto abierto.
-- UX `ElectroCraft Data`, `Local`, `Disponible sin conexión`, `Modelos`, `Registros`, `Copia de seguridad`.
-- `help.data.internal`.
-- fixtures, unit test e integración PGlite real preparados.
+## Gate requerido
 
-## M08.3 — implementado hasta ahora
+Abrir PR de esta rama a `main` y ejecutar una sola validación real: documentación, lint/Prettier, typecheck, Vitest, build y Playwright. M08.4 permanece ACTIVE hasta ese resultado.
 
-Owner: Web Fetch API + DataSourceAdapter + `@scalar/openapi-parser@0.28.11`.
+## Si el gate queda verde
 
-Disponible en la rama:
-
-1. `RestDataSourceAdapter` con Fetch, timeout, typed params/body, result/error/pagination y gateway fallback;
-2. OpenAPI import adapter Scalar para JSON/YAML/Swagger;
-3. exports públicos de ambos adapters desde `@electrocraft/connectors`;
-4. registro `rest.fetch` en el ConnectorRegistry real del Studio;
-5. wizard REST: URL base → Autenticación → OpenAPI/Manual → Operaciones → Probar → Guardar;
-6. HelpRegistry específico `help.data.rest`;
-7. SecretRef-only; no bearer/API key/password en source config;
-8. fixtures REST/OpenAPI;
-9. tests M08.3 para import, GET/POST, pagination, auth missing, Gateway, 4xx/5xx, timeout y security.
-
-Evidencia: `.ai/evidence/F08/M08.3/IMPLEMENTATION_2026-08-29.md`.
-
-## Pendiente exacto para cerrar M08.3
-
-1. Ejecutar lint/typecheck/Vitest/build en un workspace ejecutable; no usar Actions solo para una microfase.
-2. Corregir fallos reales si aparecen.
-3. Solo entonces cambiar M08.3 a DONE y activar M08.4.
-
-## Deuda de gate F08 visible
-
-- `package-lock.json` debe regenerarse por `packages/connectors` y la dependencia Studio.
-- root `format/format:check` debe incluir connectors/data-web.
-- no abrir PR ni ejecutar Actions hasta Gate F08 salvo blocker excepcional.
+- registrar run/commit en evidencia;
+- cambiar M08.4 a IMPLEMENTADA/GREEN;
+- fusionar a `main`;
+- activar `M08.5 — ConnectorGateway y SecretStore`.
 
 ## Read set
 
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/phases/F08.md → M08_1.md → M08_2.md → M08_3.md → evidence/F08 → packages/domain/src/data → packages/application/src/data + connector-registry → packages/connectors → packages/data-web → apps/studio/src/features/data → tooling/vitest`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/phases/F08.md → .ai/microphases/M08_4.md → packages/domain/src/data → packages/application/src/data + connector-registry → packages/connectors → packages/data-web → apps/studio/src/features/data → apps/studio/src/help → tooling/vitest → tooling/playwright`.

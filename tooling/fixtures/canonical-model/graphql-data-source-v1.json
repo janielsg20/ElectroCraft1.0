@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "id": "ec_source_0000000000084",
+  "version": 1,
+  "key": "catalogGraphQL",
+  "label": "Catálogo GraphQL",
+  "kind": "graphql",
+  "adapterId": "graphql.fetch",
+  "authRef": null,
+  "config": {
+    "endpoint": "https://api.example.test/graphql",
+    "defaultHeaders": { "Accept": "application/json" },
+    "timeoutMs": 1000,
+    "executionMode": "browser",
+    "introspectionEnabled": true,
+    "operations": [
+      {
+        "id": "query_products",
+        "label": "Productos",
+        "operationType": "query",
+        "kind": "read",
+        "fieldName": "products",
+        "document": "query Products { products { id name } }",
+        "requiresAuth": false,
+        "variables": [],
+        "outputSchema": null
+      },
+      {
+        "id": "mutation_updateProduct",
+        "label": "Actualizar producto",
+        "operationType": "mutation",
+        "kind": "update",
+        "fieldName": "updateProduct",
+        "document": "mutation UpdateProduct($id: ID!, $name: String!) { updateProduct(id: $id, name: $name) { id name } }",
+        "requiresAuth": true,
+        "variables": [
+          { "name": "id", "graphQLType": "ID!", "valueType": "string", "required": true },
+          { "name": "name", "graphQLType": "String!", "valueType": "string", "required": true }
+        ],
+        "outputSchema": null
+      }
+    ]
+  },
+  "environmentScope": ["development", "preview", "production"],
+  "environmentOverrides": {},
+  "schemaDiscovery": "on-demand",
+  "capabilities": ["read", "update"],
+  "metadata": { "owner": "GraphQL over fetch + DataSourceAdapter" }
+}
