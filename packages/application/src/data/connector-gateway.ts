@@ -2,7 +2,6 @@ import type {
   ElectroCraftDataOperationDefinition,
   ElectroCraftDataSourceEnvironment,
   ElectroCraftGraphQLDataResult,
-  ElectroCraftObjectId,
   ElectroCraftRestDataResult,
   ElectroCraftRestMethod,
   JsonValue,
@@ -15,8 +14,8 @@ export interface ConnectorGatewayStatus {
 }
 
 interface ConnectorGatewayExecutionBase {
-  readonly sourceId: ElectroCraftObjectId;
-  readonly authRef: ElectroCraftObjectId | null;
+  readonly sourceId: string;
+  readonly authRef: string | null;
   readonly environment: ElectroCraftDataSourceEnvironment;
   readonly headers: Readonly<Record<string, string>>;
   readonly timeoutMs: number;
