@@ -24,66 +24,49 @@ jobs:
           cache-dependency-path: package-lock.json
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Restore canonical HelpRegistry and add GraphQL
-        shell: python
+        shell: bash
         run: |
+          python - <<'PY'
           from pathlib import Path
-
           base = Path('apps/studio/src/help/help-registry-base.ts')
           target = Path('apps/studio/src/help/help-registry.ts')
           text = base.read_text()
-          text = text.replace("  | 'help.data.rest'\n", "  | 'help.data.rest'\n  | 'help.data.graphql'\n")
-
-          marker = """  {
-    id: 'help.data.rest',
-    sectionId: 'data-rest',
-    navigationItemId: 'data-sources',
-    ...dataSourceKeys,
-    relatedIds: ['help.data.sources', 'help.data.internal', 'help.section.queries'],
-    keywords: [
-      'rest api',
-      'openapi',
-      'swagger',
-      'endpoint',
-      'secretref',
-      'connectorgateway',
-      'cors',
-      'fetch',
-      'operaciones',
-      'autenticación',
-    ],
-    learnMoreRef: '.ai/microphases/M08_3.md',
-  },
-"""
-          addition = marker + """  {
-    id: 'help.data.graphql',
-    sectionId: 'data-graphql',
-    navigationItemId: 'data-sources',
-    ...dataSourceKeys,
-    relatedIds: ['help.data.sources', 'help.data.rest', 'help.section.queries'],
-    keywords: [
-      'graphql',
-      'introspection',
-      'query',
-      'mutation',
-      'variables',
-      'secretref',
-      'connectorgateway',
-      'cors',
-      'schema',
-      'endpoint',
-    ],
-    learnMoreRef: '.ai/microphases/M08_4.md',
-  },
-"""
-          if marker not in text:
-              raise SystemExit('REST help marker not found')
-          text = text.replace(marker, addition)
+          union_needle = "  | 'help.data.rest'\n"
+          text = text.replace(union_needle, union_needle + "  | 'help.data.graphql'\n", 1)
+          anchor = "    learnMoreRef: '.ai/microphases/M08_3.md',\n  },\n"
+          descriptor = "\n".join([
+              "  {",
+              "    id: 'help.data.graphql',",
+              "    sectionId: 'data-graphql',",
+              "    navigationItemId: 'data-sources',",
+              "    ...dataSourceKeys,",
+              "    relatedIds: ['help.data.sources', 'help.data.rest', 'help.section.queries'],",
+              "    keywords: [",
+              "      'graphql',",
+              "      'introspection',",
+              "      'query',",
+              "      'mutation',",
+              "      'variables',",
+              "      'secretref',",
+              "      'connectorgateway',",
+              "      'cors',",
+              "      'schema',",
+              "      'endpoint',",
+              "    ],",
+              "    learnMoreRef: '.ai/microphases/M08_4.md',",
+              "  },",
+              "",
+          ])
+          if anchor not in text:
+              raise SystemExit('REST help anchor not found')
+          text = text.replace(anchor, anchor + descriptor, 1)
           text = text.replace(
               "'data-sources': ['help.data.sources', 'help.data.internal', 'help.data.rest', 'help.section.queries'],",
               "'data-sources': ['help.data.sources', 'help.data.internal', 'help.data.rest', 'help.data.graphql', 'help.section.queries'],",
           )
           target.write_text(text)
           base.unlink()
+          PY
       - run: npm run format
       - name: Commit fix
         shell: bash
