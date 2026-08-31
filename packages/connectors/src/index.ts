@@ -5,10 +5,14 @@ import {
   type ElectroCraftDataConnector,
 } from '@electrocraft/application';
 
+export * from './connector-gateway-bridge';
+export * from './connector-gateway-http-handler';
+export * from './graphql-data-source-adapter';
 export * from './internal-data-source-adapter';
 export * from './openapi-import-adapter';
 export * from './rest-data-source-adapter';
-export * from './graphql-data-source-adapter';
+export * from './server-connector-gateway';
+export * from './server-secret-store';
 export { dataSourceConnectorRegistry };
 
 export function registerDataSourceAdapter(adapter: DataSourceAdapter) {
