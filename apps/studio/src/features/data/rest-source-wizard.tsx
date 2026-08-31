@@ -41,7 +41,12 @@ export function RestSourceWizardSheet({
           </SheetDescription>
         </SheetHeader>
         <div className="grid gap-3 p-4 pt-2">
-          <Button className="h-auto justify-start p-4 text-left" variant="outline" onClick={() => setMode('rest')}>
+          <Button
+            aria-label="REST API"
+            className="h-auto justify-start p-4 text-left"
+            variant="outline"
+            onClick={() => setMode('rest')}
+          >
             <span className="grid gap-1">
               <strong>REST API</strong>
               <span className="text-xs font-normal text-muted-foreground">
@@ -49,7 +54,12 @@ export function RestSourceWizardSheet({
               </span>
             </span>
           </Button>
-          <Button className="h-auto justify-start p-4 text-left" variant="outline" onClick={() => setMode('graphql')}>
+          <Button
+            aria-label="GraphQL"
+            className="h-auto justify-start p-4 text-left"
+            variant="outline"
+            onClick={() => setMode('graphql')}
+          >
             <span className="grid gap-1">
               <strong>GraphQL</strong>
               <span className="text-xs font-normal text-muted-foreground">
