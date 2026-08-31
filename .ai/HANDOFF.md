@@ -2,46 +2,47 @@
 
 ## Current
 
-F08 / M08.4 — GraphQL Connector — `ACTIVE`.
+F08 / M08.5 — ConnectorGateway y SecretStore — `ACTIVE`.
 
-Rama activa: `codex/m08-4-graphql`.
+Rama activa: `codex/m08-5-connector-gateway-secrets`.
 
-M08.3 quedó certificada por Base CI `33326524968` (#818) y PR `#69` fusionada a `main` en `71f750017b0f37775918e26bbab86b63239736e4`.
+M08.4 quedó certificada por ElectroCraft Base CI `33412562136` (#834) y PR `#70` fusionada por squash a `main` en `6b79ee859c9d0f4f712d897b4cc973bcc388cefb`.
 
-## M08.4 owner y límites
+## M08.5 owner y límites
 
-Owner: `GraphQL over fetch + DataSourceAdapter`.
+Owner: `ConnectorGatewayPort + SecretStorePort`.
 
-- reutiliza `DataSourceAdapter`, `ConnectorRegistry` y `WebDataSourceRepository` existentes;
-- no introduce Apollo/Relay/urql ni una segunda caché GraphQL;
-- TanStack Query mantiene ownership de cache async;
-- secrets siguen siendo `authRef` y requieren ConnectorGateway cuando corresponda;
-- raw GraphQL solo vive en Advanced.
+- reutiliza el único `ConnectorRegistry` y los DataSourceAdapter REST/GraphQL existentes;
+- `SecretRef` es metadata portable, nunca el valor;
+- Studio solo usa `SecretStoreAdminPort` (write/status/remove), sin operación de resolve/read-back;
+- resolución del valor ocurre únicamente server-side dentro de ConnectorGateway;
+- `ServerEnvironmentSecretStore` es válido para desarrollo; producción debe alojar el mismo port sobre un secret manager/server seguro;
+- no `localStorage` para secretos;
+- `.env.example` solo documenta nombres y URL de Gateway.
 
-## Implementación candidata
+## Implementación actual
 
-1. contratos GraphQL portables y bloqueo de headers sensibles;
-2. `GraphQLDataSourceAdapter` `graphql.fetch`;
-3. Query/Mutation + variables tipadas;
-4. introspection estándar → `ElectroCraftDataSchema` + operation definitions;
-5. browser Fetch, timeout, normalización `data/errors`, Gateway fallback;
-6. registro Studio en el único ConnectorRegistry;
-7. selector `Nueva fuente` REST API / GraphQL;
-8. wizard GraphQL de seis pasos;
-9. Help `help.data.graphql`;
-10. fixtures, Vitest y Playwright desktop/mobile.
+1. `packages/domain/src/data/secrets.ts`: SecretRef, scopes y binding;
+2. `packages/application/src/data/secret-store.ts`: SecretStorePort/AdminPort;
+3. `packages/application/src/data/connector-gateway.ts`: Gateway común REST/GraphQL;
+4. server-env SecretStore;
+5. server ConnectorGateway con inyección de credencial sin echo;
+6. handler HTTP Web-standard;
+7. cliente browser Gateway + secret admin;
+8. bridges que conectan REST/GraphQL certificados al port común;
+9. Studio activa Gateway por `VITE_ELECTROCRAFT_CONNECTOR_GATEWAY_URL` o permanece fail-closed;
+10. Settings UI con Gateway/Secretos/Desarrollo/Producción, estado, creación de refs y reemplazo sin read-back;
+11. fixture y Vitest de seguridad/runtime preparados.
 
-## Gate requerido
+## Pendiente
 
-Abrir PR de esta rama a `main` y ejecutar una sola validación real: documentación, lint/Prettier, typecheck, Vitest, build y Playwright. M08.4 permanece ACTIVE hasta ese resultado.
+- HelpRegistry `help.data.secrets` y trigger contextual exacto;
+- E2E desktop/mobile de Settings;
+- bundle/export/log secret scan;
+- validación ejecutable de M08.5.
 
-## Si el gate queda verde
-
-- registrar run/commit en evidencia;
-- cambiar M08.4 a IMPLEMENTADA/GREEN;
-- fusionar a `main`;
-- activar `M08.5 — ConnectorGateway y SecretStore`.
+No declarar GREEN ni activar M08.6 antes de ese gate.
 
 ## Read set
 
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/phases/F08.md → .ai/microphases/M08_4.md → packages/domain/src/data → packages/application/src/data + connector-registry → packages/connectors → packages/data-web → apps/studio/src/features/data → apps/studio/src/help → tooling/vitest → tooling/playwright`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/phases/F08.md → .ai/microphases/M08_5.md → packages/domain/src/data/secrets.ts → packages/application/src/data/{connector-gateway,secret-store}.ts → packages/connectors/src/{server-secret-store,server-connector-gateway,connector-gateway-http-handler,connector-gateway-bridge}.ts → packages/data-web/src/browser-connector-gateway.ts → apps/studio/src/features/data/data-integrations-* → apps/studio/src/help → tooling/vitest → tooling/playwright`.
