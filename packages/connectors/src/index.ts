@@ -8,6 +8,7 @@ import {
 export * from './internal-data-source-adapter';
 export * from './openapi-import-adapter';
 export * from './rest-data-source-adapter';
+export * from './graphql-data-source-adapter';
 export { dataSourceConnectorRegistry };
 
 export function registerDataSourceAdapter(adapter: DataSourceAdapter) {
