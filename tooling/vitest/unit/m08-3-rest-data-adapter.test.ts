@@ -197,7 +197,8 @@ describe('M08.3 REST API Connector y OpenAPI import', () => {
   });
 
   it('exposes the six-step Spanish REST wizard and registers the real adapter in Studio', () => {
-    const wizard = readFileSync(resolve('apps/studio/src/features/data/rest-source-wizard.tsx'), 'utf8');
+    const picker = readFileSync(resolve('apps/studio/src/features/data/rest-source-wizard.tsx'), 'utf8');
+    const wizard = readFileSync(resolve('apps/studio/src/features/data/rest-source-wizard-impl.tsx'), 'utf8');
     const registration = readFileSync(resolve('apps/studio/src/features/data/studio-data-source-adapters.ts'), 'utf8');
     const workspace = readFileSync(resolve('apps/studio/src/features/data/data-sources-workspace.tsx'), 'utf8');
 
@@ -215,6 +216,8 @@ describe('M08.3 REST API Connector y OpenAPI import', () => {
       expect(wizard).toContain(copy);
     }
     expect(wizard).not.toMatch(/bearerToken|apiKey\s*[:=]|password\s*[:=]/i);
+    expect(picker).toContain('RestSourceWizardImpl');
+    expect(picker).toContain('GraphQLSourceWizardSheet');
     expect(registration).toContain('createRestDataSourceAdapter');
     expect(registration).toContain('REST_DATA_ADAPTER_ID');
     expect(workspace).toContain('RestSourceWizardSheet');
