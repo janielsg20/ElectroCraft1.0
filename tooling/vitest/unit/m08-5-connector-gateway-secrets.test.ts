@@ -20,6 +20,30 @@ function secretFixture() {
   );
 }
 
+const restRequest = {
+  protocol: 'rest' as const,
+  sourceId: 'ec_data-source_0000000000081',
+  authRef: 'ec_secret_0000000000083',
+  environment: 'preview' as const,
+  operation: {
+    id: 'getProduct',
+    label: 'Get product',
+    kind: 'read' as const,
+    method: 'GET' as const,
+    path: '/products/{id}',
+    requiresAuth: true,
+    parameters: [],
+    inputSchema: null,
+    outputSchema: null,
+    pagination: { kind: 'none' as const },
+  },
+  url: 'https://api.example.test/products/p-1',
+  method: 'GET' as const,
+  headers: {},
+  body: null,
+  timeoutMs: 1000,
+};
+
 describe('M08.5 ConnectorGateway y SecretStore', () => {
   it('writes server secrets without read-back and resolves preview through development scope', async () => {
     const ref = secretFixture();
@@ -37,7 +61,24 @@ describe('M08.5 ConnectorGateway y SecretStore', () => {
     expect(environment[secretEnvironmentVariableName(ref, 'development')]).toBe('super-secret-value');
   });
 
-  it('injects auth only inside the server Gateway and never returns the secret', async () => {
+  it('fails closed when server execution authorization is missing', async () => {
+    const ref = secretFixture();
+    const environment: Record<string, string | undefined> = {};
+    const store = createServerEnvironmentSecretStore({ environment, allowWrites: true });
+    await store.write({ ref, environment: 'development', value: 'must-never-leave' });
+    const upstreamFetch = vi.fn(async () => new Response('{}', { status: 200 })) as unknown as typeof fetch;
+    const gateway = createServerConnectorGateway({
+      secretStore: store,
+      resolveSecretRef: (refId) => (refId === ref.id ? ref : null),
+      fetch: upstreamFetch,
+    });
+
+    await expect(gateway.status()).resolves.toMatchObject({ configured: false });
+    await expect(gateway.executeRest(restRequest)).rejects.toMatchObject({ code: 'GATEWAY_EXECUTION_DENIED' });
+    expect(upstreamFetch).not.toHaveBeenCalled();
+  });
+
+  it('injects auth only inside an authorized server Gateway and never returns the secret', async () => {
     const ref = secretFixture();
     const environment: Record<string, string | undefined> = {};
     const store = createServerEnvironmentSecretStore({ environment, allowWrites: true });
@@ -54,39 +95,46 @@ describe('M08.5 ConnectorGateway y SecretStore', () => {
     const gateway = createServerConnectorGateway({
       secretStore: store,
       resolveSecretRef: (refId) => (refId === ref.id ? ref : null),
+      authorizeExecution: (request) =>
+        request.sourceId === restRequest.sourceId &&
+        request.protocol === 'rest' &&
+        request.url === restRequest.url,
       fetch: upstreamFetch,
     });
 
-    const result = await gateway.executeRest({
-      protocol: 'rest',
-      sourceId: 'ec_data-source_0000000000081',
-      authRef: ref.id,
-      environment: 'preview',
-      operation: {
-        id: 'getProduct',
-        label: 'Get product',
-        kind: 'read',
-        method: 'GET',
-        path: '/products/{id}',
-        requiresAuth: true,
-        parameters: [],
-        inputSchema: null,
-        outputSchema: null,
-        pagination: { kind: 'none' },
-      },
-      url: 'https://api.example.test/products/p-1',
-      method: 'GET',
-      headers: {},
-      body: null,
-      timeoutMs: 1000,
-    });
+    const result = await gateway.executeRest(restRequest);
 
     expect(authorization).toBe('Bearer gateway-only-token');
     expect(result).toMatchObject({ ok: true, status: 200, transport: 'gateway', data: { id: 'p-1' } });
     expect(JSON.stringify(result)).not.toContain('gateway-only-token');
   });
 
-  it('round-trips browser Gateway and secret administration through the Web-standard HTTP handler', async () => {
+  it('blocks unauthorized HTTP secret administration before reading the request body', async () => {
+    const ref = secretFixture();
+    const environment: Record<string, string | undefined> = {};
+    const store = createServerEnvironmentSecretStore({ environment, allowWrites: true });
+    const serverGateway = createServerConnectorGateway({
+      secretStore: store,
+      resolveSecretRef: () => ref,
+      authorizeExecution: () => true,
+      fetch: vi.fn() as unknown as typeof fetch,
+    });
+    const handler = createConnectorGatewayHttpHandler({ gateway: serverGateway, secretStore: store });
+
+    const response = await handler(
+      new Request('https://gateway.example.test/secrets/write', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ ref, environment: 'development', value: 'blocked-secret' }),
+      }),
+    );
+
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toMatchObject({ error: { code: 'GATEWAY_REQUEST_DENIED' } });
+    expect(await store.resolve(ref, 'development')).toBeNull();
+  });
+
+  it('round-trips authorized browser Gateway and secret administration through the Web-standard HTTP handler', async () => {
     const ref = secretFixture();
     const environment: Record<string, string | undefined> = {};
     const store = createServerEnvironmentSecretStore({ environment, allowWrites: true });
@@ -106,12 +154,22 @@ describe('M08.5 ConnectorGateway y SecretStore', () => {
     const serverGateway = createServerConnectorGateway({
       secretStore: store,
       resolveSecretRef: (refId) => (refId === ref.id ? ref : null),
+      authorizeExecution: (request) => {
+        if (request.sourceId !== 'ec_data-source_0000000000082') return false;
+        return request.protocol === 'graphql' && request.endpoint === 'https://graphql.example.test/graphql';
+      },
       fetch: upstreamFetch,
     });
-    const handler = createConnectorGatewayHttpHandler({ gateway: serverGateway, secretStore: store });
-    const gatewayFetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) =>
-      handler(new Request(String(input), init)),
-    ) as unknown as typeof fetch;
+    const handler = createConnectorGatewayHttpHandler({
+      gateway: serverGateway,
+      secretStore: store,
+      authorizeRequest: (request) => request.headers.get('x-test-session') === 'allowed',
+    });
+    const gatewayFetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const headers = new Headers(init?.headers);
+      headers.set('x-test-session', 'allowed');
+      return handler(new Request(String(input), { ...init, headers }));
+    }) as unknown as typeof fetch;
     const browserGateway = createBrowserConnectorGateway({ baseUrl: 'https://gateway.example.test', fetch: gatewayFetch });
     const browserSecrets = createBrowserSecretStoreAdmin({ baseUrl: 'https://gateway.example.test', fetch: gatewayFetch });
 
@@ -166,8 +224,11 @@ describe('M08.5 ConnectorGateway y SecretStore', () => {
       'packages/data-web/src/browser-connector-gateway.ts',
       'packages/connectors/src/server-secret-store.ts',
       'packages/connectors/src/server-connector-gateway.ts',
+      'apps/studio/src/features/data/data-integrations-runtime.ts',
     ]) {
-      expect(readFileSync(resolve(path), 'utf8')).not.toContain('localStorage');
+      const source = readFileSync(resolve(path), 'utf8');
+      expect(source).not.toContain('localStorage');
+      expect(source).not.toMatch(/console\.(?:log|debug|info)\s*\(/);
     }
   });
 });
