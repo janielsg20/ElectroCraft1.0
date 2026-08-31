@@ -20,6 +20,7 @@ export type StudioHelpId =
   | 'help.data.internal'
   | 'help.data.rest'
   | 'help.data.graphql'
+  | 'help.data.secrets'
   | `help.section.${SidebarNavigationItemId}`;
 
 export interface HelpDescriptor {
@@ -282,6 +283,8 @@ const studioDefinitions = Object.freeze([
     relatedIds: [
       'help.data.internal',
       'help.data.rest',
+      'help.data.graphql',
+      'help.data.secrets',
       'help.section.queries',
       'help.section.records',
       'help.projects',
@@ -326,7 +329,7 @@ const studioDefinitions = Object.freeze([
     sectionId: 'data-rest',
     navigationItemId: 'data-sources',
     ...dataSourceKeys,
-    relatedIds: ['help.data.sources', 'help.data.internal', 'help.section.queries'],
+    relatedIds: ['help.data.sources', 'help.data.secrets', 'help.data.internal', 'help.section.queries'],
     keywords: [
       'rest api',
       'openapi',
@@ -346,7 +349,7 @@ const studioDefinitions = Object.freeze([
     sectionId: 'data-graphql',
     navigationItemId: 'data-sources',
     ...dataSourceKeys,
-    relatedIds: ['help.data.sources', 'help.data.rest', 'help.section.queries'],
+    relatedIds: ['help.data.sources', 'help.data.secrets', 'help.data.rest', 'help.section.queries'],
     keywords: [
       'graphql',
       'introspection',
@@ -360,6 +363,28 @@ const studioDefinitions = Object.freeze([
       'endpoint',
     ],
     learnMoreRef: '.ai/microphases/M08_4.md',
+  },
+  {
+    id: 'help.data.secrets',
+    sectionId: 'data-secrets',
+    navigationItemId: 'data-sources',
+    ...dataSourceKeys,
+    relatedIds: ['help.data.sources', 'help.data.rest', 'help.data.graphql'],
+    keywords: [
+      'connector gateway',
+      'connectorgateway',
+      'secretstore',
+      'secretref',
+      'secretos',
+      'credenciales',
+      'desarrollo',
+      'producción',
+      'server env',
+      'secret manager',
+      'sin read-back',
+      'autenticación',
+    ],
+    learnMoreRef: '.ai/microphases/M08_5.md',
   },
 ] as const satisfies readonly HelpDefinition[]);
 
@@ -402,6 +427,7 @@ const navigationRelated: Partial<Record<SidebarNavigationItemId, readonly Studio
     'help.data.internal',
     'help.data.rest',
     'help.data.graphql',
+    'help.data.secrets',
     'help.section.queries',
   ],
   queries: ['help.section.records', 'help.data.sources'],
