@@ -229,7 +229,7 @@ export function GraphQLSourceWizardSheet({
     try {
       if (!advancedOpen) throw new Error('Abre Advanced para definir el documento GraphQL manual.');
       if (!fieldName.trim() || !rawDocument.trim()) throw new Error('Completa field y documento GraphQL.');
-      const variables = parseVariables(variableDefinitions);
+      const variables = [...parseVariables(variableDefinitions)];
       const candidate: ElectroCraftGraphQLOperationDefinition = {
         id: operationId(operationType, fieldName.trim(), new Set(operations.map(({ id }) => id))),
         label: operationLabel.trim() || fieldName.trim(),

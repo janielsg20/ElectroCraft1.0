@@ -503,7 +503,7 @@ export function graphQLIntrospectionToOperations(
           fieldName: field.name,
           document,
           requiresAuth: false,
-          variables: Object.freeze(variables),
+          variables: [...variables],
           outputSchema: null,
         }),
       );

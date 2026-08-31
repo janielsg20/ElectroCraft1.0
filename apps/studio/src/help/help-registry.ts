@@ -16,7 +16,7 @@ const graphQLHelpDescriptor: HelpDescriptor = Object.freeze({
   shortKey: 'help.section.data-sources.short',
   longKey: 'help.section.data-sources.long',
   exampleKeys: Object.freeze([]),
-  relatedIds: Object.freeze(['help.data.sources', 'help.data.rest', 'help.section.queries']),
+  relatedIds: Object.freeze(['help.data.sources', 'help.data.rest', 'help.section.queries'] as const),
   keywords: Object.freeze([
     'graphql',
     'introspection',
