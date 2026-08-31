@@ -19,6 +19,7 @@ export class ConnectorGatewayError extends Error {
     readonly code:
       | 'SECRET_REF_NOT_FOUND'
       | 'SECRET_VALUE_MISSING'
+      | 'GATEWAY_EXECUTION_DENIED'
       | 'GATEWAY_FETCH_FAILED'
       | 'GATEWAY_RESPONSE_INVALID',
     message: string,
@@ -28,9 +29,14 @@ export class ConnectorGatewayError extends Error {
   }
 }
 
+export type ServerGatewayExecutionRequest =
+  | ConnectorGatewayRestExecutionRequest
+  | ConnectorGatewayGraphQLExecutionRequest;
+
 export interface ServerConnectorGatewayOptions {
   readonly secretStore: SecretStorePort;
   readonly resolveSecretRef: (refId: string) => ElectroCraftSecretRef | null | Promise<ElectroCraftSecretRef | null>;
+  readonly authorizeExecution?: (request: ServerGatewayExecutionRequest) => boolean | Promise<boolean>;
   readonly fetch?: typeof globalThis.fetch;
   readonly provider?: string;
 }
@@ -92,7 +98,23 @@ export class ServerConnectorGateway implements ConnectorGatewayPort {
   }
 
   async status(): Promise<ConnectorGatewayStatus> {
-    return Object.freeze({ configured: true, provider: this.provider, message: 'Gateway de conectores configurado.' });
+    const configured = Boolean(this.options.authorizeExecution);
+    return Object.freeze({
+      configured,
+      provider: this.provider,
+      message: configured
+        ? 'Gateway de conectores configurado.'
+        : 'Gateway bloqueado hasta configurar una política de autorización server-side.',
+    });
+  }
+
+  private async assertExecutionAuthorized(request: ServerGatewayExecutionRequest) {
+    if (!(await this.options.authorizeExecution?.(request))) {
+      throw new ConnectorGatewayError(
+        'GATEWAY_EXECUTION_DENIED',
+        'ConnectorGateway bloqueó la ejecución porque falta autorización server-side.',
+      );
+    }
   }
 
   private async applySecret(
@@ -131,6 +153,7 @@ export class ServerConnectorGateway implements ConnectorGatewayPort {
   }
 
   async executeRest(request: ConnectorGatewayRestExecutionRequest): Promise<ElectroCraftRestDataResult> {
+    await this.assertExecutionAuthorized(request);
     const authorized = await this.applySecret(request.authRef, request.environment, request.url, request.headers);
     try {
       return await withTimeout(request.timeoutMs, async (signal) => {
@@ -169,6 +192,7 @@ export class ServerConnectorGateway implements ConnectorGatewayPort {
   }
 
   async executeGraphQL(request: ConnectorGatewayGraphQLExecutionRequest): Promise<ElectroCraftGraphQLDataResult> {
+    await this.assertExecutionAuthorized(request);
     const authorized = await this.applySecret(request.authRef, request.environment, request.endpoint, request.headers);
     try {
       return await withTimeout(request.timeoutMs, async (signal) => {
