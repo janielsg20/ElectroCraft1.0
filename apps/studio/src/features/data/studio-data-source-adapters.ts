@@ -6,11 +6,12 @@ import {
   GRAPHQL_DATA_ADAPTER_ID,
   REST_DATA_ADAPTER_ID,
 } from '@electrocraft/connectors';
-import { createBrowserConnectorGateway } from '@electrocraft/data-web';
+import { createBrowserConnectorGateway, createBrowserSecretStoreAdmin } from '@electrocraft/data-web';
 import { dataSourceWorkspaceRuntime } from './data-source-runtime';
 
 const gatewayBaseUrl = import.meta.env.VITE_ELECTROCRAFT_CONNECTOR_GATEWAY_URL?.trim() ?? '';
 const browserGateway = gatewayBaseUrl ? createBrowserConnectorGateway({ baseUrl: gatewayBaseUrl }) : null;
+const browserSecretStoreAdmin = gatewayBaseUrl ? createBrowserSecretStoreAdmin({ baseUrl: gatewayBaseUrl }) : null;
 
 export function ensureStudioDataSourceAdapters() {
   if (!dataSourceWorkspaceRuntime.registry.has(REST_DATA_ADAPTER_ID)) {
@@ -28,6 +29,10 @@ export function ensureStudioDataSourceAdapters() {
 
 export function studioConnectorGateway() {
   return browserGateway;
+}
+
+export function studioSecretStoreAdmin() {
+  return browserSecretStoreAdmin;
 }
 
 ensureStudioDataSourceAdapters();
