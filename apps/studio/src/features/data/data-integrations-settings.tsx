@@ -9,6 +9,7 @@ import {
 } from '@electrocraft/design-system';
 import type { ElectroCraftSecretBinding, ElectroCraftSecretEnvironment } from '@electrocraft/domain';
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import { HelpTrigger } from '../../help/help-ui';
 import { dataIntegrationsRuntime } from './data-integrations-runtime';
 
 function bindingFor(kind: 'bearer' | 'header', headerName: string): ElectroCraftSecretBinding {
@@ -59,7 +60,10 @@ export function DataIntegrationsSettings() {
     >
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 id="data-integrations-settings-title">Gateway de conectores</h2>
+          <div className="flex items-center gap-2">
+            <h2 id="data-integrations-settings-title">Gateway de conectores</h2>
+            <HelpTrigger helpId="help.data.secrets" />
+          </div>
           <p>Secretos y conexiones server-side. Los valores nunca se vuelven a mostrar completos.</p>
         </div>
         <span className="ec-ia-setting-detail-value" data-gateway-configured={gatewayConfigured ? 'true' : 'false'}>
