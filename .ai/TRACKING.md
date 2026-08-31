@@ -15,35 +15,42 @@ Date: 2026-08-31.
 | F08 / M08.1 | IMPLEMENTADA / PENDIENTE GATE F08 | `.ai/evidence/F08/M08.1/IMPLEMENTATION_2026-08-29.md` |
 | F08 / M08.2 | IMPLEMENTADA / PENDIENTE GATE F08 | `.ai/evidence/F08/M08.2/IMPLEMENTATION_2026-08-29.md` |
 | F08 / M08.3 | IMPLEMENTADA / GREEN MICROFASE | PR `#69`; Base CI `33326524968` (#818); merge `71f750017b0f37775918e26bbab86b63239736e4` |
-| F08 / M08.4 | ACTIVE — candidata a gate | `.ai/evidence/F08/M08.4/IMPLEMENTATION_2026-08-31.md` |
+| F08 / M08.4 | IMPLEMENTADA / GREEN MICROFASE | PR `#70`; Base CI `33412562136` (#834); merge `6b79ee859c9d0f4f712d897b4cc973bcc388cefb` |
+| F08 / M08.5 | ACTIVE | `.ai/evidence/F08/M08.5/IMPLEMENTATION_2026-08-31.md` |
 
 ## Rama activa
 
-`codex/m08-4-graphql`
+`codex/m08-5-connector-gateway-secrets`
 
-## M08.3 — cierre certificado
+## M08.4 — cierre certificado
 
-- REST/OpenAPI, SecretRef/Gateway, browser Fetch y wizard responsive certificados.
-- Base CI `33326524968` (#818) terminó completamente verde.
-- PR `#69` fue fusionada a `main` en `71f750017b0f37775918e26bbab86b63239736e4`.
+- GraphQL Fetch, Query/Mutation, variables tipadas, introspection, Gateway fail-closed, wizard y Help quedaron certificados.
+- Base CI `33412562136` (#834) terminó documentación, lint, typecheck, 518/518 Vitest, build, Playwright, empty-repo y artifacts en `success`.
+- PR `#70` fue fusionada por squash a `main` en `6b79ee859c9d0f4f712d897b4cc973bcc388cefb`.
 
-## F08 / M08.4 — GraphQL
+## F08 / M08.5 — ConnectorGateway y SecretStore
 
-- `packages/domain/src/data/graphql.ts`: endpoint, headers no sensibles, timeout, execution mode, operations Query/Mutation y variables tipadas.
-- `packages/connectors/src/graphql-data-source-adapter.ts`: `graphql.fetch`, ejecución browser/Gateway, timeout, GraphQL errors, introspection y conversión a `ElectroCraftDataSchema`.
-- No hay Apollo/Relay/urql ni segunda caché; TanStack Query continúa como owner de cache async y `WebDataSourceRepository` permanece como fachada única.
-- Studio registra GraphQL en el mismo ConnectorRegistry.
-- `Nueva fuente` ofrece REST API o GraphQL sin romper el wizard REST certificado.
-- Wizard: Endpoint → Autenticación → Esquema → Consultas/Mutaciones → Probar → Guardar.
-- Raw document vive exclusivamente en Advanced; el flujo principal usa introspection y operaciones derivadas.
-- Help `help.data.graphql`.
-- Fixtures: `graphql-data-source-v1.json` y `graphql/introspection-products-v1.json`.
-- Tests: Query, Mutation, variables, introspection allowed/denied, SecretRef/Gateway, headers sensibles y E2E desktop/mobile.
+- `packages/domain/src/data/secrets.ts`: `SecretRef`, binding bearer/header/query, scopes Desarrollo/Producción y nombres de server env deterministas.
+- `packages/application/src/data/secret-store.ts`: `SecretStorePort`, subset `SecretStoreAdminPort` y persistencia exclusiva de metadata `secret-ref`.
+- `packages/application/src/data/connector-gateway.ts`: único `ConnectorGatewayPort` REST/GraphQL.
+- `packages/connectors/src/server-secret-store.ts`: adapter server-env; read-back no forma parte del admin UI.
+- `packages/connectors/src/server-connector-gateway.ts`: resolución de SecretRef + inyección server-side + respuesta tipada sin credential echo.
+- `packages/connectors/src/connector-gateway-http-handler.ts`: handler Web-standard para status/execute/secrets.
+- `packages/connectors/src/connector-gateway-bridge.ts`: adapta REST/GraphQL certificados al único port común.
+- `packages/data-web/src/browser-connector-gateway.ts`: cliente browser del Gateway y admin de secretos sin resolve/read.
+- Studio configura el Gateway solo por `VITE_ELECTROCRAFT_CONNECTOR_GATEWAY_URL`; ausencia de URL mantiene fail-closed.
+- Settings incluye Gateway de conectores, Secretos, Desarrollo, Producción, Configurado/Falta configuración y Probar conexión.
+- `.env.example` no contiene valores.
+- Fixture `secret-ref-v1.json` + `m08-5-connector-gateway-secrets.test.ts` preparados.
 
-## Validación
+## Pendiente antes de GREEN
 
-M08.4 no se declara DONE todavía. El PR debe ejecutar un único gate real de documentación + lint + typecheck + Vitest + build + Playwright; se corregirán únicamente fallos observados.
+- registrar HelpRegistry exacto `help.data.secrets` y trigger `CircleHelp`;
+- preparar E2E desktop/mobile de Settings;
+- completar scan de export/bundle/logs;
+- ejecutar una validación real de documentación/lint/typecheck/Vitest/build/Playwright al gate de M08.5;
+- corregir solo fallos observados.
 
 ## Siguiente acción exacta
 
-Abrir PR de `codex/m08-4-graphql` a `main`, ejecutar el gate, cerrar M08.4 si queda verde, fusionar y activar `M08.5 — ConnectorGateway y SecretStore`.
+Completar Help/E2E/security scan de M08.5 sin ejecutar Actions por cada cambio. Con gate verde, cerrar M08.5 y activar `M08.6 — Data Explorer y prueba de operaciones`.
