@@ -14,40 +14,42 @@
 - M08.1 — Fuentes de datos y ConnectorRegistry: `IMPLEMENTADA / PENDIENTE GATE F08`.
 - M08.2 — Fuente interna ElectroCraft Data sobre PGlite: `IMPLEMENTADA / PENDIENTE GATE F08`.
 - M08.3 — REST API Connector y OpenAPI import: `IMPLEMENTADA / GREEN MICROFASE`.
-- M08.4 — GraphQL Connector: `ACTIVE`.
+- M08.4 — GraphQL Connector: `IMPLEMENTADA / GREEN MICROFASE`.
+- M08.5 — ConnectorGateway y SecretStore: `ACTIVE`.
 
 ## Rama activa
 
-`codex/m08-4-graphql`
+`codex/m08-5-connector-gateway-secrets`
 
 ## Último cierre certificado
 
-M08.3 fue certificada por Base CI run `33326524968` (#818): documentación, lint, typecheck, Vitest, build, Playwright, empty-repo y artifacts terminaron en `success`. PR `#69` se fusionó a `main` en `71f750017b0f37775918e26bbab86b63239736e4`.
+M08.4 fue certificada por ElectroCraft Base CI run `33412562136` (#834): documentación, lint, typecheck, 518/518 Vitest, build, Playwright, empty-repo y artifacts terminaron en `success`. PR `#70` se fusionó mediante squash a `main` en `6b79ee859c9d0f4f712d897b4cc973bcc388cefb`.
 
-## M08.1–M08.3
+## F08 implementado hasta M08.4
 
 - DataSourceDefinition canónico + único ConnectorRegistry.
 - ElectroCraft Data usa PGlite/Drizzle y `content_records` existente.
-- REST usa Web Fetch API + `@scalar/openapi-parser@0.28.11` con SecretRef/Gateway, OpenAPI/manual, tests y E2E certificados.
+- REST usa Web Fetch API + OpenAPI con SecretRef/Gateway fail-closed.
+- GraphQL usa Fetch, Query/Mutation, variables tipadas e introspection sobre el mismo DataSourceAdapter/ConnectorRegistry.
 
-## M08.4 implementación candidata
+## M08.5 implementación activa
 
-Owner aprobado: `GraphQL over fetch + DataSourceAdapter`.
+Owner: `ConnectorGatewayPort + SecretStorePort`.
 
-- Contratos GraphQL portables en `packages/domain/src/data/graphql.ts`.
-- `GraphQLDataSourceAdapter` `graphql.fetch` detrás del mismo ConnectorRegistry.
-- Query/Mutation, variables tipadas, timeout, normalización `data/errors` y browser/Gateway.
-- Introspection estándar convertida a `ElectroCraftDataSchema` y operaciones canónicas.
-- Studio registra `graphql.fetch` junto a REST sin segundo registry ni segunda caché.
-- `Nueva fuente` permite REST API o GraphQL.
-- Wizard GraphQL: Endpoint → Autenticación → Esquema → Consultas/Mutaciones → Probar → Guardar.
-- Raw GraphQL vive únicamente en `Advanced`.
-- Help `help.data.graphql`.
-- Fixtures, Vitest y Playwright M08.4 incluidos.
+- `SecretRef` portable separa metadata/binding/scope del valor secreto.
+- `SecretStorePort` permite write/status/remove y resolución únicamente para ejecución server-side; Studio consume solo el subset admin sin read-back.
+- `ConnectorGatewayPort` común expone REST y GraphQL sin crear otro registry.
+- `ServerEnvironmentSecretStore` aporta adapter de desarrollo server-env; write queda deshabilitado salvo host explícitamente mutable.
+- `ServerConnectorGateway` resuelve SecretRef, inyecta credenciales server-side y normaliza REST/GraphQL sin retornar secretos.
+- Handler HTTP Web-standard + clientes browser conectan Studio con un Gateway alojado por servidor/secret manager.
+- REST y GraphQL se adaptan al port común mediante bridges, preservando los adapters certificados.
+- `.env.example` contiene solo URL pública del Gateway y convención de nombres, nunca valores.
+- Settings ya incluye Gateway de conectores / Secretos, Desarrollo/Producción, estado, crear referencia y crear/reemplazar/eliminar valor sin read-back.
+- Fixture y Vitest M08.5 cubren write/no readback, environment resolution, auth injection, HTTP round-trip y secret scan básico.
 
 ## Validación pendiente
 
-M08.4 permanece `ACTIVE` hasta que el PR ejecute lint/typecheck/Vitest/build/Playwright. No se declara DONE antes de evidencia verde.
+M08.5 permanece `ACTIVE`. No ejecutar GitHub Actions por cada incremento. Antes de declararla GREEN faltan HelpRegistry `help.data.secrets`, E2E responsive/UI, revisión de export/bundle leak scan y gate ejecutable final de la microfase.
 
 ## Evidencia F08
 
@@ -55,7 +57,8 @@ M08.4 permanece `ACTIVE` hasta que el PR ejecute lint/typecheck/Vitest/build/Pla
 - `.ai/evidence/F08/M08.2/IMPLEMENTATION_2026-08-29.md`
 - `.ai/evidence/F08/M08.3/IMPLEMENTATION_2026-08-29.md`
 - `.ai/evidence/F08/M08.4/IMPLEMENTATION_2026-08-31.md`
+- `.ai/evidence/F08/M08.5/IMPLEMENTATION_2026-08-31.md`
 
 ## Siguiente transición
 
-Ejecutar un único gate PR para M08.4. Corregir solo fallos reales. Si queda verde, cerrar M08.4, fusionar a `main` y activar `M08.5 — ConnectorGateway y SecretStore`.
+Completar Help `help.data.secrets`, E2E/settings responsive, export/log/bundle leak scan y validación real de M08.5. Solo con gate verde cerrar M08.5 y activar `M08.6 — Data Explorer y prueba de operaciones`.
