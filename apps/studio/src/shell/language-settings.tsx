@@ -6,7 +6,8 @@ import {
   DropdownMenuTrigger,
 } from '@electrocraft/design-system';
 import { electroCraftI18n, translateStrict, type ElectroCraftResourceKey } from '@electrocraft/i18n';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
+import { DataIntegrationsSettings } from '../features/data/data-integrations-settings';
 import { HelpTrigger } from '../help/help-ui';
 
 const LANGUAGE_STORAGE_KEY = 'electrocraft.studio.locale';
@@ -41,45 +42,48 @@ export function LanguageSettings() {
   };
 
   return (
-    <section
-      className="ec-topbar-settings-section"
-      aria-labelledby="general-settings-title"
-      data-information-level="primary"
-      data-settings-destination="general-language"
-    >
-      <div className="flex items-center gap-2">
-        <h2 id="general-settings-title">{settingsT('settings.general.title')}</h2>
-        <HelpTrigger helpId="help.studio.language" data-language-help-trigger />
-      </div>
-
-      <div className="ec-topbar-setting-row" data-language-settings>
-        <div>
-          <strong>{settingsT('settings.language.label')}</strong>
-          <p>{settingsT('settings.language.description')}</p>
+    <Fragment>
+      <section
+        className="ec-topbar-settings-section"
+        aria-labelledby="general-settings-title"
+        data-information-level="primary"
+        data-settings-destination="general-language"
+      >
+        <div className="flex items-center gap-2">
+          <h2 id="general-settings-title">{settingsT('settings.general.title')}</h2>
+          <HelpTrigger helpId="help.studio.language" data-language-help-trigger />
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" aria-label={settingsT('settings.language.label')}>
-              {settingsT('settings.language.spanish')}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onSelect={() => setDraftLocale('es')}>
-              {settingsT('settings.language.spanish')}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
 
-      <div className="flex items-center justify-end gap-2" data-language-settings-actions>
-        {saved ? <span role="status">{settingsT('settings.language.saved')}</span> : null}
-        <Button variant="ghost" size="sm" onClick={cancel}>
-          {settingsT('settings.language.cancel')}
-        </Button>
-        <Button size="sm" onClick={save}>
-          {settingsT('settings.language.save')}
-        </Button>
-      </div>
-    </section>
+        <div className="ec-topbar-setting-row" data-language-settings>
+          <div>
+            <strong>{settingsT('settings.language.label')}</strong>
+            <p>{settingsT('settings.language.description')}</p>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" aria-label={settingsT('settings.language.label')}>
+                {settingsT('settings.language.spanish')}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => setDraftLocale('es')}>
+                {settingsT('settings.language.spanish')}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        <div className="flex items-center justify-end gap-2" data-language-settings-actions>
+          {saved ? <span role="status">{settingsT('settings.language.saved')}</span> : null}
+          <Button variant="ghost" size="sm" onClick={cancel}>
+            {settingsT('settings.language.cancel')}
+          </Button>
+          <Button size="sm" onClick={save}>
+            {settingsT('settings.language.save')}
+          </Button>
+        </div>
+      </section>
+      <DataIntegrationsSettings />
+    </Fragment>
   );
 }
