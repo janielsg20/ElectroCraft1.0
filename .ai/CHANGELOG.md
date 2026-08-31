@@ -34,9 +34,8 @@ El changelog histórico original hasta M00.8 se preserva sin modificaciones en `
 - La implementación F06 se fusionó a `main` mediante PR `#64`.
 - La PR correctiva `#67` ejecutó Base CI `33203881217`: docs/lint/typecheck/Vitest/build terminaron `success`; Playwright terminó `failure` con seis E2E heredados.
 - La rama F07 posterior incorporó reparaciones para estado vacío de Inspector avanzado, metadata responsive transitoria, solapamiento de topbar, lock contextual y breadcrumbs `App > Pantalla > Node`.
-- Estas reparaciones quedan pendientes de certificación en el siguiente gate de fase; no se registra un GREEN ficticio para el run fallido.
 
-## 2026-08-28 — F07 implementada, candidata a gate
+## 2026-08-29 — F07 completada
 - M07.1 introdujo Route/Navigation v2, migración legacy, graph validation, params, guards y deep links.
 - M07.2 añadió Pantallas CRUD, propiedades, Ruta/Navigator, apertura exacta en Editor y delete blocker por refs.
 - M07.3 convirtió el Editor en Screen Composer orientado a Pantallas con selector compartido, un solo Puck e historial aislado.
@@ -45,5 +44,29 @@ El changelog histórico original hasta M00.8 se preserva sin modificaciones en `
 - M07.6 añadió Acceso Público/Auth/Permiso/Condición, redirects sin loops y Preview fail-closed sin implementar auth real antes de F12.
 - M07.7 añadió `NavigationCompilerPort` y contratos React Router, Expo Router, LAMP/Slim, WordPress, Capacitor y Static Web sin persistir objetos target.
 - M07.8 añadió `/preview` contractual, integración de cuatro Pantallas y Playwright de flujo completo desktop/tablet/mobile.
-- Se registró evidencia para M07.1–M07.8 en `.ai/evidence/F07/`.
-- No se ejecutaron Actions por microfase. La siguiente transición exacta es `Gate F07` sobre `codex/m07-1-navigation-model`.
+- Base CI run `33262949215` (#795) certificó documentación, lint, typecheck, Vitest, build, Playwright, empty-repo y artifacts en `success`.
+- Las reparaciones QA heredadas de F06 quedaron incluidas y certificadas por ese gate.
+- PR `#68` se fusionó a `main` en `e697a42546d23f89412e6dd616018759e719e448`.
+
+## 2026-08-29 — F08 / M08.1 Fuentes de datos y ConnectorRegistry
+- Se creó un owner único `ElectroCraftDataSourceDefinition` en `packages/domain/src/data/source-definition.ts` con environment scope y 11 capability flags canónicos.
+- Aliases legacy `write/filter/paginate/subscribe/files` se normalizan sin crear un segundo contrato.
+- Se endureció la exclusión recursiva de secrets; el proyecto solo conserva configuración portable y `authRef`.
+- `DataSourceAdapter` expone testConnection/listResources/getSchema/query/mutate y `ConnectorRegistry` bloquea operaciones incompatibles fail-closed.
+- `packages/connectors` se incorporó al grafo arquitectónico como paquete estable #20 reutilizando el mismo registry de aplicación.
+- `packages/data-web` añadió `WebDataSourceRepository` sobre el registry existente; no se creó otra base PGlite.
+- Studio añadió `/data-sources` en `apps/studio/src/features/data/` con List/Detail/Inspector responsive, estados honestos y Help `help.data.sources`.
+- Se añadieron tests de registry, security, operation capability, round-trip, repository facade, Help y responsive contract.
+- M08.1 queda implementada con evidencia `.ai/evidence/F08/M08.1/IMPLEMENTATION_2026-08-29.md`; la ejecución completa, regeneración del lockfile y formato se reservan para el Gate F08, sin Actions por microfase.
+
+## 2026-08-29 — F08 / M08.2 ElectroCraft Data sobre PGlite
+- Se añadió `InternalDataSourceAdapter` `internal.pglite` detrás del mismo ConnectorRegistry.
+- `InternalDataRepository` usa la tabla genérica F04 `content_records` para CRUD/query/stats; no crea otra DB ni tablas por modelo.
+- Schema discovery lee `ElectroCraftDataSchema` canónico por `sourceRef` en lugar de introspección física.
+- Browser companion reutiliza `electrocraft-studio-storage`, `pglite.worker.ts`, migraciones y leader-election pattern de F04 y declara `offlineCapable`.
+- Permission boundary inyectable falla cerrado; Studio lo limita al proyecto actualmente abierto sin implementar auth F12.
+- Studio añadió creación directa de `ElectroCraft Data`, estado Local/Disponible sin conexión, Modelos, Registros, almacenamiento aproximado y Copia de seguridad reutilizando F04.
+- Help `help.data.internal`, fixtures, unit test e integración con PGlite real quedaron preparados.
+- Se corrigió el fallback incorrecto que trataba `lastDocumentId` como `projectId`.
+- Evidencia: `.ai/evidence/F08/M08.2/IMPLEMENTATION_2026-08-29.md`.
+- M08.3 queda como siguiente microfase activa; Actions siguen reservadas para Gate F08.

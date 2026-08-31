@@ -8,62 +8,72 @@
 - F03 — Design System, AppShell, español y ayuda: `COMPLETADA / GREEN`.
 - F04 — Persistencia local, proyectos y revisiones: `COMPLETADA / GREEN`.
 - F05 — Screen Composer con Puck: `COMPLETADA / GREEN`.
-- F06 — Layout, responsive y edición avanzada: implementación fusionada a `main`; el cierre de corrección PR `#67` terminó con fallo Playwright heredado y las reparaciones están incluidas en la rama F07 actual.
-- F07 — Pantallas, navegación y rutas: `IN_PROGRESS`; M07.8 ejecuta el gate de cierre.
-- M07.1–M07.7 — Implementación funcional: `IMPLEMENTADA / PENDIENTE GATE F07`.
-- M07.8 — Navigation E2E y UX: `ACTIVE`.
+- F06 — Layout, responsive y edición avanzada: implementación fusionada; reparaciones heredadas certificadas dentro del gate F07.
+- F07 — Pantallas, navegación y rutas: `COMPLETADA / GREEN`.
+- F08 — Fuentes de datos, modelos, registros y conectores: `IN_PROGRESS`.
+- M08.1 — Fuentes de datos y ConnectorRegistry: `IMPLEMENTADA / PENDIENTE GATE F08`.
+- M08.2 — Fuente interna ElectroCraft Data sobre PGlite: `IMPLEMENTADA / PENDIENTE GATE F08`.
+- M08.3 — REST API Connector y OpenAPI import: `ACTIVE`.
 
 ## Rama activa
 
-`codex/m07-1-navigation-model`
+`codex/m08-1-data-sources`
+
+## Gate de entrada F08
+
+F07 cerró con Base CI run `33262949215` (#795) completamente verde y PR `#68` fusionada a `main` en `e697a42546d23f89412e6dd616018759e719e448`.
+
+## M08.1 implementada
+
+- Owner único `ElectroCraftDataSourceDefinition` en `packages/domain/src/data/source-definition.ts`.
+- 11 capability flags canónicos y aliases legacy solo para migración.
+- Secrets excluidos recursivamente del payload; `authRef` conserva solo referencia.
+- `DataSourceAdapter` + único `ConnectorRegistry` fail-closed por adapter/kind/capability/environment.
+- `packages/connectors` registrado como paquete estable #20.
+- `packages/data-web` consume el registry mediante `WebDataSourceRepository`.
+- `/data-sources` usa `apps/studio/src/features/data/` con List/Detail/Inspector responsive y `help.data.sources`.
+
+## M08.2 implementada
+
+- `InternalDataSourceAdapter` `internal.pglite` sobre PGlite + Drizzle.
+- Reutiliza la tabla genérica F04 `content_records`; no crea otra base ni una tabla por modelo.
+- `InternalDataRepository` expone CRUD/query/stats y schema discovery desde `ElectroCraftDataSchema` canónico.
+- Browser companion usa el mismo `electrocraft-studio-storage`, worker, migraciones y leader-election pattern de F04.
+- Permission port inyectable fail-closed; Studio restringe al proyecto actualmente abierto sin adelantar F12.
+- Studio ofrece `Crear ElectroCraft Data`, `Local`, `Disponible sin conexión`, Modelos, Registros, tamaño aproximado y Copia de seguridad.
+- Help `help.data.internal`.
+- Fixtures + unit tests + integración PGlite real preparados.
+
+## M08.3 implementación actual
+
+- `RestDataSourceAdapter` implementado con Fetch, timeout, params tipados, normalización 4xx/5xx/pagination y fallback a ConnectorGateway.
+- `OpenAPI import adapter` implementado con `@scalar/openapi-parser@0.28.11`.
+- `packages/connectors` expone públicamente REST/OpenAPI.
+- Studio registra `rest.fetch` en el mismo `ConnectorRegistry`.
+- Wizard REST funcional de seis pasos: Endpoint base → Autenticación → OpenAPI/Manual → Operaciones → Probar → Guardar.
+- Help específico `help.data.rest` enlazado al wizard.
+- Fixtures REST/OpenAPI y tests M08.3 preparados.
+- Evidencia: `.ai/evidence/F08/M08.3/IMPLEMENTATION_2026-08-29.md`.
 
 ## Microfase activa
 
-`M07.8 — Navigation E2E y UX` permanece `ACTIVE` mientras se ejecuta el Gate F07. Su implementación está completa, pero la microfase no se cierra hasta que la fase obtenga `docs + lint + typecheck + test + build + Playwright` en verde.
+`M08.3 — REST API Connector y OpenAPI import` — `ACTIVE`.
 
-## Capacidades F07 implementadas
+Owner aprobado: Web Fetch API + DataSourceAdapter + `@scalar/openapi-parser@0.28.11`.
 
-1. `ElectroCraftRoute` y `ElectroCraftNavigation` v2 con migración legacy, params, guards, deep links y graph validation.
-2. Pantallas CRUD en `Construir > Pantallas`, rutas/navigator asociados, duplicación con IDs nuevos y delete blocker por referencias.
-3. Screen Composer orientado a Pantallas con selector compartido topbar/context/mobile, un único Puck e historial aislado por documento.
-4. Navigation Builder tree para Pila/Pestañas/Menú lateral/Modal, reordenación drag + teclado, Pantalla inicial y presentación portable.
-5. Bindings de Route Param, acciones Navegar `push|replace|back`, ActionGraph real y URL externa http/https separada.
-6. Guards Público/Autenticado/Permiso/Condición, redirects sin ciclos y Preview fail-closed sin implementar auth real antes de F12.
-7. `NavigationCompilerPort` con contratos React Router, Expo Router, LAMP/Slim, WordPress, Capacitor y Static Web sin persistir objetos target.
-8. `/preview` consume el mismo Navigation Graph; integración y Playwright F07 cubren desktop/tablet/mobile y el flujo crear → navegar → proteger → preview → bloquear delete.
+## Validación pendiente de microfase/fase
 
-## QA heredado F06
+- El contenedor de esta sesión no resuelve `github.com`; no se pudo clonar/instalar el workspace para ejecutar la suite real.
+- No se ejecutan Actions por microfase.
+- El descriptor específico `help.data.rest` ya está integrado; antes de cerrar M08.3 falta una validación ejecutable lint/typecheck/Vitest/build.
+- Antes del Gate F08 deben regenerarse `package-lock.json`, ampliar `format/format:check` a connectors/data-web y ejecutar el gate transversal una sola vez.
 
-Run de corrección: `33203881217`, job `99035169190`.
+## Evidencia F08
 
-Resultado histórico:
-- docs: success;
-- lint: success;
-- typecheck: success;
-- Vitest: success;
-- build: success;
-- Playwright: failure.
+- `.ai/evidence/F08/M08.1/IMPLEMENTATION_2026-08-29.md`
+- `.ai/evidence/F08/M08.2/IMPLEMENTATION_2026-08-29.md`
+- `.ai/evidence/F08/M08.3/IMPLEMENTATION_2026-08-29.md`
 
-Reparaciones incluidas en la rama actual antes de Gate F07:
-- advanced inspector sin selección valida estado vacío en lugar de exigir controles imposibles;
-- metadata responsive transitoria de Puck se permite en la sesión pero se comprueba que no llegue al documento canónico;
-- topbar compacta herramientas secundarias a 1536–1700px y conserva Undo/Redo sin solapamiento;
-- lock contextual sobrevive `refreshPermissions()` y se reinicia solo al cambiar la sesión de Pantalla;
-- breadcrumbs actualizados a `App > Pantalla > Node`.
+## Siguiente transición
 
-Ninguna de estas reparaciones se declara GREEN hasta completar M07.8 mediante Gate F07.
-
-## Evidencia F07
-
-- `.ai/evidence/F07/M07.1/IMPLEMENTATION_2026-08-28.md`
-- `.ai/evidence/F07/M07.2/IMPLEMENTATION_2026-08-28.md`
-- `.ai/evidence/F07/M07.3/IMPLEMENTATION_2026-08-28.md`
-- `.ai/evidence/F07/M07.4/IMPLEMENTATION_2026-08-28.md`
-- `.ai/evidence/F07/M07.5/IMPLEMENTATION_2026-08-28.md`
-- `.ai/evidence/F07/M07.6/IMPLEMENTATION_2026-08-28.md`
-- `.ai/evidence/F07/M07.7/IMPLEMENTATION_2026-08-28.md`
-- `.ai/evidence/F07/M07.8/IMPLEMENTATION_2026-08-28.md`
-
-## Regla de cierre
-
-No marcar M07.8 ni F07 `COMPLETADA / GREEN` ni activar F08 hasta que el gate de fase termine `success` y blockers P0/P1 = 0.
+Cerrar el pendiente real de M08.3: validación ejecutable lint/typecheck/Vitest/build. Corregir solo errores reales y mantener M08.3 como única `ACTIVE`; no activar M08.4 antes de evidencia verde.

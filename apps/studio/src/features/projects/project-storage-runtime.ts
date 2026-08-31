@@ -15,8 +15,18 @@ const service = createProjectStorageService(port);
 const revisionService = createProjectRevisionService(port.revisions);
 const backupService = createProjectBackupService(service);
 const listeners = new Set<() => void>();
+const CURRENT_PROJECT_SESSION_KEY = 'electrocraft.studio.currentProjectId.v1';
 
 export const workspacePreferencesStoragePort = port.workspacePreferences;
+
+function readCurrentProjectId() {
+  try {
+    const value = globalThis.sessionStorage?.getItem(CURRENT_PROJECT_SESSION_KEY)?.trim();
+    return value || null;
+  } catch {
+    return null;
+  }
+}
 
 let snapshot: ProjectStorageDiagnostics = Object.freeze({
   state: 'initial',
@@ -30,7 +40,20 @@ let snapshot: ProjectStorageDiagnostics = Object.freeze({
   message: 'Almacenamiento local pendiente de inicialización.',
 });
 let initializePromise: Promise<ProjectStorageDiagnostics> | null = null;
-let currentProjectId: string | null = null;
+let currentProjectId: string | null = readCurrentProjectId();
+
+function rememberCurrentProjectId(projectId: string | null) {
+  currentProjectId = projectId;
+  try {
+    if (projectId) {
+      globalThis.sessionStorage?.setItem(CURRENT_PROJECT_SESSION_KEY, projectId);
+    } else {
+      globalThis.sessionStorage?.removeItem(CURRENT_PROJECT_SESSION_KEY);
+    }
+  } catch {
+    // Session persistence is best-effort; storage APIs may be unavailable or blocked.
+  }
+}
 
 function publish(next: ProjectStorageDiagnostics) {
   snapshot = next;
@@ -112,12 +135,12 @@ export const projectStorageRuntime = Object.freeze({
   },
   async saveProject(request: SaveProjectRequest) {
     const revision = await runPersistence(() => service.saveProject(request));
-    currentProjectId = request.project.id;
+    rememberCurrentProjectId(request.project.id);
     autosave.noteCheckpointCommitted();
     return revision;
   },
   queueAutosave(request: IncrementalSaveProjectRequest) {
-    currentProjectId = request.project.id;
+    rememberCurrentProjectId(request.project.id);
     return autosave.queue(request);
   },
   flushAutosave: () => autosave.flush(),
@@ -140,14 +163,14 @@ export const projectStorageRuntime = Object.freeze({
   async saveRevision(projectId: string) {
     await autosave.flush();
     const revision = await revisionService.saveRevision(projectId);
-    currentProjectId = projectId;
+    rememberCurrentProjectId(projectId);
     autosave.noteCheckpointCommitted();
     return revision;
   },
   async restoreRevisionFromHistory(projectId: string, revisionId: string) {
     await autosave.flush();
     const result = await revisionService.restore(projectId, revisionId);
-    currentProjectId = projectId;
+    rememberCurrentProjectId(projectId);
     autosave.noteCheckpointCommitted();
     return result;
   },
@@ -159,13 +182,17 @@ export const projectStorageRuntime = Object.freeze({
   async importBackup(serialized: string, collisionStrategy: ProjectBackupCollisionStrategy = 'copy') {
     await autosave.flush();
     const result = await runPersistence(() => backupService.importBackup(serialized, collisionStrategy));
-    currentProjectId = result.projectId;
+    rememberCurrentProjectId(result.projectId);
     autosave.noteCheckpointCommitted();
     return result;
   },
   async openProject(projectId: string) {
     const opened = await service.openProject(projectId);
-    if (opened) currentProjectId = opened.project.id;
+    if (opened) {
+      rememberCurrentProjectId(opened.project.id);
+    } else if (currentProjectId === projectId) {
+      rememberCurrentProjectId(null);
+    }
     return opened;
   },
   verifyProject: service.verifyProject,
@@ -180,7 +207,7 @@ export const projectStorageRuntime = Object.freeze({
   async restoreRevision(projectId: string, revisionId: string) {
     await autosave.flush();
     const result = await revisionService.restore(projectId, revisionId);
-    currentProjectId = projectId;
+    rememberCurrentProjectId(projectId);
     autosave.noteCheckpointCommitted();
     return result.currentRevision;
   },

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "ec_schema_0000000000082",
+  "version": 1,
+  "sourceRef": "ec_source_0000000000082",
+  "name": "ElectroCraft Data",
+  "models": [
+    {
+      "id": "ec_model_0000000000082",
+      "key": "product",
+      "label": "Producto",
+      "fields": [
+        {
+          "id": "ec_field_0000000000082",
+          "key": "name",
+          "label": "Nombre",
+          "type": "text",
+          "nullable": false,
+          "indexed": false,
+          "faceted": false,
+          "relationModelRef": null,
+          "metadata": {}
+        },
+        {
+          "id": "ec_field_0000000000083",
+          "key": "price",
+          "label": "Precio",
+          "type": "number",
+          "nullable": false,
+          "indexed": true,
+          "faceted": false,
+          "relationModelRef": null,
+          "metadata": {}
+        }
+      ],
+      "metadata": {}
+    }
+  ],
+  "metadata": {
+    "fixture": "m08.2"
+  }
+}

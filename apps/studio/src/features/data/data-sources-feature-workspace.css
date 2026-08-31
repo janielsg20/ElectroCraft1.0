@@ -1,0 +1,121 @@
+.ec-data-sources-feature-workspace {
+  display: flex;
+  min-height: 0;
+  height: 100%;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.ec-internal-data-overview {
+  display: grid;
+  gap: 10px;
+  margin: 12px 20px 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--foreground) 7%, transparent);
+}
+
+.ec-internal-data-heading,
+.ec-internal-data-title-row,
+.ec-internal-data-badges,
+.ec-internal-data-actions {
+  display: flex;
+  align-items: center;
+}
+
+.ec-internal-data-heading {
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ec-internal-data-heading p,
+.ec-internal-data-status {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 11px;
+}
+
+.ec-internal-data-title-row {
+  gap: 6px;
+}
+
+.ec-internal-data-title-row h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.ec-internal-data-badges,
+.ec-internal-data-actions {
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ec-internal-data-badges span {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ec-internal-data-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.ec-internal-data-metrics section {
+  display: grid;
+  gap: 3px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  background: var(--muted);
+}
+
+.ec-internal-data-metrics span {
+  color: var(--muted-foreground);
+  font-size: 11px;
+}
+
+.ec-internal-data-metrics strong {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.ec-data-sources-feature-base {
+  min-height: 0;
+  flex: 1;
+}
+
+@media (max-width: 980px) {
+  .ec-internal-data-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .ec-internal-data-overview {
+    margin: 8px 12px 0;
+  }
+
+  .ec-internal-data-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ec-internal-data-metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 460px) {
+  .ec-internal-data-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .ec-internal-data-actions > * {
+    min-height: 44px;
+  }
+}

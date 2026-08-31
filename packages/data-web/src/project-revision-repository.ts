@@ -173,7 +173,9 @@ async function createReferenceRevision(
         checksum: object.checksum,
         createdAt: new Date(object.updatedAt),
       })
-      .onConflictDoNothing({ target: [schema.projectObjectVersions.projectId, schema.projectObjectVersions.versionId] });
+      .onConflictDoNothing({
+        target: [schema.projectObjectVersions.projectId, schema.projectObjectVersions.versionId],
+      });
     references.push(
       Object.freeze({
         objectId: object.objectId,

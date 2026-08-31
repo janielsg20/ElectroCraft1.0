@@ -1,10 +1,22 @@
-import type {
-  ElectroCraftDataSourceDefinition,
-  ElectroCraftObjectId,
-  ElectroCraftQueryDefinition,
-  ElectroCraftQueryResult,
-  JsonValue,
+import {
+  isDataSourceEnvironmentEnabled,
+  normalizeDataSourceCapabilities,
+  resolveDataSourceConfig,
+  type ElectroCraftCanonicalDataSourceCapability,
+  type ElectroCraftDataSourceDefinition,
+  type ElectroCraftDataSourceEnvironment,
+  type ElectroCraftObjectId,
+  type ElectroCraftQueryDefinition,
+  type ElectroCraftQueryResult,
+  type JsonValue,
 } from '@electrocraft/domain';
+import type {
+  DataSourceAdapter,
+  DataSourceAdapterContext,
+  DataSourceMutationRequest,
+  DataSourceQueryRequest,
+  DataSourceResourceDescriptor,
+} from './data';
 
 export interface DataConnectorExecutionRequest {
   source: ElectroCraftDataSourceDefinition;
@@ -22,7 +34,29 @@ export interface ElectroCraftDataConnector {
 }
 
 export type ConnectorRegistryBlockedCode =
-  'CONNECTOR_NOT_REGISTERED' | 'ADAPTER_ID_MISMATCH' | 'CONNECTOR_EXECUTION_FAILED';
+  | 'CONNECTOR_NOT_REGISTERED'
+  | 'ADAPTER_NOT_REGISTERED'
+  | 'ADAPTER_ID_MISMATCH'
+  | 'CONNECTOR_EXECUTION_FAILED'
+  | 'ADAPTER_INCOMPATIBLE'
+  | 'UNSUPPORTED_OPERATION';
+
+export type ConnectorCompatibilityDiagnosticCode =
+  'UNKNOWN_ADAPTER' | 'UNSUPPORTED_DATA_SOURCE_KIND' | 'UNSUPPORTED_CAPABILITY';
+
+export interface ConnectorCompatibilityDiagnostic {
+  readonly code: ConnectorCompatibilityDiagnosticCode;
+  readonly adapterId: string;
+  readonly sourceId: ElectroCraftObjectId;
+  readonly capability?: ElectroCraftCanonicalDataSourceCapability;
+  readonly message: string;
+}
+
+interface ConnectorRegistryEntry {
+  readonly adapterId: string;
+  connector?: ElectroCraftDataConnector;
+  adapter?: DataSourceAdapter;
+}
 
 export class ConnectorRegistryError extends Error {
   constructor(
@@ -35,28 +69,55 @@ export class ConnectorRegistryError extends Error {
   }
 }
 
+function validateAdapterId(adapterId: string) {
+  if (adapterId.trim() !== adapterId || !/^[a-z][a-z0-9.-]{1,119}$/.test(adapterId)) {
+    throw new ConnectorRegistryError('ADAPTER_ID_MISMATCH', 'connector adapterId is invalid', { adapterId });
+  }
+}
+
 export class ConnectorRegistry {
-  private readonly connectors = new Map<string, ElectroCraftDataConnector>();
+  private readonly entries = new Map<string, ConnectorRegistryEntry>();
 
   register(connector: ElectroCraftDataConnector): void {
-    if (connector.adapterId.trim() !== connector.adapterId || connector.adapterId.length < 2) {
-      throw new ConnectorRegistryError('ADAPTER_ID_MISMATCH', 'connector adapterId is invalid', {
-        adapterId: connector.adapterId,
-      });
-    }
-    this.connectors.set(connector.adapterId, connector);
+    validateAdapterId(connector.adapterId);
+    const current = this.entries.get(connector.adapterId);
+    this.entries.set(connector.adapterId, { adapterId: connector.adapterId, ...current, connector });
+  }
+
+  registerAdapter(adapter: DataSourceAdapter): void {
+    validateAdapterId(adapter.adapterId);
+    const current = this.entries.get(adapter.adapterId);
+    this.entries.set(adapter.adapterId, { adapterId: adapter.adapterId, ...current, adapter });
   }
 
   unregister(adapterId: string): boolean {
-    return this.connectors.delete(adapterId);
+    return this.entries.delete(adapterId);
   }
 
   has(adapterId: string): boolean {
-    return this.connectors.has(adapterId);
+    return this.entries.has(adapterId);
+  }
+
+  list() {
+    return Object.freeze(
+      [...this.entries.values()]
+        .map((entry) =>
+          Object.freeze({
+            adapterId: entry.adapterId,
+            displayName: entry.adapter?.displayName ?? entry.adapterId,
+            capabilities: Object.freeze([...(entry.adapter?.capabilities ?? [])]),
+            supportedDataSourceKinds: Object.freeze([...(entry.adapter?.supportedDataSourceKinds ?? [])]),
+            supportsSchemaDiscovery: entry.adapter?.supportsSchemaDiscovery ?? false,
+            connectorRegistered: Boolean(entry.connector),
+            adapterRegistered: Boolean(entry.adapter),
+          }),
+        )
+        .sort((left, right) => left.displayName.localeCompare(right.displayName)),
+    );
   }
 
   resolve(source: ElectroCraftDataSourceDefinition): ElectroCraftDataConnector {
-    const connector = this.connectors.get(source.adapterId);
+    const connector = this.entries.get(source.adapterId)?.connector;
     if (!connector) {
       throw new ConnectorRegistryError('CONNECTOR_NOT_REGISTERED', 'no connector registered for data source adapter', {
         sourceId: source.id,
@@ -73,6 +134,158 @@ export class ConnectorRegistry {
     return connector;
   }
 
+  resolveAdapter(source: ElectroCraftDataSourceDefinition): DataSourceAdapter {
+    const adapter = this.entries.get(source.adapterId)?.adapter;
+    if (!adapter) {
+      throw new ConnectorRegistryError('ADAPTER_NOT_REGISTERED', 'no DataSourceAdapter registered for data source', {
+        sourceId: source.id,
+        adapterId: source.adapterId,
+      });
+    }
+    return adapter;
+  }
+
+  validateCompatibility(source: ElectroCraftDataSourceDefinition): readonly ConnectorCompatibilityDiagnostic[] {
+    const entry = this.entries.get(source.adapterId);
+    if (!entry) {
+      return Object.freeze([
+        {
+          code: 'UNKNOWN_ADAPTER' as const,
+          adapterId: source.adapterId,
+          sourceId: source.id,
+          message: `Adapter ${source.adapterId} is not registered.`,
+        },
+      ]);
+    }
+    if (!entry.adapter) return Object.freeze([]);
+
+    const diagnostics: ConnectorCompatibilityDiagnostic[] = [];
+    if (!entry.adapter.supportedDataSourceKinds.includes(source.kind)) {
+      diagnostics.push({
+        code: 'UNSUPPORTED_DATA_SOURCE_KIND',
+        adapterId: source.adapterId,
+        sourceId: source.id,
+        message: `Adapter ${source.adapterId} does not support ${source.kind} data sources.`,
+      });
+    }
+    for (const capability of normalizeDataSourceCapabilities(source.capabilities)) {
+      if (!entry.adapter.capabilities.includes(capability)) {
+        diagnostics.push({
+          code: 'UNSUPPORTED_CAPABILITY',
+          adapterId: source.adapterId,
+          sourceId: source.id,
+          capability,
+          message: `Adapter ${source.adapterId} does not support ${capability}.`,
+        });
+      }
+    }
+    return Object.freeze(diagnostics);
+  }
+
+  assertCompatibility(source: ElectroCraftDataSourceDefinition): void {
+    const diagnostics = this.validateCompatibility(source);
+    if (diagnostics.length > 0) {
+      throw new ConnectorRegistryError('ADAPTER_INCOMPATIBLE', 'data source adapter is not compatible', {
+        sourceId: source.id,
+        adapterId: source.adapterId,
+        diagnostics,
+      });
+    }
+  }
+
+  assertOperation(
+    source: ElectroCraftDataSourceDefinition,
+    capability: ElectroCraftCanonicalDataSourceCapability,
+  ): void {
+    const declared = normalizeDataSourceCapabilities(source.capabilities);
+    if (!declared.includes(capability)) {
+      throw new ConnectorRegistryError(
+        'UNSUPPORTED_OPERATION',
+        'data source does not declare the requested capability',
+        {
+          sourceId: source.id,
+          adapterId: source.adapterId,
+          capability,
+        },
+      );
+    }
+    const adapter = this.resolveAdapter(source);
+    if (!adapter.capabilities.includes(capability)) {
+      throw new ConnectorRegistryError(
+        'UNSUPPORTED_OPERATION',
+        'data source adapter does not support the requested capability',
+        {
+          sourceId: source.id,
+          adapterId: source.adapterId,
+          capability,
+        },
+      );
+    }
+  }
+
+  createAdapterContext(
+    source: ElectroCraftDataSourceDefinition,
+    environment: ElectroCraftDataSourceEnvironment,
+  ): DataSourceAdapterContext {
+    this.assertCompatibility(source);
+    if (!isDataSourceEnvironmentEnabled(source, environment)) {
+      throw new ConnectorRegistryError(
+        'ADAPTER_INCOMPATIBLE',
+        'data source is disabled for the requested environment',
+        {
+          sourceId: source.id,
+          adapterId: source.adapterId,
+          environment,
+        },
+      );
+    }
+    return Object.freeze({ source, environment, config: resolveDataSourceConfig(source, environment) });
+  }
+
+  async testConnection(source: ElectroCraftDataSourceDefinition, environment: ElectroCraftDataSourceEnvironment) {
+    const adapter = this.resolveAdapter(source);
+    return adapter.testConnection(this.createAdapterContext(source, environment));
+  }
+
+  async listResources(
+    source: ElectroCraftDataSourceDefinition,
+    environment: ElectroCraftDataSourceEnvironment,
+  ): Promise<readonly DataSourceResourceDescriptor[]> {
+    this.assertOperation(source, 'read');
+    const adapter = this.resolveAdapter(source);
+    return adapter.listResources(this.createAdapterContext(source, environment));
+  }
+
+  async introspectSchema(source: ElectroCraftDataSourceDefinition, environment: ElectroCraftDataSourceEnvironment) {
+    const adapter = this.resolveAdapter(source);
+    if (!adapter.supportsSchemaDiscovery) return null;
+    return adapter.getSchema(this.createAdapterContext(source, environment));
+  }
+
+  async query(
+    source: ElectroCraftDataSourceDefinition,
+    environment: ElectroCraftDataSourceEnvironment,
+    request: DataSourceQueryRequest,
+  ): Promise<JsonValue> {
+    const required = new Set<ElectroCraftCanonicalDataSourceCapability>([
+      'read',
+      ...(request.requiredCapabilities ?? []),
+    ]);
+    for (const capability of required) this.assertOperation(source, capability);
+    const adapter = this.resolveAdapter(source);
+    return adapter.query(this.createAdapterContext(source, environment), request);
+  }
+
+  async mutate(
+    source: ElectroCraftDataSourceDefinition,
+    environment: ElectroCraftDataSourceEnvironment,
+    request: DataSourceMutationRequest,
+  ): Promise<JsonValue> {
+    this.assertOperation(source, request.operation);
+    const adapter = this.resolveAdapter(source);
+    return adapter.mutate(this.createAdapterContext(source, environment), request);
+  }
+
   async execute(request: DataConnectorExecutionRequest): Promise<ElectroCraftQueryResult> {
     const connector = this.resolve(request.source);
     try {
@@ -87,3 +300,5 @@ export class ConnectorRegistry {
     }
   }
 }
+
+export const dataSourceConnectorRegistry = new ConnectorRegistry();

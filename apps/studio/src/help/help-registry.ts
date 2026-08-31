@@ -16,6 +16,9 @@ export type StudioHelpId =
   | 'help.navigation.guards'
   | 'help.navigation.compiler'
   | 'help.screens'
+  | 'help.data.sources'
+  | 'help.data.internal'
+  | 'help.data.rest'
   | `help.section.${SidebarNavigationItemId}`;
 
 export interface HelpDescriptor {
@@ -68,6 +71,19 @@ function resolveDefinition(definition: HelpDefinition): HelpDescriptor {
   });
 }
 
+function sectionKeys(section: SidebarNavigationItemId) {
+  return Object.freeze({
+    titleKey: helpKey(`help.section.${section}.title`),
+    shortKey: helpKey(`help.section.${section}.short`),
+    longKey: helpKey(`help.section.${section}.long`),
+    exampleKeys: Object.freeze([helpKey(`help.section.${section}.example`)]),
+  });
+}
+
+const navigationKeys = sectionKeys('navigation');
+const dataSourceKeys = sectionKeys('data-sources');
+const screensKeys = sectionKeys('screens');
+
 const studioDefinitions = Object.freeze([
   {
     id: 'help.studio.shell',
@@ -114,17 +130,11 @@ const studioDefinitions = Object.freeze([
       'almacenamiento',
       'pglite',
       'drizzle',
-      'opfs',
-      'indexeddb',
       'persistencia',
       'autosave',
       'checkpoint',
       'restaurar',
-      'reparar',
       'workspace',
-      'preferencias',
-      'layout',
-      'sidebar',
       'multi-tab',
     ],
     learnMoreRef: '.ai/microphases/M04_7.md',
@@ -145,10 +155,7 @@ const studioDefinitions = Object.freeze([
     id: 'help.editor.screens',
     sectionId: 'editor-screens',
     navigationItemId: 'editor',
-    titleKey: helpKey('help.section.editor.title'),
-    shortKey: helpKey('help.section.editor.short'),
-    longKey: helpKey('help.section.editor.long'),
-    exampleKeys: [helpKey('help.section.editor.example')],
+    ...sectionKeys('editor'),
     relatedIds: ['help.screens', 'help.navigation.builder', 'help.editor.advanced'],
     keywords: ['editor', 'pantalla', 'pantallas', 'screen composer', 'puck', 'plataforma', 'dispositivo', 'breakpoint'],
     learnMoreRef: '.ai/microphases/M07_3.md',
@@ -157,10 +164,7 @@ const studioDefinitions = Object.freeze([
     id: 'help.navigation',
     sectionId: 'navigation-graph',
     navigationItemId: 'navigation',
-    titleKey: helpKey('help.section.navigation.title'),
-    shortKey: helpKey('help.section.navigation.short'),
-    longKey: helpKey('help.section.navigation.long'),
-    exampleKeys: [helpKey('help.section.navigation.example')],
+    ...navigationKeys,
     relatedIds: [
       'help.navigation.builder',
       'help.navigation.routes',
@@ -186,10 +190,7 @@ const studioDefinitions = Object.freeze([
     id: 'help.navigation.builder',
     sectionId: 'navigation-builder',
     navigationItemId: 'navigation',
-    titleKey: helpKey('help.section.navigation.title'),
-    shortKey: helpKey('help.section.navigation.short'),
-    longKey: helpKey('help.section.navigation.long'),
-    exampleKeys: [helpKey('help.section.navigation.example')],
+    ...navigationKeys,
     relatedIds: ['help.navigation', 'help.navigation.routes', 'help.screens'],
     keywords: [
       'navigation builder',
@@ -208,10 +209,7 @@ const studioDefinitions = Object.freeze([
     id: 'help.navigation.routes',
     sectionId: 'navigation-routes',
     navigationItemId: 'navigation',
-    titleKey: helpKey('help.section.navigation.title'),
-    shortKey: helpKey('help.section.navigation.short'),
-    longKey: helpKey('help.section.navigation.long'),
-    exampleKeys: [helpKey('help.section.navigation.example')],
+    ...navigationKeys,
     relatedIds: ['help.navigation.builder', 'help.navigation.guards', 'help.section.workflows'],
     keywords: [
       'rutas',
@@ -230,10 +228,7 @@ const studioDefinitions = Object.freeze([
     id: 'help.navigation.guards',
     sectionId: 'navigation-guards',
     navigationItemId: 'navigation',
-    titleKey: helpKey('help.section.navigation.title'),
-    shortKey: helpKey('help.section.navigation.short'),
-    longKey: helpKey('help.section.navigation.long'),
-    exampleKeys: [helpKey('help.section.navigation.example')],
+    ...navigationKeys,
     relatedIds: ['help.navigation.routes', 'help.navigation', 'help.section.users'],
     keywords: [
       'acceso',
@@ -253,10 +248,7 @@ const studioDefinitions = Object.freeze([
     id: 'help.navigation.compiler',
     sectionId: 'navigation-compiler',
     navigationItemId: 'navigation',
-    titleKey: helpKey('help.section.navigation.title'),
-    shortKey: helpKey('help.section.navigation.short'),
-    longKey: helpKey('help.section.navigation.long'),
-    exampleKeys: [helpKey('help.section.navigation.example')],
+    ...navigationKeys,
     relatedIds: ['help.navigation', 'help.section.compatibility', 'help.section.export'],
     keywords: [
       'compiler',
@@ -276,18 +268,82 @@ const studioDefinitions = Object.freeze([
     id: 'help.screens',
     sectionId: 'screens-management',
     navigationItemId: 'screens',
-    titleKey: helpKey('help.section.screens.title'),
-    shortKey: helpKey('help.section.screens.short'),
-    longKey: helpKey('help.section.screens.long'),
-    exampleKeys: [helpKey('help.section.screens.example')],
+    ...screensKeys,
     relatedIds: ['help.navigation.builder', 'help.editor.screens'],
     keywords: ['pantallas', 'screen', 'ruta', 'navigator', 'plantilla', 'estado', 'duplicar', 'abrir en editor'],
     learnMoreRef: '.ai/microphases/M07_2.md',
   },
+  {
+    id: 'help.data.sources',
+    sectionId: 'data-sources-management',
+    navigationItemId: 'data-sources',
+    ...dataSourceKeys,
+    relatedIds: [
+      'help.data.internal',
+      'help.data.rest',
+      'help.section.queries',
+      'help.section.records',
+      'help.projects',
+    ],
+    keywords: [
+      'fuentes de datos',
+      'data sources',
+      'connector registry',
+      'adapter',
+      'capabilities',
+      'authref',
+      'credenciales',
+      'gateway',
+      'esquema',
+      'entornos',
+      'seguridad',
+    ],
+    learnMoreRef: '.ai/microphases/M08_1.md',
+  },
+  {
+    id: 'help.data.internal',
+    sectionId: 'data-internal',
+    navigationItemId: 'data-sources',
+    ...dataSourceKeys,
+    relatedIds: ['help.data.sources', 'help.data.rest', 'help.section.models', 'help.section.records', 'help.projects'],
+    keywords: [
+      'electrocraft data',
+      'pglite',
+      'drizzle',
+      'local',
+      'offline',
+      'disponible sin conexión',
+      'modelos',
+      'registros',
+      'content_records',
+      'copia de seguridad',
+    ],
+    learnMoreRef: '.ai/microphases/M08_2.md',
+  },
+  {
+    id: 'help.data.rest',
+    sectionId: 'data-rest',
+    navigationItemId: 'data-sources',
+    ...dataSourceKeys,
+    relatedIds: ['help.data.sources', 'help.data.internal', 'help.section.queries'],
+    keywords: [
+      'rest api',
+      'openapi',
+      'swagger',
+      'endpoint',
+      'secretref',
+      'connectorgateway',
+      'cors',
+      'fetch',
+      'operaciones',
+      'autenticación',
+    ],
+    learnMoreRef: '.ai/microphases/M08_3.md',
+  },
 ] as const satisfies readonly HelpDefinition[]);
 
 const navigationKeywords: Readonly<Record<SidebarNavigationItemId, readonly string[]>> = Object.freeze({
-  editor: ['editor', 'lienzo', 'canvas', 'inspector', 'puck'],
+  editor: ['editor', 'lienzo', 'canvas', 'inspector', 'puck', 'construir'],
   screens: ['pantallas', 'screens', 'rutas'],
   components: ['componentes', 'palette', 'puck', 'widgets'],
   templates: ['plantillas', 'templates', 'reutilizar'],
@@ -320,7 +376,8 @@ const navigationRelated: Partial<Record<SidebarNavigationItemId, readonly Studio
   components: ['help.section.editor', 'help.section.templates'],
   records: ['help.section.models', 'help.section.queries', 'help.section.forms'],
   models: ['help.section.records', 'help.section.forms'],
-  queries: ['help.section.records', 'help.section.data-sources'],
+  'data-sources': ['help.data.sources', 'help.data.internal', 'help.data.rest', 'help.section.queries'],
+  queries: ['help.section.records', 'help.data.sources'],
   forms: ['help.section.models', 'help.section.workflows'],
   themes: ['help.studio.appearance', 'help.section.tokens'],
   preview: ['help.section.compatibility', 'help.section.export'],
@@ -337,10 +394,7 @@ const navigationDefinitions: readonly HelpDefinition[] = navigationItemIds.map((
   id: `help.section.${itemId}` as StudioHelpId,
   sectionId: itemId,
   navigationItemId: itemId,
-  titleKey: helpKey(`help.section.${itemId}.title`),
-  shortKey: helpKey(`help.section.${itemId}.short`),
-  longKey: helpKey(`help.section.${itemId}.long`),
-  exampleKeys: [helpKey(`help.section.${itemId}.example`)],
+  ...sectionKeys(itemId),
   relatedIds: navigationRelated[itemId] ?? ['help.studio.shell'],
   keywords: navigationKeywords[itemId],
 }));
@@ -369,6 +423,7 @@ export function getHelpIdForNavigationItem(itemId: SidebarNavigationItemId): Stu
   if (itemId === 'editor') return 'help.editor.screens';
   if (itemId === 'screens') return 'help.screens';
   if (itemId === 'navigation') return 'help.navigation.builder';
+  if (itemId === 'data-sources') return 'help.data.sources';
   return `help.section.${itemId}`;
 }
 

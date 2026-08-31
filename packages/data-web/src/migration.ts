@@ -213,10 +213,5 @@ export async function applyStudioStorageMigrations(client: PGliteMigrationClient
   await applyMigration(client, 2, M04_3_MIGRATION_CHECKSUM, M04_3_INCREMENTAL_SQL);
   await applyMigration(client, 3, M04_4_MIGRATION_CHECKSUM, M04_4_PROJECT_HOME_SQL);
   await applyMigration(client, 4, M04_6_REFERENTIAL_INTEGRITY_CHECKSUM, M04_6_REFERENTIAL_INTEGRITY_SQL);
-  await applyMigration(
-    client,
-    STUDIO_STORAGE_SCHEMA_VERSION,
-    M04_8_REVISION_STORE_CHECKSUM,
-    M04_8_REVISION_STORE_SQL,
-  );
+  await applyMigration(client, STUDIO_STORAGE_SCHEMA_VERSION, M04_8_REVISION_STORE_CHECKSUM, M04_8_REVISION_STORE_SQL);
 }

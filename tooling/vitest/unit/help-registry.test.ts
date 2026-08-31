@@ -20,6 +20,9 @@ const studioScopedHelpIds = [
   'help.navigation.guards',
   'help.navigation.compiler',
   'help.screens',
+  'help.data.sources',
+  'help.data.internal',
+  'help.data.rest',
 ] as const;
 
 describe('M03.11 typed HelpRegistry', () => {
@@ -50,6 +53,27 @@ describe('M03.11 typed HelpRegistry', () => {
     expect(searchStudioHelp('enlace profundo').some((entry) => entry.id === 'help.navigation.routes')).toBe(true);
     expect(searchStudioHelp('iniciar sesión').some((entry) => entry.id === 'help.navigation.guards')).toBe(true);
     expect(searchStudioHelp('expo router').some((entry) => entry.id === 'help.navigation.compiler')).toBe(true);
+    expect(searchStudioHelp('connector registry').some((entry) => entry.id === 'help.data.sources')).toBe(true);
+    expect(searchStudioHelp('electrocraft data').some((entry) => entry.id === 'help.data.internal')).toBe(true);
+    expect(searchStudioHelp('disponible sin conexión').some((entry) => entry.id === 'help.data.internal')).toBe(true);
+    expect(searchStudioHelp('openapi').some((entry) => entry.id === 'help.data.rest')).toBe(true);
+    expect(searchStudioHelp('connectorgateway').some((entry) => entry.id === 'help.data.rest')).toBe(true);
+  });
+
+  it('maps Fuentes de datos to its M08 contextual descriptor', () => {
+    expect(getHelpIdForNavigationItem('data-sources')).toBe('help.data.sources');
+    expect(getStudioHelpDescriptor('help.data.sources')).toMatchObject({
+      sectionId: 'data-sources-management',
+      learnMoreRef: '.ai/microphases/M08_1.md',
+    });
+    expect(getStudioHelpDescriptor('help.data.internal')).toMatchObject({
+      sectionId: 'data-internal',
+      learnMoreRef: '.ai/microphases/M08_2.md',
+    });
+    expect(getStudioHelpDescriptor('help.data.rest')).toMatchObject({
+      sectionId: 'data-rest',
+      learnMoreRef: '.ai/microphases/M08_3.md',
+    });
   });
 
   it('keeps related concepts inside the same registry', () => {

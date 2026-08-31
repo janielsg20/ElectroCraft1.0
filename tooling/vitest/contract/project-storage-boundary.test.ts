@@ -28,15 +28,15 @@ describe('M04.1 storage ownership boundary', () => {
     expect(studioSources).toContain('@electrocraft/data-web');
   });
 
-  it('registers data-web as the nineteenth stable package and twenty-first public alias', () => {
+  it('registers data-web with the twenty stable packages and twenty-two public aliases', () => {
     const boundaries = JSON.parse(read('tooling/package-boundaries.json')) as {
       packages: Record<string, readonly string[]>;
       publicAliases: Record<string, string>;
       invariants: { expectedStablePackageCount: number };
     };
-    expect(boundaries.invariants.expectedStablePackageCount).toBe(19);
-    expect(Object.keys(boundaries.packages)).toHaveLength(19);
-    expect(Object.keys(boundaries.publicAliases)).toHaveLength(21);
+    expect(boundaries.invariants.expectedStablePackageCount).toBe(20);
+    expect(Object.keys(boundaries.packages)).toHaveLength(20);
+    expect(Object.keys(boundaries.publicAliases)).toHaveLength(22);
     expect(boundaries.packages['@electrocraft/data-web']).toEqual([
       '@electrocraft/domain',
       '@electrocraft/application',

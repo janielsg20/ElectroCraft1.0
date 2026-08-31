@@ -2,68 +2,69 @@
 
 ## Current
 
-F07 / M07.8 — Navigation E2E y UX — `ACTIVE`.
+F08 / M08.3 — REST API Connector y OpenAPI import — `ACTIVE`.
 
-Rama activa: `codex/m07-1-navigation-model`.
+Rama activa: `codex/m08-1-data-sources`.
 
-M07.8 mantiene activo el cierre de F07: la implementación funcional ya está completa, pero no se cierra hasta que Base CI certifique documentación, lint, typecheck, test, build y Playwright.
+F07 está `GREEN` y fusionada. M08.1 y M08.2 están implementadas con evidencia. M08.3 ya contiene core REST/OpenAPI, wizard, Help específico, fixtures y tests preparados, pero no se declara DONE sin validación ejecutable.
 
-## Heredado
+## Gate de entrada F08
 
-- F00–F05 están `COMPLETADA / GREEN`.
-- F06 fue fusionada funcionalmente a `main` mediante PR `#64`.
-- La PR correctiva F06 `#67` ejecutó run `33203881217`; docs/lint/typecheck/Vitest/build pasaron y Playwright falló.
-- La rama F07 actual parte de esa corrección y añade reparaciones de los blockers Playwright encontrados, todavía sin certificar.
-- `@electrocraft/editor-puck` sigue siendo el único boundary del engine Puck. No persistir AppState, selection, visual history, clipboard, locks, guides ni feedback transitorio.
+- Base CI F07: `33262949215` (#795), success completo.
+- PR F07: `#68`.
+- merge: `e697a42546d23f89412e6dd616018759e719e448`.
 
-## F07 implementada
+## M08.1 — implementada / pendiente Gate F08
 
-### M07.1
-Route/Navigation v2, migración legacy, refs, cycles, params, guards, deep links y compiler source portable.
+- DataSourceDefinition canónico en `packages/domain/src/data/source-definition.ts`.
+- 11 capability flags canónicos.
+- secrets excluidos; `authRef` portable.
+- DataSourceAdapter + único ConnectorRegistry.
+- `packages/connectors` paquete estable #20.
+- `/data-sources` responsive + `help.data.sources`.
 
-### M07.2
-Pantallas CRUD, búsqueda/detalle responsive, Ruta/Navigator, duplicación, apertura exacta en Editor y delete blocker por referencias.
+## M08.2 — implementada / pendiente Gate F08
 
-### M07.3
-Screen Composer: selector de Pantalla en topbar/context/mobile, un solo `PuckEditorRoot`, history aislado por documento y breadcrumb `App > Pantalla > Node`.
+- `InternalDataSourceAdapter` `internal.pglite`.
+- CRUD/query/stats sobre la tabla genérica F04 `content_records`.
+- No hay segunda DB ni tablas por modelo.
+- schema discovery desde `ElectroCraftDataSchema`.
+- companion browser sobre el mismo `electrocraft-studio-storage`/worker/migrations.
+- permission port fail-closed limitado al proyecto abierto.
+- UX `ElectroCraft Data`, `Local`, `Disponible sin conexión`, `Modelos`, `Registros`, `Copia de seguridad`.
+- `help.data.internal`.
+- fixtures, unit test e integración PGlite real preparados.
 
-### M07.4
-Navigation Builder tree con Pila/Pestañas/Menú lateral/Modal, reorder drag + teclado, Pantalla inicial, inspector portable y preview derivado.
+## M08.3 — implementado hasta ahora
 
-### M07.5
-Route params/deep links, binding `source=route`, ActionGraph Navegar `push|replace|back` y URL externa http/https separada.
+Owner: Web Fetch API + DataSourceAdapter + `@scalar/openapi-parser@0.28.11`.
 
-### M07.6
-Guards Público/Auth/Permiso/Condición, redirect sin loops y Preview fail-closed; auth real sigue reservado para F12.
+Disponible en la rama:
 
-### M07.7
-`NavigationCompilerPort` y contratos React Router, Expo Router, LAMP/Slim, WordPress, Capacitor y Static Web sin persistir objetos target.
+1. `RestDataSourceAdapter` con Fetch, timeout, typed params/body, result/error/pagination y gateway fallback;
+2. OpenAPI import adapter Scalar para JSON/YAML/Swagger;
+3. exports públicos de ambos adapters desde `@electrocraft/connectors`;
+4. registro `rest.fetch` en el ConnectorRegistry real del Studio;
+5. wizard REST: URL base → Autenticación → OpenAPI/Manual → Operaciones → Probar → Guardar;
+6. HelpRegistry específico `help.data.rest`;
+7. SecretRef-only; no bearer/API key/password en source config;
+8. fixtures REST/OpenAPI;
+9. tests M08.3 para import, GET/POST, pagination, auth missing, Gateway, 4xx/5xx, timeout y security.
 
-### M07.8 — ACTIVE
-`/preview` contractual, integración de cuatro Pantallas y Playwright de flujo UX/responsive preparados. La actividad restante de esta microfase es exclusivamente cerrar el Gate F07.
+Evidencia: `.ai/evidence/F08/M08.3/IMPLEMENTATION_2026-08-29.md`.
 
-## Reparaciones QA heredadas incluidas
+## Pendiente exacto para cerrar M08.3
 
-- Inspector avanzado sin selección: testea estado vacío accesible; controles reales permanecen cubiertos por M06.1.
-- Responsive metadata de Puck: transitoria en la sesión, ausente del documento persistido.
-- Topbar 1600px: cluster central compactado para no interceptar Undo/Redo.
-- Lock contextual: no se pierde al refrescar permisos; `clearSessionLocks()` se ejecuta al cambiar proyecto/Pantalla.
-- Breadcrumb E2E alineado con semántica F07.
+1. Ejecutar lint/typecheck/Vitest/build en un workspace ejecutable; no usar Actions solo para una microfase.
+2. Corregir fallos reales si aparecen.
+3. Solo entonces cambiar M08.3 a DONE y activar M08.4.
 
-## Gate requerido
+## Deuda de gate F08 visible
 
-PR `#68`, `codex/m07-1-navigation-model` → `main`, es el gate de fase. Base CI debe ejecutar:
-
-1. documentación;
-2. lint/Prettier;
-3. typecheck;
-4. Vitest/integración;
-5. build;
-6. Playwright repository gate;
-7. fixtures/artifacts base.
-
-El primer intento `33230853322` se bloqueó únicamente porque los documentos no marcaban ninguna microfase `ACTIVE`; esta corrección mantiene M07.8 como única activa. Si el siguiente run falla, corregir solo errores reales. No activar F08 hasta GREEN.
+- `package-lock.json` debe regenerarse por `packages/connectors` y la dependencia Studio.
+- root `format/format:check` debe incluir connectors/data-web.
+- no abrir PR ni ejecutar Actions hasta Gate F08 salvo blocker excepcional.
 
 ## Read set
 
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/phases/F07.md → .ai/microphases/M07_1.md … M07_8.md → .ai/evidence/F07/ → packages/domain/src/navigation → packages/application/src/navigation → apps/studio/src/features/navigation → tooling/vitest → tooling/playwright`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/phases/F08.md → M08_1.md → M08_2.md → M08_3.md → evidence/F08 → packages/domain/src/data → packages/application/src/data + connector-registry → packages/connectors → packages/data-web → apps/studio/src/features/data → tooling/vitest`.

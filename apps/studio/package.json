@@ -15,6 +15,7 @@
     "@electrocraft/admin-refine": "0.0.0-m01.3",
     "@electrocraft/application": "0.0.0-m01.3",
     "@electrocraft/auth-core": "0.0.0-m01.3",
+    "@electrocraft/connectors": "0.0.0-m08.3",
     "@electrocraft/data-core": "0.0.0-m01.3",
     "@electrocraft/data-web": "0.0.0-m04.1",
     "@electrocraft/design-system": "0.0.0-m01.3",

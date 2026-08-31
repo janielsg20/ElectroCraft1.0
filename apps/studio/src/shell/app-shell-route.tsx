@@ -1,13 +1,20 @@
 import type { DesignSystemPackageDescriptor } from '@electrocraft/design-system';
 import { translateStrict, type ElectroCraftResourceKey } from '@electrocraft/i18n';
-import type { ReactNode } from 'react';
+import { lazy, Suspense, type ReactNode } from 'react';
 import { workspacePreferencesPort } from '../features/projects/workspace-preferences-runtime';
 import { getHelpIdForNavigationItem, getStudioHelpDescriptor } from '../help/help-registry';
 import { iaT } from '../i18n/information-architecture.es';
 import { StudioAppearanceProvider } from '../theme-provider';
 import { AppShell, type AppShellCopy, type AppShellStatus } from './app-shell';
+import { StudioRouteSkeleton } from './loading-ui';
 import { resolveSidebarActiveItem, studioSidebarNavigation } from './sidebar-navigation';
 import { StudioTopbar, type StudioTopbarCopy } from './studio-topbar';
+
+const DataSourcesFeatureWorkspace = lazy(() =>
+  import('../features/data/data-sources-feature-workspace').then((module) => ({
+    default: module.DataSourcesFeatureWorkspace,
+  })),
+);
 
 export const studioDesignSystemOwner: DesignSystemPackageDescriptor['name'] = '@electrocraft/design-system';
 
@@ -98,6 +105,17 @@ function resolveActiveLabel(activeItemId: ReturnType<typeof resolveSidebarActive
   return commonT('studio.topbar.documentFallback');
 }
 
+function resolveFeatureWorkspace(pathname: string, children: ReactNode) {
+  if (pathname === '/data-sources') {
+    return (
+      <Suspense fallback={<StudioRouteSkeleton kind="generic" label="Cargando fuentes de datos" />}>
+        <DataSourcesFeatureWorkspace />
+      </Suspense>
+    );
+  }
+  return children;
+}
+
 export function StudioAppShellRoute({
   status,
   children,
@@ -105,9 +123,11 @@ export function StudioAppShellRoute({
   readonly status: AppShellStatus;
   readonly children?: ReactNode;
 }) {
-  const activeItemId = resolveSidebarActiveItem(window.location.pathname);
+  const pathname = window.location.pathname;
+  const activeItemId = resolveSidebarActiveItem(pathname);
   const help = getStudioHelpDescriptor(activeItemId ? getHelpIdForNavigationItem(activeItemId) : 'help.studio.shell');
-  const activeLabel = resolveActiveLabel(activeItemId, window.location.pathname);
+  const activeLabel = resolveActiveLabel(activeItemId, pathname);
+  const workspace = resolveFeatureWorkspace(pathname, children);
 
   return (
     <StudioAppearanceProvider>
@@ -128,7 +148,7 @@ export function StudioAppShellRoute({
           />
         }
       >
-        {children}
+        {workspace}
       </AppShell>
     </StudioAppearanceProvider>
   );

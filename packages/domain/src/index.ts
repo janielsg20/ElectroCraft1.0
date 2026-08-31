@@ -78,6 +78,8 @@ export {
   serializeElectroCraftRouteDefinition,
 } from './navigation/serialization';
 export * from './contracts/theme-blueprint';
+export * from './data/source-definition';
+export * from './data/rest';
 
 export const packageDescriptor = Object.freeze({
   name: '@electrocraft/domain',
