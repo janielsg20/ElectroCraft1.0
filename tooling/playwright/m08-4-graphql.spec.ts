@@ -101,7 +101,7 @@ test.describe.serial('M08.4 GraphQL Connector UX', () => {
     await page.getByRole('button', { name: 'Continuar' }).click();
 
     await expect(page.getByRole('heading', { name: 'Probar' })).toBeVisible();
-    await expect(page.getByLabel('Operación GraphQL de prueba')).toContainText('Productos');
+    await expect(page.getByLabel('Operación GraphQL de prueba')).toContainText('Products');
     await page.getByRole('button', { name: 'Probar', exact: true }).click();
     await expect(page.getByText('Prueba completada mediante GraphQLDataSourceAdapter.', { exact: true })).toBeVisible();
     await expect(page.locator('.ec-rest-test-result')).toContainText('Cable GraphQL');
