@@ -102,7 +102,12 @@ const introspectionPayload = {
           fields: [
             {
               name: 'updateProduct',
-              args: [{ name: 'id', type: { kind: 'NON_NULL', name: null, ofType: { kind: 'SCALAR', name: 'ID', ofType: null } } }],
+              args: [
+                {
+                  name: 'id',
+                  type: { kind: 'NON_NULL', name: null, ofType: { kind: 'SCALAR', name: 'ID', ofType: null } },
+                },
+              ],
               type: { kind: 'OBJECT', name: 'Product', ofType: null },
             },
           ],
@@ -111,7 +116,11 @@ const introspectionPayload = {
           kind: 'OBJECT',
           name: 'Product',
           fields: [
-            { name: 'id', args: [], type: { kind: 'NON_NULL', name: null, ofType: { kind: 'SCALAR', name: 'ID', ofType: null } } },
+            {
+              name: 'id',
+              args: [],
+              type: { kind: 'NON_NULL', name: null, ofType: { kind: 'SCALAR', name: 'ID', ofType: null } },
+            },
             { name: 'name', args: [], type: { kind: 'SCALAR', name: 'String', ofType: null } },
           ],
         },
@@ -156,8 +165,14 @@ describe('M08.4 GraphQLDataSourceAdapter', () => {
     const adapter = createGraphQLDataSourceAdapter({ fetch: fetch as typeof globalThis.fetch });
     const result = await adapter.introspect(context());
     expect(result.schema?.models.some(({ key }) => key === 'Product')).toBe(true);
-    expect(result.operations.some(({ operationType, fieldName }) => operationType === 'query' && fieldName === 'products')).toBe(true);
-    expect(result.operations.some(({ operationType, fieldName }) => operationType === 'mutation' && fieldName === 'updateProduct')).toBe(true);
+    expect(
+      result.operations.some(({ operationType, fieldName }) => operationType === 'query' && fieldName === 'products'),
+    ).toBe(true);
+    expect(
+      result.operations.some(
+        ({ operationType, fieldName }) => operationType === 'mutation' && fieldName === 'updateProduct',
+      ),
+    ).toBe(true);
   });
 
   it('falla explícitamente cuando introspection es denegada', async () => {

@@ -75,7 +75,9 @@ test.describe.serial('M08.3 REST API Connector y OpenAPI UX', () => {
     await expect(page.getByLabel('Operación REST de prueba')).toContainText('GET · Listar productos');
     await page.getByRole('button', { name: 'Probar solicitud' }).click();
     await expect(
-      page.locator('.ec-rest-source-sheet').getByText('Prueba completada mediante el adapter REST real.', { exact: true }),
+      page
+        .locator('.ec-rest-source-sheet')
+        .getByText('Prueba completada mediante el adapter REST real.', { exact: true }),
     ).toBeVisible();
     await expect(page.locator('.ec-rest-test-result')).toContainText('Cable USB-C');
     await page.getByRole('button', { name: 'Continuar' }).click();

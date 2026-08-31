@@ -36,19 +36,25 @@ export function RestSourceWizardSheet({
       <SheetContent side="right" className="w-full sm:max-w-[520px]" data-new-data-source-picker>
         <SheetHeader>
           <SheetTitle>Nueva fuente de datos</SheetTitle>
-          <SheetDescription>Elige el conector. Los secretos nunca se guardan dentro del proyecto portable.</SheetDescription>
+          <SheetDescription>
+            Elige el conector. Los secretos nunca se guardan dentro del proyecto portable.
+          </SheetDescription>
         </SheetHeader>
         <div className="grid gap-3 p-4 pt-2">
           <Button className="h-auto justify-start p-4 text-left" variant="outline" onClick={() => setMode('rest')}>
             <span className="grid gap-1">
               <strong>REST API</strong>
-              <span className="text-xs font-normal text-muted-foreground">OpenAPI o configuración manual con Fetch y Gateway.</span>
+              <span className="text-xs font-normal text-muted-foreground">
+                OpenAPI o configuración manual con Fetch y Gateway.
+              </span>
             </span>
           </Button>
           <Button className="h-auto justify-start p-4 text-left" variant="outline" onClick={() => setMode('graphql')}>
             <span className="grid gap-1">
               <strong>GraphQL</strong>
-              <span className="text-xs font-normal text-muted-foreground">Introspection, consultas, mutaciones y variables tipadas.</span>
+              <span className="text-xs font-normal text-muted-foreground">
+                Introspection, consultas, mutaciones y variables tipadas.
+              </span>
             </span>
           </Button>
         </div>

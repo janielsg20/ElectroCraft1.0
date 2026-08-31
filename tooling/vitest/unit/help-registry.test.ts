@@ -59,10 +59,22 @@ describe('M03.11 typed HelpRegistry', () => {
 
   it('maps Fuentes de datos to its M08 contextual descriptors', () => {
     expect(getHelpIdForNavigationItem('data-sources')).toBe('help.data.sources');
-    expect(getStudioHelpDescriptor('help.data.sources')).toMatchObject({ sectionId: 'data-sources-management', learnMoreRef: '.ai/microphases/M08_1.md' });
-    expect(getStudioHelpDescriptor('help.data.internal')).toMatchObject({ sectionId: 'data-internal', learnMoreRef: '.ai/microphases/M08_2.md' });
-    expect(getStudioHelpDescriptor('help.data.rest')).toMatchObject({ sectionId: 'data-rest', learnMoreRef: '.ai/microphases/M08_3.md' });
-    expect(getStudioHelpDescriptor('help.data.graphql')).toMatchObject({ sectionId: 'data-graphql', learnMoreRef: '.ai/microphases/M08_4.md' });
+    expect(getStudioHelpDescriptor('help.data.sources')).toMatchObject({
+      sectionId: 'data-sources-management',
+      learnMoreRef: '.ai/microphases/M08_1.md',
+    });
+    expect(getStudioHelpDescriptor('help.data.internal')).toMatchObject({
+      sectionId: 'data-internal',
+      learnMoreRef: '.ai/microphases/M08_2.md',
+    });
+    expect(getStudioHelpDescriptor('help.data.rest')).toMatchObject({
+      sectionId: 'data-rest',
+      learnMoreRef: '.ai/microphases/M08_3.md',
+    });
+    expect(getStudioHelpDescriptor('help.data.graphql')).toMatchObject({
+      sectionId: 'data-graphql',
+      learnMoreRef: '.ai/microphases/M08_4.md',
+    });
   });
 
   it('keeps related concepts inside the same registry', () => {

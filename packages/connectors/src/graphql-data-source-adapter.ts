@@ -240,7 +240,9 @@ function normalizeGraphQLErrors(value: unknown) {
     value.flatMap((item) => {
       if (!isObject(item) || typeof item.message !== 'string') return [];
       const path = Array.isArray(item.path)
-        ? item.path.filter((segment): segment is string | number => typeof segment === 'string' || typeof segment === 'number')
+        ? item.path.filter(
+            (segment): segment is string | number => typeof segment === 'string' || typeof segment === 'number',
+          )
         : null;
       return [Object.freeze({ message: item.message, path: path ? Object.freeze(path) : null })];
     }),
@@ -289,7 +291,10 @@ async function browserExecute(
           status: response.status,
           data: null,
           errors: Object.freeze([]),
-          error: Object.freeze({ code: 'GRAPHQL_RESPONSE_INVALID', message: 'La respuesta GraphQL no es JSON válido.' }),
+          error: Object.freeze({
+            code: 'GRAPHQL_RESPONSE_INVALID',
+            message: 'La respuesta GraphQL no es JSON válido.',
+          }),
           transport: 'browser' as const,
         });
       }
@@ -434,7 +439,10 @@ function operationKind(fieldName: string): 'create' | 'update' | 'delete' {
 }
 
 function humanize(value: string) {
-  const spaced = value.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/[_-]+/g, ' ').trim();
+  const spaced = value
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/[_-]+/g, ' ')
+    .trim();
   return spaced ? `${spaced[0]?.toUpperCase() ?? ''}${spaced.slice(1)}` : value;
 }
 

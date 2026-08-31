@@ -241,7 +241,10 @@ export function GraphQLSourceWizardSheet({
         variables,
         outputSchema: null,
       };
-      const parsed = electroCraftGraphQLDataSourceConfigSchema.parse({ ...config(), operations: [...operations, candidate] });
+      const parsed = electroCraftGraphQLDataSourceConfigSchema.parse({
+        ...config(),
+        operations: [...operations, candidate],
+      });
       setOperations(parsed.operations);
       if (!testOperationId) setTestOperationId(candidate.id);
       setMessage('Operación manual añadida.');
@@ -326,16 +329,33 @@ export function GraphQLSourceWizardSheet({
               <h3>Endpoint</h3>
               <p>Define el endpoint GraphQL y el transporte portable.</p>
               <div className="ec-rest-wizard-grid two">
-                <label><span>Nombre</span><Input autoFocus value={name} onChange={(event) => setName(event.target.value)} /></label>
-                <label><span>Clave</span><Input value={key} onChange={(event) => setKey(event.target.value)} /></label>
+                <label>
+                  <span>Nombre</span>
+                  <Input autoFocus value={name} onChange={(event) => setName(event.target.value)} />
+                </label>
+                <label>
+                  <span>Clave</span>
+                  <Input value={key} onChange={(event) => setKey(event.target.value)} />
+                </label>
               </div>
-              <label><span>Endpoint</span><Input value={endpoint} onChange={(event) => setEndpoint(event.target.value)} inputMode="url" /></label>
+              <label>
+                <span>Endpoint</span>
+                <Input value={endpoint} onChange={(event) => setEndpoint(event.target.value)} inputMode="url" />
+              </label>
               <div className="ec-rest-wizard-grid two">
-                <label><span>Timeout (ms)</span><Input value={timeoutMs} onChange={(event) => setTimeoutMs(event.target.value)} inputMode="numeric" /></label>
+                <label>
+                  <span>Timeout (ms)</span>
+                  <Input value={timeoutMs} onChange={(event) => setTimeoutMs(event.target.value)} inputMode="numeric" />
+                </label>
                 <label>
                   <span>Ejecución</span>
-                  <Select value={executionMode} onValueChange={(value) => setExecutionMode(value as typeof executionMode)}>
-                    <SelectTrigger aria-label="Modo de ejecución GraphQL"><SelectValue /></SelectTrigger>
+                  <Select
+                    value={executionMode}
+                    onValueChange={(value) => setExecutionMode(value as typeof executionMode)}
+                  >
+                    <SelectTrigger aria-label="Modo de ejecución GraphQL">
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="auto">Auto · navegador y fallback</SelectItem>
                       <SelectItem value="browser">Solo navegador</SelectItem>
@@ -346,7 +366,12 @@ export function GraphQLSourceWizardSheet({
               </div>
               <label>
                 <span>Headers no sensibles</span>
-                <textarea rows={5} value={defaultHeaders} onChange={(event) => setDefaultHeaders(event.target.value)} spellCheck={false} />
+                <textarea
+                  rows={5}
+                  value={defaultHeaders}
+                  onChange={(event) => setDefaultHeaders(event.target.value)}
+                  spellCheck={false}
+                />
                 <small>Authorization, cookies y API keys están bloqueados.</small>
               </label>
             </section>
@@ -359,7 +384,9 @@ export function GraphQLSourceWizardSheet({
               <label>
                 <span>Modo</span>
                 <Select value={authMode} onValueChange={(value) => setAuthMode(value as AuthMode)}>
-                  <SelectTrigger aria-label="Autenticación GraphQL"><SelectValue /></SelectTrigger>
+                  <SelectTrigger aria-label="Autenticación GraphQL">
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Sin autenticación</SelectItem>
                     <SelectItem value="secret-ref">SecretRef existente + Gateway</SelectItem>
@@ -367,8 +394,16 @@ export function GraphQLSourceWizardSheet({
                 </Select>
               </label>
               {authMode === 'secret-ref' ? (
-                <label><span>SecretRef</span><Input value={authRef} onChange={(event) => setAuthRef(event.target.value)} autoComplete="off" /></label>
-              ) : <div className="ec-rest-wizard-note"><strong>Sin credenciales</strong><span>Fetch directo solo si CORS lo permite.</span></div>}
+                <label>
+                  <span>SecretRef</span>
+                  <Input value={authRef} onChange={(event) => setAuthRef(event.target.value)} autoComplete="off" />
+                </label>
+              ) : (
+                <div className="ec-rest-wizard-note">
+                  <strong>Sin credenciales</strong>
+                  <span>Fetch directo solo si CORS lo permite.</span>
+                </div>
+              )}
             </section>
           ) : null}
 
@@ -377,14 +412,26 @@ export function GraphQLSourceWizardSheet({
               <h3>Esquema</h3>
               <p>Usa introspection cuando el endpoint lo permita.</p>
               <label className="ec-rest-checkbox-row">
-                <Checkbox checked={introspectionEnabled} onCheckedChange={(checked) => setIntrospectionEnabled(checked === true)} />
+                <Checkbox
+                  checked={introspectionEnabled}
+                  onCheckedChange={(checked) => setIntrospectionEnabled(checked === true)}
+                />
                 <span>Permitir introspection para esta fuente</span>
               </label>
-              <Button size="sm" variant="outline" disabled={busy || !introspectionEnabled} onClick={() => void introspect()}>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={busy || !introspectionEnabled}
+                onClick={() => void introspect()}
+              >
                 Inspeccionar esquema
               </Button>
               {message ? <p role="status">{message}</p> : null}
-              {operations.length > 0 ? <p>{operations.length} operación(es) disponibles.</p> : <p className="ec-rest-wizard-empty">Sin operaciones detectadas todavía.</p>}
+              {operations.length > 0 ? (
+                <p>{operations.length} operación(es) disponibles.</p>
+              ) : (
+                <p className="ec-rest-wizard-empty">Sin operaciones detectadas todavía.</p>
+              )}
             </section>
           ) : null}
 
@@ -395,13 +442,32 @@ export function GraphQLSourceWizardSheet({
               <div className="ec-rest-operation-list">
                 {operations.map((operation) => (
                   <article key={operation.id}>
-                    <div><strong>{operation.operationType === 'query' ? 'Query' : 'Mutation'}</strong><span>{operation.fieldName}</span></div>
-                    <div><span>{operation.label}</span><small>{operation.kind} · {operation.variables.length} variable(s)</small></div>
-                    <Button size="sm" variant="ghost" onClick={() => setOperations((current) => current.filter(({ id }) => id !== operation.id))}>Quitar</Button>
+                    <div>
+                      <strong>{operation.operationType === 'query' ? 'Query' : 'Mutation'}</strong>
+                      <span>{operation.fieldName}</span>
+                    </div>
+                    <div>
+                      <span>{operation.label}</span>
+                      <small>
+                        {operation.kind} · {operation.variables.length} variable(s)
+                      </small>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setOperations((current) => current.filter(({ id }) => id !== operation.id))}
+                    >
+                      Quitar
+                    </Button>
                   </article>
                 ))}
               </div>
-              <Button size="sm" variant="outline" onClick={() => setAdvancedOpen((current) => !current)} aria-expanded={advancedOpen}>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setAdvancedOpen((current) => !current)}
+                aria-expanded={advancedOpen}
+              >
                 Advanced
               </Button>
               {advancedOpen ? (
@@ -410,29 +476,73 @@ export function GraphQLSourceWizardSheet({
                   <div className="ec-rest-wizard-grid two">
                     <label>
                       <span>Tipo</span>
-                      <Select value={operationType} onValueChange={(value) => setOperationType(value as typeof operationType)}>
-                        <SelectTrigger aria-label="Tipo de operación GraphQL"><SelectValue /></SelectTrigger>
-                        <SelectContent><SelectItem value="query">Query</SelectItem><SelectItem value="mutation">Mutation</SelectItem></SelectContent>
+                      <Select
+                        value={operationType}
+                        onValueChange={(value) => setOperationType(value as typeof operationType)}
+                      >
+                        <SelectTrigger aria-label="Tipo de operación GraphQL">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="query">Query</SelectItem>
+                          <SelectItem value="mutation">Mutation</SelectItem>
+                        </SelectContent>
                       </Select>
                     </label>
                     {operationType === 'mutation' ? (
                       <label>
                         <span>Capability</span>
-                        <Select value={mutationKind} onValueChange={(value) => setMutationKind(value as typeof mutationKind)}>
-                          <SelectTrigger aria-label="Capability de mutación GraphQL"><SelectValue /></SelectTrigger>
-                          <SelectContent><SelectItem value="create">create</SelectItem><SelectItem value="update">update</SelectItem><SelectItem value="delete">delete</SelectItem></SelectContent>
+                        <Select
+                          value={mutationKind}
+                          onValueChange={(value) => setMutationKind(value as typeof mutationKind)}
+                        >
+                          <SelectTrigger aria-label="Capability de mutación GraphQL">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="create">create</SelectItem>
+                            <SelectItem value="update">update</SelectItem>
+                            <SelectItem value="delete">delete</SelectItem>
+                          </SelectContent>
                         </Select>
                       </label>
                     ) : null}
                   </div>
                   <div className="ec-rest-wizard-grid two">
-                    <label><span>Field</span><Input value={fieldName} onChange={(event) => setFieldName(event.target.value)} /></label>
-                    <label><span>Nombre</span><Input value={operationLabel} onChange={(event) => setOperationLabel(event.target.value)} /></label>
+                    <label>
+                      <span>Field</span>
+                      <Input value={fieldName} onChange={(event) => setFieldName(event.target.value)} />
+                    </label>
+                    <label>
+                      <span>Nombre</span>
+                      <Input value={operationLabel} onChange={(event) => setOperationLabel(event.target.value)} />
+                    </label>
                   </div>
-                  <label><span>Variables tipadas (JSON)</span><textarea rows={6} value={variableDefinitions} onChange={(event) => setVariableDefinitions(event.target.value)} spellCheck={false} /></label>
-                  <label><span>Documento GraphQL raw</span><textarea rows={8} value={rawDocument} onChange={(event) => setRawDocument(event.target.value)} spellCheck={false} /></label>
-                  <label className="ec-rest-checkbox-row"><Checkbox checked={requiresAuth} onCheckedChange={(checked) => setRequiresAuth(checked === true)} /><span>Requiere SecretRef/Gateway</span></label>
-                  <Button size="sm" variant="outline" onClick={addManualOperation}>Añadir operación</Button>
+                  <label>
+                    <span>Variables tipadas (JSON)</span>
+                    <textarea
+                      rows={6}
+                      value={variableDefinitions}
+                      onChange={(event) => setVariableDefinitions(event.target.value)}
+                      spellCheck={false}
+                    />
+                  </label>
+                  <label>
+                    <span>Documento GraphQL raw</span>
+                    <textarea
+                      rows={8}
+                      value={rawDocument}
+                      onChange={(event) => setRawDocument(event.target.value)}
+                      spellCheck={false}
+                    />
+                  </label>
+                  <label className="ec-rest-checkbox-row">
+                    <Checkbox checked={requiresAuth} onCheckedChange={(checked) => setRequiresAuth(checked === true)} />
+                    <span>Requiere SecretRef/Gateway</span>
+                  </label>
+                  <Button size="sm" variant="outline" onClick={addManualOperation}>
+                    Añadir operación
+                  </Button>
                 </div>
               ) : null}
             </section>
@@ -445,13 +555,39 @@ export function GraphQLSourceWizardSheet({
               <label>
                 <span>Operación</span>
                 <Select value={testOperation?.id ?? ''} onValueChange={setTestOperationId}>
-                  <SelectTrigger aria-label="Operación GraphQL de prueba"><SelectValue /></SelectTrigger>
-                  <SelectContent>{operations.map((operation) => <SelectItem key={operation.id} value={operation.id}>{operation.operationType} · {operation.label}</SelectItem>)}</SelectContent>
+                  <SelectTrigger aria-label="Operación GraphQL de prueba">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {operations.map((operation) => (
+                      <SelectItem key={operation.id} value={operation.id}>
+                        {operation.operationType} · {operation.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </label>
-              <label><span>Variables</span><textarea rows={8} value={testVariables} onChange={(event) => setTestVariables(event.target.value)} spellCheck={false} /></label>
-              {testOperation && testOperation.kind !== 'read' ? <div className="ec-rest-wizard-note warning"><strong>Mutación</strong><span>La prueba puede modificar datos reales.</span></div> : null}
-              <div className="ec-rest-wizard-inline-actions"><Button size="sm" disabled={busy || !testOperation} onClick={() => void testRequest()}>Probar</Button>{message ? <p role="status">{message}</p> : null}</div>
+              <label>
+                <span>Variables</span>
+                <textarea
+                  rows={8}
+                  value={testVariables}
+                  onChange={(event) => setTestVariables(event.target.value)}
+                  spellCheck={false}
+                />
+              </label>
+              {testOperation && testOperation.kind !== 'read' ? (
+                <div className="ec-rest-wizard-note warning">
+                  <strong>Mutación</strong>
+                  <span>La prueba puede modificar datos reales.</span>
+                </div>
+              ) : null}
+              <div className="ec-rest-wizard-inline-actions">
+                <Button size="sm" disabled={busy || !testOperation} onClick={() => void testRequest()}>
+                  Probar
+                </Button>
+                {message ? <p role="status">{message}</p> : null}
+              </div>
               {result !== null ? <pre className="ec-rest-test-result">{JSON.stringify(result, null, 2)}</pre> : null}
             </section>
           ) : null}
@@ -461,21 +597,53 @@ export function GraphQLSourceWizardSheet({
               <h3>Guardar</h3>
               <p>Revisa el contrato portable antes de guardar.</p>
               <div className="ec-rest-save-summary">
-                <section><span>Fuente</span><strong>{name}</strong><small>{normalizeKey(key || name)}</small></section>
-                <section><span>Endpoint</span><strong>{endpoint}</strong><small>{executionMode}</small></section>
-                <section><span>Operaciones</span><strong>{operations.length}</strong><small>{capabilities.join(' · ')}</small></section>
-                <section><span>Autenticación</span><strong>{authMode === 'secret-ref' ? 'SecretRef' : 'Sin autenticación'}</strong><small>{authMode === 'secret-ref' ? authRef : 'Sin secreto persistido'}</small></section>
+                <section>
+                  <span>Fuente</span>
+                  <strong>{name}</strong>
+                  <small>{normalizeKey(key || name)}</small>
+                </section>
+                <section>
+                  <span>Endpoint</span>
+                  <strong>{endpoint}</strong>
+                  <small>{executionMode}</small>
+                </section>
+                <section>
+                  <span>Operaciones</span>
+                  <strong>{operations.length}</strong>
+                  <small>{capabilities.join(' · ')}</small>
+                </section>
+                <section>
+                  <span>Autenticación</span>
+                  <strong>{authMode === 'secret-ref' ? 'SecretRef' : 'Sin autenticación'}</strong>
+                  <small>{authMode === 'secret-ref' ? authRef : 'Sin secreto persistido'}</small>
+                </section>
               </div>
-              <Button disabled={busy} onClick={() => void save()}>Guardar fuente</Button>
+              <Button disabled={busy} onClick={() => void save()}>
+                Guardar fuente
+              </Button>
             </section>
           ) : null}
 
-          {error ? <p className="ec-data-source-error" role="alert">{error}</p> : null}
+          {error ? (
+            <p className="ec-data-source-error" role="alert">
+              {error}
+            </p>
+          ) : null}
         </div>
 
         <div className="ec-rest-wizard-footer">
-          <Button variant="ghost" disabled={busy || step === 0} onClick={() => setStep(Math.max(0, step - 1) as StepIndex)}>Atrás</Button>
-          {step < 5 ? <Button disabled={busy} onClick={next}>Continuar</Button> : null}
+          <Button
+            variant="ghost"
+            disabled={busy || step === 0}
+            onClick={() => setStep(Math.max(0, step - 1) as StepIndex)}
+          >
+            Atrás
+          </Button>
+          {step < 5 ? (
+            <Button disabled={busy} onClick={next}>
+              Continuar
+            </Button>
+          ) : null}
         </div>
       </SheetContent>
     </Sheet>
