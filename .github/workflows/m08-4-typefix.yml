@@ -1,0 +1,53 @@
+name: M08.4 Temporary Typefix
+
+on:
+  push:
+    branches:
+      - codex/m08-4-graphql
+
+permissions:
+  contents: write
+
+jobs:
+  typefix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: codex/m08-4-graphql
+          persist-credentials: true
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22.16.0
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Apply targeted TypeScript fixes
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('apps/studio/src/features/data/graphql-source-wizard.tsx')
+          text = path.read_text()
+          text = text.replace('const variables = parseVariables(variableDefinitions);', 'const variables = [...parseVariables(variableDefinitions)];')
+          path.write_text(text)
+
+          path = Path('packages/connectors/src/graphql-data-source-adapter.ts')
+          text = path.read_text()
+          text = text.replace('variables: Object.freeze(variables),', 'variables: [...variables],')
+          path.write_text(text)
+
+          path = Path('apps/studio/src/help/help-registry.ts')
+          text = path.read_text()
+          text = text.replace("relatedIds: Object.freeze(['help.data.sources', 'help.data.rest', 'help.section.queries']),", "relatedIds: Object.freeze(['help.data.sources', 'help.data.rest', 'help.section.queries'] as const),")
+          path.write_text(text)
+      - run: npm run format
+      - name: Commit fixes
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          git commit -m "fix(M08.4): align GraphQL readonly types"
+          git push origin HEAD:codex/m08-4-graphql
