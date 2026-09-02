@@ -25,7 +25,8 @@ function errorResponse(error: unknown) {
 
 async function bodyObject(request: Request) {
   const value: unknown = await request.json();
-  if (!value || Array.isArray(value) || typeof value !== 'object') throw new TypeError('El body debe ser un objeto JSON.');
+  if (!value || Array.isArray(value) || typeof value !== 'object')
+    throw new TypeError('El body debe ser un objeto JSON.');
   return value as Record<string, unknown>;
 }
 
@@ -52,14 +53,18 @@ export function createConnectorGatewayHttpHandler(options: ConnectorGatewayHttpH
         if (body.protocol === 'graphql') {
           return json(await options.gateway.executeGraphQL(body as never));
         }
-        return json({ error: { code: 'GATEWAY_PROTOCOL_INVALID', message: 'Protocolo de Gateway inválido.' } }, { status: 400 });
+        return json(
+          { error: { code: 'GATEWAY_PROTOCOL_INVALID', message: 'Protocolo de Gateway inválido.' } },
+          { status: 400 },
+        );
       }
 
       if (request.method === 'POST' && url.pathname.endsWith('/secrets/write')) {
         const body = await bodyObject(request);
         const ref = electroCraftSecretRefSchema.parse(body.ref);
         const environment = electroCraftSecretEnvironmentSchema.parse(body.environment);
-        if (typeof body.value !== 'string' || !body.value.trim()) throw new TypeError('El valor secreto no puede estar vacío.');
+        if (typeof body.value !== 'string' || !body.value.trim())
+          throw new TypeError('El valor secreto no puede estar vacío.');
         return json(await options.secretStore.write({ ref, environment, value: body.value }));
       }
 
@@ -78,7 +83,10 @@ export function createConnectorGatewayHttpHandler(options: ConnectorGatewayHttpH
         return json({ ok: true });
       }
 
-      return json({ error: { code: 'GATEWAY_ROUTE_NOT_FOUND', message: 'Ruta de Gateway no encontrada.' } }, { status: 404 });
+      return json(
+        { error: { code: 'GATEWAY_ROUTE_NOT_FOUND', message: 'Ruta de Gateway no encontrada.' } },
+        { status: 404 },
+      );
     } catch (error) {
       return errorResponse(error);
     }

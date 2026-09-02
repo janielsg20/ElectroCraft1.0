@@ -74,9 +74,16 @@ export function DataIntegrationsSettings() {
       <div className="ec-topbar-setting-row">
         <div>
           <strong>Estado Gateway</strong>
-          <p role="status" aria-live="polite">{integrations.gateway.message}</p>
+          <p role="status" aria-live="polite">
+            {integrations.gateway.message}
+          </p>
         </div>
-        <Button variant="outline" size="sm" disabled={!gatewayConfigured || saving} onClick={() => void dataIntegrationsRuntime.load()}>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={!gatewayConfigured || saving}
+          onClick={() => void dataIntegrationsRuntime.load()}
+        >
           Probar conexión
         </Button>
       </div>
@@ -100,15 +107,25 @@ export function DataIntegrationsSettings() {
       <div className="ec-topbar-setting-row">
         <div>
           <strong>Secretos</strong>
-          <p>{integrations.refs.length === 0 ? 'No hay referencias todavía.' : `${integrations.refs.length} referencia(s) disponible(s).`}</p>
+          <p>
+            {integrations.refs.length === 0
+              ? 'No hay referencias todavía.'
+              : `${integrations.refs.length} referencia(s) disponible(s).`}
+          </p>
         </div>
-        <Select value={selectedRef?.id ?? ''} onValueChange={setSelectedRefId} disabled={integrations.refs.length === 0}>
+        <Select
+          value={selectedRef?.id ?? ''}
+          onValueChange={setSelectedRefId}
+          disabled={integrations.refs.length === 0}
+        >
           <SelectTrigger aria-label="Referencia de secreto">
             <SelectValue placeholder="Seleccionar secreto" />
           </SelectTrigger>
           <SelectContent>
             {integrations.refs.map((ref) => (
-              <SelectItem key={ref.id} value={ref.id}>{ref.label}</SelectItem>
+              <SelectItem key={ref.id} value={ref.id}>
+                {ref.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -145,16 +162,19 @@ export function DataIntegrationsSettings() {
               disabled={!gatewayConfigured || !status?.configured || saving}
               onClick={() => {
                 setBusy(true);
-                void dataIntegrationsRuntime
-                  .removeSecret(selectedRef, environment)
-                  .finally(() => setBusy(false));
+                void dataIntegrationsRuntime.removeSecret(selectedRef, environment).finally(() => setBusy(false));
               }}
             >
               Eliminar valor
             </Button>
             <Button
               size="sm"
-              disabled={!gatewayConfigured || !secretValue.trim() || saving || !selectedRef.environmentScope.includes(environment)}
+              disabled={
+                !gatewayConfigured ||
+                !secretValue.trim() ||
+                saving ||
+                !selectedRef.environmentScope.includes(environment)
+              }
               onClick={() => {
                 const value = secretValue;
                 setSecretValue('');
@@ -175,7 +195,11 @@ export function DataIntegrationsSettings() {
         <p>Se guarda únicamente nombre, binding y scope. El valor se envía al Gateway después.</p>
         <label className="grid gap-1">
           <span>Nombre</span>
-          <Input value={newLabel} onChange={(event) => setNewLabel(event.target.value)} placeholder="API de productos" />
+          <Input
+            value={newLabel}
+            onChange={(event) => setNewLabel(event.target.value)}
+            placeholder="API de productos"
+          />
         </label>
         <label className="grid gap-1">
           <span>Clave portable</span>
@@ -192,7 +216,11 @@ export function DataIntegrationsSettings() {
             </SelectContent>
           </Select>
           {bindingKind === 'header' ? (
-            <Input value={headerName} onChange={(event) => setHeaderName(event.target.value)} aria-label="Nombre del header" />
+            <Input
+              value={headerName}
+              onChange={(event) => setHeaderName(event.target.value)}
+              aria-label="Nombre del header"
+            />
           ) : null}
         </div>
         <Button
@@ -220,7 +248,9 @@ export function DataIntegrationsSettings() {
         </Button>
       </div>
 
-      <p role={integrations.state === 'error' ? 'alert' : 'status'} aria-live="polite">{integrations.message}</p>
+      <p role={integrations.state === 'error' ? 'alert' : 'status'} aria-live="polite">
+        {integrations.message}
+      </p>
     </section>
   );
 }

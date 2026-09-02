@@ -96,9 +96,7 @@ describe('M08.5 ConnectorGateway y SecretStore', () => {
       secretStore: store,
       resolveSecretRef: (refId) => (refId === ref.id ? ref : null),
       authorizeExecution: (request) =>
-        request.sourceId === restRequest.sourceId &&
-        request.protocol === 'rest' &&
-        request.url === restRequest.url,
+        request.sourceId === restRequest.sourceId && request.protocol === 'rest' && request.url === restRequest.url,
       fetch: upstreamFetch,
     });
 
@@ -170,8 +168,14 @@ describe('M08.5 ConnectorGateway y SecretStore', () => {
       headers.set('x-test-session', 'allowed');
       return handler(new Request(String(input), { ...init, headers }));
     }) as unknown as typeof fetch;
-    const browserGateway = createBrowserConnectorGateway({ baseUrl: 'https://gateway.example.test', fetch: gatewayFetch });
-    const browserSecrets = createBrowserSecretStoreAdmin({ baseUrl: 'https://gateway.example.test', fetch: gatewayFetch });
+    const browserGateway = createBrowserConnectorGateway({
+      baseUrl: 'https://gateway.example.test',
+      fetch: gatewayFetch,
+    });
+    const browserSecrets = createBrowserSecretStoreAdmin({
+      baseUrl: 'https://gateway.example.test',
+      fetch: gatewayFetch,
+    });
 
     await expect(browserGateway.status()).resolves.toMatchObject({ configured: true, provider: 'electrocraft-server' });
     const writeStatus = await browserSecrets.write({ ref, environment: 'development', value: 'rotated-token' });

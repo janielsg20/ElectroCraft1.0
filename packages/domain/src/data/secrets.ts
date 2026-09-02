@@ -12,7 +12,10 @@ const secretHeaderNameSchema = z
   .min(1)
   .max(120)
   .regex(/^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/, 'secret header name must be a valid HTTP token')
-  .refine((name) => !/^(?:cookie|set-cookie|proxy-authorization)$/i.test(name), 'cookie-style secret headers are forbidden');
+  .refine(
+    (name) => !/^(?:cookie|set-cookie|proxy-authorization)$/i.test(name),
+    'cookie-style secret headers are forbidden',
+  );
 
 export const electroCraftSecretBindingSchema = z.discriminatedUnion('kind', [
   z.strictObject({
@@ -27,7 +30,12 @@ export const electroCraftSecretBindingSchema = z.discriminatedUnion('kind', [
   }),
   z.strictObject({
     kind: z.literal('query'),
-    queryName: z.string().trim().min(1).max(120).regex(/^[A-Za-z][A-Za-z0-9_.-]*$/),
+    queryName: z
+      .string()
+      .trim()
+      .min(1)
+      .max(120)
+      .regex(/^[A-Za-z][A-Za-z0-9_.-]*$/),
   }),
 ]);
 export type ElectroCraftSecretBinding = z.infer<typeof electroCraftSecretBindingSchema>;
@@ -37,7 +45,10 @@ export const electroCraftSecretRefSchema = z
     schemaVersion: z.literal(1),
     id: electroCraftObjectIdSchema,
     version: z.number().int().positive(),
-    key: z.string().trim().regex(/^[A-Z][A-Z0-9_]{0,79}$/),
+    key: z
+      .string()
+      .trim()
+      .regex(/^[A-Z][A-Z0-9_]{0,79}$/),
     label: z.string().trim().min(1).max(160),
     environmentScope: z.array(electroCraftSecretEnvironmentSchema).min(1).max(2),
     binding: electroCraftSecretBindingSchema,
@@ -45,12 +56,18 @@ export const electroCraftSecretRefSchema = z
   })
   .superRefine((ref, context) => {
     if (new Set(ref.environmentScope).size !== ref.environmentScope.length) {
-      context.addIssue({ code: 'custom', path: ['environmentScope'], message: 'secret environment scope must be unique' });
+      context.addIssue({
+        code: 'custom',
+        path: ['environmentScope'],
+        message: 'secret environment scope must be unique',
+      });
     }
   });
 export type ElectroCraftSecretRef = z.infer<typeof electroCraftSecretRefSchema>;
 
-export function resolveSecretEnvironment(environment: ElectroCraftDataSourceEnvironment): ElectroCraftSecretEnvironment {
+export function resolveSecretEnvironment(
+  environment: ElectroCraftDataSourceEnvironment,
+): ElectroCraftSecretEnvironment {
   return environment === 'production' ? 'production' : 'development';
 }
 

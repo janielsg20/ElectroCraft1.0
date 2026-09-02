@@ -30,8 +30,7 @@ export class ConnectorGatewayError extends Error {
 }
 
 export type ServerGatewayExecutionRequest =
-  | ConnectorGatewayRestExecutionRequest
-  | ConnectorGatewayGraphQLExecutionRequest;
+  ConnectorGatewayRestExecutionRequest | ConnectorGatewayGraphQLExecutionRequest;
 
 export interface ServerConnectorGatewayOptions {
   readonly secretStore: SecretStorePort;
@@ -71,7 +70,9 @@ function graphQLErrors(value: unknown): readonly ElectroCraftGraphQLError[] {
     value.flatMap((entry) => {
       if (!isObject(entry) || typeof entry.message !== 'string') return [];
       const path = Array.isArray(entry.path)
-        ? entry.path.filter((segment): segment is string | number => typeof segment === 'string' || typeof segment === 'number')
+        ? entry.path.filter(
+            (segment): segment is string | number => typeof segment === 'string' || typeof segment === 'number',
+          )
         : null;
       return [Object.freeze({ message: entry.message, path: path ? Object.freeze(path) : null })];
     }),
@@ -128,7 +129,10 @@ export class ServerConnectorGateway implements ConnectorGatewayPort {
 
     const ref = await this.options.resolveSecretRef(authRef);
     if (!ref) {
-      throw new ConnectorGatewayError('SECRET_REF_NOT_FOUND', 'La referencia de secreto no está registrada en el Gateway.');
+      throw new ConnectorGatewayError(
+        'SECRET_REF_NOT_FOUND',
+        'La referencia de secreto no está registrada en el Gateway.',
+      );
     }
     const secretEnvironment = resolveSecretEnvironment(environment);
     const value = await this.options.secretStore.resolve(ref, secretEnvironment);
@@ -238,7 +242,10 @@ export class ServerConnectorGateway implements ConnectorGatewayPort {
         });
       }
       if (error instanceof ConnectorGatewayError) throw error;
-      throw new ConnectorGatewayError('GATEWAY_FETCH_FAILED', 'ConnectorGateway no pudo ejecutar la solicitud GraphQL.');
+      throw new ConnectorGatewayError(
+        'GATEWAY_FETCH_FAILED',
+        'ConnectorGateway no pudo ejecutar la solicitud GraphQL.',
+      );
     }
   }
 }

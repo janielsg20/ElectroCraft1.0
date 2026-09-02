@@ -43,14 +43,22 @@ async function readJson<T>(response: Response): Promise<T> {
   const payload: unknown = await response.json().catch(() => null);
   if (!response.ok) {
     const message =
-      payload && typeof payload === 'object' && 'error' in payload && payload.error && typeof payload.error === 'object' &&
-      'message' in payload.error && typeof payload.error.message === 'string'
+      payload &&
+      typeof payload === 'object' &&
+      'error' in payload &&
+      payload.error &&
+      typeof payload.error === 'object' &&
+      'message' in payload.error &&
+      typeof payload.error.message === 'string'
         ? payload.error.message
         : `ConnectorGateway respondió HTTP ${response.status}.`;
     throw new BrowserConnectorGatewayError('GATEWAY_HTTP_ERROR', message);
   }
   if (payload === null || payload === undefined) {
-    throw new BrowserConnectorGatewayError('GATEWAY_RESPONSE_INVALID', 'ConnectorGateway devolvió una respuesta vacía.');
+    throw new BrowserConnectorGatewayError(
+      'GATEWAY_RESPONSE_INVALID',
+      'ConnectorGateway devolvió una respuesta vacía.',
+    );
   }
   return payload as T;
 }

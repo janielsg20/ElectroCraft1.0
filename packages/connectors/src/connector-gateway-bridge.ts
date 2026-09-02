@@ -1,11 +1,15 @@
-import type { ConnectorGatewayPort, DataSourceAdapterContext, DataSourceConnectionResult } from '@electrocraft/application';
+import type {
+  ConnectorGatewayPort,
+  DataSourceAdapterContext,
+  DataSourceConnectionResult,
+} from '@electrocraft/application';
 import type { ElectroCraftGraphQLDataSourceConfig, ElectroCraftRestDataSourceConfig } from '@electrocraft/domain';
-import type { GraphQLGatewayPort } from './graphql-data-source-adapter';
-import type { RestGatewayPort } from './rest-data-source-adapter';
+import type { GraphQLGatewayExecutionRequest, GraphQLGatewayPort } from './graphql-data-source-adapter';
+import type { RestGatewayExecutionRequest, RestGatewayPort } from './rest-data-source-adapter';
 
 export function createRestGatewayBridge(gateway: Pick<ConnectorGatewayPort, 'executeRest'>): RestGatewayPort {
   return Object.freeze({
-    execute(request) {
+    execute(request: RestGatewayExecutionRequest) {
       return gateway.executeRest({ protocol: 'rest', ...request });
     },
     async testConnection(
@@ -38,7 +42,9 @@ export function createRestGatewayBridge(gateway: Pick<ConnectorGatewayPort, 'exe
       });
       return Object.freeze({
         ok: result.ok,
-        message: result.ok ? 'REST API disponible mediante Gateway.' : (result.error?.message ?? 'REST API no disponible.'),
+        message: result.ok
+          ? 'REST API disponible mediante Gateway.'
+          : (result.error?.message ?? 'REST API no disponible.'),
       });
     },
   });
@@ -46,7 +52,7 @@ export function createRestGatewayBridge(gateway: Pick<ConnectorGatewayPort, 'exe
 
 export function createGraphQLGatewayBridge(gateway: Pick<ConnectorGatewayPort, 'executeGraphQL'>): GraphQLGatewayPort {
   return Object.freeze({
-    execute(request) {
+    execute(request: GraphQLGatewayExecutionRequest) {
       return gateway.executeGraphQL({ protocol: 'graphql', ...request });
     },
     async testConnection(
@@ -66,7 +72,9 @@ export function createGraphQLGatewayBridge(gateway: Pick<ConnectorGatewayPort, '
       });
       return Object.freeze({
         ok: result.ok,
-        message: result.ok ? 'GraphQL disponible mediante Gateway.' : (result.error?.message ?? 'GraphQL no disponible.'),
+        message: result.ok
+          ? 'GraphQL disponible mediante Gateway.'
+          : (result.error?.message ?? 'GraphQL no disponible.'),
       });
     },
   });

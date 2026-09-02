@@ -99,7 +99,9 @@ async function load() {
     refs,
     gateway,
     secretStatus: {},
-    message: gateway.configured ? `${refs.length} referencia(s) de secreto.` : 'Configura ConnectorGateway para usar secretos.',
+    message: gateway.configured
+      ? `${refs.length} referencia(s) de secreto.`
+      : 'Configura ConnectorGateway para usar secretos.',
   });
 }
 
@@ -158,7 +160,11 @@ export const dataIntegrationsRuntime = Object.freeze({
       });
       return status;
     } catch (error) {
-      publish({ ...snapshot, state: 'error', message: error instanceof Error ? error.message : 'No se pudo aplicar el secreto.' });
+      publish({
+        ...snapshot,
+        state: 'error',
+        message: error instanceof Error ? error.message : 'No se pudo aplicar el secreto.',
+      });
       throw error;
     }
   },

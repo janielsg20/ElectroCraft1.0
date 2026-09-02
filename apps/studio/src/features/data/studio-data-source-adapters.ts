@@ -21,7 +21,9 @@ export function ensureStudioDataSourceAdapters() {
   }
   if (!dataSourceWorkspaceRuntime.registry.has(GRAPHQL_DATA_ADAPTER_ID)) {
     dataSourceWorkspaceRuntime.registry.registerAdapter(
-      createGraphQLDataSourceAdapter({ gateway: browserGateway ? createGraphQLGatewayBridge(browserGateway) : undefined }),
+      createGraphQLDataSourceAdapter({
+        gateway: browserGateway ? createGraphQLGatewayBridge(browserGateway) : undefined,
+      }),
     );
   }
   return dataSourceWorkspaceRuntime.registry;
