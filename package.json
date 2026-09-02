@@ -41,7 +41,7 @@
     "build:ci": "node tooling/scripts/verify-ci-base.mjs",
     "build:docs": "node tooling/scripts/verify-doc-conventions.mjs",
     "build:offline": "node tooling/scripts/build-workspace.mjs && node tooling/scripts/build-typescript-boundaries.mjs && node tooling/scripts/build-quality-report.mjs && npm run build:ci && npm run build:docs",
-    "build:studio": "vite build --config apps/studio/vite.config.ts && node tooling/scripts/verify-studio-bootstrap.mjs",
+    "build:studio": "vite build --config apps/studio/vite.config.ts && node tooling/scripts/verify-studio-bootstrap.mjs && node tooling/scripts/verify-m08-5-secret-leaks.mjs",
     "build": "npm run build:offline && npm run build:studio",
     "check:offline": "npm run lint:offline && npm run typecheck && npm run test:boundaries && npm run test:docs && npm run test:node && npm run build:offline",
     "check": "npm run lint && npm run typecheck && npm run test:boundaries && npm run test && npm run build && npm run test:e2e",

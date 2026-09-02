@@ -36,12 +36,13 @@ Owner: `ConnectorGatewayPort + SecretStorePort`.
 
 ## Pendiente
 
-- HelpRegistry `help.data.secrets` y trigger contextual exacto;
-- E2E desktop/mobile de Settings;
-- bundle/export/log secret scan;
-- validación ejecutable de M08.5.
+- publicar el cierre candidato con el gate reproducible de bundle/export/logs;
+- ejecutar ElectroCraft Base CI una sola vez sobre ese commit;
+- si el run queda GREEN, registrar su ID, cerrar M08.5 y activar M08.6.
 
-No declarar GREEN ni activar M08.6 antes de ese gate.
+Validación local del cierre candidato: documentación, lint, typecheck, límites, 41/41 Node, 525/525 Vitest, build, empty-repo y 115 artefactos del leak scan en verde. Playwright local no puede iniciar Chrome por la política de sockets del contenedor. El baseline `ca30a68` pasó el Playwright repository gate en Base CI `33651876477` (#836).
+
+No declarar GREEN ni activar M08.6 antes de que Actions valide el commit de cierre candidato.
 
 ## Read set
 
