@@ -1,6 +1,6 @@
 # TRACKING — ElectroCraft current position
 
-Date: 2026-08-31.
+Date: 2026-09-02.
 
 | Scope | Estado | Evidencia |
 | --- | --- | --- |
@@ -45,12 +45,14 @@ Date: 2026-08-31.
 
 ## Pendiente antes de GREEN
 
-- registrar HelpRegistry exacto `help.data.secrets` y trigger `CircleHelp`;
-- preparar E2E desktop/mobile de Settings;
-- completar scan de export/bundle/logs;
-- ejecutar una validación real de documentación/lint/typecheck/Vitest/build/Playwright al gate de M08.5;
-- corregir solo fallos observados.
+- HelpRegistry exacto `help.data.secrets` y trigger `CircleHelp`: completado;
+- E2E desktop/mobile de Settings y capturas: completado;
+- scan de export/bundle/logs: completado y conectado a `build:studio`;
+- gate local: documentación, lint, typecheck, límites, 41/41 Node, 525/525 Vitest, build, empty-repo y leak scan verdes;
+- Playwright local: bloqueado por `socket() failed: Operation not permitted` del contenedor, no por fallo de producto;
+- baseline remoto `ca30a68`: Base CI `33651876477` (#836) GREEN, incluido Playwright;
+- pendiente único: ejecutar Base CI sobre el commit que incorpora el gate de fugas y, si queda verde, cerrar M08.5.
 
 ## Siguiente acción exacta
 
-Completar Help/E2E/security scan de M08.5 sin ejecutar Actions por cada cambio. Con gate verde, cerrar M08.5 y activar `M08.6 — Data Explorer y prueba de operaciones`.
+Publicar el cierre candidato de M08.5 y ejecutar ElectroCraft Base CI una sola vez. Con gate verde, cerrar M08.5 y activar `M08.6 — Data Explorer y prueba de operaciones`.

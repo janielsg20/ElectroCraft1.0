@@ -49,7 +49,7 @@ Owner: `ConnectorGatewayPort + SecretStorePort`.
 
 ## Validación pendiente
 
-M08.5 permanece `ACTIVE`. No ejecutar GitHub Actions por cada incremento. Antes de declararla GREEN faltan HelpRegistry `help.data.secrets`, E2E responsive/UI, revisión de export/bundle leak scan y gate ejecutable final de la microfase.
+M08.5 permanece `ACTIVE`. HelpRegistry `help.data.secrets`, E2E responsive/UI y evidencia visual ya existen. El gate local confirmó lint, typecheck, límites, 41/41 Node, 525/525 Vitest, builds, empty-repo y el escaneo de 115 artefactos de bundle/source maps/PWA sin fugas. El contenedor local bloquea el socket interno de Chrome; el mismo baseline `ca30a68` sí pasó Playwright en Base CI `33651876477` (#836). Falta ejecutar Actions una sola vez sobre el commit que incorpora el nuevo gate de fugas antes de declarar M08.5 GREEN.
 
 ## Evidencia F08
 
@@ -58,7 +58,9 @@ M08.5 permanece `ACTIVE`. No ejecutar GitHub Actions por cada incremento. Antes 
 - `.ai/evidence/F08/M08.3/IMPLEMENTATION_2026-08-29.md`
 - `.ai/evidence/F08/M08.4/IMPLEMENTATION_2026-08-31.md`
 - `.ai/evidence/F08/M08.5/IMPLEMENTATION_2026-08-31.md`
+- `.ai/evidence/F08/M08.5/VALIDATION_2026-09-02.md`
+- `.ai/evidence/F08/M08.5/secret-leak-scan.json`
 
 ## Siguiente transición
 
-Completar Help `help.data.secrets`, E2E/settings responsive, export/log/bundle leak scan y validación real de M08.5. Solo con gate verde cerrar M08.5 y activar `M08.6 — Data Explorer y prueba de operaciones`.
+Publicar el commit de cierre candidato y ejecutar ElectroCraft Base CI una sola vez. Solo con ese gate verde cerrar M08.5 y activar `M08.6 — Data Explorer y prueba de operaciones`.

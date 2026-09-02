@@ -10,6 +10,7 @@ import { createBrowserConnectorGateway, createBrowserSecretStoreAdmin } from '@e
 import {
   electroCraftDataSourceDefinitionSchema,
   electroCraftSecretRefSchema,
+  electroCraftTargetCompileContextSchema,
   resolveSecretEnvironment,
   secretEnvironmentVariableName,
 } from '@electrocraft/domain';
@@ -233,6 +234,54 @@ describe('M08.5 ConnectorGateway y SecretStore', () => {
       const source = readFileSync(resolve(path), 'utf8');
       expect(source).not.toContain('localStorage');
       expect(source).not.toMatch(/console\.(?:log|debug|info)\s*\(/);
+    }
+  });
+
+  it('exports only SecretRef IDs and does not log secret material on Gateway failures', async () => {
+    const ref = secretFixture();
+    const secretValue = 'export-log-canary-value';
+    const environment: Record<string, string | undefined> = {};
+    const store = createServerEnvironmentSecretStore({ environment, allowWrites: true });
+    await store.write({ ref, environment: 'development', value: secretValue });
+    const consoleSpies = [
+      vi.spyOn(console, 'log').mockImplementation(() => undefined),
+      vi.spyOn(console, 'debug').mockImplementation(() => undefined),
+      vi.spyOn(console, 'info').mockImplementation(() => undefined),
+      vi.spyOn(console, 'error').mockImplementation(() => undefined),
+    ];
+
+    try {
+      const compileContext = electroCraftTargetCompileContextSchema.parse({
+        schemaVersion: 1,
+        targetId: 'react-web',
+        config: { output: 'source' },
+        capabilities: [],
+        environment: { platform: 'linux', ci: true },
+        toolchain: { node: '22.13.0', mode: 'source-only' },
+        secretRefs: [ref.id],
+      });
+      const serializedContext = JSON.stringify(compileContext);
+      expect(serializedContext).toContain(ref.id);
+      expect(serializedContext).not.toContain(ref.key);
+      expect(serializedContext).not.toContain(ref.label);
+      expect(serializedContext).not.toContain(secretValue);
+
+      const gateway = createServerConnectorGateway({
+        secretStore: store,
+        resolveSecretRef: (refId) => (refId === ref.id ? ref : null),
+        authorizeExecution: () => true,
+        fetch: vi.fn(async () => {
+          throw new Error(`upstream failed near ${secretValue}`);
+        }) as unknown as typeof fetch,
+      });
+      const error = await gateway.executeRest(restRequest).catch((reason: unknown) => reason);
+
+      expect(error).toMatchObject({ code: 'GATEWAY_FETCH_FAILED' });
+      expect(String(error)).not.toContain(secretValue);
+      expect(error).toMatchObject({ message: expect.not.stringContaining(secretValue) });
+      expect(consoleSpies.every((spy) => spy.mock.calls.length === 0)).toBe(true);
+    } finally {
+      for (const spy of consoleSpies) spy.mockRestore();
     }
   });
 });

@@ -82,10 +82,8 @@ No se crea un segundo ConnectorRegistry ni un segundo DataSource runtime.
 
 ## Pendiente antes de GREEN
 
-1. HelpRegistry exacto `help.data.secrets` + CircleHelp contextual.
-2. E2E desktop/mobile de Settings.
-3. Scan explícito de export/bundle/logs.
-4. Revisión de formato/type safety mediante toolchain real.
-5. Gate final de M08.5: docs/lint/typecheck/Vitest/build/Playwright.
+1. Publicar el cierre candidato con el gate de fugas integrado.
+2. Ejecutar ElectroCraft Base CI una sola vez sobre ese commit.
+3. Registrar el run GREEN antes de activar M08.6.
 
-No se ejecutaron GitHub Actions durante estos incrementos. M08.5 no se declara DONE hasta evidencia verde.
+Help, E2E responsive, capturas y el scan explícito de export/bundle/logs ya están implementados. La evidencia ejecutable actual vive en `VALIDATION_2026-09-02.md` y `secret-leak-scan.json`. M08.5 no se declara DONE hasta que Actions valide el cierre candidato.
