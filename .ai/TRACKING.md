@@ -18,11 +18,13 @@ Date: 2026-09-03.
 | F08 / M08.4 | IMPLEMENTADA / GREEN MICROFASE | PR `#70`; Base CI `33412562136` (#834); merge `6b79ee859c9d0f4f712d897b4cc973bcc388cefb` |
 | F08 / M08.5 | IMPLEMENTADA / GREEN MICROFASE | PR `#71`; Base CI `33685072920` (#837); merge `64da0f30d46730b9f29a4cc05edaf941b0714e85` |
 | F08 / M08.6 | IMPLEMENTADA / GREEN MICROFASE | PR `#72`; Base CI `33776935165`; merge `d89235f36f81fd91f9d8d676191c8ab52dbf7804`; `.ai/evidence/F08/M08.6/CLOSURE_2026-09-03.md` |
-| F08 / M08.7 | IMPLEMENTADA / CANDIDATA A VALIDACIÓN / ACTIVE | `.ai/evidence/F08/M08.7/IMPLEMENTATION_2026-09-03.md` |
+| F08 / M08.7 | ACTIVE | `.ai/evidence/F08/M08.7/IMPLEMENTATION_2026-09-03.md` |
 
 ## Rama activa
 
 `codex/m08-7-connector-sdk-packs`
+
+Estado de implementación M08.7: `IMPLEMENTADA / CANDIDATA A VALIDACIÓN`.
 
 ## M08.5 — cierre certificado
 
