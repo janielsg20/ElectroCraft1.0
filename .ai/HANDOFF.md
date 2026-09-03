@@ -2,47 +2,49 @@
 
 ## Current
 
-F08 / M08.7 — Connector SDK boundary y optional database packs — `ACTIVE`.
+F08 / M08.8 — Modelos de datos y Field Registry — `ACTIVE`.
 
-Rama activa: `codex/m08-7-connector-sdk-packs`.
+Rama activa: `codex/m08-8-data-models-field-registry`.
 
-Estado de implementación: `IMPLEMENTADA / CANDIDATA A VALIDACIÓN`.
+M08.7 quedó certificada por ElectroCraft Base CI `33792230116` (#858) y PR `#73` fusionada por squash a `main` en `7bded471c94bb50009a6b99215d6e02cb3b726b2`.
 
-M08.6 quedó certificada por ElectroCraft Base CI `33776935165` y PR `#72` fusionada por squash a `main` en `d89235f36f81fd91f9d8d676191c8ab52dbf7804`.
+## M08.8 owner y límites
 
-## M08.7 owner y límites
+Owner: `PGlite generic content store` existente.
 
-Owner: `ConnectorRegistry + ElectroCraftExtensionPackage`.
+- ampliar `ElectroCraftDataModel`; no crear otro concepto central de modelo;
+- modelos/campos se persisten como `data-schema` portable;
+- registros continúan en `content_records` genérico;
+- no DDL dinámico ni tabla física por modelo;
+- Field Registry es metadata portable para Studio/compilers/targets;
+- `storageHint` no ejecuta DDL en Studio;
+- model CRUD debe volver visible el schema mediante el adapter interno/ConnectorRegistry existente;
+- rename/delete de Field muestra usage/data impact;
+- M08.9 conserva la semántica profunda de Group/Repeater/Calculated/Conditional aunque M08.8 registre esos tipos;
+- M08.10/M08.11 conservan taxonomías y relaciones avanzadas; M08.8 solo deja contratos/referencias preparados.
 
-- reutiliza el único `ConnectorRegistry`; no crear otro runtime/registry de conectores;
-- `ConnectorExtensionManifest` es portable y declara kind/config/capabilities/Gateway/runtime/targets;
-- un pack SQL requiere ConnectorGateway y SecretRef; no puede conectar DB directamente desde browser;
-- PostgreSQL/MySQL son packs opcionales; Core no incluye sus drivers;
-- el lifecycle general de extensiones continúa perteneciendo a F17;
-- generated apps solo deben incluir runtime/gateway de packs realmente usados;
-- uninstall falla cerrado mientras alguna `DataSourceDefinition` use el adapter.
+## UX obligatoria
 
-## Resultado implementado
+Ruta: `Datos > Modelos` (`/models`).
 
-1. `ConnectorExtensionManifest` Zod con identidad `ElectroCraftExtensionPackage`, config schema, capabilities, Gateway/runtime y target support;
-2. `ConnectorExtensionRegistry` sobre ConnectorRegistry con install, collision guard, source/config diagnostics, missing connector, usage-aware uninstall y dependency pruning;
-3. catálogo `packages/data-web` que combina Core y extensiones sin drivers SQL embebidos;
-4. Studio: `Datos > Fuentes de datos > Nueva fuente > Más conectores`;
-5. badges Core/Extensión, estado, versión, capabilities, Gateway, compatibilidad y CTA `Instalar conector`;
-6. `help.data.connectors` registrado;
-7. `OPTIONAL_CONNECTOR_PACKS.md` para PostgreSQL/MySQL;
-8. tests de install/read-create/missing/config-SecretRef/uninstall/pruning/security/UI contract.
+Desktop: lista 280–320 px a la izquierda y detalle a la derecha. Tabs: Identidad, Campos, Validación, Plantillas, Workflow, Almacenamiento y Avanzado. Mobile/tablet no comprime el layout desktop: lista y detalle se convierten en navegación/stack usable.
 
-## Validación pendiente
+Copy visible: Modelos; Nuevo modelo; Identidad; Campos; Validación; Taxonomías; Relaciones; Estados; Almacenamiento; Avanzado.
 
-El primer run de Base CI detectó una inconsistencia del marcador documental `ACTIVE` antes de ejecutar lint/typecheck. El contenido funcional no llegó a validarse en ese run; la corrección mantiene M08.7 como única microfase `ACTIVE` con el formato canónico del docs gate.
+Ayuda: `help.content.models`.
 
-No declarar M08.7 GREEN todavía. Falta la ejecución completa de documentación, lint, typecheck, tests, build y Playwright sobre el commit corregido.
+## Engine/API verificado
+
+PGlite mantiene soporte oficial de Drizzle, almacenamiento browser y transacciones. Se reutilizan las migraciones y tablas genéricas existentes.
+
+## Validación
+
+No ejecutar Base CI mientras la microfase esté en implementación. Preparar unit/contract, integration PGlite, persistence round-trip y E2E; después publicar una única candidata y usar Base CI/Playwright como gate final.
 
 ## Siguiente acción exacta
 
-Validar la rama candidata. Si el gate queda verde, registrar `VALIDATION/CLOSURE`, fusionar y activar `M08.8 — Modelos de datos y Field Registry`. Si falla, corregir únicamente los fallos observados sin ampliar el ownership.
+Implementar contrato canónico + Field Registry + model runtime + `/models`, registrar evidence y correr el gate de M08.8. Con GREEN, fusionar y activar `M08.9 — Group, Repeater, Calculated y Conditional Fields`.
 
 ## Read set
 
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/phases/F08.md → .ai/microphases/M08_7.md → .ai/EXTENSION_PLUGIN_SYSTEM.md → packages/domain/src/data → packages/application/src/connector-registry.ts → packages/application/src/data → packages/connectors/src → packages/data-web/src → apps/studio/src/features/data → apps/studio/src/help → tooling/vitest → tooling/playwright`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/phases/F08.md → .ai/microphases/M08_8.md → packages/domain/src/contracts/data-definition.ts → packages/domain/src/data → packages/application/src/data → packages/connectors/src → packages/data-web/src/internal-data-repository.ts → apps/studio/src/features/data → apps/studio/src/help → tooling/vitest → tooling/playwright`.
