@@ -99,3 +99,10 @@ El changelog histórico original hasta M00.8 se preserva sin modificaciones en `
 - El adapter interno normaliza create/update y mantiene PGlite como store genérico, sin DDL dinámico ni tablas por modelo.
 - Studio integra jerarquía, configuración de dependencias y reordenamiento accesible en `Datos > Modelos > Campos`.
 - Local: lint, typecheck, boundaries, Node `41/41`, Vitest `547/547` y build verdes; E2E M08.9 queda para el gate final por timeout del CDN de Chromium en el contenedor.
+
+## 2026-09-03 — F08 / M08.9 cerrada y M08.10 activa
+
+- Base CI `33812380216` (#878) certificó documentación, lint, typecheck, tests, build, `121/121` Playwright, empty-repo y artifacts.
+- PR `#75` se fusionó por squash a `main` en `93440130d8c5fd62f73366925df7695dd309daf3`.
+- Group/Repeater/Calculated/Conditional, nesting portable, validación fail-closed y normalización PGlite quedan certificados.
+- Se activa M08.10 para taxonomías y términos jerárquicos dentro de Modelos sobre el mismo store genérico.
