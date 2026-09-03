@@ -1,16 +1,7 @@
 import type { ElectroCraftDataFieldType } from '@electrocraft/domain';
 
 export type ElectroCraftFieldFamily =
-  | 'text'
-  | 'number'
-  | 'choice'
-  | 'date-time'
-  | 'media'
-  | 'location'
-  | 'relation'
-  | 'composition'
-  | 'logic'
-  | 'system';
+  'text' | 'number' | 'choice' | 'date-time' | 'media' | 'location' | 'relation' | 'composition' | 'logic' | 'system';
 
 export type ElectroCraftFieldStorageHint = 'scalar' | 'json' | 'reference' | 'computed';
 
@@ -46,14 +37,16 @@ const field = (
     supportsValidation: options.supportsValidation ?? true,
     supportsOptions: options.supportsOptions ?? false,
     supportsConditions: options.supportsConditions ?? true,
-    supportsIndexing: options.supportsIndexing ?? storageHint === 'scalar' || storageHint === 'reference',
+    supportsIndexing: (options.supportsIndexing ?? storageHint === 'scalar') || storageHint === 'reference',
     ...(options.advancedOwner ? { advancedOwner: options.advancedOwner } : {}),
   });
 
 export const electroCraftFieldRegistry = Object.freeze([
   field('text', 'Texto', 'text', 'Texto corto de una línea.', 'scalar'),
   field('textarea', 'Texto largo', 'text', 'Texto multilínea sin formato enriquecido.', 'scalar'),
-  field('richtext', 'Texto enriquecido', 'text', 'Contenido enriquecido portable.', 'json', { supportsIndexing: false }),
+  field('richtext', 'Texto enriquecido', 'text', 'Contenido enriquecido portable.', 'json', {
+    supportsIndexing: false,
+  }),
   field('number', 'Número', 'number', 'Valor numérico general.', 'scalar'),
   field('currency', 'Moneda', 'number', 'Importe monetario con metadata de moneda.', 'scalar'),
   field('email', 'Correo electrónico', 'text', 'Correo con validación de formato.', 'scalar'),
@@ -72,7 +65,9 @@ export const electroCraftFieldRegistry = Object.freeze([
   }),
   field('switch', 'Interruptor', 'choice', 'Control booleano presentado como interruptor.', 'scalar'),
   field('image', 'Imagen', 'media', 'Referencia a un recurso de imagen.', 'reference'),
-  field('gallery', 'Galería', 'media', 'Colección ordenada de referencias de imagen.', 'json', { supportsIndexing: false }),
+  field('gallery', 'Galería', 'media', 'Colección ordenada de referencias de imagen.', 'json', {
+    supportsIndexing: false,
+  }),
   field('file', 'Archivo', 'media', 'Referencia a un recurso de archivo.', 'reference'),
   field('map', 'Mapa', 'location', 'Coordenadas y metadata de ubicación.', 'json', { supportsIndexing: false }),
   field('relation', 'Relación', 'relation', 'Referencia a otro modelo del mismo esquema.', 'reference', {
