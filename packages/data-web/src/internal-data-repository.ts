@@ -1,5 +1,6 @@
 import type {
   DataSourceResourceDescriptor,
+  InternalDataFieldUsage,
   InternalDataQuery,
   InternalDataQueryResult,
   InternalDataRecord,
@@ -9,7 +10,7 @@ import type {
   InternalDataSourceStats,
 } from '@electrocraft/application';
 import { electroCraftDataSchemaSchema, type ElectroCraftDataSchema, type JsonValue } from '@electrocraft/domain';
-import { and, asc, count, desc, eq } from 'drizzle-orm';
+import { and, asc, count, eq } from 'drizzle-orm';
 import type { StudioProjectDatabase } from './repository';
 import * as schema from './schema';
 
@@ -56,12 +57,7 @@ function compareValues(left: JsonValue | undefined, right: JsonValue | undefined
 function normalizeQuery(query: InternalDataQuery | undefined) {
   const offset = Math.max(0, Math.trunc(query?.offset ?? 0));
   const limit = Math.min(200, Math.max(1, Math.trunc(query?.limit ?? 50)));
-  return Object.freeze({
-    offset,
-    limit,
-    filter: query?.filter,
-    sort: query?.sort,
-  });
+  return Object.freeze({ offset, limit, filter: query?.filter, sort: query?.sort });
 }
 
 async function schemasForSource(
@@ -339,6 +335,28 @@ export function createDrizzleInternalDataRepository(db: StudioProjectDatabase): 
     });
   }
 
+  async function getFieldUsage(
+    projectIdInput: string,
+    modelIdInput: string,
+    fieldKeyInput: string,
+  ): Promise<InternalDataFieldUsage> {
+    const projectId = requireNonEmpty(projectIdInput, 'projectId');
+    const modelId = requireNonEmpty(modelIdInput, 'modelId');
+    const fieldKey = requireNonEmpty(fieldKeyInput, 'fieldKey');
+    const rows = await db
+      .select({ data: schema.contentRecords.data })
+      .from(schema.contentRecords)
+      .where(and(eq(schema.contentRecords.projectId, projectId), eq(schema.contentRecords.modelId, modelId)));
+    let populatedCount = 0;
+    for (const row of rows) {
+      const data = asJsonObject(row.data, 'record.data');
+      if (Object.prototype.hasOwnProperty.call(data, fieldKey) && data[fieldKey] !== null && data[fieldKey] !== '') {
+        populatedCount += 1;
+      }
+    }
+    return Object.freeze({ modelId, fieldKey, recordCount: rows.length, populatedCount });
+  }
+
   return Object.freeze({
     testConnection,
     listResources,
@@ -348,5 +366,6 @@ export function createDrizzleInternalDataRepository(db: StudioProjectDatabase): 
     updateRecord,
     deleteRecord,
     getStats,
+    getFieldUsage,
   });
 }
