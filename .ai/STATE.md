@@ -17,11 +17,13 @@
 - M08.4 — GraphQL Connector: `IMPLEMENTADA / GREEN MICROFASE`.
 - M08.5 — ConnectorGateway y SecretStore: `IMPLEMENTADA / GREEN MICROFASE`.
 - M08.6 — Data Explorer y prueba de operaciones: `IMPLEMENTADA / GREEN MICROFASE`.
-- M08.7 — Connector SDK boundary y optional database packs: `IMPLEMENTADA / CANDIDATA A VALIDACIÓN / ACTIVE`.
+- M08.7 — Connector SDK boundary y optional database packs: `ACTIVE`.
 
 ## Rama activa
 
 `codex/m08-7-connector-sdk-packs`
+
+Estado de implementación M08.7: `IMPLEMENTADA / CANDIDATA A VALIDACIÓN`.
 
 ## Último cierre certificado
 
@@ -68,4 +70,4 @@ Owner: `ConnectorRegistry + ElectroCraftExtensionPackage`.
 
 ## Siguiente transición
 
-Validar la candidata M08.7 con lint, typecheck, tests y build; después ejecutar una sola ElectroCraft Base CI/Playwright. Solo con gate verde fusionar y activar `M08.8 — Modelos de datos y Field Registry`.
+Validar la candidata M08.7 con lint, typecheck, tests y build; después ejecutar ElectroCraft Base CI/Playwright. Solo con gate verde fusionar y activar `M08.8 — Modelos de datos y Field Registry`.
