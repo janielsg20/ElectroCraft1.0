@@ -1,7 +1,4 @@
-import {
-  electroCraftFieldRegistry,
-  getElectroCraftFieldRegistryEntry,
-} from '@electrocraft/application';
+import { electroCraftFieldRegistry, getElectroCraftFieldRegistryEntry } from '@electrocraft/application';
 import { Button, Input, Tabs, TabsContent, TabsList, TabsTrigger } from '@electrocraft/design-system';
 import type { ElectroCraftDataField, ElectroCraftDataFieldType } from '@electrocraft/domain';
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
@@ -294,7 +291,9 @@ export function DataModelsWorkspace() {
                       type="checkbox"
                       checked={model.singleton ?? false}
                       onChange={(event) =>
-                        void dataModelWorkspaceRuntime.updateModelIdentity(model.id, { singleton: event.target.checked })
+                        void dataModelWorkspaceRuntime.updateModelIdentity(model.id, {
+                          singleton: event.target.checked,
+                        })
                       }
                     />{' '}
                     Singleton
@@ -304,7 +303,9 @@ export function DataModelsWorkspace() {
                       type="checkbox"
                       checked={model.menuVisible ?? true}
                       onChange={(event) =>
-                        void dataModelWorkspaceRuntime.updateModelIdentity(model.id, { menuVisible: event.target.checked })
+                        void dataModelWorkspaceRuntime.updateModelIdentity(model.id, {
+                          menuVisible: event.target.checked,
+                        })
                       }
                     />{' '}
                     Visible en menú
@@ -507,7 +508,8 @@ export function DataModelsWorkspace() {
                 <p>Las reglas viven en el schema canónico del campo y viajan con el proyecto.</p>
                 <div className="ec-model-metrics">
                   <span>
-                    <strong>{model.fields.filter((field) => field.required ?? !field.nullable).length}</strong> requeridos
+                    <strong>{model.fields.filter((field) => field.required ?? !field.nullable).length}</strong>{' '}
+                    requeridos
                   </span>
                   <span>
                     <strong>{model.fields.filter((field) => field.indexed).length}</strong> indexados
@@ -522,8 +524,8 @@ export function DataModelsWorkspace() {
               <section className="ec-model-panel">
                 <h3>Plantillas</h3>
                 <p>
-                  El modelo conserva metadata portable para que los targets y futuras plantillas la consuman sin acoplarla
-                  al store físico.
+                  El modelo conserva metadata portable para que los targets y futuras plantillas la consuman sin
+                  acoplarla al store físico.
                 </p>
                 <p>
                   Taxonomías y Relaciones se mantienen como referencias canónicas y sus editores avanzados pertenecen a
@@ -534,7 +536,10 @@ export function DataModelsWorkspace() {
             <TabsContent value="workflow" className="ec-model-tab-content">
               <section className="ec-model-panel">
                 <h3>Workflow</h3>
-                <p>Estados y capability refs se expresan como metadata del modelo; el motor de workflows permanece separado.</p>
+                <p>
+                  Estados y capability refs se expresan como metadata del modelo; el motor de workflows permanece
+                  separado.
+                </p>
                 <div className="ec-model-metrics">
                   <span>
                     <strong>{model.visibility ?? 'internal'}</strong> visibilidad
