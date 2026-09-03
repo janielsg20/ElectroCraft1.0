@@ -6,6 +6,7 @@ import {
   type ElectroCraftDataField,
   type ElectroCraftDataFieldType,
   type ElectroCraftDataModel,
+  type ElectroCraftObjectId,
   type JsonValue,
 } from '@electrocraft/domain';
 
@@ -29,8 +30,8 @@ export function createAdvancedMetadataForField(
   model: ElectroCraftDataModel,
   type: ElectroCraftDataFieldType,
   options?: {
-    readonly fieldId?: string;
-    readonly parentFieldRef?: string | null;
+    readonly fieldId?: ElectroCraftObjectId;
+    readonly parentFieldRef?: ElectroCraftObjectId | null;
     readonly order?: number;
     readonly existing?: ElectroCraftAdvancedFieldMetadata;
   },
@@ -93,14 +94,15 @@ export function withAdvancedFieldMetadata(
 
 export function modelCapabilityRefsForFields(model: ElectroCraftDataModel, fields: readonly ElectroCraftDataField[]) {
   const refs = new Set(model.capabilityRefs ?? []);
-  if (fields.some((field) => isElectroCraftAdvancedFieldType(field.type))) refs.add(ELECTROCRAFT_ADVANCED_FIELD_CAPABILITY);
+  if (fields.some((field) => isElectroCraftAdvancedFieldType(field.type)))
+    refs.add(ELECTROCRAFT_ADVANCED_FIELD_CAPABILITY);
   else refs.delete(ELECTROCRAFT_ADVANCED_FIELD_CAPABILITY);
   return Object.freeze([...refs]);
 }
 
 export function moveFieldWithinScope(
   model: ElectroCraftDataModel,
-  fieldId: string,
+  fieldId: ElectroCraftObjectId,
   direction: -1 | 1,
 ): readonly ElectroCraftDataField[] {
   const field = model.fields.find(({ id }) => id === fieldId);
@@ -126,4 +128,41 @@ export function moveFieldWithinScope(
       return order === undefined ? candidate : withAdvancedFieldMetadata(model, candidate, candidate.type, { order });
     }),
   );
+}
+
+export interface OrderedAdvancedField {
+  readonly field: ElectroCraftDataField;
+  readonly depth: number;
+}
+
+export function orderAdvancedFieldsForDisplay(model: ElectroCraftDataModel): readonly OrderedAdvancedField[] {
+  const children = new Map<ElectroCraftObjectId | null, ElectroCraftDataField[]>();
+  for (const field of model.fields) {
+    const parent = readElectroCraftAdvancedFieldMetadata(field).parentFieldRef;
+    const scoped = children.get(parent) ?? [];
+    scoped.push(field);
+    children.set(parent, scoped);
+  }
+  for (const scoped of children.values()) {
+    scoped.sort(
+      (left, right) =>
+        readElectroCraftAdvancedFieldMetadata(left).order - readElectroCraftAdvancedFieldMetadata(right).order,
+    );
+  }
+
+  const ordered: OrderedAdvancedField[] = [];
+  const visited = new Set<ElectroCraftObjectId>();
+  const visit = (parent: ElectroCraftObjectId | null, depth: number) => {
+    for (const field of children.get(parent) ?? []) {
+      if (visited.has(field.id)) continue;
+      visited.add(field.id);
+      ordered.push(Object.freeze({ field, depth }));
+      if (field.type === 'group' || field.type === 'repeater') visit(field.id, depth + 1);
+    }
+  };
+  visit(null, 0);
+  for (const field of model.fields) {
+    if (!visited.has(field.id)) ordered.push(Object.freeze({ field, depth: 0 }));
+  }
+  return Object.freeze(ordered);
 }

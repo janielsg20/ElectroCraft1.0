@@ -197,14 +197,22 @@ export function validateElectroCraftAdvancedFieldModel(
     const raw = field.metadata[ELECTROCRAFT_ADVANCED_FIELD_METADATA_KEY];
     const parsed = electroCraftAdvancedFieldMetadataSchema.safeParse(raw ?? {});
     if (!parsed.success) {
-      diagnostics.push({ code: 'invalid-advanced-config', fieldId: field.id, message: `${field.label}: configuración avanzada inválida.` });
+      diagnostics.push({
+        code: 'invalid-advanced-config',
+        fieldId: field.id,
+        message: `${field.label}: configuración avanzada inválida.`,
+      });
       continue;
     }
     const advanced = parsed.data;
     if (advanced.parentFieldRef) {
       const parent = byId.get(advanced.parentFieldRef);
       if (!parent || !['group', 'repeater'].includes(parent.type) || parent.id === field.id) {
-        diagnostics.push({ code: 'invalid-parent', fieldId: field.id, message: `${field.label}: el padre debe ser Group o Repeater del mismo modelo.` });
+        diagnostics.push({
+          code: 'invalid-parent',
+          fieldId: field.id,
+          message: `${field.label}: el padre debe ser Group o Repeater del mismo modelo.`,
+        });
       } else {
         parentGraph.set(field.id, [parent.id]);
       }
@@ -213,22 +221,46 @@ export function validateElectroCraftAdvancedFieldModel(
     }
 
     if (field.type === 'repeater' && !advanced.repeater) {
-      diagnostics.push({ code: 'invalid-advanced-config', fieldId: field.id, message: `${field.label}: Repeater requiere configuración repetible.` });
+      diagnostics.push({
+        code: 'invalid-advanced-config',
+        fieldId: field.id,
+        message: `${field.label}: Repeater requiere configuración repetible.`,
+      });
     }
     if (field.type === 'calculated' && !advanced.calculated) {
-      diagnostics.push({ code: 'invalid-advanced-config', fieldId: field.id, message: `${field.label}: Calculated requiere operación y operandos.` });
+      diagnostics.push({
+        code: 'invalid-advanced-config',
+        fieldId: field.id,
+        message: `${field.label}: Calculated requiere operación y operandos.`,
+      });
     }
     if (field.type === 'conditional' && !advanced.conditional) {
-      diagnostics.push({ code: 'invalid-advanced-config', fieldId: field.id, message: `${field.label}: Conditional requiere un rule AST.` });
+      diagnostics.push({
+        code: 'invalid-advanced-config',
+        fieldId: field.id,
+        message: `${field.label}: Conditional requiere un rule AST.`,
+      });
     }
     if (field.type !== 'repeater' && advanced.repeater) {
-      diagnostics.push({ code: 'invalid-advanced-config', fieldId: field.id, message: `${field.label}: repeater config solo es válida para Repeater.` });
+      diagnostics.push({
+        code: 'invalid-advanced-config',
+        fieldId: field.id,
+        message: `${field.label}: repeater config solo es válida para Repeater.`,
+      });
     }
     if (field.type !== 'calculated' && advanced.calculated) {
-      diagnostics.push({ code: 'invalid-advanced-config', fieldId: field.id, message: `${field.label}: calculated config solo es válida para Calculated.` });
+      diagnostics.push({
+        code: 'invalid-advanced-config',
+        fieldId: field.id,
+        message: `${field.label}: calculated config solo es válida para Calculated.`,
+      });
     }
     if (field.type !== 'conditional' && advanced.conditional) {
-      diagnostics.push({ code: 'invalid-advanced-config', fieldId: field.id, message: `${field.label}: conditional config solo es válida para Conditional.` });
+      diagnostics.push({
+        code: 'invalid-advanced-config',
+        fieldId: field.id,
+        message: `${field.label}: conditional config solo es válida para Conditional.`,
+      });
     }
 
     const dependencies = collectElectroCraftAdvancedFieldDependencies(field);
@@ -236,23 +268,41 @@ export function validateElectroCraftAdvancedFieldModel(
     for (const dependency of dependencies) {
       const target = byKey.get(dependency);
       if (!target) {
-        diagnostics.push({ code: 'missing-dependency', fieldId: field.id, message: `${field.label}: dependencia ${dependency} no existe.` });
+        diagnostics.push({
+          code: 'missing-dependency',
+          fieldId: field.id,
+          message: `${field.label}: dependencia ${dependency} no existe.`,
+        });
         continue;
       }
       const targetParent = readElectroCraftAdvancedFieldMetadata(target).parentFieldRef;
       if (targetParent !== advanced.parentFieldRef) {
-        diagnostics.push({ code: 'cross-scope-dependency', fieldId: field.id, message: `${field.label}: ${dependency} pertenece a otro scope anidado.` });
+        diagnostics.push({
+          code: 'cross-scope-dependency',
+          fieldId: field.id,
+          message: `${field.label}: ${dependency} pertenece a otro scope anidado.`,
+        });
       }
     }
   }
 
   for (const fieldId of hasCycle(parentGraph)) {
     const field = byId.get(fieldId as ElectroCraftObjectId);
-    if (field) diagnostics.push({ code: 'parent-cycle', fieldId: field.id, message: `${field.label}: ciclo de Group/Repeater detectado.` });
+    if (field)
+      diagnostics.push({
+        code: 'parent-cycle',
+        fieldId: field.id,
+        message: `${field.label}: ciclo de Group/Repeater detectado.`,
+      });
   }
   for (const fieldKey of hasCycle(dependencyGraph)) {
     const field = byKey.get(fieldKey);
-    if (field) diagnostics.push({ code: 'dependency-cycle', fieldId: field.id, message: `${field.label}: ciclo de dependencias detectado.` });
+    if (field)
+      diagnostics.push({
+        code: 'dependency-cycle',
+        fieldId: field.id,
+        message: `${field.label}: ciclo de dependencias detectado.`,
+      });
   }
 
   return Object.freeze(diagnostics);
@@ -260,5 +310,6 @@ export function validateElectroCraftAdvancedFieldModel(
 
 export function assertElectroCraftAdvancedFieldModel(model: ElectroCraftDataModel): void {
   const diagnostics = validateElectroCraftAdvancedFieldModel(model);
-  if (diagnostics.length) throw new Error(`ADVANCED_FIELD_MODEL_INVALID:${diagnostics.map(({ message }) => message).join(' | ')}`);
+  if (diagnostics.length)
+    throw new Error(`ADVANCED_FIELD_MODEL_INVALID:${diagnostics.map(({ message }) => message).join(' | ')}`);
 }

@@ -14,6 +14,7 @@ import {
   type ElectroCraftDataField,
   type ElectroCraftDataFieldType,
   type ElectroCraftDataModel,
+  type ElectroCraftObjectId,
   type ElectroCraftDataSchema,
   type ElectroCraftDataSourceDefinition,
   type JsonValue,
@@ -399,10 +400,14 @@ export const dataModelWorkspaceRuntime = Object.freeze({
       capabilityRefs: modelCapabilityRefsForFields(model, fields),
       fields,
     });
-    await persistSchema(replaceModel(current.schema, nextModel), modelId, `Configuración de ${field.label} actualizada.`);
+    await persistSchema(
+      replaceModel(current.schema, nextModel),
+      modelId,
+      `Configuración de ${field.label} actualizada.`,
+    );
     return nextField;
   },
-  async moveField(modelId: string, fieldId: string, direction: -1 | 1) {
+  async moveField(modelId: string, fieldId: ElectroCraftObjectId, direction: -1 | 1) {
     const current = snapshot;
     if (!current.schema) throw new Error('No hay esquema interno para editar.');
     const model = current.schema.models.find(({ id }) => id === modelId);
@@ -422,7 +427,8 @@ export const dataModelWorkspaceRuntime = Object.freeze({
     const childCount = model.fields.filter(
       (candidate) => readElectroCraftAdvancedFieldMetadata(candidate).parentFieldRef === field.id,
     ).length;
-    if (childCount > 0) throw new Error(`Mueve o elimina primero los ${childCount} campo(s) anidados dentro de ${field.label}.`);
+    if (childCount > 0)
+      throw new Error(`Mueve o elimina primero los ${childCount} campo(s) anidados dentro de ${field.label}.`);
     const impact = await queryFieldImpact(current.source, model, field);
     if (impact.populatedCount > 0 && !confirmDataImpact)
       throw new Error(`FIELD_DELETE_IMPACT:${impact.populatedCount}`);

@@ -43,6 +43,7 @@ export function evaluateElectroCraftFieldRule(
   if (rule.kind === 'and') return rule.rules.every((candidate) => evaluateElectroCraftFieldRule(candidate, scope));
   if (rule.kind === 'or') return rule.rules.some((candidate) => evaluateElectroCraftFieldRule(candidate, scope));
   if (rule.kind === 'not') return !evaluateElectroCraftFieldRule(rule.rule, scope);
+  if (rule.kind !== 'comparison') return false;
 
   const current = scope[rule.fieldKey];
   if (rule.operator === 'empty') return isEmpty(current);
@@ -128,15 +129,31 @@ function validateScalar(field: ElectroCraftDataField, value: JsonValue | undefin
     diagnostics.push({ fieldKey: field.key, path, message: `${field.label} debe ser texto.` });
   }
   if (field.validation?.min !== undefined && typeof value === 'number' && value < field.validation.min) {
-    diagnostics.push({ fieldKey: field.key, path, message: `${field.label} debe ser mayor o igual que ${field.validation.min}.` });
+    diagnostics.push({
+      fieldKey: field.key,
+      path,
+      message: `${field.label} debe ser mayor o igual que ${field.validation.min}.`,
+    });
   }
   if (field.validation?.max !== undefined && typeof value === 'number' && value > field.validation.max) {
-    diagnostics.push({ fieldKey: field.key, path, message: `${field.label} debe ser menor o igual que ${field.validation.max}.` });
+    diagnostics.push({
+      fieldKey: field.key,
+      path,
+      message: `${field.label} debe ser menor o igual que ${field.validation.max}.`,
+    });
   }
-  if (field.validation?.minLength !== undefined && typeof value === 'string' && value.length < field.validation.minLength) {
+  if (
+    field.validation?.minLength !== undefined &&
+    typeof value === 'string' &&
+    value.length < field.validation.minLength
+  ) {
     diagnostics.push({ fieldKey: field.key, path, message: `${field.label} no alcanza la longitud mínima.` });
   }
-  if (field.validation?.maxLength !== undefined && typeof value === 'string' && value.length > field.validation.maxLength) {
+  if (
+    field.validation?.maxLength !== undefined &&
+    typeof value === 'string' &&
+    value.length > field.validation.maxLength
+  ) {
     diagnostics.push({ fieldKey: field.key, path, message: `${field.label} supera la longitud máxima.` });
   }
   return diagnostics;
@@ -147,7 +164,10 @@ function normalizeScope(
   parentFieldRef: string | null,
   input: Readonly<Record<string, JsonValue>>,
   path: string,
-): { readonly data: Readonly<Record<string, JsonValue>>; readonly diagnostics: readonly AdvancedFieldRuntimeDiagnostic[] } {
+): {
+  readonly data: Readonly<Record<string, JsonValue>>;
+  readonly diagnostics: readonly AdvancedFieldRuntimeDiagnostic[];
+} {
   const scopedFields = model.fields
     .filter((field) => readElectroCraftAdvancedFieldMetadata(field).parentFieldRef === parentFieldRef)
     .sort(
@@ -242,15 +262,27 @@ function normalizeScope(
       const minItems = advanced.repeater?.minItems;
       const maxItems = advanced.repeater?.maxItems;
       if (minItems !== undefined && value.length < minItems) {
-        diagnostics.push({ fieldKey: field.key, path: fieldPath, message: `${field.label} requiere al menos ${minItems} elemento(s).` });
+        diagnostics.push({
+          fieldKey: field.key,
+          path: fieldPath,
+          message: `${field.label} requiere al menos ${minItems} elemento(s).`,
+        });
       }
       if (maxItems !== undefined && value.length > maxItems) {
-        diagnostics.push({ fieldKey: field.key, path: fieldPath, message: `${field.label} admite como máximo ${maxItems} elemento(s).` });
+        diagnostics.push({
+          fieldKey: field.key,
+          path: fieldPath,
+          message: `${field.label} admite como máximo ${maxItems} elemento(s).`,
+        });
       }
       const normalizedItems: JsonValue[] = [];
       value.forEach((item, index) => {
         if (!isJsonObject(item)) {
-          diagnostics.push({ fieldKey: field.key, path: `${fieldPath}[${index}]`, message: `${field.label}: cada elemento debe ser un objeto.` });
+          diagnostics.push({
+            fieldKey: field.key,
+            path: `${fieldPath}[${index}]`,
+            message: `${field.label}: cada elemento debe ser un objeto.`,
+          });
           return;
         }
         const nested = normalizeScope(model, field.id, item, `${fieldPath}[${index}]`);

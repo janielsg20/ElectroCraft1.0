@@ -6,6 +6,7 @@ import {
   type ElectroCraftConditionalValueType,
   type ElectroCraftDataField,
   type ElectroCraftDataModel,
+  type ElectroCraftObjectId,
 } from '@electrocraft/domain';
 import { useEffect, useMemo, useState } from 'react';
 import { dataModelWorkspaceRuntime } from './data-model-runtime';
@@ -30,10 +31,12 @@ const comparisonOperators: readonly { readonly value: ElectroCraftConditionalOpe
 
 export function AdvancedFieldEditor({ model, field, onMessage }: AdvancedFieldEditorProps) {
   const advanced = readElectroCraftAdvancedFieldMetadata(field);
-  const [parentFieldRef, setParentFieldRef] = useState<string>(advanced.parentFieldRef ?? '');
+  const [parentFieldRef, setParentFieldRef] = useState<ElectroCraftObjectId | ''>(advanced.parentFieldRef ?? '');
   const [minItems, setMinItems] = useState(String(advanced.repeater?.minItems ?? 0));
   const [maxItems, setMaxItems] = useState(String(advanced.repeater?.maxItems ?? ''));
-  const [operation, setOperation] = useState<ElectroCraftCalculatedOperation>(advanced.calculated?.operation ?? 'coalesce');
+  const [operation, setOperation] = useState<ElectroCraftCalculatedOperation>(
+    advanced.calculated?.operation ?? 'coalesce',
+  );
   const [firstDependency, setFirstDependency] = useState(
     advanced.calculated?.operands.find((operand) => operand.kind === 'field')?.fieldKey ?? '',
   );
@@ -68,7 +71,8 @@ export function AdvancedFieldEditor({ model, field, onMessage }: AdvancedFieldEd
   }, [field]);
 
   const parentCandidates = useMemo(
-    () => model.fields.filter((candidate) => candidate.id !== field.id && ['group', 'repeater'].includes(candidate.type)),
+    () =>
+      model.fields.filter((candidate) => candidate.id !== field.id && ['group', 'repeater'].includes(candidate.type)),
     [field.id, model.fields],
   );
   const dependencyCandidates = useMemo(
@@ -76,7 +80,10 @@ export function AdvancedFieldEditor({ model, field, onMessage }: AdvancedFieldEd
       model.fields.filter((candidate) => {
         if (candidate.id === field.id) return false;
         const candidateAdvanced = readElectroCraftAdvancedFieldMetadata(candidate);
-        return candidateAdvanced.parentFieldRef === (parentFieldRef || null) && !['group', 'repeater'].includes(candidate.type);
+        return (
+          candidateAdvanced.parentFieldRef === (parentFieldRef || null) &&
+          !['group', 'repeater'].includes(candidate.type)
+        );
       }),
     [field.id, model.fields, parentFieldRef],
   );
@@ -118,6 +125,15 @@ export function AdvancedFieldEditor({ model, field, onMessage }: AdvancedFieldEd
     onMessage('Configuración avanzada guardada. Dependencias y ciclos fueron validados.');
   }
 
+  async function moveField(direction: -1 | 1) {
+    try {
+      await dataModelWorkspaceRuntime.moveField(model.id, field.id, direction);
+      onMessage('Orden de campos actualizado.');
+    } catch (error) {
+      onMessage(error instanceof Error ? error.message : 'No se pudo actualizar el orden del campo.');
+    }
+  }
+
   return (
     <section className="ec-advanced-field-editor" aria-label="Configuración avanzada del campo">
       <div className="ec-advanced-field-heading">
@@ -126,10 +142,10 @@ export function AdvancedFieldEditor({ model, field, onMessage }: AdvancedFieldEd
           <p>La configuración es portable; PGlite sigue usando `content_records` sin DDL dinámico.</p>
         </div>
         <div className="ec-advanced-order-actions" aria-label="Orden del campo">
-          <Button size="sm" variant="outline" onClick={() => void dataModelWorkspaceRuntime.moveField(model.id, field.id, -1)}>
+          <Button size="sm" variant="outline" onClick={() => void moveField(-1)}>
             Subir
           </Button>
-          <Button size="sm" variant="outline" onClick={() => void dataModelWorkspaceRuntime.moveField(model.id, field.id, 1)}>
+          <Button size="sm" variant="outline" onClick={() => void moveField(1)}>
             Bajar
           </Button>
         </div>
@@ -138,7 +154,10 @@ export function AdvancedFieldEditor({ model, field, onMessage }: AdvancedFieldEd
       <div className="ec-model-form-grid">
         <label>
           Dentro de
-          <select value={parentFieldRef} onChange={(event) => setParentFieldRef(event.target.value)}>
+          <select
+            value={parentFieldRef}
+            onChange={(event) => setParentFieldRef(event.target.value as ElectroCraftObjectId | '')}
+          >
             <option value="">Raíz del modelo</option>
             {parentCandidates.map((candidate) => (
               <option key={candidate.id} value={candidate.id}>
@@ -165,7 +184,10 @@ export function AdvancedFieldEditor({ model, field, onMessage }: AdvancedFieldEd
           <>
             <label>
               Operación segura
-              <select value={operation} onChange={(event) => setOperation(event.target.value as ElectroCraftCalculatedOperation)}>
+              <select
+                value={operation}
+                onChange={(event) => setOperation(event.target.value as ElectroCraftCalculatedOperation)}
+              >
                 <option value="coalesce">Primer valor disponible</option>
                 <option value="concat">Concatenar</option>
                 <option value="add">Sumar</option>
@@ -247,12 +269,30 @@ export function AdvancedFieldEditor({ model, field, onMessage }: AdvancedFieldEd
         ) : null}
       </div>
 
-      {field.type === 'group' ? <p className="ec-advanced-hint">Los campos hijos se guardan como objeto JSON anidado.</p> : null}
-      {field.type === 'repeater' ? <p className="ec-advanced-hint">Cada elemento del Repeater valida sus hijos de forma independiente.</p> : null}
-      {field.type === 'calculated' ? <p className="ec-advanced-hint">Solo se ejecutan operaciones registradas; nunca se evalúa código del usuario.</p> : null}
-      {field.type === 'conditional' ? <p className="ec-advanced-hint">La condición usa un AST tipado y se interpreta sin `eval`.</p> : null}
+      {field.type === 'group' ? (
+        <p className="ec-advanced-hint">Los campos hijos se guardan como objeto JSON anidado.</p>
+      ) : null}
+      {field.type === 'repeater' ? (
+        <p className="ec-advanced-hint">Cada elemento del Repeater valida sus hijos de forma independiente.</p>
+      ) : null}
+      {field.type === 'calculated' ? (
+        <p className="ec-advanced-hint">
+          Solo se ejecutan operaciones registradas; nunca se evalúa código del usuario.
+        </p>
+      ) : null}
+      {field.type === 'conditional' ? (
+        <p className="ec-advanced-hint">La condición usa un AST tipado y se interpreta sin `eval`.</p>
+      ) : null}
 
-      <Button size="sm" variant="outline" onClick={() => void saveAdvanced().catch((error: unknown) => onMessage(error instanceof Error ? error.message : 'No se pudo guardar la configuración avanzada.'))}>
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={() =>
+          void saveAdvanced().catch((error: unknown) =>
+            onMessage(error instanceof Error ? error.message : 'No se pudo guardar la configuración avanzada.'),
+          )
+        }
+      >
         Guardar estructura
       </Button>
     </section>
