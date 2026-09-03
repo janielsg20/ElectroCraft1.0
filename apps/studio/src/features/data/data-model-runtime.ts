@@ -1,10 +1,13 @@
-import { createStoredDataSchemaObject, type StoredProjectDefinition } from '@electrocraft/application';
+import {
+  createStoredDataSchemaObject,
+  getElectroCraftFieldRegistryEntry,
+  type StoredProjectDefinition,
+} from '@electrocraft/application';
 import {
   createDeterministicObjectId,
   electroCraftDataFieldSchema,
   electroCraftDataModelSchema,
   electroCraftDataSchemaSchema,
-  getElectroCraftFieldRegistryEntry,
   type ElectroCraftDataField,
   type ElectroCraftDataFieldType,
   type ElectroCraftDataModel,
@@ -223,7 +226,11 @@ export const dataModelWorkspaceRuntime = Object.freeze({
     if (!loadPromise) {
       loadPromise = loadWorkspace()
         .catch((error: unknown) => {
-          publish({ ...snapshot, state: 'error', message: error instanceof Error ? error.message : 'No se pudieron cargar los modelos.' });
+          publish({
+            ...snapshot,
+            state: 'error',
+            message: error instanceof Error ? error.message : 'No se pudieron cargar los modelos.',
+          });
           throw error;
         })
         .finally(() => {
@@ -329,12 +336,12 @@ export const dataModelWorkspaceRuntime = Object.freeze({
     confirmDataImpact = false,
   ) {
     const current = snapshot;
-    if (!current.schema) throw new Error('No hay esquema interno para editar.');
+    if (!current.schema || !current.source) throw new Error('No hay esquema interno para editar.');
     const model = current.schema.models.find(({ id }) => id === modelId);
     const field = model?.fields.find(({ id }) => id === fieldId);
     if (!model || !field) throw new Error('Campo no encontrado.');
     if (typeof patch.key === 'string' && patch.key !== field.key && !confirmDataImpact) {
-      const impact = await queryFieldImpact(current.source!, model, field);
+      const impact = await queryFieldImpact(current.source, model, field);
       if (impact.populatedCount > 0) throw new Error(`FIELD_RENAME_IMPACT:${impact.populatedCount}`);
     }
     const nextField = electroCraftDataFieldSchema.parse({ ...field, ...patch, id: field.id });
