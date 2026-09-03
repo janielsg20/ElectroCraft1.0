@@ -55,11 +55,11 @@ test('M08.6 ejecuta una lectura, sanitiza la traza y crea un borrador de consult
   await page.getByRole('button', { name: 'Explorar' }).click();
   await expect(page.getByRole('heading', { name: 'Explorar' })).toBeVisible();
   await expect(page.locator('[data-help-trigger="help.data.explorer"]')).toBeVisible();
-  await expect(page.getByText('Listar productos', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Listar productos', exact: true })).toBeVisible();
   await expect(page.getByText('Sin ejecutar')).toBeVisible();
   await page.getByRole('button', { name: 'Ejecutar' }).click();
 
-  await expect(page.getByText('Cable Explorer')).toBeVisible();
+  await expect(page.locator('.ec-data-explorer-table-scroll td').filter({ hasText: 'Cable Explorer' })).toBeVisible();
   await expect(page.getByText('Operación ejecutada correctamente.')).toBeVisible();
   await page.getByText('Avanzado · traza sanitizada').click();
   const trace = page.locator('.ec-data-explorer-result pre');
