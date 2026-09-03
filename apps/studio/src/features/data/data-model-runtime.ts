@@ -133,7 +133,8 @@ async function loadWorkspace(): Promise<DataModelWorkspaceSnapshot> {
 
 async function persistSchema(nextSchema: ElectroCraftDataSchema, selectedModelId: string, message: string) {
   const current = snapshot;
-  if (!current.project || !current.source) throw new Error('ElectroCraft Data no está disponible en el proyecto activo.');
+  if (!current.project || !current.source)
+    throw new Error('ElectroCraft Data no está disponible en el proyecto activo.');
   const parsed = electroCraftDataSchemaSchema.parse(nextSchema);
   publish({ ...current, state: 'saving', message: 'Guardando modelo…' });
   try {
@@ -194,7 +195,8 @@ async function queryFieldImpact(
       offset,
       limit: pageSize,
     });
-    if (!result || Array.isArray(result) || typeof result !== 'object') throw new Error('Respuesta de registros inválida.');
+    if (!result || Array.isArray(result) || typeof result !== 'object')
+      throw new Error('Respuesta de registros inválida.');
     const candidate = result as Record<string, JsonValue>;
     const rows = Array.isArray(candidate.rows) ? candidate.rows : [];
     const total = typeof candidate.total === 'number' ? candidate.total : rows.length;
@@ -205,7 +207,11 @@ async function queryFieldImpact(
       const data = record.data;
       if (!data || Array.isArray(data) || typeof data !== 'object') continue;
       const object = data as Record<string, JsonValue>;
-      if (Object.prototype.hasOwnProperty.call(object, field.key) && object[field.key] !== null && object[field.key] !== '') {
+      if (
+        Object.prototype.hasOwnProperty.call(object, field.key) &&
+        object[field.key] !== null &&
+        object[field.key] !== ''
+      ) {
         populatedCount += 1;
       }
     }
@@ -360,7 +366,8 @@ export const dataModelWorkspaceRuntime = Object.freeze({
     if (!model || !field) throw new Error('Campo no encontrado.');
     if (model.fields.length <= 1) throw new Error('El modelo debe conservar al menos un campo.');
     const impact = await queryFieldImpact(current.source, model, field);
-    if (impact.populatedCount > 0 && !confirmDataImpact) throw new Error(`FIELD_DELETE_IMPACT:${impact.populatedCount}`);
+    if (impact.populatedCount > 0 && !confirmDataImpact)
+      throw new Error(`FIELD_DELETE_IMPACT:${impact.populatedCount}`);
     const nextModel = electroCraftDataModelSchema.parse({
       ...model,
       fields: model.fields.filter(({ id }) => id !== field.id),
