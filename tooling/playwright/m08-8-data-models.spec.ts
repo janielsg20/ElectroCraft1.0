@@ -46,8 +46,9 @@ test('M08.8 crea y persiste un modelo con Field Registry desde Datos > Modelos',
   await page.getByLabel('Nombre del nuevo campo').fill('Precio');
   await page.getByLabel('Tipo del nuevo campo').selectOption('currency');
   await page.getByRole('button', { name: 'Añadir' }).click();
-  await expect(page.getByText('Precio', { exact: true }).first()).toBeVisible();
-  await expect(page.getByText('Moneda', { exact: true }).first()).toBeVisible();
+  const priceField = page.getByRole('listitem').filter({ hasText: 'Precio' });
+  await expect(priceField).toBeVisible();
+  await expect(priceField).toContainText('Moneda');
 
   await page.getByRole('button', { name: 'Analizar impacto' }).click();
   await expect(page.getByText('Este modelo todavía no tiene registros.')).toBeVisible();
