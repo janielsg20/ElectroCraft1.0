@@ -99,10 +99,7 @@ const optionalConnectorPacks = Object.freeze([
   },
 ] as const satisfies readonly OptionalConnectorCatalogDefinition[]);
 
-function coreEntry(
-  definition: CoreConnectorCatalogDefinition,
-  registry: ConnectorRegistry,
-): ConnectorCatalogEntry {
+function coreEntry(definition: CoreConnectorCatalogDefinition, registry: ConnectorRegistry): ConnectorCatalogEntry {
   const runtime = registry.list().find((entry) => entry.adapterId === definition.adapterId) ?? null;
   const installed = Boolean(runtime?.adapterRegistered);
   return Object.freeze({
