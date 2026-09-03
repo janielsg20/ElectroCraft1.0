@@ -1,10 +1,7 @@
 import * as z from 'zod';
 import { electroCraftExportTargetIdSchema } from '../contracts/export-ir';
 import { jsonValueSchema } from '../contracts/json-value';
-import {
-  electroCraftCanonicalDataSourceCapabilitySchema,
-  electroCraftDataSourceKindSchema,
-} from './source-definition';
+import { electroCraftCanonicalDataSourceCapabilitySchema, electroCraftDataSourceKindSchema } from './source-definition';
 
 export const electroCraftExtensionPackageIdentitySchema = z.strictObject({
   format: z.literal('ElectroCraftExtensionPackage'),
@@ -15,13 +12,7 @@ export const electroCraftExtensionPackageIdentitySchema = z.strictObject({
 });
 export type ElectroCraftExtensionPackageIdentity = z.infer<typeof electroCraftExtensionPackageIdentitySchema>;
 
-export const connectorExtensionConfigFieldTypeSchema = z.enum([
-  'string',
-  'number',
-  'boolean',
-  'url',
-  'secret-ref',
-]);
+export const connectorExtensionConfigFieldTypeSchema = z.enum(['string', 'number', 'boolean', 'url', 'secret-ref']);
 export type ConnectorExtensionConfigFieldType = z.infer<typeof connectorExtensionConfigFieldTypeSchema>;
 
 export const connectorExtensionConfigFieldSchema = z
