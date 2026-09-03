@@ -1,10 +1,9 @@
-import { Button, Input, Tabs, TabsContent, TabsList, TabsTrigger } from '@electrocraft/design-system';
 import {
   electroCraftFieldRegistry,
   getElectroCraftFieldRegistryEntry,
-  type ElectroCraftDataField,
-  type ElectroCraftDataFieldType,
-} from '@electrocraft/domain';
+} from '@electrocraft/application';
+import { Button, Input, Tabs, TabsContent, TabsList, TabsTrigger } from '@electrocraft/design-system';
+import type { ElectroCraftDataField, ElectroCraftDataFieldType } from '@electrocraft/domain';
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { HelpTrigger } from '../../help/help-ui';
 import { dataModelWorkspaceRuntime, type DataFieldImpact } from './data-model-runtime';
@@ -70,21 +69,22 @@ export function DataModelsWorkspace() {
       pluralLabel: model.pluralLabel ?? `${model.label}s`,
       description: model.description ?? '',
     });
-    setSelectedFieldId((current) => (model.fields.some(({ id }) => id === current) ? current : model.fields[0]?.id ?? null));
-  }, [model?.id, model?.label, model?.singularLabel, model?.pluralLabel, model?.description, model?.fields]);
+    setSelectedFieldId((current) =>
+      model.fields.some(({ id }) => id === current) ? current : (model.fields[0]?.id ?? null),
+    );
+  }, [model]);
 
   useEffect(() => {
     setFieldState(selectedField ? fieldDraft(selectedField) : null);
     setImpact(null);
     setConfirmAction(null);
-  }, [selectedField?.id, selectedField?.label, selectedField?.key, selectedField?.type, selectedField?.required, selectedField?.indexed, selectedField?.nullable]);
-
-  const fieldDescriptor = selectedField ? getElectroCraftFieldRegistryEntry(selectedField.type) : null;
+  }, [selectedField]);
 
   async function saveField(confirm = false) {
     if (!model || !selectedField || !fieldState) return;
     setActionMessage('Guardando campo…');
     try {
+      const descriptor = getElectroCraftFieldRegistryEntry(fieldState.type);
       await dataModelWorkspaceRuntime.updateField(
         model.id,
         selectedField.id,
@@ -94,13 +94,14 @@ export function DataModelsWorkspace() {
           type: fieldState.type,
           nullable: !fieldState.required,
           required: fieldState.required,
-          indexed: fieldState.indexed,
-          faceted: selectedField.faceted && fieldState.indexed,
+          indexed: descriptor.supportsIndexing ? fieldState.indexed : false,
+          faceted: selectedField.faceted && descriptor.supportsIndexing && fieldState.indexed,
           relationModelRef: fieldState.type === 'relation' ? (selectedField.relationModelRef ?? model.id) : null,
           metadata: {
             ...selectedField.metadata,
-            storageHint: getElectroCraftFieldRegistryEntry(fieldState.type).storageHint,
-            fieldFamily: getElectroCraftFieldRegistryEntry(fieldState.type).family,
+            storageHint: descriptor.storageHint,
+            fieldFamily: descriptor.family,
+            ...(descriptor.advancedOwner ? { advancedOwner: descriptor.advancedOwner } : {}),
           },
         },
         confirm,
@@ -186,7 +187,9 @@ export function DataModelsWorkspace() {
                 onClick={() => dataModelWorkspaceRuntime.selectModel(candidate.id)}
               >
                 <span>{candidate.label}</span>
-                <small>{candidate.fields.length} campo(s) · {candidate.visibility === 'public' ? 'Público' : 'Interno'}</small>
+                <small>
+                  {candidate.fields.length} campo(s) · {candidate.visibility === 'public' ? 'Público' : 'Interno'}
+                </small>
               </button>
             ))}
           </div>
@@ -224,7 +227,10 @@ export function DataModelsWorkspace() {
             <TabsContent value="identity" className="ec-model-tab-content">
               <section className="ec-model-panel">
                 <div className="ec-model-panel-heading">
-                  <div><h3>Identidad</h3><p>Nombre, visibilidad y presentación del modelo.</p></div>
+                  <div>
+                    <h3>Identidad</h3>
+                    <p>Nombre, visibilidad y presentación del modelo.</p>
+                  </div>
                   <Button
                     size="sm"
                     disabled={snapshot.state === 'saving'}
@@ -236,18 +242,73 @@ export function DataModelsWorkspace() {
                         description: identity.description.trim(),
                       })
                     }
-                  >Guardar identidad</Button>
+                  >
+                    Guardar identidad
+                  </Button>
                 </div>
                 <div className="ec-model-form-grid">
-                  <label>Nombre del modelo<Input value={identity.label} onChange={(event) => setIdentity({ ...identity, label: event.target.value })} /></label>
-                  <label>Nombre singular<Input value={identity.singularLabel} onChange={(event) => setIdentity({ ...identity, singularLabel: event.target.value })} /></label>
-                  <label>Nombre plural<Input value={identity.pluralLabel} onChange={(event) => setIdentity({ ...identity, pluralLabel: event.target.value })} /></label>
-                  <label className="ec-model-form-wide">Descripción<textarea value={identity.description} onChange={(event) => setIdentity({ ...identity, description: event.target.value })} /></label>
+                  <label>
+                    Nombre del modelo
+                    <Input
+                      value={identity.label}
+                      onChange={(event) => setIdentity({ ...identity, label: event.target.value })}
+                    />
+                  </label>
+                  <label>
+                    Nombre singular
+                    <Input
+                      value={identity.singularLabel}
+                      onChange={(event) => setIdentity({ ...identity, singularLabel: event.target.value })}
+                    />
+                  </label>
+                  <label>
+                    Nombre plural
+                    <Input
+                      value={identity.pluralLabel}
+                      onChange={(event) => setIdentity({ ...identity, pluralLabel: event.target.value })}
+                    />
+                  </label>
+                  <label className="ec-model-form-wide">
+                    Descripción
+                    <textarea
+                      value={identity.description}
+                      onChange={(event) => setIdentity({ ...identity, description: event.target.value })}
+                    />
+                  </label>
                 </div>
                 <div className="ec-model-flags">
-                  <label><input type="checkbox" checked={model.visibility === 'public'} onChange={(event) => void dataModelWorkspaceRuntime.updateModelIdentity(model.id, { visibility: event.target.checked ? 'public' : 'internal' })} /> Público</label>
-                  <label><input type="checkbox" checked={model.singleton ?? false} onChange={(event) => void dataModelWorkspaceRuntime.updateModelIdentity(model.id, { singleton: event.target.checked })} /> Singleton</label>
-                  <label><input type="checkbox" checked={model.menuVisible ?? true} onChange={(event) => void dataModelWorkspaceRuntime.updateModelIdentity(model.id, { menuVisible: event.target.checked })} /> Visible en menú</label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={model.visibility === 'public'}
+                      onChange={(event) =>
+                        void dataModelWorkspaceRuntime.updateModelIdentity(model.id, {
+                          visibility: event.target.checked ? 'public' : 'internal',
+                        })
+                      }
+                    />{' '}
+                    Público
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={model.singleton ?? false}
+                      onChange={(event) =>
+                        void dataModelWorkspaceRuntime.updateModelIdentity(model.id, { singleton: event.target.checked })
+                      }
+                    />{' '}
+                    Singleton
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={model.menuVisible ?? true}
+                      onChange={(event) =>
+                        void dataModelWorkspaceRuntime.updateModelIdentity(model.id, { menuVisible: event.target.checked })
+                      }
+                    />{' '}
+                    Visible en menú
+                  </label>
                 </div>
               </section>
             </TabsContent>
@@ -255,66 +316,279 @@ export function DataModelsWorkspace() {
             <TabsContent value="fields" className="ec-model-tab-content">
               <div className="ec-fields-layout">
                 <section className="ec-model-panel ec-fields-list-panel">
-                  <div className="ec-model-panel-heading"><div><h3>Campos</h3><p>Filas compactas; selecciona una para editar.</p></div></div>
+                  <div className="ec-model-panel-heading">
+                    <div>
+                      <h3>Campos</h3>
+                      <p>Filas compactas; selecciona una para editar.</p>
+                    </div>
+                  </div>
                   <div className="ec-field-add-row">
-                    <Input aria-label="Nombre del nuevo campo" placeholder="Nombre del campo" value={newFieldLabel} onChange={(event) => setNewFieldLabel(event.target.value)} />
-                    <select aria-label="Tipo del nuevo campo" value={newFieldType} onChange={(event) => setNewFieldType(event.target.value as ElectroCraftDataFieldType)}>
-                      {electroCraftFieldRegistry.map((entry) => <option key={entry.type} value={entry.type}>{entry.label}</option>)}
+                    <Input
+                      aria-label="Nombre del nuevo campo"
+                      placeholder="Nombre del campo"
+                      value={newFieldLabel}
+                      onChange={(event) => setNewFieldLabel(event.target.value)}
+                    />
+                    <select
+                      aria-label="Tipo del nuevo campo"
+                      value={newFieldType}
+                      onChange={(event) => setNewFieldType(event.target.value as ElectroCraftDataFieldType)}
+                    >
+                      {electroCraftFieldRegistry.map((entry) => (
+                        <option key={entry.type} value={entry.type}>
+                          {entry.label}
+                        </option>
+                      ))}
                     </select>
-                    <Button size="sm" onClick={() => {
-                      void dataModelWorkspaceRuntime.addField(model.id, { label: newFieldLabel || getElectroCraftFieldRegistryEntry(newFieldType).label, type: newFieldType }).then((created) => {
-                        setSelectedFieldId(created.id);
-                        setNewFieldLabel('');
-                        setActionMessage('Campo añadido.');
-                      }).catch((error: unknown) => setActionMessage(error instanceof Error ? error.message : 'No se pudo añadir el campo.'));
-                    }}>Añadir</Button>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        void dataModelWorkspaceRuntime
+                          .addField(model.id, {
+                            label: newFieldLabel || getElectroCraftFieldRegistryEntry(newFieldType).label,
+                            type: newFieldType,
+                          })
+                          .then((created) => {
+                            setSelectedFieldId(created.id);
+                            setNewFieldLabel('');
+                            setActionMessage('Campo añadido.');
+                          })
+                          .catch((error: unknown) =>
+                            setActionMessage(error instanceof Error ? error.message : 'No se pudo añadir el campo.'),
+                          );
+                      }}
+                    >
+                      Añadir
+                    </Button>
                   </div>
                   <div className="ec-field-list" role="list">
                     {model.fields.map((field) => (
-                      <button key={field.id} type="button" role="listitem" className="ec-field-row" aria-current={field.id === selectedField?.id ? 'true' : undefined} onClick={() => setSelectedFieldId(field.id)}>
-                        <span><strong>{field.label}</strong><small>{field.key}</small></span>
-                        <span><small>{getElectroCraftFieldRegistryEntry(field.type).label}</small><small>{field.required ?? !field.nullable ? 'Requerido' : 'Opcional'}</small></span>
+                      <button
+                        key={field.id}
+                        type="button"
+                        role="listitem"
+                        className="ec-field-row"
+                        aria-current={field.id === selectedField?.id ? 'true' : undefined}
+                        onClick={() => setSelectedFieldId(field.id)}
+                      >
+                        <span>
+                          <strong>{field.label}</strong>
+                          <small>{field.key}</small>
+                        </span>
+                        <span>
+                          <small>{getElectroCraftFieldRegistryEntry(field.type).label}</small>
+                          <small>{(field.required ?? !field.nullable) ? 'Requerido' : 'Opcional'}</small>
+                        </span>
                       </button>
                     ))}
                   </div>
                 </section>
 
                 <section className="ec-model-panel ec-field-editor" aria-live="polite">
-                  {selectedField && fieldState && fieldDescriptor ? (
+                  {selectedField && fieldState ? (
                     <>
-                      <div className="ec-model-panel-heading"><div><h3>{selectedField.label}</h3><p>{fieldDescriptor.help}</p></div><span>{fieldDescriptor.family}</span></div>
+                      <div className="ec-model-panel-heading">
+                        <div>
+                          <h3>{selectedField.label}</h3>
+                          <p>{getElectroCraftFieldRegistryEntry(selectedField.type).help}</p>
+                        </div>
+                        <span>{getElectroCraftFieldRegistryEntry(selectedField.type).family}</span>
+                      </div>
                       <div className="ec-model-form-grid">
-                        <label>Etiqueta<Input value={fieldState.label} onChange={(event) => setFieldState({ ...fieldState, label: event.target.value })} /></label>
-                        <label>Clave<Input value={fieldState.key} onChange={(event) => setFieldState({ ...fieldState, key: event.target.value })} /></label>
-                        <label>Tipo<select value={fieldState.type} onChange={(event) => setFieldState({ ...fieldState, type: event.target.value as ElectroCraftDataFieldType })}>{electroCraftFieldRegistry.map((entry) => <option key={entry.type} value={entry.type}>{entry.label}</option>)}</select></label>
-                        <label className="ec-model-check"><input type="checkbox" checked={fieldState.required} onChange={(event) => setFieldState({ ...fieldState, required: event.target.checked })} /> Requerido</label>
-                        <label className="ec-model-check"><input type="checkbox" checked={fieldState.indexed} disabled={!getElectroCraftFieldRegistryEntry(fieldState.type).supportsIndexing} onChange={(event) => setFieldState({ ...fieldState, indexed: event.target.checked })} /> Indexado</label>
+                        <label>
+                          Etiqueta
+                          <Input
+                            value={fieldState.label}
+                            onChange={(event) => setFieldState({ ...fieldState, label: event.target.value })}
+                          />
+                        </label>
+                        <label>
+                          Clave
+                          <Input
+                            value={fieldState.key}
+                            onChange={(event) => setFieldState({ ...fieldState, key: event.target.value })}
+                          />
+                        </label>
+                        <label>
+                          Tipo
+                          <select
+                            value={fieldState.type}
+                            onChange={(event) =>
+                              setFieldState({ ...fieldState, type: event.target.value as ElectroCraftDataFieldType })
+                            }
+                          >
+                            {electroCraftFieldRegistry.map((entry) => (
+                              <option key={entry.type} value={entry.type}>
+                                {entry.label}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <label className="ec-model-check">
+                          <input
+                            type="checkbox"
+                            checked={fieldState.required}
+                            onChange={(event) => setFieldState({ ...fieldState, required: event.target.checked })}
+                          />{' '}
+                          Requerido
+                        </label>
+                        <label className="ec-model-check">
+                          <input
+                            type="checkbox"
+                            checked={fieldState.indexed}
+                            disabled={!getElectroCraftFieldRegistryEntry(fieldState.type).supportsIndexing}
+                            onChange={(event) => setFieldState({ ...fieldState, indexed: event.target.checked })}
+                          />{' '}
+                          Indexado
+                        </label>
                       </div>
                       <div className="ec-field-metadata">
                         <span>Storage hint: {getElectroCraftFieldRegistryEntry(fieldState.type).storageHint}</span>
-                        {getElectroCraftFieldRegistryEntry(fieldState.type).advancedOwner ? <span>Semántica avanzada: {getElectroCraftFieldRegistryEntry(fieldState.type).advancedOwner}</span> : null}
+                        {getElectroCraftFieldRegistryEntry(fieldState.type).advancedOwner ? (
+                          <span>
+                            Semántica avanzada: {getElectroCraftFieldRegistryEntry(fieldState.type).advancedOwner}
+                          </span>
+                        ) : null}
                       </div>
                       <div className="ec-model-actions">
-                        <Button size="sm" onClick={() => void saveField(false)}>Guardar cambios</Button>
-                        <Button size="sm" variant="outline" onClick={() => void dataModelWorkspaceRuntime.fieldImpact(model.id, selectedField.id).then((next) => { setImpact(next); setActionMessage(impactText(next)); })}>Analizar impacto</Button>
-                        <Button size="sm" variant="ghost" onClick={() => void deleteField(false)}>Eliminar campo</Button>
+                        <Button size="sm" onClick={() => void saveField(false)}>
+                          Guardar cambios
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            void dataModelWorkspaceRuntime.fieldImpact(model.id, selectedField.id).then((next) => {
+                              setImpact(next);
+                              setActionMessage(impactText(next));
+                            })
+                          }
+                        >
+                          Analizar impacto
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => void deleteField(false)}>
+                          Eliminar campo
+                        </Button>
                       </div>
-                      {impact ? <div className="ec-impact-box"><strong>Impacto de datos</strong><p>{impactText(impact)}</p></div> : null}
-                      {confirmAction ? <div className="ec-impact-confirm"><strong>Confirmación necesaria</strong><p>{actionMessage}</p><Button size="sm" onClick={() => void (confirmAction === 'rename' ? saveField(true) : deleteField(true))}>Confirmar {confirmAction === 'rename' ? 'cambio de clave' : 'eliminación'}</Button></div> : null}
+                      {impact ? (
+                        <div className="ec-impact-box">
+                          <strong>Impacto de datos</strong>
+                          <p>{impactText(impact)}</p>
+                        </div>
+                      ) : null}
+                      {confirmAction ? (
+                        <div className="ec-impact-confirm">
+                          <strong>Confirmación necesaria</strong>
+                          <p>{actionMessage}</p>
+                          <Button
+                            size="sm"
+                            onClick={() => void (confirmAction === 'rename' ? saveField(true) : deleteField(true))}
+                          >
+                            Confirmar {confirmAction === 'rename' ? 'cambio de clave' : 'eliminación'}
+                          </Button>
+                        </div>
+                      ) : null}
                     </>
-                  ) : <p>Selecciona un campo.</p>}
+                  ) : (
+                    <p>Selecciona un campo.</p>
+                  )}
                 </section>
               </div>
-              {actionMessage && !confirmAction ? <p className="ec-models-action-status" role="status">{actionMessage}</p> : null}
+              {actionMessage && !confirmAction ? (
+                <p className="ec-models-action-status" role="status">
+                  {actionMessage}
+                </p>
+              ) : null}
             </TabsContent>
 
             <TabsContent value="validation" className="ec-model-tab-content">
-              <section className="ec-model-panel"><h3>Validación</h3><p>Las reglas viven en el schema canónico del campo y viajan con el proyecto.</p><div className="ec-model-metrics"><span><strong>{model.fields.filter((field) => field.required ?? !field.nullable).length}</strong> requeridos</span><span><strong>{model.fields.filter((field) => field.indexed).length}</strong> indexados</span><span><strong>{model.fields.filter((field) => field.validation).length}</strong> con reglas</span></div></section>
+              <section className="ec-model-panel">
+                <h3>Validación</h3>
+                <p>Las reglas viven en el schema canónico del campo y viajan con el proyecto.</p>
+                <div className="ec-model-metrics">
+                  <span>
+                    <strong>{model.fields.filter((field) => field.required ?? !field.nullable).length}</strong> requeridos
+                  </span>
+                  <span>
+                    <strong>{model.fields.filter((field) => field.indexed).length}</strong> indexados
+                  </span>
+                  <span>
+                    <strong>{model.fields.filter((field) => field.validation).length}</strong> con reglas
+                  </span>
+                </div>
+              </section>
             </TabsContent>
-            <TabsContent value="templates" className="ec-model-tab-content"><section className="ec-model-panel"><h3>Plantillas</h3><p>El modelo conserva metadata portable para que los targets y futuras plantillas la consuman sin acoplarla al store físico.</p><p>Taxonomías y Relaciones se mantienen como referencias canónicas y sus editores avanzados pertenecen a M08.10/M08.11.</p></section></TabsContent>
-            <TabsContent value="workflow" className="ec-model-tab-content"><section className="ec-model-panel"><h3>Workflow</h3><p>Estados y capability refs se expresan como metadata del modelo; el motor de workflows permanece separado.</p><div className="ec-model-metrics"><span><strong>{model.visibility ?? 'internal'}</strong> visibilidad</span><span><strong>{model.singleton ? 'Sí' : 'No'}</strong> singleton</span><span><strong>{model.capabilityRefs?.length ?? 0}</strong> capabilities</span></div></section></TabsContent>
-            <TabsContent value="storage" className="ec-model-tab-content"><section className="ec-model-panel"><h3>Almacenamiento</h3><p>PGlite + Drizzle usan `content_records` como store genérico. No existe DDL dinámico por modelo.</p><div className="ec-storage-list">{model.fields.map((field) => <span key={field.id}>{field.label}<small>{String(field.metadata.storageHint ?? getElectroCraftFieldRegistryEntry(field.type).storageHint)}</small></span>)}</div></section></TabsContent>
-            <TabsContent value="advanced" className="ec-model-tab-content"><section className="ec-model-panel"><h3>Avanzado</h3><dl className="ec-model-dl"><div><dt>Model ID</dt><dd>{model.id}</dd></div><div><dt>Schema ID</dt><dd>{snapshot.schema?.id ?? '—'}</dd></div><div><dt>Source ref</dt><dd>{snapshot.source?.id ?? '—'}</dd></div><div><dt>Schema version</dt><dd>{snapshot.schema?.version ?? '—'}</dd></div></dl></section></TabsContent>
+            <TabsContent value="templates" className="ec-model-tab-content">
+              <section className="ec-model-panel">
+                <h3>Plantillas</h3>
+                <p>
+                  El modelo conserva metadata portable para que los targets y futuras plantillas la consuman sin acoplarla
+                  al store físico.
+                </p>
+                <p>
+                  Taxonomías y Relaciones se mantienen como referencias canónicas y sus editores avanzados pertenecen a
+                  M08.10/M08.11.
+                </p>
+              </section>
+            </TabsContent>
+            <TabsContent value="workflow" className="ec-model-tab-content">
+              <section className="ec-model-panel">
+                <h3>Workflow</h3>
+                <p>Estados y capability refs se expresan como metadata del modelo; el motor de workflows permanece separado.</p>
+                <div className="ec-model-metrics">
+                  <span>
+                    <strong>{model.visibility ?? 'internal'}</strong> visibilidad
+                  </span>
+                  <span>
+                    <strong>{model.singleton ? 'Sí' : 'No'}</strong> singleton
+                  </span>
+                  <span>
+                    <strong>{model.capabilityRefs?.length ?? 0}</strong> capabilities
+                  </span>
+                </div>
+              </section>
+            </TabsContent>
+            <TabsContent value="storage" className="ec-model-tab-content">
+              <section className="ec-model-panel">
+                <h3>Almacenamiento</h3>
+                <p>PGlite + Drizzle usan `content_records` como store genérico. No existe DDL dinámico por modelo.</p>
+                <div className="ec-storage-list">
+                  {model.fields.map((field) => (
+                    <span key={field.id}>
+                      {field.label}
+                      <small>
+                        {String(
+                          field.metadata.storageHint ?? getElectroCraftFieldRegistryEntry(field.type).storageHint,
+                        )}
+                      </small>
+                    </span>
+                  ))}
+                </div>
+              </section>
+            </TabsContent>
+            <TabsContent value="advanced" className="ec-model-tab-content">
+              <section className="ec-model-panel">
+                <h3>Avanzado</h3>
+                <dl className="ec-model-dl">
+                  <div>
+                    <dt>Model ID</dt>
+                    <dd>{model.id}</dd>
+                  </div>
+                  <div>
+                    <dt>Schema ID</dt>
+                    <dd>{snapshot.schema?.id ?? '—'}</dd>
+                  </div>
+                  <div>
+                    <dt>Source ref</dt>
+                    <dd>{snapshot.source?.id ?? '—'}</dd>
+                  </div>
+                  <div>
+                    <dt>Schema version</dt>
+                    <dd>{snapshot.schema?.version ?? '—'}</dd>
+                  </div>
+                </dl>
+              </section>
+            </TabsContent>
           </Tabs>
         )}
       </main>
