@@ -51,7 +51,8 @@ test('M08.8 crea y persiste un modelo con Field Registry desde Datos > Modelos',
   await expect(priceField).toContainText('Moneda');
 
   await page.getByRole('button', { name: 'Analizar impacto' }).click();
-  await expect(page.getByText('Este modelo todavía no tiene registros.')).toBeVisible();
+  const fieldImpactStatus = page.getByRole('tabpanel', { name: 'Campos' }).getByRole('status');
+  await expect(fieldImpactStatus).toHaveText('Este modelo todavía no tiene registros.');
   await page.screenshot({ path: '.ai/evidence/F08/M08.8/data-models-desktop.png', fullPage: true });
 
   await page.reload();
