@@ -244,7 +244,7 @@ describe('M08.7 Connector SDK boundary', () => {
     expect(catalogSource).toContain('Instalar conector');
     expect(catalogSource).toContain('help.data.connectors');
     expect(catalogModelSource).toContain('/extensions?connector=');
-    expect(optionalPacksDoc).toContain('Core no incluye el driver');
+    expect(optionalPacksDoc).toContain('no incorpora drivers SQL por defecto');
     expect(optionalPacksDoc).toContain('pruneRuntimeDependencies()');
     expect(connectorPackageJson).not.toMatch(/\b(pg|postgres|postgresql|mysql2|mysql|mariadb)\b/i);
   });
