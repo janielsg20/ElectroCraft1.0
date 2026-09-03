@@ -31,6 +31,8 @@ async function createRestSource(page: Page) {
   await page.getByLabel('Nombre').fill('Listar productos');
   await page.getByRole('button', { name: 'Añadir operación' }).click();
   await page.getByRole('button', { name: 'Continuar' }).click();
+  await page.getByRole('button', { name: 'Probar solicitud' }).click();
+  await expect(page.getByText('Prueba completada mediante el adapter REST real.', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Continuar' }).click();
   await page.getByRole('button', { name: 'Guardar fuente' }).click();
   await expect(page.getByRole('option', { name: /Catálogo Explorer/ })).toBeVisible({ timeout: 60_000 });
