@@ -26,6 +26,7 @@ const studioScopedHelpIds = [
   'help.data.graphql',
   'help.data.secrets',
   'help.data.explorer',
+  'help.data.connectors',
 ] as const;
 
 describe('M03.11 typed HelpRegistry', () => {
@@ -60,6 +61,8 @@ describe('M03.11 typed HelpRegistry', () => {
     expect(searchStudioHelp('secretstore').some((entry) => entry.id === 'help.data.secrets')).toBe(true);
     expect(searchStudioHelp('sin read-back').some((entry) => entry.id === 'help.data.secrets')).toBe(true);
     expect(searchStudioHelp('data explorer').some((entry) => entry.id === 'help.data.explorer')).toBe(true);
+    expect(searchStudioHelp('postgresql').some((entry) => entry.id === 'help.data.connectors')).toBe(true);
+    expect(searchStudioHelp('connector sdk').some((entry) => entry.id === 'help.data.connectors')).toBe(true);
   });
 
   it('maps Fuentes de datos to its M08 contextual descriptors', () => {
@@ -87,6 +90,10 @@ describe('M03.11 typed HelpRegistry', () => {
     expect(getStudioHelpDescriptor('help.data.secrets')).toMatchObject({
       sectionId: 'data-secrets',
       learnMoreRef: '.ai/microphases/M08_5.md',
+    });
+    expect(getStudioHelpDescriptor('help.data.connectors')).toMatchObject({
+      sectionId: 'data-connectors',
+      learnMoreRef: '.ai/microphases/M08_7.md',
     });
   });
 

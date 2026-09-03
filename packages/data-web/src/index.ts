@@ -5,6 +5,7 @@ export * from './browser';
 export * from './browser-connector-gateway';
 export * from './browser-internal-data';
 export * from './browser-workspace-preferences';
+export * from './connector-catalog';
 export * from './data-source-repository';
 export * from './internal-data-repository';
 export * from './migration';

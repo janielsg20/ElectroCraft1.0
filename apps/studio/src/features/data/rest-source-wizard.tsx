@@ -1,9 +1,10 @@
 import { Button, Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@electrocraft/design-system';
 import { useEffect, useState } from 'react';
+import { ConnectorCatalogSheet } from './connector-catalog';
 import { GraphQLSourceWizardSheet } from './graphql-source-wizard';
 import { RestSourceWizardSheet as RestSourceWizardImpl } from './rest-source-wizard-impl';
 
-type SourceWizardMode = 'choose' | 'rest' | 'graphql';
+type SourceWizardMode = 'choose' | 'rest' | 'graphql' | 'more';
 
 export function RestSourceWizardSheet({
   open,
@@ -29,6 +30,17 @@ export function RestSourceWizardSheet({
 
   if (mode === 'graphql') {
     return <GraphQLSourceWizardSheet open={open} onOpenChange={handleOpenChange} />;
+  }
+
+  if (mode === 'more') {
+    return (
+      <ConnectorCatalogSheet
+        open={open}
+        onOpenChange={handleOpenChange}
+        onBack={() => setMode('choose')}
+        onChooseCore={(connectorId) => setMode(connectorId)}
+      />
+    );
   }
 
   return (
@@ -64,6 +76,19 @@ export function RestSourceWizardSheet({
               <strong>GraphQL</strong>
               <span className="text-xs font-normal text-muted-foreground">
                 Introspection, consultas, mutaciones y variables tipadas.
+              </span>
+            </span>
+          </Button>
+          <Button
+            aria-label="Más conectores"
+            className="h-auto justify-start p-4 text-left"
+            variant="outline"
+            onClick={() => setMode('more')}
+          >
+            <span className="grid gap-1">
+              <strong>Más conectores</strong>
+              <span className="text-xs font-normal text-muted-foreground">
+                Catálogo Core y extensiones opcionales como PostgreSQL y MySQL.
               </span>
             </span>
           </Button>
