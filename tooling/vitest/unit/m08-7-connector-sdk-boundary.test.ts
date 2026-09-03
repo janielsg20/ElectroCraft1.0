@@ -1,10 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { ConnectorRegistry, type DataSourceAdapter } from '@electrocraft/application';
-import {
-  ConnectorExtensionRegistry,
-  ConnectorExtensionRegistryError,
-} from '@electrocraft/connectors';
+import { ConnectorExtensionRegistry, ConnectorExtensionRegistryError } from '@electrocraft/connectors';
 import { createConnectorCatalog } from '@electrocraft/data-web';
 import {
   connectorExtensionManifestSchema,
