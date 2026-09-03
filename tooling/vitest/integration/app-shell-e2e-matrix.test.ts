@@ -15,7 +15,7 @@ const matrix = [
   [320, 'mobile'],
 ] as const;
 
-const studioScopedHelpCount = 18;
+const studioScopedHelpCount = 19;
 
 describe('M03.12 observable AppShell matrix', () => {
   it('maps every required width to the canonical responsive mode', () => {
@@ -39,6 +39,7 @@ describe('M03.12 observable AppShell matrix', () => {
     expect(studioHelpDescriptors.some((descriptor) => descriptor.id === 'help.data.graphql')).toBe(true);
     expect(studioHelpDescriptors.some((descriptor) => descriptor.id === 'help.data.secrets')).toBe(true);
     expect(studioHelpDescriptors.some((descriptor) => descriptor.id === 'help.data.explorer')).toBe(true);
+    expect(studioHelpDescriptors.some((descriptor) => descriptor.id === 'help.data.connectors')).toBe(true);
     for (const item of items) {
       expect(resolveSidebarActiveItem(item.href)).toBe(item.id);
       expect(studioHelpDescriptors.some((descriptor) => descriptor.id === `help.section.${item.id}`)).toBe(true);
