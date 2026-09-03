@@ -120,16 +120,28 @@ function source(adapterId = 'sql.postgresql'): ElectroCraftDataSourceDefinition 
 }
 
 describe('M08.7 Connector SDK boundary', () => {
-  it('installs a real extension adapter over the existing ConnectorRegistry and exposes versioned catalog state', () => {
+  it('installs a real extension adapter over the existing ConnectorRegistry and executes read/CRUD through it', async () => {
     const registry = new ConnectorRegistry();
     const extensions = new ConnectorExtensionRegistry(registry);
     const pgManifest = manifest();
     const pgAdapter = adapter();
+    const pgSource = source();
 
     extensions.install({ manifest: pgManifest, adapter: pgAdapter });
 
-    expect(registry.resolveAdapter(source())).toBe(pgAdapter);
+    expect(registry.resolveAdapter(pgSource)).toBe(pgAdapter);
     expect(extensions.requireInstalled('sql.postgresql')).toEqual(pgManifest);
+    expect(extensions.diagnoseSource(pgSource)).toEqual([]);
+    await expect(registry.query(pgSource, 'development', { resourceId: 'public.products' })).resolves.toEqual({
+      resourceId: 'public.products',
+    });
+    await expect(
+      registry.mutate(pgSource, 'development', {
+        resourceId: 'public.products',
+        operation: 'create',
+        input: { name: 'Producto' },
+      }),
+    ).resolves.toEqual({ resourceId: 'public.products', operation: 'create' });
     expect(createConnectorCatalog(registry, extensions)).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -154,6 +166,24 @@ describe('M08.7 Connector SDK boundary', () => {
       }),
     ]);
     expect(() => registry.resolveAdapter(source())).toThrow(/no DataSourceAdapter registered/);
+  });
+
+  it('consumes the manifest config schema and reports missing config/SecretRef explicitly', () => {
+    const registry = new ConnectorRegistry();
+    const extensions = new ConnectorExtensionRegistry(registry);
+    extensions.install({ manifest: manifest(), adapter: adapter() });
+    const invalidSource = electroCraftDataSourceDefinitionSchema.parse({
+      ...source(),
+      authRef: null,
+      config: { port: 5432 },
+    });
+
+    expect(extensions.diagnoseSource(invalidSource)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: 'EXTENSION_CONFIG_REQUIRED', fieldKey: 'host' }),
+        expect.objectContaining({ code: 'EXTENSION_SECRET_REF_REQUIRED', fieldKey: 'credentialRef' }),
+      ]),
+    );
   });
 
   it('blocks uninstall while a DataSourceDefinition still uses the extension', () => {
