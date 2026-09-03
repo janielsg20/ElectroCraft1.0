@@ -34,7 +34,12 @@ function fieldFor(type: ElectroCraftDataFieldType, index: number) {
     ...(descriptor.supportsOptions && type !== 'checkbox'
       ? { options: [{ label: 'Opción A', value: 'a' }] }
       : descriptor.supportsOptions
-        ? { options: [{ label: 'Opción A', value: 'a' }, { label: 'Opción B', value: 'b' }] }
+        ? {
+            options: [
+              { label: 'Opción A', value: 'a' },
+              { label: 'Opción B', value: 'b' },
+            ],
+          }
         : {}),
     ...(descriptor.supportsValidation ? { validation: { maxLength: 120 } } : {}),
     conditions: [{ fieldKey: 'name', operator: 'not-empty' }],
@@ -56,7 +61,7 @@ describe('M08.8 canonical DataModel and Field Registry', () => {
     expect(ownership).toContain("key: 'field-type'");
     expect(ownership).toContain("ownerPackage: '@electrocraft/application'");
     expect(applicationIndex).toContain("export * from './field-registry'");
-    expect(domainIndex).not.toContain("./data/field-registry");
+    expect(domainIndex).not.toContain('./data/field-registry');
   });
 
   it('registers every required field type with portable storage semantics', () => {
@@ -100,7 +105,11 @@ describe('M08.8 canonical DataModel and Field Registry', () => {
     expect(getElectroCraftFieldRegistryEntry('taxonomy').advancedOwner).toBe('M08.10');
     expect(getElectroCraftFieldRegistryEntry('group').advancedOwner).toBe('M08.9');
     expect(getElectroCraftFieldRegistryEntry('calculated').storageHint).toBe('computed');
-    expect(listElectroCraftFieldRegistryByFamily('media').map(({ type }) => type)).toEqual(['image', 'gallery', 'file']);
+    expect(listElectroCraftFieldRegistryByFamily('media').map(({ type }) => type)).toEqual([
+      'image',
+      'gallery',
+      'file',
+    ]);
   });
 
   it('parses every registry family and round-trips expanded model identity without engine internals', () => {
@@ -174,7 +183,9 @@ describe('M08.8 canonical DataModel and Field Registry', () => {
       metadata: {},
     };
 
-    expect(() => electroCraftDataFieldSchema.parse({ ...base, required: true })).toThrow(/required fields cannot be nullable/);
+    expect(() => electroCraftDataFieldSchema.parse({ ...base, required: true })).toThrow(
+      /required fields cannot be nullable/,
+    );
     expect(() => electroCraftDataFieldSchema.parse({ ...base, options: [{ label: 'A', value: 'a' }] })).toThrow(
       /options are only valid/,
     );
