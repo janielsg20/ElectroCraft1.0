@@ -22,6 +22,7 @@ export type StudioHelpId =
   | 'help.data.graphql'
   | 'help.data.secrets'
   | 'help.data.explorer'
+  | 'help.data.connectors'
   | `help.section.${SidebarNavigationItemId}`;
 
 export interface HelpDescriptor {
@@ -287,6 +288,7 @@ const studioDefinitions = Object.freeze([
       'help.data.graphql',
       'help.data.secrets',
       'help.data.explorer',
+      'help.data.connectors',
       'help.section.queries',
       'help.section.records',
       'help.projects',
@@ -383,7 +385,7 @@ const studioDefinitions = Object.freeze([
     sectionId: 'data-secrets',
     navigationItemId: 'data-sources',
     ...dataSourceKeys,
-    relatedIds: ['help.data.sources', 'help.data.rest', 'help.data.graphql'],
+    relatedIds: ['help.data.sources', 'help.data.rest', 'help.data.graphql', 'help.data.connectors'],
     keywords: [
       'connector gateway',
       'connectorgateway',
@@ -399,6 +401,28 @@ const studioDefinitions = Object.freeze([
       'autenticación',
     ],
     learnMoreRef: '.ai/microphases/M08_5.md',
+  },
+  {
+    id: 'help.data.connectors',
+    sectionId: 'data-connectors',
+    navigationItemId: 'data-sources',
+    ...dataSourceKeys,
+    relatedIds: ['help.data.sources', 'help.data.secrets', 'help.section.extensions', 'help.section.compatibility'],
+    keywords: [
+      'más conectores',
+      'connector sdk',
+      'connector extension',
+      'electrocraft extension package',
+      'postgresql',
+      'mysql',
+      'database pack',
+      'requiere extensión',
+      'requiere gateway',
+      'instalar conector',
+      'dependency pruning',
+      'adapter',
+    ],
+    learnMoreRef: '.ai/microphases/M08_7.md',
   },
 ] as const satisfies readonly HelpDefinition[]);
 
@@ -443,6 +467,7 @@ const navigationRelated: Partial<Record<SidebarNavigationItemId, readonly Studio
     'help.data.graphql',
     'help.data.secrets',
     'help.data.explorer',
+    'help.data.connectors',
     'help.section.queries',
   ],
   queries: ['help.section.records', 'help.data.sources'],
