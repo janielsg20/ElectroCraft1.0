@@ -84,6 +84,7 @@ export * from './data/graphql';
 export * from './data/secrets';
 export * from './data/explorer';
 export * from './data/connector-extension';
+export * from './data/field-registry';
 
 export const packageDescriptor = Object.freeze({
   name: '@electrocraft/domain',
