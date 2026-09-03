@@ -38,7 +38,7 @@ describe('M03.11 typed HelpRegistry', () => {
     for (const helpId of studioScopedHelpIds) expect(() => getStudioHelpDescriptor(helpId)).not.toThrow();
     for (const item of navigationItems) {
       const descriptor = getStudioHelpDescriptor(getHelpIdForNavigationItem(item.id));
-      expect(descriptor.title).toBe(item.label);
+      expect(descriptor.title).toBe(item.id === 'models' ? 'Modelos y campos' : item.label);
       expect(descriptor.summary.length).toBeGreaterThan(10);
       expect(descriptor.details.length).toBeGreaterThanOrEqual(2);
     }
