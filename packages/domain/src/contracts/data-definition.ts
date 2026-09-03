@@ -134,7 +134,11 @@ export const electroCraftDataFieldSchema = z
         message: 'options are only valid for select, radio or checkbox fields',
       });
     }
-    if (field.validation?.min !== undefined && field.validation?.max !== undefined && field.validation.min > field.validation.max) {
+    if (
+      field.validation?.min !== undefined &&
+      field.validation?.max !== undefined &&
+      field.validation.min > field.validation.max
+    ) {
       context.addIssue({ code: 'custom', path: ['validation'], message: 'validation min cannot exceed max' });
     }
     if (
@@ -142,7 +146,11 @@ export const electroCraftDataFieldSchema = z
       field.validation?.maxLength !== undefined &&
       field.validation.minLength > field.validation.maxLength
     ) {
-      context.addIssue({ code: 'custom', path: ['validation'], message: 'validation minLength cannot exceed maxLength' });
+      context.addIssue({
+        code: 'custom',
+        path: ['validation'],
+        message: 'validation minLength cannot exceed maxLength',
+      });
     }
   });
 
