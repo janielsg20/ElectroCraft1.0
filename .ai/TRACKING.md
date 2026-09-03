@@ -17,17 +17,12 @@ Date: 2026-09-03.
 | F08 / M08.3 | IMPLEMENTADA / GREEN MICROFASE | PR `#69`; Base CI `33326524968` (#818); merge `71f750017b0f37775918e26bbab86b63239736e4` |
 | F08 / M08.4 | IMPLEMENTADA / GREEN MICROFASE | PR `#70`; Base CI `33412562136` (#834); merge `6b79ee859c9d0f4f712d897b4cc973bcc388cefb` |
 | F08 / M08.5 | IMPLEMENTADA / GREEN MICROFASE | PR `#71`; Base CI `33685072920` (#837); merge `64da0f30d46730b9f29a4cc05edaf941b0714e85` |
-| F08 / M08.6 | ACTIVE | `.ai/evidence/F08/M08.6/IMPLEMENTATION_2026-09-03.md` |
+| F08 / M08.6 | IMPLEMENTADA / GREEN MICROFASE | PR `#72`; Base CI `33776935165`; merge `d89235f36f81fd91f9d8d676191c8ab52dbf7804`; `.ai/evidence/F08/M08.6/CLOSURE_2026-09-03.md` |
+| F08 / M08.7 | IMPLEMENTADA / CANDIDATA A VALIDACIÓN / ACTIVE | `.ai/evidence/F08/M08.7/IMPLEMENTATION_2026-09-03.md` |
 
 ## Rama activa
 
-`codex/m08-6-data-explorer`
-
-## M08.4 — cierre certificado
-
-- GraphQL Fetch, Query/Mutation, variables tipadas, introspection, Gateway fail-closed, wizard y Help quedaron certificados.
-- Base CI `33412562136` (#834) terminó documentación, lint, typecheck, 518/518 Vitest, build, Playwright, empty-repo y artifacts en `success`.
-- PR `#70` fue fusionada por squash a `main` en `6b79ee859c9d0f4f712d897b4cc973bcc388cefb`.
+`codex/m08-7-connector-sdk-packs`
 
 ## M08.5 — cierre certificado
 
@@ -47,7 +42,7 @@ Date: 2026-09-03.
 - Base CI `33685072920` (#837) terminó documentación, lint, typecheck, 525/525 Vitest, build, leak scan, Playwright, empty-repo y artifacts en `success`.
 - PR `#71` se fusionó por squash a `main` en `64da0f30d46730b9f29a4cc05edaf941b0714e85`.
 
-## F08 / M08.6 — Data Explorer y prueba de operaciones
+## M08.6 — cierre certificado
 
 - Owner: `ConnectorRegistry + DataSourceAdapter` existentes.
 - `packages/domain/src/data/explorer.ts` define operation/parameter descriptors portables.
@@ -56,9 +51,22 @@ Date: 2026-09-03.
 - Studio incluye layout de tres paneles, tabla/JSON, estados españoles y `help.data.explorer`.
 - Mutaciones requieren confirmación explícita; no hay auto-run.
 - `Crear consulta desde esta operación` persiste Draft QueryDefinition canónico.
-- Local: lint, typecheck, build, Node `41/41` y Vitest `529/529` verdes.
-- E2E real preparado; el contenedor local no incluye Chromium y Base CI es el gate pendiente.
+- ElectroCraft Base CI `33776935165` terminó documentación, lint, typecheck, tests, build, Playwright repository gate, empty-repo y artifacts en `success`.
+- PR `#72` se fusionó por squash a `main` en `d89235f36f81fd91f9d8d676191c8ab52dbf7804`.
+
+## M08.7 — candidata a validación
+
+- Owner: `ConnectorRegistry + ElectroCraftExtensionPackage`.
+- `packages/domain/src/data/connector-extension.ts` define `ConnectorExtensionManifest` portable y fail-closed.
+- `packages/connectors/src/connector-extension-registry.ts` instala adapters reales sobre el registry existente, valida source/config/capabilities, bloquea uninstall en uso y diagnostica missing connectors.
+- `pruneRuntimeDependencies()` elimina runtime/gateway de packs no usados por el proyecto.
+- `packages/data-web/src/connector-catalog.ts` expone Core + extensiones según estado real.
+- Studio añade `Más conectores` con Core/Extensión, versión, capabilities, Gateway y CTA hacia Extensiones.
+- `help.data.connectors` queda registrado.
+- PostgreSQL y MySQL se reservan como packs opcionales; `@electrocraft/connectors` no incorpora drivers SQL.
+- Tests M08.7 cubren install, read/create, missing, config/SecretRef, uninstall guard, pruning y seguridad.
+- Validación reproducible todavía pendiente; no declarar GREEN antes de lint/typecheck/tests/build + Base CI.
 
 ## Siguiente acción exacta
 
-Publicar la rama candidata, abrir PR M08.6 y ejecutar Base CI una sola vez para validar Playwright, artifacts y el resto del gate antes de fusionar.
+Ejecutar validación de la candidata M08.7. Si la Base CI/Playwright queda verde, fusionar la PR y activar `M08.8 — Modelos de datos y Field Registry`; si falla, corregir solo la evidencia concreta observada.
