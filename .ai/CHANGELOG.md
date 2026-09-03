@@ -70,3 +70,23 @@ El changelog histórico original hasta M00.8 se preserva sin modificaciones en `
 - Se corrigió el fallback incorrecto que trataba `lastDocumentId` como `projectId`.
 - Evidencia: `.ai/evidence/F08/M08.2/IMPLEMENTATION_2026-08-29.md`.
 - M08.3 queda como siguiente microfase activa; Actions siguen reservadas para Gate F08.
+
+## 2026-09-02 — F08 / M08.3–M08.5 conectores externos y secretos
+
+- M08.3 añadió REST Fetch, import OpenAPI, operaciones tipadas y UX de creación/prueba con Gateway fail-closed.
+- M08.4 añadió GraphQL Query/Mutation, variables, introspection y normalización sobre el mismo ConnectorRegistry.
+- M08.5 añadió `ConnectorGatewayPort`, `SecretStorePort`, `SecretRef`, Gateway server-side, cliente browser y Settings sin read-back.
+- Help contextual, E2E desktop/mobile y capturas certifican Gateway/Secretos en Studio.
+- `build:studio` inspecciona bundle, source maps y PWA; ExportIR conserva solo IDs de `SecretRef` y los errores no registran valores.
+- Base CI `33685072920` (#837) cerró M08.5 en GREEN; PR `#71` se fusionó por squash a `main` en `64da0f30d46730b9f29a4cc05edaf941b0714e85`.
+- M08.6 — Data Explorer y prueba de operaciones queda `ACTIVE`.
+
+## 2026-09-03 — F08 / M08.6 Data Explorer candidata a cierre
+
+- Se añadió un contrato portable de operaciones/parámetros del Explorer y su orquestación detrás del único ConnectorRegistry.
+- Internal, REST y GraphQL describen controles tipados; REST mantiene auth fuera del input y GraphQL deriva variables declaradas.
+- Studio incorporó `Datos > Fuentes de datos > <fuente> > Explorar`, ejecución explícita, confirmación de mutaciones, tabla/JSON avanzado, tiempo, truncación y errores españoles.
+- La traza se sanitiza antes de UI; claves/textos sensibles se reemplazan y los secretos siguen exclusivamente en SecretRef/Gateway.
+- El handoff crea y persiste Draft QueryDefinition canónico; QueryDefinition permite un grupo de condiciones vacío para consultas sin filtro.
+- `help.data.explorer`, pruebas unitarias y E2E real quedaron incorporados.
+- Local: lint, typecheck, build, Node `41/41` y Vitest `529/529` verdes. Base CI/Playwright queda como único gate antes del cierre.

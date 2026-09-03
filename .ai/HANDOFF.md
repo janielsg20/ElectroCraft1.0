@@ -2,48 +2,40 @@
 
 ## Current
 
-F08 / M08.5 — ConnectorGateway y SecretStore — `ACTIVE`.
+F08 / M08.6 — Data Explorer y prueba de operaciones — `IMPLEMENTADA / CANDIDATA A GATE CI / ACTIVE`.
 
-Rama activa: `codex/m08-5-connector-gateway-secrets`.
+Rama activa: `codex/m08-6-data-explorer`.
 
-M08.4 quedó certificada por ElectroCraft Base CI `33412562136` (#834) y PR `#70` fusionada por squash a `main` en `6b79ee859c9d0f4f712d897b4cc973bcc388cefb`.
+M08.5 quedó certificada por ElectroCraft Base CI `33685072920` (#837) y PR `#71` fusionada por squash a `main` en `64da0f30d46730b9f29a4cc05edaf941b0714e85`.
 
-## M08.5 owner y límites
+## M08.6 owner y límites
 
-Owner: `ConnectorGatewayPort + SecretStorePort`.
+Owner: `ConnectorRegistry + DataSourceAdapter`.
 
-- reutiliza el único `ConnectorRegistry` y los DataSourceAdapter REST/GraphQL existentes;
-- `SecretRef` es metadata portable, nunca el valor;
-- Studio solo usa `SecretStoreAdminPort` (write/status/remove), sin operación de resolve/read-back;
-- resolución del valor ocurre únicamente server-side dentro de ConnectorGateway;
-- `ServerEnvironmentSecretStore` es válido para desarrollo; producción debe alojar el mismo port sobre un secret manager/server seguro;
-- no `localStorage` para secretos;
-- `.env.example` solo documenta nombres y URL de Gateway.
+- reutiliza el único ConnectorRegistry y los adapters Internal/REST/GraphQL existentes;
+- Explorer es una herramienta de Studio, no un runtime de producción;
+- una operación se ejecuta solo mediante acción explícita `Ejecutar`;
+- mutaciones requieren confirmación previa;
+- auth headers, query secrets y traces se redactan antes de llegar a UI/logs;
+- resultados grandes se truncan de forma visible;
+- `Crear consulta desde esta operación` crea Draft QueryDefinition canónico, no un formato paralelo.
 
-## Implementación actual
+## Resultado implementado
 
-1. `packages/domain/src/data/secrets.ts`: SecretRef, scopes y binding;
-2. `packages/application/src/data/secret-store.ts`: SecretStorePort/AdminPort;
-3. `packages/application/src/data/connector-gateway.ts`: Gateway común REST/GraphQL;
-4. server-env SecretStore;
-5. server ConnectorGateway con inyección de credencial sin echo;
-6. handler HTTP Web-standard;
-7. cliente browser Gateway + secret admin;
-8. bridges que conectan REST/GraphQL certificados al port común;
-9. Studio activa Gateway por `VITE_ELECTROCRAFT_CONNECTOR_GATEWAY_URL` o permanece fail-closed;
-10. Settings UI con Gateway/Secretos/Desarrollo/Producción, estado, creación de refs y reemplazo sin read-back;
-11. fixture y Vitest de seguridad/runtime preparados.
+1. DataExplorer conectado a source/schema/capabilities reales;
+2. resources/operations y parameter controls derivados del contrato;
+3. ejecución read + confirmación de mutation;
+4. tabla/lista y JSON avanzado sanitizado;
+5. source-to-query handoff Draft persistible;
+6. estados español, Help `help.data.explorer`, responsive y accesibilidad;
+7. pruebas de read, mutation confirm, redaction, truncation, errors y query handoff.
 
-## Pendiente
+Validación local: lint, typecheck, build, Node `41/41`, Vitest `529/529`. El E2E se incorporó, pero requiere Chromium en Base CI.
 
-- publicar el cierre candidato con el gate reproducible de bundle/export/logs;
-- ejecutar ElectroCraft Base CI una sola vez sobre ese commit;
-- si el run queda GREEN, registrar su ID, cerrar M08.5 y activar M08.6.
+## Siguiente acción exacta
 
-Validación local del cierre candidato: documentación, lint, typecheck, límites, 41/41 Node, 525/525 Vitest, build, empty-repo y 115 artefactos del leak scan en verde. Playwright local no puede iniciar Chrome por la política de sockets del contenedor. El baseline `ca30a68` pasó el Playwright repository gate en Base CI `33651876477` (#836).
-
-No declarar GREEN ni activar M08.6 antes de que Actions valide el commit de cierre candidato.
+Publicar commit/PR candidata M08.6 y ejecutar Base CI. Si Playwright queda verde, fusionar y documentar cierre; si falla, corregir la evidencia concreta sin reabrir ownership.
 
 ## Read set
 
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/phases/F08.md → .ai/microphases/M08_5.md → packages/domain/src/data/secrets.ts → packages/application/src/data/{connector-gateway,secret-store}.ts → packages/connectors/src/{server-secret-store,server-connector-gateway,connector-gateway-http-handler,connector-gateway-bridge}.ts → packages/data-web/src/browser-connector-gateway.ts → apps/studio/src/features/data/data-integrations-* → apps/studio/src/help → tooling/vitest → tooling/playwright`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/phases/F08.md → .ai/microphases/M08_6.md → packages/domain/src/data → packages/application/src/data → packages/connectors/src → packages/data-web/src → apps/studio/src/features/data → apps/studio/src/help → tooling/vitest → tooling/playwright`.

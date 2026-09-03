@@ -21,6 +21,7 @@ export type StudioHelpId =
   | 'help.data.rest'
   | 'help.data.graphql'
   | 'help.data.secrets'
+  | 'help.data.explorer'
   | `help.section.${SidebarNavigationItemId}`;
 
 export interface HelpDescriptor {
@@ -285,6 +286,7 @@ const studioDefinitions = Object.freeze([
       'help.data.rest',
       'help.data.graphql',
       'help.data.secrets',
+      'help.data.explorer',
       'help.section.queries',
       'help.section.records',
       'help.projects',
@@ -365,6 +367,18 @@ const studioDefinitions = Object.freeze([
     learnMoreRef: '.ai/microphases/M08_4.md',
   },
   {
+    id: 'help.data.explorer',
+    sectionId: 'data-explorer',
+    navigationItemId: 'data-sources',
+    titleKey: 'help.data.explorer.title',
+    shortKey: 'help.data.explorer.short',
+    longKey: 'help.data.explorer.long',
+    exampleKeys: ['help.data.explorer.example'],
+    relatedIds: ['help.data.sources', 'help.data.rest', 'help.data.graphql', 'help.section.queries'],
+    keywords: ['explorar', 'data explorer', 'operaciones', 'parámetros', 'resultado', 'traza', 'mutación'],
+    learnMoreRef: '.ai/microphases/M08_6.md',
+  },
+  {
     id: 'help.data.secrets',
     sectionId: 'data-secrets',
     navigationItemId: 'data-sources',
@@ -428,6 +442,7 @@ const navigationRelated: Partial<Record<SidebarNavigationItemId, readonly Studio
     'help.data.rest',
     'help.data.graphql',
     'help.data.secrets',
+    'help.data.explorer',
     'help.section.queries',
   ],
   queries: ['help.section.records', 'help.data.sources'],

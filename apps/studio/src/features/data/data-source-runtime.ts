@@ -1,6 +1,9 @@
 import {
+  createDataExplorerQueryDraft,
+  createDataExplorerService,
   createStoredDataSourceObject,
   dataSourceConnectorRegistry,
+  type DataExplorerOperationDescriptor,
   type StoredProjectDefinition,
 } from '@electrocraft/application';
 import { createInternalDataSourceAdapter, INTERNAL_DATA_ADAPTER_ID } from '@electrocraft/connectors';
@@ -56,6 +59,7 @@ const INTERNAL_CAPABILITIES = Object.freeze([
 
 const listeners = new Set<() => void>();
 const internalDataRepository = createBrowserInternalDataRepositoryPort();
+const dataExplorerService = createDataExplorerService(dataSourceConnectorRegistry);
 let registeredInternalProjectId: string | null = null;
 let loadPromise: Promise<DataSourceWorkspaceSnapshot> | null = null;
 let sourceUpdatedAt = new Map<string, string>();
@@ -249,6 +253,65 @@ export const dataSourceWorkspaceRuntime = Object.freeze({
   },
   async listResources(source: ElectroCraftDataSourceDefinition, environment: ElectroCraftDataSourceEnvironment) {
     return webDataSourceRepository.listResources(source, environment);
+  },
+  async listExplorerOperations(
+    source: ElectroCraftDataSourceDefinition,
+    environment: ElectroCraftDataSourceEnvironment,
+  ) {
+    return dataExplorerService.listOperations(source, environment);
+  },
+  async executeExplorerOperation(
+    source: ElectroCraftDataSourceDefinition,
+    environment: ElectroCraftDataSourceEnvironment,
+    operation: DataExplorerOperationDescriptor,
+    input: JsonValue,
+    mutationConfirmed = false,
+  ) {
+    return dataExplorerService.execute({ source, environment, operation, input, mutationConfirmed });
+  },
+  async createExplorerQueryDraft(
+    source: ElectroCraftDataSourceDefinition,
+    operation: DataExplorerOperationDescriptor,
+    input: JsonValue,
+  ) {
+    const current = snapshot;
+    if (!current.project) throw new Error('Abre un proyecto antes de crear una consulta.');
+    const query = createDataExplorerQueryDraft({
+      source,
+      operation,
+      input,
+      idSeed: globalThis.crypto.randomUUID(),
+    });
+    publish({ ...current, state: 'saving', message: 'Guardando borrador de consulta…', lastOperation: null });
+    try {
+      projectStorageRuntime.queueAutosave({
+        project: current.project,
+        dirtyObjects: [
+          {
+            objectId: query.id,
+            kind: 'query-definition',
+            schemaVersion: query.schemaVersion,
+            payload: structuredClone(query) as unknown as JsonValue,
+          },
+        ],
+      });
+      await projectStorageRuntime.flushAutosave();
+      publish({
+        ...current,
+        state: 'ready',
+        message: `Borrador ${query.name} creado.`,
+        lastOperation: 'Consulta creada como borrador.',
+      });
+      return query;
+    } catch (error) {
+      publish({
+        ...current,
+        state: 'error',
+        message: error instanceof Error ? error.message : 'No se pudo guardar el borrador.',
+        lastOperation: null,
+      });
+      throw error;
+    }
   },
   async query(
     source: ElectroCraftDataSourceDefinition,

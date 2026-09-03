@@ -21,6 +21,7 @@ import type {
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { HelpTrigger } from '../../help/help-ui';
 import { dataSourceWorkspaceRuntime } from './data-source-runtime';
+import { DataExplorer } from './data-explorer';
 import { RestSourceWizardSheet } from './rest-source-wizard';
 import './studio-data-source-adapters';
 import './data-sources-workspace.css';
@@ -93,6 +94,7 @@ export function DataSourcesWorkspace() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [inspectorOpen, setInspectorOpen] = useState(false);
+  const [explorerOpen, setExplorerOpen] = useState(false);
   const [environment, setEnvironment] = useState<ElectroCraftDataSourceEnvironment>('development');
   const [search, setSearch] = useState('');
   const [actionError, setActionError] = useState<string | null>(null);
@@ -105,6 +107,7 @@ export function DataSourcesWorkspace() {
     if (selectedId && snapshot.sources.some(({ id }) => id === selectedId)) return;
     setSelectedId(snapshot.sources[0]?.id ?? null);
     setDetailOpen(false);
+    setExplorerOpen(false);
   }, [selectedId, snapshot.sources]);
 
   const filtered = useMemo(() => {
@@ -182,6 +185,8 @@ export function DataSourcesWorkspace() {
             <AddIcon aria-hidden="true" /> Nueva fuente REST
           </Button>
         </div>
+      ) : explorerOpen && selected ? (
+        <DataExplorer source={selected} environment={environment} onBack={() => setExplorerOpen(false)} />
       ) : (
         <div className="ec-data-sources-layout" data-mobile-detail={detailOpen ? 'true' : 'false'}>
           <aside className="ec-data-sources-list" aria-label="Fuentes de datos">
@@ -205,6 +210,7 @@ export function DataSourcesWorkspace() {
                     onClick={() => {
                       setSelectedId(source.id);
                       setDetailOpen(true);
+                      setExplorerOpen(false);
                       setActionError(null);
                     }}
                   >
@@ -250,6 +256,16 @@ export function DataSourcesWorkspace() {
                     onClick={() => setInspectorOpen(true)}
                   >
                     Seguridad y compatibilidad
+                  </Button>
+                  <Button
+                    size="sm"
+                    disabled={!adapterUsable}
+                    onClick={() => {
+                      setActionError(null);
+                      setExplorerOpen(true);
+                    }}
+                  >
+                    Explorar
                   </Button>
                 </div>
 

@@ -1,5 +1,6 @@
 export * from './connector-gateway';
 export * from './secret-store';
+export * from './data-explorer';
 
 import type {
   ElectroCraftCanonicalDataSourceCapability,
@@ -7,6 +8,7 @@ import type {
   ElectroCraftDataSourceDefinition,
   ElectroCraftDataSourceEnvironment,
   ElectroCraftDataSourceKind,
+  ElectroCraftDataExplorerOperation,
   JsonValue,
 } from '@electrocraft/domain';
 import type { StoredProjectObjectInput } from '../projects/project-storage';
@@ -26,6 +28,7 @@ export interface DataSourceResourceDescriptor {
   readonly id: string;
   readonly label: string;
   readonly kind: string;
+  readonly operations?: readonly ElectroCraftDataExplorerOperation[];
   readonly metadata?: Readonly<Record<string, JsonValue>>;
 }
 
