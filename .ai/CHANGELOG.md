@@ -90,3 +90,12 @@ El changelog histórico original hasta M00.8 se preserva sin modificaciones en `
 - El handoff crea y persiste Draft QueryDefinition canónico; QueryDefinition permite un grupo de condiciones vacío para consultas sin filtro.
 - `help.data.explorer`, pruebas unitarias y E2E real quedaron incorporados.
 - Local: lint, typecheck, build, Node `41/41` y Vitest `529/529` verdes. Base CI/Playwright queda como único gate antes del cierre.
+
+## 2026-09-03 — F08 / M08.8 cerrada y M08.9 candidata
+
+- M08.8 añadió Field Registry, modelos canónicos en `data-schema`, `/models` e impacto de datos sobre `content_records`.
+- Base CI `33804227049` (#875) certificó documentación, lint, typecheck, tests, build, Playwright, empty-repo y artifacts; PR `#74` se fusionó a `main` en `8225f3aa5797972265a470f49c8aff75c5bab87c`.
+- M08.9 añadió Group/Repeater anidados, Calculated con operaciones registradas y Conditional con rule AST sin `eval`.
+- El adapter interno normaliza create/update y mantiene PGlite como store genérico, sin DDL dinámico ni tablas por modelo.
+- Studio integra jerarquía, configuración de dependencias y reordenamiento accesible en `Datos > Modelos > Campos`.
+- Local: lint, typecheck, boundaries, Node `41/41`, Vitest `547/547` y build verdes; E2E M08.9 queda para el gate final por timeout del CDN de Chromium en el contenedor.

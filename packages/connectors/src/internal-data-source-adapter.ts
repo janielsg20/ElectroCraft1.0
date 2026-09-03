@@ -11,6 +11,7 @@ import type {
   InternalDataRepository,
 } from '@electrocraft/application';
 import type { JsonValue } from '@electrocraft/domain';
+import { normalizeElectroCraftAdvancedFieldRecord } from './advanced-field-runtime';
 
 export const INTERNAL_DATA_ADAPTER_ID = 'internal.pglite' as const;
 
@@ -148,6 +149,17 @@ export class InternalDataSourceAdapter implements DataSourceAdapter {
     if (!allowed) throw new InternalDataPermissionError(operation, resourceId);
   }
 
+  private async normalizeMutationData(
+    context: DataSourceAdapterContext,
+    resourceId: string,
+    data: Readonly<Record<string, JsonValue>>,
+  ) {
+    const schema = await this.options.repository.getSchema(this.options.projectId, context.source.id);
+    const model = schema?.models.find(({ id }) => id === resourceId);
+    if (!model) throw new Error(`Modelo interno no encontrado: ${resourceId}.`);
+    return normalizeElectroCraftAdvancedFieldRecord(model, data);
+  }
+
   testConnection() {
     return this.options.repository.testConnection(this.options.projectId);
   }
@@ -174,18 +186,20 @@ export class InternalDataSourceAdapter implements DataSourceAdapter {
   async mutate(context: DataSourceAdapterContext, request: DataSourceMutationRequest): Promise<JsonValue> {
     await this.authorize(context, request.resourceId, request.operation);
     if (request.operation === 'create') {
-      return (await this.options.repository.createRecord(
-        this.options.projectId,
-        request.resourceId,
-        parseCreateInput(request.input),
-      )) as unknown as JsonValue;
+      const input = parseCreateInput(request.input);
+      const data = await this.normalizeMutationData(context, request.resourceId, input.data);
+      return (await this.options.repository.createRecord(this.options.projectId, request.resourceId, {
+        ...input,
+        data,
+      })) as unknown as JsonValue;
     }
     if (request.operation === 'update') {
-      return (await this.options.repository.updateRecord(
-        this.options.projectId,
-        request.resourceId,
-        parseUpdateInput(request.input),
-      )) as unknown as JsonValue;
+      const input = parseUpdateInput(request.input);
+      const data = await this.normalizeMutationData(context, request.resourceId, input.data);
+      return (await this.options.repository.updateRecord(this.options.projectId, request.resourceId, {
+        ...input,
+        data,
+      })) as unknown as JsonValue;
     }
     return Object.freeze({
       deleted: await this.options.repository.deleteRecord(

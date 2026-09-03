@@ -19,39 +19,38 @@ Date: 2026-09-03.
 | F08 / M08.5 | IMPLEMENTADA / GREEN MICROFASE | PR `#71`; Base CI `33685072920` (#837) |
 | F08 / M08.6 | IMPLEMENTADA / GREEN MICROFASE | PR `#72`; Base CI `33776935165` |
 | F08 / M08.7 | IMPLEMENTADA / GREEN MICROFASE | PR `#73`; Base CI `33792230116` (#858); merge `7bded471c94bb50009a6b99215d6e02cb3b726b2`; `.ai/evidence/F08/M08.7/CLOSURE_2026-09-03.md` |
-| F08 / M08.8 | ACTIVE | `.ai/microphases/M08_8.md` |
+| F08 / M08.8 | IMPLEMENTADA / GREEN MICROFASE | PR `#74`; Base CI `33804227049` (#875); merge `8225f3aa5797972265a470f49c8aff75c5bab87c`; `.ai/evidence/F08/M08.8/CLOSURE_2026-09-03.md` |
+| F08 / M08.9 | ACTIVE / CANDIDATA A GATE | `.ai/evidence/F08/M08.9/IMPLEMENTATION_2026-09-03.md` |
 
 ## Rama activa
 
-`codex/m08-8-data-models-field-registry`
+`codex/m08-9-advanced-fields`
 
-## M08.7 — cierre certificado
+## M08.8 — cierre certificado
 
-- Owner: `ConnectorRegistry + ElectroCraftExtensionPackage`.
-- El único `ConnectorRegistry` instala adapters de extensión reales y falla cerrado cuando un connector requerido no existe.
-- PostgreSQL/MySQL permanecen packs opcionales, sin drivers SQL embebidos en Core.
-- SQL exige `ConnectorGateway` + `SecretRef`; uninstall en uso queda bloqueado.
-- `pruneRuntimeDependencies()` mantiene solo dependencias de packs realmente usados.
-- Studio incluye `Más conectores` y `help.data.connectors`.
-- Base CI `33792230116` (#858) terminó documentación, lint, typecheck, tests, build, Playwright repository gate, empty-repo y artifacts en `success`.
-- PR `#73` se fusionó por squash a `main` en `7bded471c94bb50009a6b99215d6e02cb3b726b2`.
+- Owner: `PGlite generic content store` y schema canónico `ElectroCraftDataModel`.
+- Field Registry portable, modelos persistidos como `data-schema` y registros en `content_records`.
+- Studio incluye `Datos > Modelos`, impacto de datos y `help.content.models`.
+- Base CI `33804227049` (#875) terminó documentación, lint, typecheck, tests, build, Playwright repository gate, empty-repo y artifacts en `success`.
+- PR `#74` se fusionó por squash a `main` en `8225f3aa5797972265a470f49c8aff75c5bab87c`.
 
-## M08.8 — implementación activa
+## M08.9 — implementación candidata
 
 Owner: `PGlite generic content store`.
 
-- ampliar `ElectroCraftDataModel` y el contrato de campos sin romper schemas REST/GraphQL existentes;
-- crear Field Registry portable con families, validación, opciones, permissions e indexing;
-- mantener `content_records` como store físico genérico y `data-schema` como metadata canónica;
-- implementar `Datos > Modelos` con lista 280–320 px, detalle por tabs y estados responsive/accessibles;
-- mostrar impacto de datos antes de rename/delete de campos;
-- registrar `help.content.models`;
-- añadir unit/contract, integration PGlite y E2E antes del gate.
+- contratos portables para Group/Repeater/Calculated/Conditional y capability `data.advanced-fields`;
+- operaciones calculadas registradas y rule AST condicional sin `eval`;
+- detección de ciclos, dependencias ausentes/cross-scope y validación anidada;
+- normalización create/update detrás de `InternalDataSourceAdapter`/ConnectorRegistry;
+- store físico genérico `content_records`, sin DDL dinámico;
+- Studio con jerarquía indentada, configuración de estructura/dependencias y reordenamiento por botones;
+- unit/contract/integration PGlite verdes; E2E M08.9 preparado para el gate.
+- Base CI `33810318819` (#877) validó todo salvo un locator Playwright ambiguo (`120/121` E2E); la candidata acota ese assertion al panel Campos.
 
 ## Validación de engine
 
-La API oficial actual de PGlite confirma soporte de Drizzle, persistencia browser, consultas y transacciones. M08.8 reutiliza ese engine; no introduce DDL dinámico ni un ORM/store paralelo.
+La API oficial actual de PGlite confirma soporte de Drizzle, persistencia browser, consultas y transacciones. M08.9 reutiliza el mismo JSONB genérico; las expresiones y reglas son lógica portable de ElectroCraft, no ejecución SQL ni código dinámico.
 
 ## Siguiente acción exacta
 
-Completar la implementación de M08.8 en esta rama, preparar evidence y ejecutar una única Base CI/Playwright al finalizar la microfase. Si queda verde, fusionar y activar `M08.9`.
+Publicar la adaptación y ejecutar Base CI/Playwright. Si queda verde, fusionar y activar `M08.10`.

@@ -4,18 +4,28 @@ import {
   type StoredProjectDefinition,
 } from '@electrocraft/application';
 import {
+  assertElectroCraftAdvancedFieldModel,
   createDeterministicObjectId,
   electroCraftDataFieldSchema,
   electroCraftDataModelSchema,
   electroCraftDataSchemaSchema,
+  readElectroCraftAdvancedFieldMetadata,
+  type ElectroCraftAdvancedFieldMetadata,
   type ElectroCraftDataField,
   type ElectroCraftDataFieldType,
   type ElectroCraftDataModel,
+  type ElectroCraftObjectId,
   type ElectroCraftDataSchema,
   type ElectroCraftDataSourceDefinition,
   type JsonValue,
 } from '@electrocraft/domain';
 import { projectStorageRuntime } from '../projects/project-storage-runtime';
+import {
+  createAdvancedMetadataForField,
+  modelCapabilityRefsForFields,
+  moveFieldWithinScope,
+  withAdvancedFieldMetadata,
+} from './advanced-field-model';
 import { dataSourceWorkspaceRuntime } from './data-source-runtime';
 
 export type DataModelWorkspaceState = 'initial' | 'loading' | 'ready' | 'saving' | 'error';
@@ -135,6 +145,7 @@ async function persistSchema(nextSchema: ElectroCraftDataSchema, selectedModelId
   const current = snapshot;
   if (!current.project || !current.source)
     throw new Error('ElectroCraft Data no está disponible en el proyecto activo.');
+  for (const model of nextSchema.models) assertElectroCraftAdvancedFieldModel(model);
   const parsed = electroCraftDataSchemaSchema.parse(nextSchema);
   publish({ ...current, state: 'saving', message: 'Guardando modelo…' });
   try {
@@ -176,7 +187,11 @@ function createDefaultField(seed: string): ElectroCraftDataField {
     relationModelRef: null,
     help: 'Nombre principal del registro.',
     required: true,
-    metadata: { storageHint: 'scalar', fieldFamily: 'text' },
+    metadata: {
+      storageHint: 'scalar',
+      fieldFamily: 'text',
+      advancedField: { parentFieldRef: null, order: 0 },
+    },
   });
 }
 
@@ -306,6 +321,7 @@ export const dataModelWorkspaceRuntime = Object.freeze({
     const seed = globalThis.crypto.randomUUID();
     const label = input.label.trim() || descriptor.label;
     const relationModelRef = input.type === 'relation' ? (input.relationModelRef ?? model.id) : null;
+    const advancedField = createAdvancedMetadataForField(model, input.type, { order: model.fields.length });
     const nextField = electroCraftDataFieldSchema.parse({
       id: createDeterministicObjectId('data-field', seed),
       key: normalizeKey(label, 'field'),
@@ -320,10 +336,16 @@ export const dataModelWorkspaceRuntime = Object.freeze({
       metadata: {
         storageHint: descriptor.storageHint,
         fieldFamily: descriptor.family,
+        advancedField: advancedField as unknown as JsonValue,
         ...(descriptor.advancedOwner ? { advancedOwner: descriptor.advancedOwner } : {}),
       },
     });
-    const nextModel = electroCraftDataModelSchema.parse({ ...model, fields: [...model.fields, nextField] });
+    const fields = [...model.fields, nextField];
+    const nextModel = electroCraftDataModelSchema.parse({
+      ...model,
+      capabilityRefs: modelCapabilityRefsForFields(model, fields),
+      fields,
+    });
     await persistSchema(replaceModel(current.schema, nextModel), modelId, `Campo ${nextField.label} añadido.`);
     return nextField;
   },
@@ -350,13 +372,50 @@ export const dataModelWorkspaceRuntime = Object.freeze({
       const impact = await queryFieldImpact(current.source, model, field);
       if (impact.populatedCount > 0) throw new Error(`FIELD_RENAME_IMPACT:${impact.populatedCount}`);
     }
-    const nextField = electroCraftDataFieldSchema.parse({ ...field, ...patch, id: field.id });
+    const parsedField = electroCraftDataFieldSchema.parse({ ...field, ...patch, id: field.id });
+    const nextField = withAdvancedFieldMetadata(model, parsedField, parsedField.type);
+    const fields = model.fields.map((candidate) => (candidate.id === field.id ? nextField : candidate));
     const nextModel = electroCraftDataModelSchema.parse({
       ...model,
-      fields: model.fields.map((candidate) => (candidate.id === field.id ? nextField : candidate)),
+      capabilityRefs: modelCapabilityRefsForFields(model, fields),
+      fields,
     });
     await persistSchema(replaceModel(current.schema, nextModel), modelId, `Campo ${nextField.label} actualizado.`);
     return nextField;
+  },
+  async updateAdvancedFieldMetadata(
+    modelId: string,
+    fieldId: string,
+    patch: Partial<ElectroCraftAdvancedFieldMetadata>,
+  ) {
+    const current = snapshot;
+    if (!current.schema) throw new Error('No hay esquema interno para editar.');
+    const model = current.schema.models.find(({ id }) => id === modelId);
+    const field = model?.fields.find(({ id }) => id === fieldId);
+    if (!model || !field) throw new Error('Campo no encontrado.');
+    const nextField = withAdvancedFieldMetadata(model, field, field.type, patch);
+    const fields = model.fields.map((candidate) => (candidate.id === field.id ? nextField : candidate));
+    const nextModel = electroCraftDataModelSchema.parse({
+      ...model,
+      capabilityRefs: modelCapabilityRefsForFields(model, fields),
+      fields,
+    });
+    await persistSchema(
+      replaceModel(current.schema, nextModel),
+      modelId,
+      `Configuración de ${field.label} actualizada.`,
+    );
+    return nextField;
+  },
+  async moveField(modelId: string, fieldId: ElectroCraftObjectId, direction: -1 | 1) {
+    const current = snapshot;
+    if (!current.schema) throw new Error('No hay esquema interno para editar.');
+    const model = current.schema.models.find(({ id }) => id === modelId);
+    if (!model) throw new Error('Modelo no encontrado.');
+    const fields = moveFieldWithinScope(model, fieldId, direction);
+    const nextModel = electroCraftDataModelSchema.parse({ ...model, fields });
+    await persistSchema(replaceModel(current.schema, nextModel), modelId, 'Orden de campos actualizado.');
+    return nextModel;
   },
   async deleteField(modelId: string, fieldId: string, confirmDataImpact = false) {
     const current = snapshot;
@@ -365,12 +424,19 @@ export const dataModelWorkspaceRuntime = Object.freeze({
     const field = model?.fields.find(({ id }) => id === fieldId);
     if (!model || !field) throw new Error('Campo no encontrado.');
     if (model.fields.length <= 1) throw new Error('El modelo debe conservar al menos un campo.');
+    const childCount = model.fields.filter(
+      (candidate) => readElectroCraftAdvancedFieldMetadata(candidate).parentFieldRef === field.id,
+    ).length;
+    if (childCount > 0)
+      throw new Error(`Mueve o elimina primero los ${childCount} campo(s) anidados dentro de ${field.label}.`);
     const impact = await queryFieldImpact(current.source, model, field);
     if (impact.populatedCount > 0 && !confirmDataImpact)
       throw new Error(`FIELD_DELETE_IMPACT:${impact.populatedCount}`);
+    const fields = model.fields.filter(({ id }) => id !== field.id);
     const nextModel = electroCraftDataModelSchema.parse({
       ...model,
-      fields: model.fields.filter(({ id }) => id !== field.id),
+      capabilityRefs: modelCapabilityRefsForFields(model, fields),
+      fields,
     });
     await persistSchema(replaceModel(current.schema, nextModel), modelId, `Campo ${field.label} eliminado.`);
     return impact;

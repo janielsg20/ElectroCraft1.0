@@ -247,7 +247,11 @@
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
-  padding: 8px 9px;
+  padding: 8px 9px 8px calc(9px + var(--ec-field-depth, 0) * 18px);
+}
+
+.ec-field-row[data-depth]:not([data-depth='0']) {
+  background: color-mix(in srgb, var(--muted) 45%, transparent);
 }
 
 .ec-field-row > span {
@@ -264,6 +268,34 @@
 .ec-model-actions {
   flex-wrap: wrap;
   margin-top: 14px;
+}
+
+.ec-advanced-field-editor {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: var(--radius);
+  background: var(--muted);
+}
+
+.ec-advanced-field-heading,
+.ec-advanced-order-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ec-advanced-field-heading p,
+.ec-advanced-hint {
+  margin: 3px 0 0;
+  color: var(--muted-foreground);
+  font-size: var(--ec-text-xs);
+}
+
+.ec-advanced-field-editor .ec-model-form-grid {
+  margin-top: 0;
 }
 
 .ec-impact-box,
@@ -374,8 +406,14 @@
   }
 
   .ec-model-actions > button,
-  .ec-impact-confirm button {
+  .ec-impact-confirm button,
+  .ec-advanced-field-editor > button {
     width: 100%;
+  }
+
+  .ec-advanced-field-heading {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
 

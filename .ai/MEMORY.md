@@ -28,6 +28,8 @@ Solo contiene hechos estables y decisiones vigentes. Progreso y siguiente paso p
 - Puck AppState/history, Rete NodeEditor/sockets/history, Zustand store instances y TanStack Query cache permanecen prohibidos como payload persistido; se reconstruyen desde definiciones ElectroCraft canónicas.
 - Project Revisions son historial durable separado del Undo/history de engines. Cada restore es no destructivo: crea un checkpoint de seguridad y una nueva revisión actual; el historial previo permanece intacto.
 - `project_object_versions` deduplica payloads por identidad de versión/checksum para que los manifests de revisión puedan referenciar objetos sin duplicar contenido.
+- Group/Repeater son scopes anidados de `ElectroCraftDataField`, no widgets globales; Calculated usa operaciones registradas y Conditional un rule AST tipado sin `eval`.
+- Advanced Fields se normalizan detrás del adapter interno/ConnectorRegistry y persisten únicamente en el JSONB genérico de `content_records`; no crean DDL ni tablas físicas por modelo/campo.
 
 ## AI
 

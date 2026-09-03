@@ -1,8 +1,10 @@
 import { electroCraftFieldRegistry, getElectroCraftFieldRegistryEntry } from '@electrocraft/application';
 import { Button, Input, Tabs, TabsContent, TabsList, TabsTrigger } from '@electrocraft/design-system';
 import type { ElectroCraftDataField, ElectroCraftDataFieldType } from '@electrocraft/domain';
-import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useState, useSyncExternalStore, type CSSProperties } from 'react';
 import { HelpTrigger } from '../../help/help-ui';
+import { AdvancedFieldEditor } from './advanced-field-editor';
+import { orderAdvancedFieldsForDisplay } from './advanced-field-model';
 import { dataModelWorkspaceRuntime, type DataFieldImpact } from './data-model-runtime';
 import './data-models-workspace.css';
 
@@ -43,6 +45,7 @@ export function DataModelsWorkspace() {
   const [identity, setIdentity] = useState({ label: '', singularLabel: '', pluralLabel: '', description: '' });
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
   const selectedField = model?.fields.find(({ id }) => id === selectedFieldId) ?? model?.fields[0] ?? null;
+  const orderedFields = useMemo(() => (model ? orderAdvancedFieldsForDisplay(model) : []), [model]);
   const [fieldState, setFieldState] = useState<FieldDraft | null>(null);
   const [newFieldLabel, setNewFieldLabel] = useState('');
   const [newFieldType, setNewFieldType] = useState<ElectroCraftDataFieldType>('text');
@@ -363,18 +366,20 @@ export function DataModelsWorkspace() {
                     </Button>
                   </div>
                   <div className="ec-field-list" role="list">
-                    {model.fields.map((field) => (
+                    {orderedFields.map(({ field, depth }) => (
                       <button
                         key={field.id}
                         type="button"
                         role="listitem"
                         className="ec-field-row"
+                        data-depth={depth}
+                        style={{ '--ec-field-depth': depth } as CSSProperties}
                         aria-current={field.id === selectedField?.id ? 'true' : undefined}
                         onClick={() => setSelectedFieldId(field.id)}
                       >
                         <span>
                           <strong>{field.label}</strong>
-                          <small>{field.key}</small>
+                          <small>{depth > 0 ? `↳ ${field.key}` : field.key}</small>
                         </span>
                         <span>
                           <small>{getElectroCraftFieldRegistryEntry(field.type).label}</small>
@@ -451,6 +456,7 @@ export function DataModelsWorkspace() {
                           </span>
                         ) : null}
                       </div>
+                      <AdvancedFieldEditor model={model} field={selectedField} onMessage={setActionMessage} />
                       <div className="ec-model-actions">
                         <Button size="sm" onClick={() => void saveField(false)}>
                           Guardar cambios

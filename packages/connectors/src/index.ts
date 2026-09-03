@@ -5,6 +5,7 @@ import {
   type ElectroCraftDataConnector,
 } from '@electrocraft/application';
 
+export * from './advanced-field-runtime';
 export * from './connector-extension-registry';
 export * from './connector-gateway-bridge';
 export * from './connector-gateway-http-handler';
