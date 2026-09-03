@@ -5,6 +5,7 @@ import {
   type ElectroCraftDataConnector,
 } from '@electrocraft/application';
 
+export * from './connector-extension-registry';
 export * from './connector-gateway-bridge';
 export * from './connector-gateway-http-handler';
 export * from './graphql-data-source-adapter';
