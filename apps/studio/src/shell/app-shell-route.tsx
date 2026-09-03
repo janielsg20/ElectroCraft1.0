@@ -15,6 +15,11 @@ const DataSourcesFeatureWorkspace = lazy(() =>
     default: module.DataSourcesFeatureWorkspace,
   })),
 );
+const DataModelsWorkspace = lazy(() =>
+  import('../features/data/data-models-workspace').then((module) => ({
+    default: module.DataModelsWorkspace,
+  })),
+);
 
 export const studioDesignSystemOwner: DesignSystemPackageDescriptor['name'] = '@electrocraft/design-system';
 
@@ -110,6 +115,13 @@ function resolveFeatureWorkspace(pathname: string, children: ReactNode) {
     return (
       <Suspense fallback={<StudioRouteSkeleton kind="generic" label="Cargando fuentes de datos" />}>
         <DataSourcesFeatureWorkspace />
+      </Suspense>
+    );
+  }
+  if (pathname === '/models') {
+    return (
+      <Suspense fallback={<StudioRouteSkeleton kind="generic" label="Cargando modelos" />}>
+        <DataModelsWorkspace />
       </Suspense>
     );
   }

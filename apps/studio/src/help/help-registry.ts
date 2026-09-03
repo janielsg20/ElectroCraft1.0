@@ -23,6 +23,7 @@ export type StudioHelpId =
   | 'help.data.secrets'
   | 'help.data.explorer'
   | 'help.data.connectors'
+  | 'help.content.models'
   | `help.section.${SidebarNavigationItemId}`;
 
 export interface HelpDescriptor {
@@ -289,6 +290,7 @@ const studioDefinitions = Object.freeze([
       'help.data.secrets',
       'help.data.explorer',
       'help.data.connectors',
+      'help.content.models',
       'help.section.queries',
       'help.section.records',
       'help.projects',
@@ -313,7 +315,7 @@ const studioDefinitions = Object.freeze([
     sectionId: 'data-internal',
     navigationItemId: 'data-sources',
     ...dataSourceKeys,
-    relatedIds: ['help.data.sources', 'help.data.rest', 'help.section.models', 'help.section.records', 'help.projects'],
+    relatedIds: ['help.data.sources', 'help.data.rest', 'help.content.models', 'help.section.records', 'help.projects'],
     keywords: [
       'electrocraft data',
       'pglite',
@@ -424,6 +426,30 @@ const studioDefinitions = Object.freeze([
     ],
     learnMoreRef: '.ai/microphases/M08_7.md',
   },
+  {
+    id: 'help.content.models',
+    sectionId: 'content-models',
+    navigationItemId: 'models',
+    titleKey: 'help.content.models.title',
+    shortKey: 'help.content.models.short',
+    longKey: 'help.content.models.long',
+    exampleKeys: ['help.content.models.example'],
+    relatedIds: ['help.section.records', 'help.data.internal', 'help.data.sources', 'help.section.forms'],
+    keywords: [
+      'modelos',
+      'campos',
+      'field registry',
+      'validación',
+      'schema',
+      'pglite',
+      'content_records',
+      'storage hint',
+      'impacto de datos',
+      'renombrar campo',
+      'eliminar campo',
+    ],
+    learnMoreRef: '.ai/microphases/M08_8.md',
+  },
 ] as const satisfies readonly HelpDefinition[]);
 
 const navigationKeywords: Readonly<Record<SidebarNavigationItemId, readonly string[]>> = Object.freeze({
@@ -433,7 +459,7 @@ const navigationKeywords: Readonly<Record<SidebarNavigationItemId, readonly stri
   templates: ['plantillas', 'templates', 'reutilizar'],
   'ai-generate': ['ia', 'ai', 'generar', 'asistente'],
   records: ['registros', 'contenido', 'content', 'list detail'],
-  models: ['modelos', 'campos', 'schema', 'contenido'],
+  models: ['modelos', 'campos', 'schema', 'contenido', 'field registry'],
   'data-sources': ['fuentes', 'datos', 'conexiones', 'adapters'],
   queries: ['consultas', 'queries', 'filtros', 'rqb'],
   workflows: ['acciones', 'workflows', 'rete', 'lógica'],
@@ -458,8 +484,8 @@ const navigationRelated: Partial<Record<SidebarNavigationItemId, readonly Studio
   screens: ['help.screens', 'help.navigation.builder', 'help.editor.screens'],
   navigation: ['help.navigation.builder', 'help.navigation.routes', 'help.navigation'],
   components: ['help.section.editor', 'help.section.templates'],
-  records: ['help.section.models', 'help.section.queries', 'help.section.forms'],
-  models: ['help.section.records', 'help.section.forms'],
+  records: ['help.content.models', 'help.section.queries', 'help.section.forms'],
+  models: ['help.content.models', 'help.section.records', 'help.section.forms'],
   'data-sources': [
     'help.data.sources',
     'help.data.internal',
@@ -468,10 +494,11 @@ const navigationRelated: Partial<Record<SidebarNavigationItemId, readonly Studio
     'help.data.secrets',
     'help.data.explorer',
     'help.data.connectors',
+    'help.content.models',
     'help.section.queries',
   ],
   queries: ['help.section.records', 'help.data.sources'],
-  forms: ['help.section.models', 'help.section.workflows'],
+  forms: ['help.content.models', 'help.section.workflows'],
   themes: ['help.studio.appearance', 'help.section.tokens'],
   preview: ['help.section.compatibility', 'help.section.export'],
   compatibility: ['help.section.preview', 'help.section.export'],
@@ -517,6 +544,7 @@ export function getHelpIdForNavigationItem(itemId: SidebarNavigationItemId): Stu
   if (itemId === 'screens') return 'help.screens';
   if (itemId === 'navigation') return 'help.navigation.builder';
   if (itemId === 'data-sources') return 'help.data.sources';
+  if (itemId === 'models') return 'help.content.models';
   return `help.section.${itemId}`;
 }
 

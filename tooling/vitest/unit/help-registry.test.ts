@@ -27,6 +27,7 @@ const studioScopedHelpIds = [
   'help.data.secrets',
   'help.data.explorer',
   'help.data.connectors',
+  'help.content.models',
 ] as const;
 
 describe('M03.11 typed HelpRegistry', () => {
@@ -63,9 +64,11 @@ describe('M03.11 typed HelpRegistry', () => {
     expect(searchStudioHelp('data explorer').some((entry) => entry.id === 'help.data.explorer')).toBe(true);
     expect(searchStudioHelp('postgresql').some((entry) => entry.id === 'help.data.connectors')).toBe(true);
     expect(searchStudioHelp('connector sdk').some((entry) => entry.id === 'help.data.connectors')).toBe(true);
+    expect(searchStudioHelp('field registry').some((entry) => entry.id === 'help.content.models')).toBe(true);
+    expect(searchStudioHelp('impacto de datos').some((entry) => entry.id === 'help.content.models')).toBe(true);
   });
 
-  it('maps Fuentes de datos to its M08 contextual descriptors', () => {
+  it('maps Fuentes de datos and Modelos to their M08 contextual descriptors', () => {
     expect(getHelpIdForNavigationItem('data-sources')).toBe('help.data.sources');
     expect(getStudioHelpDescriptor('help.data.sources')).toMatchObject({
       sectionId: 'data-sources-management',
@@ -94,6 +97,11 @@ describe('M03.11 typed HelpRegistry', () => {
     expect(getStudioHelpDescriptor('help.data.connectors')).toMatchObject({
       sectionId: 'data-connectors',
       learnMoreRef: '.ai/microphases/M08_7.md',
+    });
+    expect(getHelpIdForNavigationItem('models')).toBe('help.content.models');
+    expect(getStudioHelpDescriptor('help.content.models')).toMatchObject({
+      sectionId: 'content-models',
+      learnMoreRef: '.ai/microphases/M08_8.md',
     });
   });
 

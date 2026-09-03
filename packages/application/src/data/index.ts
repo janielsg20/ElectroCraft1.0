@@ -1,6 +1,7 @@
 export * from './connector-gateway';
 export * from './secret-store';
 export * from './data-explorer';
+export * from './field-registry';
 
 import type {
   ElectroCraftCanonicalDataSourceCapability,
@@ -112,6 +113,13 @@ export interface InternalDataSourceStats {
   readonly recordCount: number;
 }
 
+export interface InternalDataFieldUsage {
+  readonly modelId: string;
+  readonly fieldKey: string;
+  readonly recordCount: number;
+  readonly populatedCount: number;
+}
+
 export interface InternalDataRepository {
   testConnection(projectId: string): Promise<DataSourceConnectionResult>;
   listResources(projectId: string, sourceId: string): Promise<readonly DataSourceResourceDescriptor[]>;
@@ -121,6 +129,7 @@ export interface InternalDataRepository {
   updateRecord(projectId: string, modelId: string, input: InternalDataRecordUpdate): Promise<InternalDataRecord>;
   deleteRecord(projectId: string, modelId: string, recordId: string): Promise<boolean>;
   getStats(projectId: string, sourceId: string): Promise<InternalDataSourceStats>;
+  getFieldUsage(projectId: string, modelId: string, fieldKey: string): Promise<InternalDataFieldUsage>;
 }
 
 export type InternalDataPermissionOperation = 'read' | 'create' | 'update' | 'delete';
@@ -142,5 +151,14 @@ export function createStoredDataSourceObject(source: ElectroCraftDataSourceDefin
     kind: 'data-source',
     schemaVersion: source.schemaVersion,
     payload: structuredClone(source) as unknown as JsonValue,
+  });
+}
+
+export function createStoredDataSchemaObject(dataSchema: ElectroCraftDataSchema): StoredProjectObjectInput {
+  return Object.freeze({
+    objectId: dataSchema.id,
+    kind: 'data-schema',
+    schemaVersion: dataSchema.schemaVersion,
+    payload: structuredClone(dataSchema) as unknown as JsonValue,
   });
 }
