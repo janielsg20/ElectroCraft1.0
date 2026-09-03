@@ -84,6 +84,8 @@ export function createBrowserInternalDataRepositoryPort(
     deleteRecord: (projectId, modelId, recordId) =>
       delegate((active) => active.deleteRecord(projectId, modelId, recordId)),
     getStats: (projectId, sourceId) => delegate((active) => active.getStats(projectId, sourceId)),
+    getFieldUsage: (projectId, modelId, fieldKey) =>
+      delegate((active) => active.getFieldUsage(projectId, modelId, fieldKey)),
     async close() {
       const active = client;
       client = null;
