@@ -82,6 +82,13 @@ function createMemoryRepository(dataSchema: ElectroCraftDataSchema): InternalDat
     async getStats() {
       return { modelCount: resources.length, recordCount: rows.size };
     },
+    async getFieldUsage(_projectId: string, modelId: string, fieldKey: string) {
+      const matches = [...rows.values()].filter((row) => row.modelId === modelId);
+      const populatedCount = matches.filter(
+        ({ data }) => Object.prototype.hasOwnProperty.call(data, fieldKey) && data[fieldKey] !== null && data[fieldKey] !== '',
+      ).length;
+      return { modelId, fieldKey, recordCount: matches.length, populatedCount };
+    },
   };
 }
 
