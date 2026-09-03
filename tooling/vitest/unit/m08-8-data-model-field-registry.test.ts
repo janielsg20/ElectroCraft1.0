@@ -1,12 +1,16 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import {
+  electroCraftFieldRegistry,
+  getElectroCraftFieldRegistryEntry,
+  listElectroCraftFieldRegistryByFamily,
+} from '@electrocraft/application';
 import {
   createDeterministicObjectId,
   electroCraftDataFieldSchema,
   electroCraftDataModelSchema,
   electroCraftDataSchemaSchema,
-  electroCraftFieldRegistry,
-  getElectroCraftFieldRegistryEntry,
-  listElectroCraftFieldRegistryByFamily,
   type ElectroCraftDataFieldType,
 } from '@electrocraft/domain';
 
@@ -44,6 +48,17 @@ function fieldFor(type: ElectroCraftDataFieldType, index: number) {
 }
 
 describe('M08.8 canonical DataModel and Field Registry', () => {
+  it('keeps field-type registry under the pre-existing application owner', () => {
+    const ownership = readFileSync(resolve('packages/domain/src/contracts/model-ownership.ts'), 'utf8');
+    const domainIndex = readFileSync(resolve('packages/domain/src/index.ts'), 'utf8');
+    const applicationIndex = readFileSync(resolve('packages/application/src/data/index.ts'), 'utf8');
+
+    expect(ownership).toContain("key: 'field-type'");
+    expect(ownership).toContain("ownerPackage: '@electrocraft/application'");
+    expect(applicationIndex).toContain("export * from './field-registry'");
+    expect(domainIndex).not.toContain("./data/field-registry");
+  });
+
   it('registers every required field type with portable storage semantics', () => {
     expect(electroCraftFieldRegistry).toHaveLength(29);
     expect(new Set(electroCraftFieldRegistry.map(({ type }) => type)).size).toBe(electroCraftFieldRegistry.length);
