@@ -2,9 +2,11 @@
 
 ## Current
 
-F08 / M08.7 — Connector SDK boundary y optional database packs — `IMPLEMENTADA / CANDIDATA A VALIDACIÓN / ACTIVE`.
+F08 / M08.7 — Connector SDK boundary y optional database packs — `ACTIVE`.
 
 Rama activa: `codex/m08-7-connector-sdk-packs`.
+
+Estado de implementación: `IMPLEMENTADA / CANDIDATA A VALIDACIÓN`.
 
 M08.6 quedó certificada por ElectroCraft Base CI `33776935165` y PR `#72` fusionada por squash a `main` en `d89235f36f81fd91f9d8d676191c8ab52dbf7804`.
 
@@ -33,7 +35,9 @@ Owner: `ConnectorRegistry + ElectroCraftExtensionPackage`.
 
 ## Validación pendiente
 
-No declarar M08.7 GREEN todavía. Falta ejecutar lint, typecheck, tests y build sobre la candidata y luego una sola ElectroCraft Base CI/Playwright.
+El primer run de Base CI detectó una inconsistencia del marcador documental `ACTIVE` antes de ejecutar lint/typecheck. El contenido funcional no llegó a validarse en ese run; la corrección mantiene M08.7 como única microfase `ACTIVE` con el formato canónico del docs gate.
+
+No declarar M08.7 GREEN todavía. Falta la ejecución completa de documentación, lint, typecheck, tests, build y Playwright sobre el commit corregido.
 
 ## Siguiente acción exacta
 
