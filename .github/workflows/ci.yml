@@ -40,8 +40,21 @@ jobs:
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Verify documentation conventions
         run: npm run test:docs
-      - name: Lint
-        run: npm run lint
+      - name: Lint format diagnostic
+        run: |
+          npx prettier --write \
+            packages/domain/src/data/connector-extension.ts \
+            packages/connectors/src/connector-extension-registry.ts \
+            packages/data-web/src/connector-catalog.ts \
+            apps/studio/src/features/data/connector-catalog.tsx \
+            tooling/vitest/unit/m08-7-connector-sdk-boundary.test.ts
+          git diff -- \
+            packages/domain/src/data/connector-extension.ts \
+            packages/connectors/src/connector-extension-registry.ts \
+            packages/data-web/src/connector-catalog.ts \
+            apps/studio/src/features/data/connector-catalog.tsx \
+            tooling/vitest/unit/m08-7-connector-sdk-boundary.test.ts
+          exit 1
       - name: Typecheck
         run: npm run typecheck
       - name: Test
