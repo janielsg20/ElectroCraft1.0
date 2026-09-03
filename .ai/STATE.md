@@ -16,17 +16,18 @@
 - M08.3 — REST API Connector y OpenAPI import: `IMPLEMENTADA / GREEN MICROFASE`.
 - M08.4 — GraphQL Connector: `IMPLEMENTADA / GREEN MICROFASE`.
 - M08.5 — ConnectorGateway y SecretStore: `IMPLEMENTADA / GREEN MICROFASE`.
-- M08.6 — Data Explorer y prueba de operaciones: `ACTIVE`.
+- M08.6 — Data Explorer y prueba de operaciones: `IMPLEMENTADA / GREEN MICROFASE`.
+- M08.7 — Connector SDK boundary y optional database packs: `IMPLEMENTADA / CANDIDATA A VALIDACIÓN / ACTIVE`.
 
 ## Rama activa
 
-`codex/m08-6-data-explorer`
+`codex/m08-7-connector-sdk-packs`
 
 ## Último cierre certificado
 
-M08.5 fue certificada por ElectroCraft Base CI run `33685072920` (#837): documentación, lint, typecheck, 525/525 Vitest, build, secret leak scan, Playwright, empty-repo y artifacts terminaron en `success`. PR `#71` se fusionó mediante squash a `main` en `64da0f30d46730b9f29a4cc05edaf941b0714e85`.
+M08.6 fue certificada por ElectroCraft Base CI run `33776935165`: documentación, lint, typecheck, tests, build, Playwright repository gate, empty-repo y artifacts terminaron en `success`. PR `#72` se fusionó por squash a `main` en `d89235f36f81fd91f9d8d676191c8ab52dbf7804`.
 
-## F08 implementado hasta M08.5
+## F08 implementado hasta M08.6
 
 - DataSourceDefinition canónico + único ConnectorRegistry.
 - ElectroCraft Data usa PGlite/Drizzle y `content_records` existente.
@@ -35,26 +36,20 @@ M08.5 fue certificada por ElectroCraft Base CI run `33685072920` (#837): documen
 - `SecretRef` portable separa metadata/binding/scope del valor secreto.
 - `SecretStorePort` permite write/status/remove y resolución únicamente para ejecución server-side; Studio consume solo el subset admin sin read-back.
 - `ConnectorGatewayPort` común expone REST y GraphQL sin crear otro registry.
-- `ServerEnvironmentSecretStore` aporta adapter de desarrollo server-env; write queda deshabilitado salvo host explícitamente mutable.
-- `ServerConnectorGateway` resuelve SecretRef, inyecta credenciales server-side y normaliza REST/GraphQL sin retornar secretos.
-- Handler HTTP Web-standard + clientes browser conectan Studio con un Gateway alojado por servidor/secret manager.
-- REST y GraphQL se adaptan al port común mediante bridges, preservando los adapters certificados.
-- `.env.example` contiene solo URL pública del Gateway y convención de nombres, nunca valores.
-- Settings ya incluye Gateway de conectores / Secretos, Desarrollo/Producción, estado, crear referencia y crear/reemplazar/eliminar valor sin read-back.
-- Fixture y Vitest M08.5 cubren write/no readback, environment resolution, auth injection, HTTP round-trip, ExportIR/logs y secret leak scan del bundle.
+- Data Explorer usa resources/operations reales, ejecución explícita, confirmación de mutaciones, traza sanitizada/truncada y handoff a Draft QueryDefinition canónico.
 
-## M08.6 candidata a cierre
+## M08.7 candidata a validación
 
-Owner: `ConnectorRegistry + DataSourceAdapter`.
+Owner: `ConnectorRegistry + ElectroCraftExtensionPackage`.
 
-- ruta: `Datos > Fuentes de datos > <fuente> > Explorar`;
-- resources/operations a la izquierda, parámetros y ejecución explícita al centro, resultado tabla/JSON a la derecha;
-- mutaciones requieren confirmación;
-- trace avanzado debe permanecer sanitizado;
-- `Crear consulta desde esta operación` produce un Draft `QueryDefinition`;
-- no convertir Explorer en runtime de producción ni auto-ejecutar mutaciones.
-- implementación, lint, typecheck, build y `529/529` pruebas Vitest están verdes localmente;
-- E2E real está preparado y espera Chromium/Base CI para certificación y captura.
+- `ConnectorExtensionManifest` define adapter/source kind/config schema/capabilities/Gateway/runtime/target support sin secretos embebidos;
+- `ConnectorExtensionRegistry` instala adapters reales sobre el único ConnectorRegistry, valida manifest/source, bloquea uninstall en uso y diagnostica connector ausente;
+- `pruneRuntimeDependencies()` conserva solo runtime/gateway de conectores usados;
+- `packages/data-web` expone catálogo Core/Extensión basado en estado real;
+- Studio añade `Datos > Fuentes de datos > Nueva fuente > Más conectores`;
+- PostgreSQL/MySQL permanecen packs opcionales y ningún driver SQL fue añadido a Core;
+- `help.data.connectors` está conectado al HelpRegistry;
+- tests M08.7 cubren installed/missing/uninstall/pruning/config/SecretRef/read-create/security y contrato UI.
 
 ## Evidencia F08
 
@@ -68,7 +63,9 @@ Owner: `ConnectorRegistry + DataSourceAdapter`.
 - `.ai/evidence/F08/M08.5/CLOSURE_2026-09-02.md`
 - `.ai/evidence/F08/M08.6/IMPLEMENTATION_2026-09-03.md`
 - `.ai/evidence/F08/M08.6/VALIDATION_2026-09-03.md`
+- `.ai/evidence/F08/M08.6/CLOSURE_2026-09-03.md`
+- `.ai/evidence/F08/M08.7/IMPLEMENTATION_2026-09-03.md`
 
 ## Siguiente transición
 
-Publicar la candidata M08.6, ejecutar una sola Base CI con Playwright y corregir únicamente cualquier fallo observado antes de fusionar/certificar.
+Validar la candidata M08.7 con lint, typecheck, tests y build; después ejecutar una sola ElectroCraft Base CI/Playwright. Solo con gate verde fusionar y activar `M08.8 — Modelos de datos y Field Registry`.
