@@ -1,6 +1,7 @@
 export * from './connector-gateway';
 export * from './secret-store';
 export * from './data-explorer';
+export * from './field-registry';
 
 import type {
   ElectroCraftCanonicalDataSourceCapability,
