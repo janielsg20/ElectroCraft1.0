@@ -1,13 +1,6 @@
 import { connectorExtensionRegistry } from '@electrocraft/connectors';
 import { createConnectorCatalog, type ConnectorCatalogEntry } from '@electrocraft/data-web';
-import {
-  Button,
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@electrocraft/design-system';
+import { Button, Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@electrocraft/design-system';
 import { HelpTrigger } from '../../help/help-ui';
 import { dataSourceWorkspaceRuntime } from './data-source-runtime';
 
@@ -43,8 +36,8 @@ export function ConnectorCatalogSheet({
             <HelpTrigger helpId="help.data.connectors" />
           </div>
           <SheetDescription>
-            Core conserva contratos y seguridad. Los drivers adicionales se instalan como extensiones y nunca
-            guardan secretos dentro del proyecto.
+            Core conserva contratos y seguridad. Los drivers adicionales se instalan como extensiones y nunca guardan
+            secretos dentro del proyecto.
           </SheetDescription>
         </SheetHeader>
 
