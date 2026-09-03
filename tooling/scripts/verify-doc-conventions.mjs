@@ -30,7 +30,8 @@ const formatterProbeFiles = [
 for (const relativePath of formatterProbeFiles) {
   const absolutePath = resolve(root, relativePath);
   const source = readFileSync(absolutePath, 'utf8');
-  const formatted = await prettier.format(source, { filepath: absolutePath });
+  const config = (await prettier.resolveConfig(absolutePath)) ?? {};
+  const formatted = await prettier.format(source, { ...config, filepath: absolutePath });
   writeFileSync(absolutePath, formatted, 'utf8');
 }
 
