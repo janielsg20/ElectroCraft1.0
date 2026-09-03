@@ -323,6 +323,38 @@ export class RestDataSourceAdapter implements DataSourceAdapter {
           id: operation.id,
           label: operation.label,
           kind: `rest:${operation.kind}`,
+          operations: Object.freeze([
+            Object.freeze({
+              id: operation.id,
+              label: operation.label,
+              capability: operation.kind,
+              parameters: Object.freeze([
+                ...operation.parameters.map((parameter) =>
+                  Object.freeze({
+                    name: parameter.name,
+                    label: parameter.name,
+                    location: parameter.location,
+                    inputPath: Object.freeze([parameter.location, parameter.name]),
+                    required: parameter.required,
+                    valueType: parameter.valueType,
+                  }),
+                ),
+                ...(operation.method !== 'GET'
+                  ? [
+                      Object.freeze({
+                        name: 'body',
+                        label: 'Cuerpo JSON',
+                        location: 'body' as const,
+                        inputPath: Object.freeze(['body']),
+                        required: operation.inputSchema !== null,
+                        valueType: 'json' as const,
+                      }),
+                    ]
+                  : []),
+              ]),
+              inputSchema: operation.inputSchema,
+            }),
+          ]),
           metadata: Object.freeze({
             method: operation.method,
             path: operation.path,

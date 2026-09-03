@@ -15,27 +15,23 @@
 - M08.2 — Fuente interna ElectroCraft Data sobre PGlite: `IMPLEMENTADA / PENDIENTE GATE F08`.
 - M08.3 — REST API Connector y OpenAPI import: `IMPLEMENTADA / GREEN MICROFASE`.
 - M08.4 — GraphQL Connector: `IMPLEMENTADA / GREEN MICROFASE`.
-- M08.5 — ConnectorGateway y SecretStore: `ACTIVE`.
+- M08.5 — ConnectorGateway y SecretStore: `IMPLEMENTADA / GREEN MICROFASE`.
+- M08.6 — Data Explorer y prueba de operaciones: `ACTIVE`.
 
 ## Rama activa
 
-`codex/m08-5-connector-gateway-secrets`
+`codex/m08-6-data-explorer`
 
 ## Último cierre certificado
 
-M08.4 fue certificada por ElectroCraft Base CI run `33412562136` (#834): documentación, lint, typecheck, 518/518 Vitest, build, Playwright, empty-repo y artifacts terminaron en `success`. PR `#70` se fusionó mediante squash a `main` en `6b79ee859c9d0f4f712d897b4cc973bcc388cefb`.
+M08.5 fue certificada por ElectroCraft Base CI run `33685072920` (#837): documentación, lint, typecheck, 525/525 Vitest, build, secret leak scan, Playwright, empty-repo y artifacts terminaron en `success`. PR `#71` se fusionó mediante squash a `main` en `64da0f30d46730b9f29a4cc05edaf941b0714e85`.
 
-## F08 implementado hasta M08.4
+## F08 implementado hasta M08.5
 
 - DataSourceDefinition canónico + único ConnectorRegistry.
 - ElectroCraft Data usa PGlite/Drizzle y `content_records` existente.
 - REST usa Web Fetch API + OpenAPI con SecretRef/Gateway fail-closed.
 - GraphQL usa Fetch, Query/Mutation, variables tipadas e introspection sobre el mismo DataSourceAdapter/ConnectorRegistry.
-
-## M08.5 implementación activa
-
-Owner: `ConnectorGatewayPort + SecretStorePort`.
-
 - `SecretRef` portable separa metadata/binding/scope del valor secreto.
 - `SecretStorePort` permite write/status/remove y resolución únicamente para ejecución server-side; Studio consume solo el subset admin sin read-back.
 - `ConnectorGatewayPort` común expone REST y GraphQL sin crear otro registry.
@@ -45,11 +41,20 @@ Owner: `ConnectorGatewayPort + SecretStorePort`.
 - REST y GraphQL se adaptan al port común mediante bridges, preservando los adapters certificados.
 - `.env.example` contiene solo URL pública del Gateway y convención de nombres, nunca valores.
 - Settings ya incluye Gateway de conectores / Secretos, Desarrollo/Producción, estado, crear referencia y crear/reemplazar/eliminar valor sin read-back.
-- Fixture y Vitest M08.5 cubren write/no readback, environment resolution, auth injection, HTTP round-trip y secret scan básico.
+- Fixture y Vitest M08.5 cubren write/no readback, environment resolution, auth injection, HTTP round-trip, ExportIR/logs y secret leak scan del bundle.
 
-## Validación pendiente
+## M08.6 candidata a cierre
 
-M08.5 permanece `ACTIVE`. HelpRegistry `help.data.secrets`, E2E responsive/UI y evidencia visual ya existen. El gate local confirmó lint, typecheck, límites, 41/41 Node, 525/525 Vitest, builds, empty-repo y el escaneo de 115 artefactos de bundle/source maps/PWA sin fugas. El contenedor local bloquea el socket interno de Chrome; el mismo baseline `ca30a68` sí pasó Playwright en Base CI `33651876477` (#836). Falta ejecutar Actions una sola vez sobre el commit que incorpora el nuevo gate de fugas antes de declarar M08.5 GREEN.
+Owner: `ConnectorRegistry + DataSourceAdapter`.
+
+- ruta: `Datos > Fuentes de datos > <fuente> > Explorar`;
+- resources/operations a la izquierda, parámetros y ejecución explícita al centro, resultado tabla/JSON a la derecha;
+- mutaciones requieren confirmación;
+- trace avanzado debe permanecer sanitizado;
+- `Crear consulta desde esta operación` produce un Draft `QueryDefinition`;
+- no convertir Explorer en runtime de producción ni auto-ejecutar mutaciones.
+- implementación, lint, typecheck, build y `529/529` pruebas Vitest están verdes localmente;
+- E2E real está preparado y espera Chromium/Base CI para certificación y captura.
 
 ## Evidencia F08
 
@@ -60,7 +65,10 @@ M08.5 permanece `ACTIVE`. HelpRegistry `help.data.secrets`, E2E responsive/UI y 
 - `.ai/evidence/F08/M08.5/IMPLEMENTATION_2026-08-31.md`
 - `.ai/evidence/F08/M08.5/VALIDATION_2026-09-02.md`
 - `.ai/evidence/F08/M08.5/secret-leak-scan.json`
+- `.ai/evidence/F08/M08.5/CLOSURE_2026-09-02.md`
+- `.ai/evidence/F08/M08.6/IMPLEMENTATION_2026-09-03.md`
+- `.ai/evidence/F08/M08.6/VALIDATION_2026-09-03.md`
 
 ## Siguiente transición
 
-Publicar el commit de cierre candidato y ejecutar ElectroCraft Base CI una sola vez. Solo con ese gate verde cerrar M08.5 y activar `M08.6 — Data Explorer y prueba de operaciones`.
+Publicar la candidata M08.6, ejecutar una sola Base CI con Playwright y corregir únicamente cualquier fallo observado antes de fusionar/certificar.

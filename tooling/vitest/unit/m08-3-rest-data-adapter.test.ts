@@ -61,6 +61,18 @@ describe('M08.3 REST API Connector y OpenAPI import', () => {
       expect.objectContaining({ adapterId: REST_DATA_ADAPTER_ID, adapterRegistered: true, displayName: 'REST API' }),
     ]);
     expect(registry.validateCompatibility(source)).toEqual([]);
+    const resources = await registry.listResources(source, 'development');
+    expect(resources.find(({ id }) => id === 'listProducts')?.operations?.[0]).toMatchObject({
+      capability: 'read',
+      parameters: [
+        { name: 'page', location: 'query', inputPath: ['query', 'page'], valueType: 'number' },
+        { name: 'pageSize', location: 'query', inputPath: ['query', 'pageSize'], valueType: 'number' },
+      ],
+    });
+    expect(resources.find(({ id }) => id === 'createProduct')?.operations?.[0]).toMatchObject({
+      capability: 'create',
+      parameters: [{ name: 'body', location: 'body', inputPath: ['body'], required: false }],
+    });
 
     await expect(
       registry.query(source, 'development', {

@@ -57,10 +57,7 @@ export interface ElectroCraftQueryGroup {
 export const electroCraftQueryGroupSchema: z.ZodType<ElectroCraftQueryGroup> = z.lazy(() =>
   z.strictObject({
     combinator: z.enum(['and', 'or']),
-    rules: z
-      .array(z.union([electroCraftQueryRuleSchema, electroCraftQueryGroupSchema]))
-      .min(1)
-      .max(200),
+    rules: z.array(z.union([electroCraftQueryRuleSchema, electroCraftQueryGroupSchema])).max(200),
   }),
 );
 

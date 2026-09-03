@@ -661,6 +661,27 @@ export class GraphQLDataSourceAdapter implements DataSourceAdapter {
           id: operation.id,
           label: operation.label,
           kind: `graphql:${operation.operationType}`,
+          operations: Object.freeze([
+            Object.freeze({
+              id: operation.id,
+              label: operation.label,
+              capability: operation.kind,
+              parameters: Object.freeze(
+                operation.variables.map((variable) =>
+                  Object.freeze({
+                    name: variable.name,
+                    label: `$${variable.name}: ${variable.graphQLType}`,
+                    location: 'variable' as const,
+                    inputPath: Object.freeze(['variables', variable.name]),
+                    required: variable.required,
+                    valueType: variable.valueType,
+                    ...(variable.defaultValue === undefined ? {} : { defaultValue: variable.defaultValue }),
+                  }),
+                ),
+              ),
+              inputSchema: null,
+            }),
+          ]),
           metadata: Object.freeze({
             fieldName: operation.fieldName,
             operationType: operation.operationType,

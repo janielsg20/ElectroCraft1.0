@@ -2,7 +2,7 @@
 
 Fecha: 2026-09-02  
 Rama: `codex/m08-5-connector-gateway-secrets`  
-Estado: `ACTIVE` — candidato local completo; pendiente Base CI del commit final.
+Estado: `GREEN MICROFASE`.
 
 ## Cambio de gate
 
@@ -33,6 +33,8 @@ El contenedor local no permite que Chrome cree su socket de proceso y aborta ant
 
 El baseline exacto anterior a los cambios de test/gate, `ca30a68d8b8a7d77cc26aa526e5ba7945cca0e52`, fue validado por ElectroCraft Base CI `33651876477` (#836): instalación, documentación, lint, typecheck, tests, build, Playwright repository gate, empty-repo y artifacts terminaron en `success`.
 
-## Decisión
+## Certificación remota
 
-No declarar M08.5 GREEN con evidencia combinada. Ejecutar Base CI una sola vez sobre el commit que contiene el nuevo scan; cerrar y activar M08.6 únicamente si ese run termina en `success`.
+ElectroCraft Base CI `33685072920` (#837) validó el cierre candidato del PR `#71`. Documentación, lint, typecheck, 525/525 Vitest, build, secret leak scan, Playwright repository gate, empty-repo y artifacts terminaron en `success`.
+
+PR `#71` se fusionó mediante squash a `main` en `64da0f30d46730b9f29a4cc05edaf941b0714e85`. M08.5 queda `GREEN` y M08.6 puede activarse.
