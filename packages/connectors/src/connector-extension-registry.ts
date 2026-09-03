@@ -257,7 +257,9 @@ export class ConnectorExtensionRegistry {
     return Object.freeze(
       [...this.installed.values()]
         .map((manifest) => Object.freeze({ adapterId: manifest.adapterId, manifest }))
-        .sort((left, right) => left.manifest.extensionPackage.displayName.localeCompare(right.manifest.extensionPackage.displayName)),
+        .sort((left, right) =>
+          left.manifest.extensionPackage.displayName.localeCompare(right.manifest.extensionPackage.displayName),
+        ),
     );
   }
 
