@@ -8,7 +8,7 @@
 - F03 — Design System, AppShell, español y ayuda: `COMPLETADA / GREEN`.
 - F04 — Persistencia local, proyectos y revisiones: `COMPLETADA / GREEN`.
 - F05 — Screen Composer con Puck: `COMPLETADA / GREEN`.
-- F06 — Layout, responsive y edición avanzada: implementación fusionada; reparaciones heredadas certificadas dentro del gate F07.
+- F06 — Layout, responsive y edición avanzada: implementación fusionada; reparaciones certificadas dentro del gate F07.
 - F07 — Pantallas, navegación y rutas: `COMPLETADA / GREEN`.
 - F08 — Fuentes de datos, modelos, registros y conectores: `IN_PROGRESS`.
 - M08.1 — Fuentes de datos y ConnectorRegistry: `IMPLEMENTADA / PENDIENTE GATE F08`.
@@ -17,57 +17,36 @@
 - M08.4 — GraphQL Connector: `IMPLEMENTADA / GREEN MICROFASE`.
 - M08.5 — ConnectorGateway y SecretStore: `IMPLEMENTADA / GREEN MICROFASE`.
 - M08.6 — Data Explorer y prueba de operaciones: `IMPLEMENTADA / GREEN MICROFASE`.
-- M08.7 — Connector SDK boundary y optional database packs: `ACTIVE`.
+- M08.7 — Connector SDK boundary y optional database packs: `IMPLEMENTADA / GREEN MICROFASE`.
+- M08.8 — Modelos de datos y Field Registry: `ACTIVE`.
 
 ## Rama activa
 
-`codex/m08-7-connector-sdk-packs`
-
-Estado de implementación M08.7: `IMPLEMENTADA / CANDIDATA A VALIDACIÓN`.
+`codex/m08-8-data-models-field-registry`
 
 ## Último cierre certificado
 
-M08.6 fue certificada por ElectroCraft Base CI run `33776935165`: documentación, lint, typecheck, tests, build, Playwright repository gate, empty-repo y artifacts terminaron en `success`. PR `#72` se fusionó por squash a `main` en `d89235f36f81fd91f9d8d676191c8ab52dbf7804`.
+M08.7 fue certificada por ElectroCraft Base CI run `33792230116` (#858): documentación, lint, typecheck, tests, build, Playwright repository gate, empty-repo y artifacts terminaron en `success`. PR `#73` se fusionó por squash a `main` en `7bded471c94bb50009a6b99215d6e02cb3b726b2`.
 
-## F08 implementado hasta M08.6
+## M08.8 — owner y alcance
 
-- DataSourceDefinition canónico + único ConnectorRegistry.
-- ElectroCraft Data usa PGlite/Drizzle y `content_records` existente.
-- REST usa Web Fetch API + OpenAPI con SecretRef/Gateway fail-closed.
-- GraphQL usa Fetch, Query/Mutation, variables tipadas e introspection sobre el mismo DataSourceAdapter/ConnectorRegistry.
-- `SecretRef` portable separa metadata/binding/scope del valor secreto.
-- `SecretStorePort` permite write/status/remove y resolución únicamente para ejecución server-side; Studio consume solo el subset admin sin read-back.
-- `ConnectorGatewayPort` común expone REST y GraphQL sin crear otro registry.
-- Data Explorer usa resources/operations reales, ejecución explícita, confirmación de mutaciones, traza sanitizada/truncada y handoff a Draft QueryDefinition canónico.
+Owner: `PGlite generic content store` existente, accesible mediante el adapter interno y el `ConnectorRegistry` ya certificados.
 
-## M08.7 candidata a validación
+- `ElectroCraftDataModel` continúa siendo el modelo canónico; se amplía, no se reemplaza.
+- Field Registry define metadata portable de tipos/capacidades/validación/UX.
+- Los modelos se persisten como objetos canónicos `data-schema` del proyecto.
+- Los registros permanecen en `content_records`; no se crea una tabla física por modelo ni DDL dinámico.
+- `storageHint` es metadata para compilers/targets, nunca DDL del Studio.
+- Studio implementa `Datos > Modelos` con lista + detalle y Progressive Disclosure.
+- Rename/delete de campos debe mostrar impacto de uso/datos antes de aplicar cambios destructivos.
+- Ayuda propietaria: `help.content.models`.
 
-Owner: `ConnectorRegistry + ElectroCraftExtensionPackage`.
+## Evidencia F08 reciente
 
-- `ConnectorExtensionManifest` define adapter/source kind/config schema/capabilities/Gateway/runtime/target support sin secretos embebidos;
-- `ConnectorExtensionRegistry` instala adapters reales sobre el único ConnectorRegistry, valida manifest/source, bloquea uninstall en uso y diagnostica connector ausente;
-- `pruneRuntimeDependencies()` conserva solo runtime/gateway de conectores usados;
-- `packages/data-web` expone catálogo Core/Extensión basado en estado real;
-- Studio añade `Datos > Fuentes de datos > Nueva fuente > Más conectores`;
-- PostgreSQL/MySQL permanecen packs opcionales y ningún driver SQL fue añadido a Core;
-- `help.data.connectors` está conectado al HelpRegistry;
-- tests M08.7 cubren installed/missing/uninstall/pruning/config/SecretRef/read-create/security y contrato UI.
-
-## Evidencia F08
-
-- `.ai/evidence/F08/M08.1/IMPLEMENTATION_2026-08-29.md`
-- `.ai/evidence/F08/M08.2/IMPLEMENTATION_2026-08-29.md`
-- `.ai/evidence/F08/M08.3/IMPLEMENTATION_2026-08-29.md`
-- `.ai/evidence/F08/M08.4/IMPLEMENTATION_2026-08-31.md`
-- `.ai/evidence/F08/M08.5/IMPLEMENTATION_2026-08-31.md`
-- `.ai/evidence/F08/M08.5/VALIDATION_2026-09-02.md`
-- `.ai/evidence/F08/M08.5/secret-leak-scan.json`
-- `.ai/evidence/F08/M08.5/CLOSURE_2026-09-02.md`
-- `.ai/evidence/F08/M08.6/IMPLEMENTATION_2026-09-03.md`
-- `.ai/evidence/F08/M08.6/VALIDATION_2026-09-03.md`
 - `.ai/evidence/F08/M08.6/CLOSURE_2026-09-03.md`
 - `.ai/evidence/F08/M08.7/IMPLEMENTATION_2026-09-03.md`
+- `.ai/evidence/F08/M08.7/CLOSURE_2026-09-03.md`
 
 ## Siguiente transición
 
-Validar la candidata M08.7 con lint, typecheck, tests y build; después ejecutar ElectroCraft Base CI/Playwright. Solo con gate verde fusionar y activar `M08.8 — Modelos de datos y Field Registry`.
+Implementar M08.8, validar localmente todo lo disponible sin disparar Actions intermedias, publicar una única candidata y ejecutar Base CI/Playwright solo como gate de microfase. Con gate verde, fusionar y activar `M08.9 — Group, Repeater, Calculated y Conditional Fields`.
