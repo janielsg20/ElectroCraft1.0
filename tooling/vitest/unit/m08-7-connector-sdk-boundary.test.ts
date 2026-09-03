@@ -19,6 +19,10 @@ const catalogSource = readFileSync(
   new URL('../../../apps/studio/src/features/data/connector-catalog.tsx', import.meta.url),
   'utf8',
 );
+const catalogModelSource = readFileSync(
+  new URL('../../../packages/data-web/src/connector-catalog.ts', import.meta.url),
+  'utf8',
+);
 const optionalPacksDoc = readFileSync(
   new URL('../../../packages/connectors/OPTIONAL_CONNECTOR_PACKS.md', import.meta.url),
   'utf8',
@@ -233,13 +237,13 @@ describe('M08.7 Connector SDK boundary', () => {
 
   it('keeps PostgreSQL/MySQL as honest optional packs and exposes the required Spanish catalog UX', () => {
     expect(pickerSource).toContain('Más conectores');
-    expect(catalogSource).toContain('PostgreSQL');
-    expect(catalogSource).toContain('MySQL');
+    expect(catalogModelSource).toContain('PostgreSQL');
+    expect(catalogModelSource).toContain('MySQL');
     expect(catalogSource).toContain('Requiere extensión');
     expect(catalogSource).toContain('Requiere gateway');
     expect(catalogSource).toContain('Instalar conector');
     expect(catalogSource).toContain('help.data.connectors');
-    expect(catalogSource).toContain('/extensions?connector=');
+    expect(catalogModelSource).toContain('/extensions?connector=');
     expect(optionalPacksDoc).toContain('Core no incluye el driver');
     expect(optionalPacksDoc).toContain('pruneRuntimeDependencies()');
     expect(connectorPackageJson).not.toMatch(/\b(pg|postgres|postgresql|mysql2|mysql|mariadb)\b/i);
