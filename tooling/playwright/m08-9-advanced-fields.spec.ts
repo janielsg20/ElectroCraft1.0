@@ -70,7 +70,10 @@ test('M08.9 configura campos anidados, calculados y condicionales en Modelos', a
   await expect(page.getByText('La condición usa un AST tipado y se interpreta sin `eval`.')).toBeVisible();
 
   await page.getByRole('button', { name: 'Subir' }).click();
-  await expect(page.getByText('Orden de campos actualizado.')).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByRole('tabpanel', { name: 'Campos' }).getByRole('status')).toHaveText(
+    'Orden de campos actualizado.',
+    { timeout: 60_000 },
+  );
   await page.screenshot({ path: '.ai/evidence/F08/M08.9/advanced-fields-desktop.png', fullPage: true });
 
   await page.reload();

@@ -45,6 +45,7 @@ Owner: `PGlite generic content store`.
 - store físico genérico `content_records`, sin DDL dinámico;
 - Studio con jerarquía indentada, configuración de estructura/dependencias y reordenamiento por botones;
 - unit/contract/integration PGlite verdes; E2E M08.9 preparado para el gate.
+- Base CI `33810318819` (#877) validó todo salvo un locator Playwright ambiguo (`120/121` E2E); la candidata acota ese assertion al panel Campos.
 
 ## Validación de engine
 
@@ -52,4 +53,4 @@ La API oficial actual de PGlite confirma soporte de Drizzle, persistencia browse
 
 ## Siguiente acción exacta
 
-Publicar la candidata y ejecutar una única Base CI/Playwright. Si queda verde, fusionar y activar `M08.10`.
+Publicar la adaptación y ejecutar Base CI/Playwright. Si queda verde, fusionar y activar `M08.10`.

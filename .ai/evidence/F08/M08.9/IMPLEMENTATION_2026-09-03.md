@@ -53,6 +53,16 @@ La microfase permanece `ACTIVE` hasta que ElectroCraft Base CI/Playwright termin
 
 La ejecución E2E local no comenzó porque el CDN de Playwright agotó el timeout en todos los intentos de descargar Chromium. La prueba quedó compilada y el gate final se delega a la única ejecución de Base CI/Playwright de la candidata.
 
+## Primer gate remoto y adaptación
+
+- PR: `#75`;
+- Base CI: `33810318819` (#877);
+- documentación, lint, typecheck, tests, build, instalación de Chromium y `120/121` pruebas Playwright: GREEN;
+- único fallo: el assertion de confirmación de reordenamiento resolvía dos regiones `status` con el mismo copy (sidebar y panel Campos);
+- la interacción y persistencia habían concluido correctamente; se acotó el locator al `tabpanel` Campos sin modificar comportamiento productivo.
+
+El run #877 se conserva como evidencia roja y M08.9 continúa `ACTIVE` hasta que la candidata reparada termine el gate en `success`.
+
 ## Siguiente acción
 
-Publicar la candidata, ejecutar Base CI una vez y cerrar/fusionar solo con resultado `success`; después activar `M08.10`.
+Publicar la adaptación del selector, ejecutar Base CI y cerrar/fusionar solo con resultado `success`; después activar `M08.10`.
