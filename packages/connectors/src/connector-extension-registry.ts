@@ -6,9 +6,12 @@ import {
 } from '@electrocraft/application';
 import {
   connectorExtensionManifestSchema,
+  normalizeDataSourceCapabilities,
+  type ConnectorExtensionConfigField,
   type ConnectorExtensionManifest,
   type ElectroCraftDataSourceDefinition,
   type ElectroCraftExportTargetId,
+  type JsonValue,
 } from '@electrocraft/domain';
 
 export type ConnectorExtensionRegistryErrorCode =
@@ -48,10 +51,19 @@ export interface ConnectorRuntimeDependency {
   readonly targetSupport: readonly ElectroCraftExportTargetId[];
 }
 
-export interface MissingConnectorDiagnostic {
-  readonly code: 'MISSING_CONNECTOR_EXTENSION';
+export type ConnectorExtensionSourceDiagnosticCode =
+  | 'MISSING_CONNECTOR_EXTENSION'
+  | 'EXTENSION_SOURCE_KIND_MISMATCH'
+  | 'EXTENSION_CAPABILITY_MISMATCH'
+  | 'EXTENSION_CONFIG_REQUIRED'
+  | 'EXTENSION_CONFIG_INVALID'
+  | 'EXTENSION_SECRET_REF_REQUIRED';
+
+export interface ConnectorExtensionSourceDiagnostic {
+  readonly code: ConnectorExtensionSourceDiagnosticCode;
   readonly adapterId: string;
   readonly sourceId: string;
+  readonly fieldKey?: string;
   readonly message: string;
 }
 
@@ -80,6 +92,92 @@ function validateRuntimeCompatibility(manifest: ConnectorExtensionManifest, adap
       { adapterId: manifest.adapterId, missingCapabilities },
     );
   }
+}
+
+function matchesConfigFieldType(field: ConnectorExtensionConfigField, value: JsonValue): boolean {
+  if (field.type === 'string') return typeof value === 'string';
+  if (field.type === 'number') return typeof value === 'number' && Number.isFinite(value);
+  if (field.type === 'boolean') return typeof value === 'boolean';
+  if (field.type === 'url') {
+    if (typeof value !== 'string') return false;
+    try {
+      const parsed = new URL(value);
+      return parsed.protocol === 'https:' || parsed.protocol === 'http:';
+    } catch {
+      return false;
+    }
+  }
+  return true;
+}
+
+function validateSourceAgainstManifest(
+  source: ElectroCraftDataSourceDefinition,
+  manifest: ConnectorExtensionManifest,
+): readonly ConnectorExtensionSourceDiagnostic[] {
+  const diagnostics: ConnectorExtensionSourceDiagnostic[] = [];
+
+  if (source.kind !== manifest.sourceKind) {
+    diagnostics.push({
+      code: 'EXTENSION_SOURCE_KIND_MISMATCH',
+      adapterId: source.adapterId,
+      sourceId: source.id,
+      message: `El conector ${source.adapterId} requiere una fuente ${manifest.sourceKind}.`,
+    });
+  }
+
+  const manifestCapabilities = new Set(manifest.capabilities);
+  const unsupportedCapabilities = normalizeDataSourceCapabilities(source.capabilities).filter(
+    (capability) => !manifestCapabilities.has(capability),
+  );
+  if (unsupportedCapabilities.length > 0) {
+    diagnostics.push({
+      code: 'EXTENSION_CAPABILITY_MISMATCH',
+      adapterId: source.adapterId,
+      sourceId: source.id,
+      message: `La fuente solicita capacidades que la extensión no declara: ${unsupportedCapabilities.join(', ')}.`,
+    });
+  }
+
+  for (const field of manifest.configSchema.fields) {
+    if (field.type === 'secret-ref') {
+      if (field.required && !source.authRef) {
+        diagnostics.push({
+          code: 'EXTENSION_SECRET_REF_REQUIRED',
+          adapterId: source.adapterId,
+          sourceId: source.id,
+          fieldKey: field.key,
+          message: `${field.label} requiere una SecretRef configurada mediante Gateway.`,
+        });
+      }
+      continue;
+    }
+
+    const value = source.config[field.key];
+    if (value === undefined) {
+      if (field.required && field.defaultValue === undefined) {
+        diagnostics.push({
+          code: 'EXTENSION_CONFIG_REQUIRED',
+          adapterId: source.adapterId,
+          sourceId: source.id,
+          fieldKey: field.key,
+          message: `Falta el campo obligatorio ${field.label}.`,
+        });
+      }
+      continue;
+    }
+
+    if (!matchesConfigFieldType(field, value)) {
+      diagnostics.push({
+        code: 'EXTENSION_CONFIG_INVALID',
+        adapterId: source.adapterId,
+        sourceId: source.id,
+        fieldKey: field.key,
+        message: `El valor de ${field.label} no cumple el tipo ${field.type} declarado por la extensión.`,
+      });
+    }
+  }
+
+  return Object.freeze(diagnostics);
 }
 
 export class ConnectorExtensionRegistry {
@@ -163,16 +261,20 @@ export class ConnectorExtensionRegistry {
     );
   }
 
-  diagnoseSource(source: ElectroCraftDataSourceDefinition): readonly MissingConnectorDiagnostic[] {
-    if (this.connectorRegistry.has(source.adapterId)) return Object.freeze([]);
-    return Object.freeze([
-      {
-        code: 'MISSING_CONNECTOR_EXTENSION' as const,
-        adapterId: source.adapterId,
-        sourceId: source.id,
-        message: `Falta el conector ${source.adapterId}. Instala la extensión requerida antes de usar esta fuente.`,
-      },
-    ]);
+  diagnoseSource(source: ElectroCraftDataSourceDefinition): readonly ConnectorExtensionSourceDiagnostic[] {
+    if (!this.connectorRegistry.has(source.adapterId)) {
+      return Object.freeze([
+        {
+          code: 'MISSING_CONNECTOR_EXTENSION' as const,
+          adapterId: source.adapterId,
+          sourceId: source.id,
+          message: `Falta el conector ${source.adapterId}. Instala la extensión requerida antes de usar esta fuente.`,
+        },
+      ]);
+    }
+
+    const manifest = this.installed.get(source.adapterId);
+    return manifest ? validateSourceAgainstManifest(source, manifest) : Object.freeze([]);
   }
 
   pruneRuntimeDependencies(
