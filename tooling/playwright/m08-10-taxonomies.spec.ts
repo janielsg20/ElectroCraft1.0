@@ -16,6 +16,7 @@ async function createProject(page: Page) {
 
 async function createInternalSource(page: Page) {
   await page.goto('/data-sources');
+  await expect(page.getByRole('heading', { name: 'Fuentes de datos' })).toBeVisible({ timeout: 60_000 });
   const createInternal = page.getByRole('button', { name: 'Crear ElectroCraft Data' });
   if (await createInternal.isVisible()) {
     await createInternal.click();
@@ -28,7 +29,10 @@ test('M08.10 define taxonomías y persiste términos jerárquicos desde Modelos'
   await createProject(page);
   await createInternalSource(page);
   await page.goto('/models');
-  await page.getByRole('button', { name: 'Nuevo modelo' }).click();
+  await expect(page.getByRole('heading', { name: 'Modelos', exact: true })).toBeVisible({ timeout: 60_000 });
+  const newModel = page.getByRole('button', { name: 'Nuevo modelo' });
+  await expect(newModel).toBeEnabled({ timeout: 60_000 });
+  await newModel.click();
   await expect(page.getByRole('heading', { name: 'Nuevo modelo', exact: true })).toBeVisible({ timeout: 60_000 });
   await page.getByRole('tab', { name: 'Taxonomías' }).click();
   await expect(page.getByRole('heading', { name: 'Taxonomías', exact: true })).toBeVisible();
