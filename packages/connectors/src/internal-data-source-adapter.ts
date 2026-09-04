@@ -9,10 +9,14 @@ import type {
   InternalDataRecordInput,
   InternalDataRecordUpdate,
   InternalDataRepository,
+  InternalRelationEdgeInput,
+  InternalRelationEdgeQuery,
+  InternalRelationEdgeUpdate,
+  InternalRelationRepository,
   InternalTaxonomyTermInput,
   InternalTaxonomyTermUpdate,
 } from '@electrocraft/application';
-import { parseTaxonomyResourceId, type JsonValue } from '@electrocraft/domain';
+import { parseRelationResourceId, parseTaxonomyResourceId, type JsonValue } from '@electrocraft/domain';
 import { normalizeElectroCraftAdvancedFieldRecord } from './advanced-field-runtime';
 
 export const INTERNAL_DATA_ADAPTER_ID = 'internal.pglite' as const;
@@ -30,6 +34,7 @@ export class InternalDataPermissionError extends Error {
 export interface InternalDataSourceAdapterOptions {
   readonly projectId: string;
   readonly repository: InternalDataRepository;
+  readonly relations?: InternalRelationRepository;
   readonly permissions: InternalDataPermissionPort;
 }
 
@@ -83,6 +88,21 @@ function parseQuery(value: JsonValue | undefined): InternalDataQuery {
   });
 }
 
+function parseRelationQuery(value: JsonValue | undefined): InternalRelationEdgeQuery {
+  if (value === undefined) return Object.freeze({});
+  const input = asObject(value, 'query.input');
+  if (input.fromRecordId !== undefined && typeof input.fromRecordId !== 'string') {
+    throw new TypeError('query.input.fromRecordId debe ser texto.');
+  }
+  if (input.toRecordId !== undefined && typeof input.toRecordId !== 'string') {
+    throw new TypeError('query.input.toRecordId debe ser texto.');
+  }
+  return Object.freeze({
+    ...(typeof input.fromRecordId === 'string' ? { fromRecordId: input.fromRecordId } : {}),
+    ...(typeof input.toRecordId === 'string' ? { toRecordId: input.toRecordId } : {}),
+  });
+}
+
 function parseCreateInput(value: JsonValue | undefined): InternalDataRecordInput {
   const input = asObject(value, 'mutation.input');
   const data = asObject(input.data, 'mutation.input.data');
@@ -115,6 +135,26 @@ function parseDeleteId(value: JsonValue | undefined) {
   const input = asObject(value, 'mutation.input');
   if (typeof input.id !== 'string' || input.id.trim() === '') throw new TypeError('mutation.input.id es obligatorio.');
   return input.id;
+}
+
+function parseRelationEdgeInput(value: JsonValue | undefined, requireId = false) {
+  const input = asObject(value, 'mutation.input');
+  if (requireId && (typeof input.id !== 'string' || input.id.trim() === '')) {
+    throw new TypeError('mutation.input.id es obligatorio.');
+  }
+  if (input.id !== undefined && typeof input.id !== 'string') throw new TypeError('mutation.input.id debe ser texto.');
+  if (typeof input.fromRecordId !== 'string' || input.fromRecordId.trim() === '') {
+    throw new TypeError('mutation.input.fromRecordId es obligatorio.');
+  }
+  if (typeof input.toRecordId !== 'string' || input.toRecordId.trim() === '') {
+    throw new TypeError('mutation.input.toRecordId es obligatorio.');
+  }
+  return Object.freeze({
+    ...(typeof input.id === 'string' ? { id: input.id } : {}),
+    fromRecordId: input.fromRecordId,
+    toRecordId: input.toRecordId,
+    ...(input.payload !== undefined ? { payload: input.payload } : {}),
+  });
 }
 
 function parseTaxonomyTermInput(value: JsonValue | undefined, requireId = false) {
@@ -156,6 +196,7 @@ export class InternalDataSourceAdapter implements DataSourceAdapter {
     'sort',
     'transactions',
     'taxonomies',
+    'relations',
   ] as const;
   readonly supportsSchemaDiscovery = true;
 
@@ -188,13 +229,39 @@ export class InternalDataSourceAdapter implements DataSourceAdapter {
     return normalizeElectroCraftAdvancedFieldRecord(model, data);
   }
 
+  private requireRelations() {
+    if (!this.options.relations) throw new Error('La capacidad de relaciones no está registrada para esta fuente.');
+    return this.options.relations;
+  }
+
   testConnection() {
     return this.options.repository.testConnection(this.options.projectId);
   }
 
   async listResources(context: DataSourceAdapterContext) {
     await this.authorize(context, context.source.id, 'read');
-    return this.options.repository.listResources(this.options.projectId, context.source.id);
+    const resources = await this.options.repository.listResources(this.options.projectId, context.source.id);
+    const schema = await this.options.repository.getSchema(this.options.projectId, context.source.id);
+    const relations = (schema?.relations ?? []).map((relation) =>
+      Object.freeze({
+        id: `relation:${relation.id}`,
+        label: relation.label,
+        kind: 'relation',
+        operations: Object.freeze([
+          Object.freeze({ id: 'read', label: 'Listar vínculos', capability: 'read' as const, parameters: [], inputSchema: null }),
+          Object.freeze({ id: 'create', label: 'Crear vínculo', capability: 'create' as const, parameters: [], inputSchema: null }),
+          Object.freeze({ id: 'update', label: 'Actualizar vínculo', capability: 'update' as const, parameters: [], inputSchema: null }),
+          Object.freeze({ id: 'delete', label: 'Eliminar vínculo', capability: 'delete' as const, parameters: [], inputSchema: null }),
+        ]),
+        metadata: Object.freeze({
+          relationId: relation.id,
+          sourceModelRef: relation.sourceModelRef,
+          targetModelRef: relation.targetModelRef,
+          cardinality: relation.cardinality,
+        }),
+      }),
+    );
+    return Object.freeze([...resources, ...relations]);
   }
 
   async getSchema(context: DataSourceAdapterContext) {
@@ -204,6 +271,15 @@ export class InternalDataSourceAdapter implements DataSourceAdapter {
 
   async query(context: DataSourceAdapterContext, request: DataSourceQueryRequest): Promise<JsonValue> {
     await this.authorize(context, request.resourceId, 'read');
+    const relationId = parseRelationResourceId(request.resourceId);
+    if (relationId) {
+      return (await this.requireRelations().listRelationEdges(
+        this.options.projectId,
+        context.source.id,
+        relationId,
+        parseRelationQuery(request.input),
+      )) as unknown as JsonValue;
+    }
     const taxonomyId = parseTaxonomyResourceId(request.resourceId);
     if (taxonomyId) {
       return (await this.options.repository.listTaxonomyTerms(
@@ -221,6 +297,34 @@ export class InternalDataSourceAdapter implements DataSourceAdapter {
 
   async mutate(context: DataSourceAdapterContext, request: DataSourceMutationRequest): Promise<JsonValue> {
     await this.authorize(context, request.resourceId, request.operation);
+    const relationId = parseRelationResourceId(request.resourceId);
+    if (relationId) {
+      const relations = this.requireRelations();
+      if (request.operation === 'create') {
+        return (await relations.createRelationEdge(
+          this.options.projectId,
+          context.source.id,
+          relationId,
+          parseRelationEdgeInput(request.input) as InternalRelationEdgeInput,
+        )) as unknown as JsonValue;
+      }
+      if (request.operation === 'update') {
+        return (await relations.updateRelationEdge(
+          this.options.projectId,
+          context.source.id,
+          relationId,
+          parseRelationEdgeInput(request.input, true) as InternalRelationEdgeUpdate,
+        )) as unknown as JsonValue;
+      }
+      return Object.freeze({
+        deleted: await relations.deleteRelationEdge(
+          this.options.projectId,
+          context.source.id,
+          relationId,
+          parseDeleteId(request.input),
+        ),
+      }) as unknown as JsonValue;
+    }
     const taxonomyId = parseTaxonomyResourceId(request.resourceId);
     if (taxonomyId) {
       if (request.operation === 'create') {
@@ -264,12 +368,15 @@ export class InternalDataSourceAdapter implements DataSourceAdapter {
         data,
       })) as unknown as JsonValue;
     }
+    const recordId = parseDeleteId(request.input);
+    await this.options.relations?.prepareRecordDelete(
+      this.options.projectId,
+      context.source.id,
+      request.resourceId,
+      recordId,
+    );
     return Object.freeze({
-      deleted: await this.options.repository.deleteRecord(
-        this.options.projectId,
-        request.resourceId,
-        parseDeleteId(request.input),
-      ),
+      deleted: await this.options.repository.deleteRecord(this.options.projectId, request.resourceId, recordId),
     }) as unknown as JsonValue;
   }
 }
