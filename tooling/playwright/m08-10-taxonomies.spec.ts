@@ -29,16 +29,22 @@ test('M08.10 define taxonomías y persiste términos jerárquicos desde Modelos'
   await createInternalSource(page);
   await page.goto('/models');
   await page.getByRole('button', { name: 'Nuevo modelo' }).click();
+  await expect(page.getByRole('heading', { name: 'Nuevo modelo', exact: true })).toBeVisible({ timeout: 60_000 });
   await page.getByRole('tab', { name: 'Taxonomías' }).click();
+  await expect(page.getByRole('heading', { name: 'Taxonomías', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Nueva', exact: true }).click();
 
   const definition = page.locator('section').filter({ has: page.getByRole('heading', { name: 'Definición' }) });
+  await expect(definition).toBeVisible({ timeout: 60_000 });
   await definition.getByLabel('Nombre').fill('Categorías');
   await definition.getByLabel('Clave').fill('categories');
   await definition.getByLabel('Singular').fill('Categoría');
   await definition.getByLabel('Plural').fill('Categorías');
   await definition.getByRole('button', { name: 'Guardar definición' }).click();
-  await expect(page.getByRole('status')).toContainText('Definición de taxonomía guardada.', { timeout: 60_000 });
+  await expect(page.locator('.ec-taxonomy-detail').getByRole('status')).toContainText(
+    'Definición de taxonomía guardada.',
+    { timeout: 60_000 },
+  );
 
   const manager = page.locator('#taxonomy-terms');
   await manager.getByLabel('Nombre').fill('Electrónica');
@@ -56,6 +62,7 @@ test('M08.10 define taxonomías y persiste términos jerárquicos desde Modelos'
   await page.screenshot({ path: '.ai/evidence/F08/M08.10/taxonomies-desktop.png', fullPage: true });
 
   await page.reload();
+  await expect(page.getByRole('heading', { name: 'Nuevo modelo', exact: true })).toBeVisible({ timeout: 60_000 });
   await page.getByRole('tab', { name: 'Taxonomías' }).click();
   await expect(page.getByText('Categorías', { exact: true }).first()).toBeVisible({ timeout: 60_000 });
   await expect(page.locator('#taxonomy-terms').getByText('Teléfonos', { exact: true })).toBeVisible({
