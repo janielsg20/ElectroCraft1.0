@@ -108,7 +108,7 @@ export function normalizeDataSourceCapabilities(
 
 const dataSourceCapabilitiesSchema = z
   .array(electroCraftDataSourceCapabilitySchema)
-  .max(17)
+  .max(18)
   .superRefine((capabilities, context) => {
     const seen = new Set<string>();
     for (const [index, capability] of capabilities.entries()) {
