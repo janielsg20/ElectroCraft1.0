@@ -86,6 +86,14 @@ export function createBrowserInternalDataRepositoryPort(
     getStats: (projectId, sourceId) => delegate((active) => active.getStats(projectId, sourceId)),
     getFieldUsage: (projectId, modelId, fieldKey) =>
       delegate((active) => active.getFieldUsage(projectId, modelId, fieldKey)),
+    listTaxonomyTerms: (projectId, sourceId, taxonomyId) =>
+      delegate((active) => active.listTaxonomyTerms(projectId, sourceId, taxonomyId)),
+    createTaxonomyTerm: (projectId, sourceId, taxonomyId, input) =>
+      delegate((active) => active.createTaxonomyTerm(projectId, sourceId, taxonomyId, input)),
+    updateTaxonomyTerm: (projectId, sourceId, taxonomyId, input) =>
+      delegate((active) => active.updateTaxonomyTerm(projectId, sourceId, taxonomyId, input)),
+    deleteTaxonomyTerm: (projectId, sourceId, taxonomyId, termId) =>
+      delegate((active) => active.deleteTaxonomyTerm(projectId, sourceId, taxonomyId, termId)),
     async close() {
       const active = client;
       client = null;

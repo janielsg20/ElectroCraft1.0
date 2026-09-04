@@ -10,6 +10,7 @@ import type {
   ElectroCraftDataSourceEnvironment,
   ElectroCraftDataSourceKind,
   ElectroCraftDataExplorerOperation,
+  ElectroTaxonomyTerm,
   JsonValue,
 } from '@electrocraft/domain';
 import type { StoredProjectObjectInput } from '../projects/project-storage';
@@ -120,6 +121,18 @@ export interface InternalDataFieldUsage {
   readonly populatedCount: number;
 }
 
+export interface InternalTaxonomyTermInput {
+  readonly id?: string;
+  readonly slug: string;
+  readonly name: string;
+  readonly parentId?: string | null;
+  readonly metadata?: ElectroTaxonomyTerm['metadata'];
+}
+
+export interface InternalTaxonomyTermUpdate extends InternalTaxonomyTermInput {
+  readonly id: string;
+}
+
 export interface InternalDataRepository {
   testConnection(projectId: string): Promise<DataSourceConnectionResult>;
   listResources(projectId: string, sourceId: string): Promise<readonly DataSourceResourceDescriptor[]>;
@@ -130,6 +143,20 @@ export interface InternalDataRepository {
   deleteRecord(projectId: string, modelId: string, recordId: string): Promise<boolean>;
   getStats(projectId: string, sourceId: string): Promise<InternalDataSourceStats>;
   getFieldUsage(projectId: string, modelId: string, fieldKey: string): Promise<InternalDataFieldUsage>;
+  listTaxonomyTerms(projectId: string, sourceId: string, taxonomyId: string): Promise<readonly ElectroTaxonomyTerm[]>;
+  createTaxonomyTerm(
+    projectId: string,
+    sourceId: string,
+    taxonomyId: string,
+    input: InternalTaxonomyTermInput,
+  ): Promise<ElectroTaxonomyTerm>;
+  updateTaxonomyTerm(
+    projectId: string,
+    sourceId: string,
+    taxonomyId: string,
+    input: InternalTaxonomyTermUpdate,
+  ): Promise<ElectroTaxonomyTerm>;
+  deleteTaxonomyTerm(projectId: string, sourceId: string, taxonomyId: string, termId: string): Promise<boolean>;
 }
 
 export type InternalDataPermissionOperation = 'read' | 'create' | 'update' | 'delete';

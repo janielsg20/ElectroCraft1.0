@@ -30,6 +30,7 @@ Solo contiene hechos estables y decisiones vigentes. Progreso y siguiente paso p
 - `project_object_versions` deduplica payloads por identidad de versión/checksum para que los manifests de revisión puedan referenciar objetos sin duplicar contenido.
 - Group/Repeater son scopes anidados de `ElectroCraftDataField`, no widgets globales; Calculated usa operaciones registradas y Conditional un rule AST tipado sin `eval`.
 - Advanced Fields se normalizan detrás del adapter interno/ConnectorRegistry y persisten únicamente en el JSONB genérico de `content_records`; no crean DDL ni tablas físicas por modelo/campo.
+- Taxonomías son metadata canónica asociada a modelos/campos por refs; sus términos son Content Entities en `taxonomy_terms`, con jerarquía mediante `parentId`, y se operan detrás del adapter interno/ConnectorRegistry.
 
 ## AI
 

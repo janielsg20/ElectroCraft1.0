@@ -44,7 +44,7 @@ describe('M04.1 storage ownership boundary', () => {
   });
 
   it('pins one physical schema independent of user-defined model count', () => {
-    expect(STUDIO_STORAGE_SCHEMA_VERSION).toBe(5);
+    expect(STUDIO_STORAGE_SCHEMA_VERSION).toBe(6);
     expect(STUDIO_STORAGE_TABLES).toEqual(
       expect.arrayContaining([
         'projects',
@@ -65,6 +65,7 @@ describe('M04.1 storage ownership boundary', () => {
     const incrementalMigration = read('packages/data-web/drizzle/0001_m04_3_incremental.sql');
     const integrityMigration = read('packages/data-web/drizzle/0003_m04_6_referential_integrity.sql');
     const revisionMigration = read('packages/data-web/drizzle/0004_m04_8_revision_object_versions.sql');
+    const taxonomyMigration = read('packages/data-web/drizzle/0005_m08_10_taxonomy_terms.sql');
     expect(migration).toContain('data jsonb NOT NULL');
     expect(migration).toContain('record_field_index_fts_idx');
     expect(migration).not.toMatch(/CREATE TABLE[^;]*(user_model|dynamic_model)/i);
@@ -72,6 +73,8 @@ describe('M04.1 storage ownership boundary', () => {
     expect(integrityMigration).toContain('ON DELETE CASCADE');
     expect(revisionMigration).toContain('project_object_versions');
     expect(revisionMigration).toContain('ON CONFLICT (project_id, version_id) DO NOTHING');
+    expect(taxonomyMigration).toContain('parent_id');
+    expect(taxonomyMigration).toContain('CREATE UNIQUE INDEX');
   });
 
   it('keeps autosave incremental and histories session-local', () => {

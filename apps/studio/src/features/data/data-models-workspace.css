@@ -235,6 +235,60 @@
   min-width: 0;
 }
 
+.ec-taxonomy-layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.72fr) minmax(440px, 1.28fr);
+  gap: 14px;
+  min-width: 0;
+}
+
+.ec-taxonomy-list,
+.ec-taxonomy-detail,
+.ec-taxonomy-options,
+.ec-term-list,
+.ec-term-form {
+  display: grid;
+  gap: 10px;
+}
+
+.ec-taxonomy-list {
+  margin-top: 14px;
+}
+
+.ec-taxonomy-options {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 16px;
+}
+
+.ec-taxonomy-options > div {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: 10px;
+  border-radius: var(--radius);
+  background: var(--muted);
+}
+
+.ec-taxonomy-options p {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--ec-text-xs);
+}
+
+.ec-term-manager {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.8fr) minmax(280px, 1.2fr);
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.ec-term-form label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted-foreground);
+  font-size: var(--ec-text-xs);
+}
+
 .ec-field-add-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(130px, 0.7fr) auto;
@@ -360,6 +414,10 @@
   .ec-fields-layout {
     grid-template-columns: 1fr;
   }
+
+  .ec-taxonomy-layout {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 1023px) {
@@ -398,6 +456,11 @@
   }
 
   .ec-field-add-row {
+    grid-template-columns: 1fr;
+  }
+
+  .ec-taxonomy-options,
+  .ec-term-manager {
     grid-template-columns: 1fr;
   }
 

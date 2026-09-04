@@ -50,4 +50,4 @@ Owner: `PGlite generic content store` existente, accesible mediante el adapter i
 
 ## Siguiente transición
 
-Inspeccionar contratos/storage/UI existentes, verificar la API oficial del owner y ejecutar `M08.10 — Taxonomías dentro de Modelos` sin abrir un subsystem paralelo.
+M08.10 está `IMPLEMENTADA / CANDIDATA A GATE`: contrato, storage v6, adapter, CRUD jerárquico, UI y `552/552` pruebas Vitest están verdes localmente. Publicar una única candidata y ejecutar Base CI/Playwright; solo con gate completo verde fusionar y activar `M08.11 — Relaciones 1:1, 1:N y N:N`.

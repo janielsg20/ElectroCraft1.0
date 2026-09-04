@@ -1,11 +1,12 @@
 import { electroCraftFieldRegistry, getElectroCraftFieldRegistryEntry } from '@electrocraft/application';
 import { Button, Input, Tabs, TabsContent, TabsList, TabsTrigger } from '@electrocraft/design-system';
-import type { ElectroCraftDataField, ElectroCraftDataFieldType } from '@electrocraft/domain';
+import type { ElectroCraftDataField, ElectroCraftDataFieldType, ElectroCraftObjectId } from '@electrocraft/domain';
 import { useEffect, useMemo, useState, useSyncExternalStore, type CSSProperties } from 'react';
 import { HelpTrigger } from '../../help/help-ui';
 import { AdvancedFieldEditor } from './advanced-field-editor';
 import { orderAdvancedFieldsForDisplay } from './advanced-field-model';
 import { dataModelWorkspaceRuntime, type DataFieldImpact } from './data-model-runtime';
+import { TaxonomyEditor } from './taxonomy-editor';
 import './data-models-workspace.css';
 
 interface FieldDraft {
@@ -14,6 +15,7 @@ interface FieldDraft {
   readonly type: ElectroCraftDataFieldType;
   readonly required: boolean;
   readonly indexed: boolean;
+  readonly taxonomyRef: ElectroCraftObjectId | null;
 }
 
 function fieldDraft(field: ElectroCraftDataField): FieldDraft {
@@ -23,6 +25,7 @@ function fieldDraft(field: ElectroCraftDataField): FieldDraft {
     type: field.type,
     required: field.required ?? !field.nullable,
     indexed: field.indexed,
+    taxonomyRef: field.taxonomyRef ?? null,
   };
 }
 
@@ -97,6 +100,7 @@ export function DataModelsWorkspace() {
           indexed: descriptor.supportsIndexing ? fieldState.indexed : false,
           faceted: selectedField.faceted && descriptor.supportsIndexing && fieldState.indexed,
           relationModelRef: fieldState.type === 'relation' ? (selectedField.relationModelRef ?? model.id) : null,
+          taxonomyRef: fieldState.type === 'taxonomy' ? fieldState.taxonomyRef : null,
           metadata: {
             ...selectedField.metadata,
             storageHint: descriptor.storageHint,
@@ -217,6 +221,7 @@ export function DataModelsWorkspace() {
             <TabsList className="ec-model-tabs-list" aria-label="Secciones del modelo">
               <TabsTrigger value="identity">Identidad</TabsTrigger>
               <TabsTrigger value="fields">Campos</TabsTrigger>
+              <TabsTrigger value="taxonomies">Taxonomías</TabsTrigger>
               <TabsTrigger value="validation">Validación</TabsTrigger>
               <TabsTrigger value="templates">Plantillas</TabsTrigger>
               <TabsTrigger value="workflow">Workflow</TabsTrigger>
@@ -430,6 +435,29 @@ export function DataModelsWorkspace() {
                             ))}
                           </select>
                         </label>
+                        {fieldState.type === 'taxonomy' ? (
+                          <label>
+                            Taxonomía
+                            <select
+                              value={fieldState.taxonomyRef ?? ''}
+                              onChange={(event) =>
+                                setFieldState({
+                                  ...fieldState,
+                                  taxonomyRef: (event.target.value as ElectroCraftObjectId) || null,
+                                })
+                              }
+                            >
+                              <option value="">Sin enlazar</option>
+                              {snapshot.taxonomies
+                                .filter(({ modelRefs }) => modelRefs.includes(model.id))
+                                .map((taxonomy) => (
+                                  <option key={taxonomy.id} value={taxonomy.id}>
+                                    {taxonomy.label}
+                                  </option>
+                                ))}
+                            </select>
+                          </label>
+                        ) : null}
                         <label className="ec-model-check">
                           <input
                             type="checkbox"
@@ -508,6 +536,10 @@ export function DataModelsWorkspace() {
               ) : null}
             </TabsContent>
 
+            <TabsContent value="taxonomies" className="ec-model-tab-content">
+              <TaxonomyEditor model={model} models={snapshot.models} taxonomies={snapshot.taxonomies} />
+            </TabsContent>
+
             <TabsContent value="validation" className="ec-model-tab-content">
               <section className="ec-model-panel">
                 <h3>Validación</h3>
@@ -534,8 +566,8 @@ export function DataModelsWorkspace() {
                   acoplarla al store físico.
                 </p>
                 <p>
-                  Taxonomías y Relaciones se mantienen como referencias canónicas y sus editores avanzados pertenecen a
-                  M08.10/M08.11.
+                  Taxonomías y Relaciones se mantienen como referencias canónicas; las taxonomías se administran en su
+                  sección y las relaciones avanzadas pertenecen a M08.11.
                 </p>
               </section>
             </TabsContent>

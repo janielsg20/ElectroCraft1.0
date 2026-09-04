@@ -101,7 +101,7 @@ describe('M03.11 typed HelpRegistry', () => {
     expect(getHelpIdForNavigationItem('models')).toBe('help.content.models');
     expect(getStudioHelpDescriptor('help.content.models')).toMatchObject({
       sectionId: 'content-models',
-      learnMoreRef: '.ai/microphases/M08_8.md',
+      learnMoreRef: '.ai/microphases/M08_10.md',
     });
   });
 

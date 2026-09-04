@@ -4,6 +4,7 @@ export * from './graphql';
 export * from './secrets';
 export * from './explorer';
 export * from './connector-extension';
+export * from './taxonomies';
 export {
   electroCraftDataFieldConditionSchema,
   electroCraftDataFieldOptionSchema,
@@ -13,8 +14,10 @@ export {
   electroCraftDataFieldValidationSchema,
   electroCraftDataModelSchema,
   electroCraftDataSchemaSchema,
+  electroTaxonomySchema,
   getDataField,
   getDataModel,
+  getElectroTaxonomy,
   validateDataSchemaReferences,
   type DataOwnershipReferenceDiagnostic,
   type ElectroCraftDataField,
@@ -25,4 +28,5 @@ export {
   type ElectroCraftDataFieldValidation,
   type ElectroCraftDataModel,
   type ElectroCraftDataSchema,
+  type ElectroTaxonomy,
 } from '../contracts/data-definition';

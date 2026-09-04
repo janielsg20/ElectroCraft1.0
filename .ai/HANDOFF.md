@@ -2,7 +2,7 @@
 
 ## Current
 
-F08 / M08.10 — Taxonomías dentro de Modelos — `ACTIVE`.
+F08 / M08.10 — Taxonomías dentro de Modelos — `ACTIVE / CANDIDATA A GATE`.
 
 Rama activa: `codex/m08-10-taxonomies`.
 
@@ -33,10 +33,22 @@ Ruta: `Datos > Modelos > <modelo> > Taxonomías` y gestor de términos contextua
 - PR `#75`: fusionada por squash.
 - no hay P0/P1 abiertos en la dependencia inmediata.
 
+## Implementación candidata
+
+- contratos `ElectroTaxonomy`/`ElectroTaxonomyTerm` y refs canónicas fail-closed;
+- capability `taxonomies` sobre la fuente/adaptador interno existente;
+- migración PGlite/Drizzle v6: `taxonomy_terms.parent_id` y slug único por taxonomía;
+- CRUD jerárquico detrás de ConnectorRegistry con permisos, ciclos, padres e hijos validados;
+- Studio en `Modelos > Taxonomías`, con definición y gestor de términos separados;
+- ayuda persistente en español actualizada;
+- lint/typecheck/boundaries/build verdes; Node `41/41`; Vitest `552/552`.
+
+E2E: `tooling/playwright/m08-10-taxonomies.spec.ts` está preparado. Localmente no pudo arrancar porque falta Chromium; la descarga desde `cdn.playwright.dev` agotó timeout y devolvió 502.
+
 ## Siguiente acción exacta
 
-Inspeccionar implementación existente, verificar la API pública actual de PGlite y construir M08.10 detrás del owner certificado. Ejecutar unit/contract/integration/negative/round-trip/E2E antes de publicar una única candidata.
+Publicar una única candidata M08.10 y ejecutar ElectroCraft Base CI/Playwright. Con `success`, registrar VALIDATION/CLOSURE, fusionar y activar M08.11. Ante fallo, corregir únicamente la evidencia observada.
 
 ## Read set
 
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/phases/F08.md → .ai/microphases/M08_10.md → packages/domain/src/data/ → packages/connectors/src/ → packages/data-web/src/ → apps/studio/src/features/data/ → tooling/vitest → tooling/playwright`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M08_10.md → .ai/evidence/F08/M08.10/IMPLEMENTATION_2026-09-04.md → tooling/playwright/m08-10-taxonomies.spec.ts`.

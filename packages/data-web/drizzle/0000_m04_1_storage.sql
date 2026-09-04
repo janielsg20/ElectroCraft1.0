@@ -2,6 +2,7 @@
 CREATE TABLE IF NOT EXISTS projects (
   id text PRIMARY KEY,
   name text NOT NULL,
+  parent_id text,
   metadata jsonb NOT NULL DEFAULT '{}'::jsonb,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
@@ -46,7 +47,7 @@ CREATE TABLE IF NOT EXISTS taxonomy_terms (
   metadata jsonb NOT NULL DEFAULT '{}'::jsonb,
   PRIMARY KEY (project_id, id)
 );
-CREATE INDEX IF NOT EXISTS taxonomy_terms_taxonomy_idx ON taxonomy_terms(project_id, taxonomy_id, slug);
+CREATE UNIQUE INDEX IF NOT EXISTS taxonomy_terms_taxonomy_slug_idx ON taxonomy_terms(project_id, taxonomy_id, slug);
 CREATE TABLE IF NOT EXISTS record_terms (
   project_id text NOT NULL,
   record_id text NOT NULL,
