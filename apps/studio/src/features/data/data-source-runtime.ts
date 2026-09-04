@@ -56,6 +56,7 @@ const INTERNAL_CAPABILITIES = Object.freeze([
   'sort',
   'transactions',
   'taxonomies',
+  'relations',
 ] as const satisfies readonly ElectroCraftCanonicalDataSourceCapability[]);
 
 const listeners = new Set<() => void>();
@@ -89,6 +90,7 @@ function registerInternalAdapter(projectId: string) {
     createInternalDataSourceAdapter({
       projectId,
       repository: internalDataRepository,
+      relations: internalDataRepository.relations,
       permissions: {
         authorize(request) {
           return request.projectId === projectStorageRuntime.currentProjectId();
