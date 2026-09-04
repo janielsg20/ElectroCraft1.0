@@ -22,7 +22,7 @@ Date: 2026-09-04.
 | F08 / M08.8        | IMPLEMENTADA / GREEN MICROFASE                             | PR `#74`; Base CI `33804227049` (#875); merge `8225f3aa5797972265a470f49c8aff75c5bab87c`; `.ai/evidence/F08/M08.8/CLOSURE_2026-09-03.md` |
 | F08 / M08.9        | IMPLEMENTADA / GREEN MICROFASE                             | PR `#75`; Base CI `33812380216` (#878); merge `93440130d8c5fd62f73366925df7695dd309daf3`; `.ai/evidence/F08/M08.9/CLOSURE_2026-09-03.md` |
 | F08 / M08.10       | IMPLEMENTADA / GREEN MICROFASE                             | PR `#76`; Base CI `33896051996` (#882); merge `78c88b65ef8708575ea2885edf7ad6631a30afce`; `.ai/evidence/F08/M08.10/CLOSURE_2026-09-04.md` |
-| F08 / M08.11       | ACTIVE / IMPLEMENTADA / PENDIENTE GATE                    | `.ai/evidence/F08/M08.11/IMPLEMENTATION_2026-09-04.md`                                                                                   |
+| F08 / M08.11       | ACTIVE                                                     | `.ai/evidence/F08/M08.11/IMPLEMENTATION_2026-09-04.md`                                                                                   |
 
 ## Rama activa
 
@@ -39,7 +39,9 @@ Owner: `PGlite generic content store`.
 - Base CI `33896051996` (#882) terminó completo en `success` con `123/123` Playwright;
 - PR `#76` se fusionó por squash a `main` en `78c88b65ef8708575ea2885edf7ad6631a30afce`.
 
-## M08.11 — candidata
+## M08.11 — estado de implementación
+
+`IMPLEMENTADA / PENDIENTE GATE`.
 
 Owner: `PGlite generic content store`.
 
@@ -59,4 +61,4 @@ PGlite/Drizzle siguen siendo el único owner físico. `relation_edges` ya exist�
 
 ## Siguiente acción exacta
 
-Revisar formato/tipos de la candidata, abrir PR M08.11 y ejecutar una única ElectroCraft Base CI. Con `success`, registrar VALIDATION/CLOSURE, fusionar y activar M08.12. Ante fallo, corregir únicamente la evidencia observada.
+Ejecutar ElectroCraft Base CI sobre PR `#77`. Con `success`, registrar VALIDATION/CLOSURE, fusionar y activar M08.12. Ante fallo, corregir únicamente la evidencia observada.
