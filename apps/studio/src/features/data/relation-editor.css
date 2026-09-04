@@ -1,0 +1,85 @@
+.ec-relation-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.7fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.ec-relation-detail {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.ec-relation-list {
+  display: grid;
+  gap: 6px;
+}
+
+.ec-relation-selector-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.ec-relation-selector-grid label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.ec-relation-selector-grid select,
+.ec-relation-detail select {
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--background);
+  color: var(--foreground);
+  padding: 6px 10px;
+}
+
+.ec-relation-edge-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.ec-relation-edge-list .ec-field-row {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+}
+
+.ec-relation-edge-target {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+@media (max-width: 1023px) {
+  .ec-relation-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .ec-relation-list-panel {
+    max-height: 260px;
+    overflow: auto;
+  }
+}
+
+@media (max-width: 767px) {
+  .ec-relation-selector-grid,
+  .ec-relation-edge-list .ec-field-row {
+    grid-template-columns: 1fr;
+  }
+
+  .ec-relation-selector-grid > button,
+  .ec-relation-edge-list button {
+    width: 100%;
+  }
+
+  .ec-relation-edge-target {
+    justify-content: flex-start;
+  }
+}
