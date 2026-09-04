@@ -20,34 +20,36 @@
 - M08.7 — Connector SDK boundary y optional database packs: `IMPLEMENTADA / GREEN MICROFASE`.
 - M08.8 — Modelos de datos y Field Registry: `IMPLEMENTADA / GREEN MICROFASE`.
 - M08.9 — Group, Repeater, Calculated y Conditional Fields: `IMPLEMENTADA / GREEN MICROFASE`.
-- M08.10 — Taxonomías dentro de Modelos: `ACTIVE`.
+- M08.10 — Taxonomías dentro de Modelos: `IMPLEMENTADA / GREEN MICROFASE`.
+- M08.11 — Relaciones 1:1, 1:N y N:N: `ACTIVE / IMPLEMENTADA / PENDIENTE GATE`.
 
 ## Rama activa
 
-`codex/m08-10-taxonomies`
+`codex/m08-11-relations`
 
 ## Último cierre certificado
 
-M08.9 fue certificada por ElectroCraft Base CI run `33812380216` (#878): documentación, lint, typecheck, tests, build, las `121` pruebas Playwright, empty-repo y artifacts terminaron en `success`. PR `#75` se fusionó por squash a `main` en `93440130d8c5fd62f73366925df7695dd309daf3`.
+M08.10 fue certificada por ElectroCraft Base CI run `33896051996` (#882): documentación, lint, typecheck, tests, build, las `123` pruebas Playwright, empty-repo y artifacts terminaron en `success`. PR `#76` se fusionó por squash a `main` en `78c88b65ef8708575ea2885edf7ad6631a30afce`.
 
-## M08.10 — owner y alcance
+## M08.11 — owner y alcance
 
 Owner: `PGlite generic content store` existente, accesible mediante el adapter interno y el `ConnectorRegistry` certificados.
 
-- `ElectroTaxonomy` será metadata canónica portable asociada a modelos por refs.
-- los términos persistirán en el store genérico `taxonomy_terms`, con jerarquía por `parentId`.
-- definición de taxonomía y administración contextual de términos permanecerán separadas en Studio.
-- no se permite DDL dinámico, internals del engine ni un registry paralelo al ConnectorRegistry.
+- `ElectroRelation` es metadata canónica portable con origen, destino, cardinalidad, inverso, integridad y permisos.
+- todos los vínculos persisten en la tabla genérica existente `relation_edges`.
+- cardinalidad `1:1`, `1:N` y `N:N` se valida en aplicación/repositorio, nunca mediante DDL por relación.
+- `restrict`, `detach` y `cascade` expresan integridad de borrado observable.
+- Studio expone `Datos > Modelos > <modelo> > Relaciones` y selectores de registros.
+- Data Explorer descubre las relaciones como recursos `relation:<id>` detrás del mismo ConnectorRegistry.
+- no se permite un segundo store, un registry paralelo, internals PGlite ni secretos persistidos.
 
 ## Evidencia F08 reciente
 
-- `.ai/evidence/F08/M08.6/CLOSURE_2026-09-03.md`
-- `.ai/evidence/F08/M08.7/IMPLEMENTATION_2026-09-03.md`
-- `.ai/evidence/F08/M08.7/CLOSURE_2026-09-03.md`
-- `.ai/evidence/F08/M08.8/CLOSURE_2026-09-03.md`
-- `.ai/evidence/F08/M08.9/IMPLEMENTATION_2026-09-03.md`
 - `.ai/evidence/F08/M08.9/CLOSURE_2026-09-03.md`
+- `.ai/evidence/F08/M08.10/IMPLEMENTATION_2026-09-04.md`
+- `.ai/evidence/F08/M08.10/CLOSURE_2026-09-04.md`
+- `.ai/evidence/F08/M08.11/IMPLEMENTATION_2026-09-04.md`
 
 ## Siguiente transición
 
-M08.10 está `IMPLEMENTADA / CANDIDATA A GATE`: contrato, storage v6, adapter, CRUD jerárquico, UI y `552/552` pruebas Vitest están verdes localmente. Publicar una única candidata y ejecutar Base CI/Playwright; solo con gate completo verde fusionar y activar `M08.11 — Relaciones 1:1, 1:N y N:N`.
+M08.11 está implementada en `codex/m08-11-relations` pero no está cerrada. Revisar formato/tipos estáticos, publicar una única candidata y ejecutar ElectroCraft Base CI completo. Solo con gate GREEN registrar cierre, fusionar y activar `M08.12`.
