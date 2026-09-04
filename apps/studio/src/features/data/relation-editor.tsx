@@ -9,6 +9,7 @@ import type {
 } from '@electrocraft/domain';
 import { useEffect, useMemo, useState } from 'react';
 import { dataModelWorkspaceRuntime, type DataRecordOption } from './data-model-runtime';
+import './relation-editor.css';
 
 interface RelationEditorProps {
   readonly model: ElectroCraftDataModel;
@@ -117,6 +118,8 @@ export function RelationEditor({ model, models, relations }: RelationEditorProps
     if (!selected || !draft) return;
     setMessage('Guardando relación…');
     try {
+      const readRoles = roleList(draft.readRoles);
+      const writeRoles = roleList(draft.writeRoles);
       await dataModelWorkspaceRuntime.updateRelation(selected.id, {
         label: draft.label.trim(),
         key: draft.key.trim(),
@@ -128,8 +131,8 @@ export function RelationEditor({ model, models, relations }: RelationEditorProps
             ? { key: draft.inverseKey.trim(), label: draft.inverseLabel.trim() }
             : undefined,
         permissions: {
-          ...(roleList(draft.readRoles) ? { read: roleList(draft.readRoles) } : {}),
-          ...(roleList(draft.writeRoles) ? { write: roleList(draft.writeRoles) } : {}),
+          ...(readRoles ? { read: readRoles } : {}),
+          ...(writeRoles ? { write: writeRoles } : {}),
         },
       });
       setMessage('Definición de relación guardada.');
@@ -193,7 +196,8 @@ export function RelationEditor({ model, models, relations }: RelationEditorProps
                 >
                   <span>{relation.label}</span>
                   <small>
-                    {model.label} · {cardinalityLabel(relation.cardinality)} · {target?.label ?? relation.targetModelRef}
+                    {model.label} · {cardinalityLabel(relation.cardinality)} ·{' '}
+                    {target?.label ?? relation.targetModelRef}
                   </small>
                 </button>
               );
@@ -342,7 +346,11 @@ export function RelationEditor({ model, models, relations }: RelationEditorProps
               <div className="ec-relation-selector-grid">
                 <label>
                   Registro de origen
-                  <select aria-label="Registro de origen" value={fromRecordId} onChange={(event) => setFromRecordId(event.target.value)}>
+                  <select
+                    aria-label="Registro de origen"
+                    value={fromRecordId}
+                    onChange={(event) => setFromRecordId(event.target.value)}
+                  >
                     <option value="">Seleccionar…</option>
                     {sourceOptions.map((option) => (
                       <option key={option.id} value={option.id}>
@@ -353,7 +361,11 @@ export function RelationEditor({ model, models, relations }: RelationEditorProps
                 </label>
                 <label>
                   Registro de destino
-                  <select aria-label="Registro de destino" value={toRecordId} onChange={(event) => setToRecordId(event.target.value)}>
+                  <select
+                    aria-label="Registro de destino"
+                    value={toRecordId}
+                    onChange={(event) => setToRecordId(event.target.value)}
+                  >
                     <option value="">Seleccionar…</option>
                     {targetOptions.map((option) => (
                       <option key={option.id} value={option.id}>
@@ -370,12 +382,16 @@ export function RelationEditor({ model, models, relations }: RelationEditorProps
                 {edges.map((edge) => (
                   <div key={edge.id} role="listitem" className="ec-field-row">
                     <span>
-                      <strong>{sourceOptions.find(({ id }) => id === edge.fromRecordRef)?.label ?? edge.fromRecordRef}</strong>
+                      <strong>
+                        {sourceOptions.find(({ id }) => id === edge.fromRecordRef)?.label ?? edge.fromRecordRef}
+                      </strong>
                       <small>{edge.fromRecordRef}</small>
                     </span>
                     <span className="ec-relation-edge-target">
                       <small>→</small>
-                      <strong>{targetOptions.find(({ id }) => id === edge.toRecordRef)?.label ?? edge.toRecordRef}</strong>
+                      <strong>
+                        {targetOptions.find(({ id }) => id === edge.toRecordRef)?.label ?? edge.toRecordRef}
+                      </strong>
                     </span>
                     <Button
                       size="sm"
