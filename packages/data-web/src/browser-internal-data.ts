@@ -1,8 +1,9 @@
-import type { InternalDataRepository } from '@electrocraft/application';
+import type { InternalDataRepository, InternalRelationRepository } from '@electrocraft/application';
 import type { PGlite } from '@electric-sql/pglite';
 import { PGliteWorker } from '@electric-sql/pglite/worker';
 import { drizzle } from 'drizzle-orm/pglite';
 import { createDrizzleInternalDataRepository } from './internal-data-repository';
+import { createDrizzleInternalRelationRepository } from './internal-relation-repository';
 import { applyStudioStorageMigrations } from './migration';
 import * as schema from './schema';
 
@@ -13,6 +14,7 @@ export interface BrowserInternalDataOptions {
 
 export interface BrowserInternalDataRepositoryPort extends InternalDataRepository {
   readonly offlineCapable: true;
+  readonly relations: InternalRelationRepository;
   close(): Promise<void>;
 }
 
@@ -39,6 +41,7 @@ export function createBrowserInternalDataRepositoryPort(
   const backend = options.preferredBackend === 'opfs-ahp' && canUseOpfs() ? 'opfs-ahp' : 'indexeddb';
   let client: PGliteWorker | null = null;
   let repository: InternalDataRepository | null = null;
+  let relationRepository: InternalRelationRepository | null = null;
   let initializePromise: Promise<InternalDataRepository> | null = null;
 
   async function initialize() {
@@ -63,6 +66,7 @@ export function createBrowserInternalDataRepositoryPort(
       const db = drizzle(nextClient as unknown as PGlite, { schema });
       client = nextClient;
       repository = createDrizzleInternalDataRepository(db);
+      relationRepository = createDrizzleInternalRelationRepository(db);
       return repository;
     })().finally(() => {
       initializePromise = null;
@@ -72,17 +76,35 @@ export function createBrowserInternalDataRepositoryPort(
 
   const delegate = async <T>(operation: (active: InternalDataRepository) => Promise<T>) =>
     operation(await initialize());
+  const relationDelegate = async <T>(operation: (active: InternalRelationRepository) => Promise<T>) => {
+    await initialize();
+    if (!relationRepository) throw new Error('El repositorio de relaciones no está disponible.');
+    return operation(relationRepository);
+  };
+
+  const relations: InternalRelationRepository = Object.freeze({
+    listRelationEdges: (projectId, sourceId, relationId, query) =>
+      relationDelegate((active) => active.listRelationEdges(projectId, sourceId, relationId, query)),
+    createRelationEdge: (projectId, sourceId, relationId, input) =>
+      relationDelegate((active) => active.createRelationEdge(projectId, sourceId, relationId, input)),
+    updateRelationEdge: (projectId, sourceId, relationId, input) =>
+      relationDelegate((active) => active.updateRelationEdge(projectId, sourceId, relationId, input)),
+    deleteRelationEdge: (projectId, sourceId, relationId, edgeId) =>
+      relationDelegate((active) => active.deleteRelationEdge(projectId, sourceId, relationId, edgeId)),
+    prepareRecordDelete: (projectId, sourceId, modelId, recordId) =>
+      relationDelegate((active) => active.prepareRecordDelete(projectId, sourceId, modelId, recordId)),
+  });
 
   const port: BrowserInternalDataRepositoryPort = {
     offlineCapable: true,
+    relations,
     testConnection: (projectId) => delegate((active) => active.testConnection(projectId)),
     listResources: (projectId, sourceId) => delegate((active) => active.listResources(projectId, sourceId)),
     getSchema: (projectId, sourceId) => delegate((active) => active.getSchema(projectId, sourceId)),
     queryRecords: (projectId, modelId, query) => delegate((active) => active.queryRecords(projectId, modelId, query)),
     createRecord: (projectId, modelId, input) => delegate((active) => active.createRecord(projectId, modelId, input)),
     updateRecord: (projectId, modelId, input) => delegate((active) => active.updateRecord(projectId, modelId, input)),
-    deleteRecord: (projectId, modelId, recordId) =>
-      delegate((active) => active.deleteRecord(projectId, modelId, recordId)),
+    deleteRecord: (projectId, modelId, recordId) => delegate((active) => active.deleteRecord(projectId, modelId, recordId)),
     getStats: (projectId, sourceId) => delegate((active) => active.getStats(projectId, sourceId)),
     getFieldUsage: (projectId, modelId, fieldKey) =>
       delegate((active) => active.getFieldUsage(projectId, modelId, fieldKey)),
@@ -98,6 +120,7 @@ export function createBrowserInternalDataRepositoryPort(
       const active = client;
       client = null;
       repository = null;
+      relationRepository = null;
       await active?.close();
     },
   };
