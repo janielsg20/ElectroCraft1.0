@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { PGlite } from '@electric-sql/pglite';
+import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/pglite';
 import { describe, expect, it } from 'vitest';
 import { ConnectorRegistry } from '@electrocraft/application';
@@ -33,10 +34,7 @@ describe('M08.11 relations through ConnectorRegistry and PGlite', () => {
       ) as Record<string, unknown>;
       const source = electroCraftDataSourceDefinitionSchema.parse({
         ...rawSource,
-        capabilities: [
-          ...((rawSource.capabilities as string[] | undefined) ?? []),
-          'relations',
-        ],
+        capabilities: [...((rawSource.capabilities as string[] | undefined) ?? []), 'relations'],
       });
       const sourceModelId = createDeterministicObjectId('data-model', 'm08-11-order');
       const targetModelId = createDeterministicObjectId('data-model', 'm08-11-customer');
@@ -194,7 +192,7 @@ describe('M08.11 relations through ConnectorRegistry and PGlite', () => {
       await db
         .update(storageSchema.projectObjects)
         .set({ payload: detachedSchema, checksum: 'm08-11-schema-fixture-v2' })
-        .where(storageSchema.projectObjects.objectId.eq(dataSchema.id));
+        .where(eq(storageSchema.projectObjects.objectId, dataSchema.id));
 
       await expect(
         registry.mutate(source, 'development', {
