@@ -9,9 +9,13 @@ import {
   electroCraftDataFieldSchema,
   electroCraftDataModelSchema,
   electroCraftDataSchemaSchema,
+  electroRelationEdgeSchema,
+  electroRelationSchema,
   electroTaxonomySchema,
   electroTaxonomyTermSchema,
   readElectroCraftAdvancedFieldMetadata,
+  relationResourceId,
+  taxonomyResourceId,
   type ElectroCraftAdvancedFieldMetadata,
   type ElectroCraftDataField,
   type ElectroCraftDataFieldType,
@@ -19,10 +23,13 @@ import {
   type ElectroCraftObjectId,
   type ElectroCraftDataSchema,
   type ElectroCraftDataSourceDefinition,
+  type ElectroRelation,
+  type ElectroRelationCardinality,
+  type ElectroRelationDeleteBehavior,
+  type ElectroRelationEdge,
   type ElectroTaxonomy,
   type ElectroTaxonomyTerm,
   type JsonValue,
-  taxonomyResourceId,
 } from '@electrocraft/domain';
 import { projectStorageRuntime } from '../projects/project-storage-runtime';
 import {
@@ -42,6 +49,7 @@ export interface DataModelWorkspaceSnapshot {
   readonly schema: ElectroCraftDataSchema | null;
   readonly models: readonly ElectroCraftDataModel[];
   readonly taxonomies: readonly ElectroTaxonomy[];
+  readonly relations: readonly ElectroRelation[];
   readonly selectedModelId: string | null;
   readonly message: string;
 }
@@ -52,6 +60,11 @@ export interface DataFieldImpact {
   readonly fieldKey: string;
   readonly recordCount: number;
   readonly populatedCount: number;
+}
+
+export interface DataRecordOption {
+  readonly id: string;
+  readonly label: string;
 }
 
 export interface CreateFieldInput {
@@ -69,6 +82,7 @@ let snapshot: DataModelWorkspaceSnapshot = Object.freeze({
   schema: null,
   models: Object.freeze([]),
   taxonomies: Object.freeze([]),
+  relations: Object.freeze([]),
   selectedModelId: null,
   message: 'Modelos pendientes de carga.',
 });
@@ -78,6 +92,7 @@ function publish(next: DataModelWorkspaceSnapshot) {
     ...next,
     models: Object.freeze([...next.models]),
     taxonomies: Object.freeze([...next.taxonomies]),
+    relations: Object.freeze([...next.relations]),
   });
   for (const listener of listeners) listener();
   return snapshot;
@@ -114,6 +129,7 @@ async function loadWorkspace(): Promise<DataModelWorkspaceSnapshot> {
       schema: null,
       models: [],
       taxonomies: [],
+      relations: [],
       selectedModelId: null,
       message: 'Abre un proyecto para editar sus modelos.',
     });
@@ -126,6 +142,7 @@ async function loadWorkspace(): Promise<DataModelWorkspaceSnapshot> {
       schema: null,
       models: [],
       taxonomies: [],
+      relations: [],
       selectedModelId: null,
       message: 'Crea ElectroCraft Data en Fuentes de datos antes de definir modelos.',
     });
@@ -150,6 +167,7 @@ async function loadWorkspace(): Promise<DataModelWorkspaceSnapshot> {
     schema,
     models,
     taxonomies: schema?.taxonomies ?? [],
+    relations: schema?.relations ?? [],
     selectedModelId: selected?.id ?? null,
     message: models.length ? `${models.length} modelo(s) cargado(s).` : 'Todavía no hay modelos internos.',
   });
@@ -259,6 +277,17 @@ async function queryTaxonomyTerms(taxonomyId: string): Promise<readonly ElectroT
   });
   const parsed = electroTaxonomyTermSchema.array().safeParse(result);
   if (!parsed.success) throw new Error('La respuesta de términos no es válida.');
+  return Object.freeze(parsed.data);
+}
+
+async function queryRelationEdges(relationId: string): Promise<readonly ElectroRelationEdge[]> {
+  const current = snapshot;
+  if (!current.source) throw new Error('ElectroCraft Data no está disponible.');
+  const result = await dataSourceWorkspaceRuntime.registry.query(current.source, 'development', {
+    resourceId: relationResourceId(relationId),
+  });
+  const parsed = electroRelationEdgeSchema.array().safeParse(result);
+  if (!parsed.success) throw new Error('La respuesta de vínculos de relación no es válida.');
   return Object.freeze(parsed.data);
 }
 
@@ -451,6 +480,155 @@ export const dataModelWorkspaceRuntime = Object.freeze({
       operation: 'delete',
       input: { id: termId },
     });
+  },
+  async createRelation(modelId: string, labelInput = 'Nueva relación') {
+    const current = snapshot;
+    if (!current.schema) throw new Error('No hay esquema interno para editar.');
+    const model = current.schema.models.find(({ id }) => id === modelId);
+    if (!model) throw new Error('Modelo no encontrado.');
+    const target = current.schema.models.find(({ id }) => id !== model.id) ?? model;
+    const seed = globalThis.crypto.randomUUID();
+    const label = labelInput.trim() || 'Nueva relación';
+    const relation = electroRelationSchema.parse({
+      id: createDeterministicObjectId('relation', seed),
+      key: normalizeKey(label, 'relation'),
+      label,
+      sourceModelRef: model.id,
+      targetModelRef: target.id,
+      cardinality: 'one-to-many',
+      deleteBehavior: 'restrict',
+      metadata: { owner: 'PGlite generic content store' },
+    });
+    const nextModels = current.schema.models.map((candidate) =>
+      candidate.id === model.id
+        ? electroCraftDataModelSchema.parse({
+            ...candidate,
+            capabilityRefs: [...new Set([...(candidate.capabilityRefs ?? []), 'data.relations'])],
+          })
+        : candidate,
+    );
+    const nextSchema = electroCraftDataSchemaSchema.parse({
+      ...current.schema,
+      version: current.schema.version + 1,
+      models: nextModels,
+      relations: [...(current.schema.relations ?? []), relation],
+    });
+    await persistSchema(nextSchema, model.id, `Relación ${relation.label} creada.`);
+    return relation;
+  },
+  async updateRelation(
+    relationId: string,
+    patch: Partial<Omit<ElectroRelation, 'id' | 'sourceModelRef'>> & {
+      readonly cardinality?: ElectroRelationCardinality;
+      readonly deleteBehavior?: ElectroRelationDeleteBehavior;
+    },
+  ) {
+    const current = snapshot;
+    if (!current.schema) throw new Error('No hay esquema interno para editar.');
+    const relation = (current.schema.relations ?? []).find(({ id }) => id === relationId);
+    if (!relation) throw new Error('Relación no encontrada.');
+    const edges = await queryRelationEdges(relation.id);
+    if (edges.length > 0 && (patch.targetModelRef ?? relation.targetModelRef) !== relation.targetModelRef) {
+      throw new Error('Elimina los vínculos existentes antes de cambiar el modelo de destino.');
+    }
+    const nextRelation = electroRelationSchema.parse({ ...relation, ...patch, id: relation.id });
+    const nextSchema = electroCraftDataSchemaSchema.parse({
+      ...current.schema,
+      version: current.schema.version + 1,
+      relations: (current.schema.relations ?? []).map((candidate) =>
+        candidate.id === relation.id ? nextRelation : candidate,
+      ),
+    });
+    await persistSchema(nextSchema, relation.sourceModelRef, `Relación ${nextRelation.label} actualizada.`);
+    return nextRelation;
+  },
+  async deleteRelation(relationId: string) {
+    const current = snapshot;
+    if (!current.schema) throw new Error('No hay esquema interno para editar.');
+    const relation = (current.schema.relations ?? []).find(({ id }) => id === relationId);
+    if (!relation) throw new Error('Relación no encontrada.');
+    if (current.schema.models.some((model) => model.fields.some((field) => field.relationRef === relation.id))) {
+      throw new Error('Desvincula primero los campos que usan esta relación.');
+    }
+    const edges = await queryRelationEdges(relation.id);
+    if (edges.length > 0) throw new Error('Elimina primero los vínculos de esta relación.');
+    const nextModels = current.schema.models.map((model) => {
+      const stillSource = (current.schema!.relations ?? []).some(
+        (candidate) => candidate.id !== relation.id && candidate.sourceModelRef === model.id,
+      );
+      return electroCraftDataModelSchema.parse({
+        ...model,
+        capabilityRefs: stillSource
+          ? model.capabilityRefs
+          : (model.capabilityRefs ?? []).filter((ref) => ref !== 'data.relations'),
+      });
+    });
+    const nextSchema = electroCraftDataSchemaSchema.parse({
+      ...current.schema,
+      version: current.schema.version + 1,
+      models: nextModels,
+      relations: (current.schema.relations ?? []).filter(({ id }) => id !== relation.id),
+    });
+    await persistSchema(nextSchema, relation.sourceModelRef, 'Relación eliminada.');
+  },
+  async listRelationEdges(relationId: string) {
+    return queryRelationEdges(relationId);
+  },
+  async createRelationEdge(relationId: string, fromRecordId: string, toRecordId: string) {
+    const current = snapshot;
+    if (!current.source) throw new Error('ElectroCraft Data no está disponible.');
+    return dataSourceWorkspaceRuntime.registry.mutate(current.source, 'development', {
+      resourceId: relationResourceId(relationId),
+      operation: 'create',
+      input: {
+        id: globalThis.crypto.randomUUID(),
+        fromRecordId,
+        toRecordId,
+        payload: {},
+      },
+    });
+  },
+  async updateRelationEdge(edge: ElectroRelationEdge, fromRecordId: string, toRecordId: string) {
+    const current = snapshot;
+    if (!current.source) throw new Error('ElectroCraft Data no está disponible.');
+    return dataSourceWorkspaceRuntime.registry.mutate(current.source, 'development', {
+      resourceId: relationResourceId(edge.relationRef),
+      operation: 'update',
+      input: { id: edge.id, fromRecordId, toRecordId, payload: edge.payload },
+    });
+  },
+  async deleteRelationEdge(relationId: string, edgeId: string) {
+    const current = snapshot;
+    if (!current.source) throw new Error('ElectroCraft Data no está disponible.');
+    return dataSourceWorkspaceRuntime.registry.mutate(current.source, 'development', {
+      resourceId: relationResourceId(relationId),
+      operation: 'delete',
+      input: { id: edgeId },
+    });
+  },
+  async listRecordOptions(modelId: string): Promise<readonly DataRecordOption[]> {
+    const current = snapshot;
+    if (!current.source) throw new Error('ElectroCraft Data no está disponible.');
+    const result = await dataSourceWorkspaceRuntime.registry.query(current.source, 'development', {
+      resourceId: modelId,
+      input: { offset: 0, limit: 200 },
+    });
+    if (!result || Array.isArray(result) || typeof result !== 'object') return Object.freeze([]);
+    const rows = Array.isArray((result as Record<string, JsonValue>).rows)
+      ? ((result as Record<string, JsonValue>).rows as JsonValue[])
+      : [];
+    return Object.freeze(
+      rows.flatMap((row) => {
+        if (!row || Array.isArray(row) || typeof row !== 'object') return [];
+        const record = row as Record<string, JsonValue>;
+        if (typeof record.id !== 'string') return [];
+        const data = record.data && !Array.isArray(record.data) && typeof record.data === 'object'
+          ? (record.data as Record<string, JsonValue>)
+          : {};
+        const preferred = [data.name, data.title, data.label].find((value) => typeof value === 'string' && value.trim());
+        return [{ id: record.id, label: typeof preferred === 'string' ? preferred : record.id }];
+      }),
+    );
   },
   async updateModelIdentity(modelId: string, patch: Partial<Omit<ElectroCraftDataModel, 'id' | 'fields'>>) {
     const current = snapshot;
