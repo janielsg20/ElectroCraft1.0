@@ -2,11 +2,15 @@
 
 ## Current
 
-F08 / M08.11 — Relaciones 1:1, 1:N y N:N — `ACTIVE / IMPLEMENTADA / PENDIENTE GATE`.
+F08 / M08.11 — Relaciones 1:1, 1:N y N:N — `ACTIVE`.
 
 Rama activa: `codex/m08-11-relations`.
 
 M08.10 quedó certificada por ElectroCraft Base CI `33896051996` (#882) y PR `#76` fusionada por squash a `main` en `78c88b65ef8708575ea2885edf7ad6631a30afce`.
+
+## M08.11 — estado de implementación
+
+`IMPLEMENTADA / PENDIENTE GATE`.
 
 ## M08.11 owner y límites
 
@@ -53,7 +57,7 @@ Evidencia: `.ai/evidence/F08/M08.11/IMPLEMENTATION_2026-09-04.md`.
 
 ## Siguiente acción exacta
 
-Hacer revisión estática final de formato/tipos, publicar PR M08.11 y ejecutar una única ElectroCraft Base CI. Solo con `success` registrar cierre, fusionar y activar M08.12. Ante fallo, corregir exclusivamente la señal observada.
+Ejecutar ElectroCraft Base CI sobre PR `#77`. Solo con `success` registrar cierre, fusionar y activar M08.12. Ante fallo, corregir exclusivamente la señal observada.
 
 ## Read set
 
