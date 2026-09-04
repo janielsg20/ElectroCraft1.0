@@ -2,53 +2,59 @@
 
 ## Current
 
-F08 / M08.10 — Taxonomías dentro de Modelos — `ACTIVE / CANDIDATA A GATE`.
+F08 / M08.11 — Relaciones 1:1, 1:N y N:N — `ACTIVE / IMPLEMENTADA / PENDIENTE GATE`.
 
-Rama activa: `codex/m08-10-taxonomies`.
+Rama activa: `codex/m08-11-relations`.
 
-M08.9 quedó certificada por ElectroCraft Base CI `33812380216` (#878) y PR `#75` fusionada por squash a `main` en `93440130d8c5fd62f73366925df7695dd309daf3`.
+M08.10 quedó certificada por ElectroCraft Base CI `33896051996` (#882) y PR `#76` fusionada por squash a `main` en `78c88b65ef8708575ea2885edf7ad6631a30afce`.
 
-## M08.10 owner y límites
+## M08.11 owner y límites
 
 Owner: `PGlite generic content store` existente.
 
-- `ElectroTaxonomy` debe ser metadata portable y referenciar modelos canónicos.
-- términos viven en el storage genérico `taxonomy_terms`; `parentId` expresa jerarquía.
-- definición y administración de términos son superficies separadas.
-- el acceso pasa por adapter/repository y el único ConnectorRegistry.
-- no hay DDL dinámico, internals PGlite ni secretos persistidos.
+- `ElectroRelation` es metadata portable; source/target son refs de modelos canónicos.
+- todos los edges viven en la tabla física existente `relation_edges`.
+- cardinalidad `1:1`, `1:N`, `N:N` se valida en aplicación/repositorio.
+- `restrict`, `detach` y `cascade` controlan integridad de borrado.
+- acceso a edges pasa por `InternalRelationRepository`, `InternalDataSourceAdapter` y el único ConnectorRegistry.
+- no hay migración M08.11, DDL dinámico, segundo store, registry paralelo ni secretos persistidos.
 
-## UX objetivo
+## UX implementada
 
-Ruta: `Datos > Modelos > <modelo> > Taxonomías` y gestor de términos contextual.
+Ruta: `Datos > Modelos > <modelo> > Relaciones`.
 
-- List izquierda y detail con Identidad/Jerarquía/Modelos/Campos/Plantillas.
-- gestor de términos separado y contextual.
-- estados initial/loading/ready/empty/error/saving/saved/blocked cuando apliquen.
-- ayuda `help.content.models` actualizada en español si introduce concepto nuevo.
+- list compacta origen · cardinalidad · destino;
+- detail con Nombre, Clave, Origen, Tipo, Destino, Inverso, Integridad y Permisos;
+- selectores de registros para crear edges;
+- lista de vínculos con eliminación explícita;
+- campos `relation` pueden enlazar `relationRef` canónico;
+- layout responsive: 2 columnas desktop, 1 columna tablet, controles apilados móvil.
 
 ## Precondición certificada
 
-- M08.9: `GREEN` por Base CI `33812380216` (#878).
-- PR `#75`: fusionada por squash.
+- M08.10: `GREEN` por Base CI `33896051996` (#882), `123/123` Playwright.
+- PR `#76`: fusionada por squash en `78c88b65ef8708575ea2885edf7ad6631a30afce`.
 - no hay P0/P1 abiertos en la dependencia inmediata.
 
 ## Implementación candidata
 
-- contratos `ElectroTaxonomy`/`ElectroTaxonomyTerm` y refs canónicas fail-closed;
-- capability `taxonomies` sobre la fuente/adaptador interno existente;
-- migración PGlite/Drizzle v6: `taxonomy_terms.parent_id` y slug único por taxonomía;
-- CRUD jerárquico detrás de ConnectorRegistry con permisos, ciclos, padres e hijos validados;
-- Studio en `Modelos > Taxonomías`, con definición y gestor de términos separados;
-- ayuda persistente en español actualizada;
-- lint/typecheck/boundaries/build verdes; Node `41/41`; Vitest `552/552`.
+- contratos `ElectroRelation` y `ElectroRelationEdge`;
+- capability `relations` en DataSource y adapter interno;
+- `relations[]` en schema canónico con refs fail-closed;
+- `relationRef` opcional y backward-compatible en campos relation;
+- repositorio Drizzle sobre `relation_edges` existente;
+- validación de cardinalidad/duplicados/endpoints;
+- integridad `restrict/detach/cascade`;
+- recursos `relation:<id>` descubribles desde Data Explorer;
+- Studio Modelos > Relaciones + selectores de records;
+- unit/contract/integration PGlite/E2E preparados.
 
-E2E: `tooling/playwright/m08-10-taxonomies.spec.ts` está preparado. Localmente no pudo arrancar porque falta Chromium; la descarga desde `cdn.playwright.dev` agotó timeout y devolvió 502.
+Evidencia: `.ai/evidence/F08/M08.11/IMPLEMENTATION_2026-09-04.md`.
 
 ## Siguiente acción exacta
 
-Publicar una única candidata M08.10 y ejecutar ElectroCraft Base CI/Playwright. Con `success`, registrar VALIDATION/CLOSURE, fusionar y activar M08.11. Ante fallo, corregir únicamente la evidencia observada.
+Hacer revisión estática final de formato/tipos, publicar PR M08.11 y ejecutar una única ElectroCraft Base CI. Solo con `success` registrar cierre, fusionar y activar M08.12. Ante fallo, corregir exclusivamente la señal observada.
 
 ## Read set
 
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M08_10.md → .ai/evidence/F08/M08.10/IMPLEMENTATION_2026-09-04.md → tooling/playwright/m08-10-taxonomies.spec.ts`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M08_11.md → .ai/evidence/F08/M08.10/CLOSURE_2026-09-04.md → .ai/evidence/F08/M08.11/IMPLEMENTATION_2026-09-04.md → packages/domain/src/data/relations.ts → packages/data-web/src/internal-relation-repository.ts → packages/connectors/src/internal-data-source-adapter.ts → apps/studio/src/features/data/relation-editor.tsx → tooling/vitest → tooling/playwright/m08-11-relations.spec.ts`.
