@@ -21,7 +21,7 @@
 - M08.8 — Modelos de datos y Field Registry: `IMPLEMENTADA / GREEN MICROFASE`.
 - M08.9 — Group, Repeater, Calculated y Conditional Fields: `IMPLEMENTADA / GREEN MICROFASE`.
 - M08.10 — Taxonomías dentro de Modelos: `IMPLEMENTADA / GREEN MICROFASE`.
-- M08.11 — Relaciones 1:1, 1:N y N:N: `ACTIVE / IMPLEMENTADA / PENDIENTE GATE`.
+- M08.11 — Relaciones 1:1, 1:N y N:N: `ACTIVE`.
 
 ## Rama activa
 
@@ -31,7 +31,9 @@
 
 M08.10 fue certificada por ElectroCraft Base CI run `33896051996` (#882): documentación, lint, typecheck, tests, build, las `123` pruebas Playwright, empty-repo y artifacts terminaron en `success`. PR `#76` se fusionó por squash a `main` en `78c88b65ef8708575ea2885edf7ad6631a30afce`.
 
-## M08.11 — owner y alcance
+## M08.11 — estado de implementación
+
+`IMPLEMENTADA / PENDIENTE GATE`.
 
 Owner: `PGlite generic content store` existente, accesible mediante el adapter interno y el `ConnectorRegistry` certificados.
 
@@ -52,4 +54,4 @@ Owner: `PGlite generic content store` existente, accesible mediante el adapter i
 
 ## Siguiente transición
 
-M08.11 está implementada en `codex/m08-11-relations` pero no está cerrada. Revisar formato/tipos estáticos, publicar una única candidata y ejecutar ElectroCraft Base CI completo. Solo con gate GREEN registrar cierre, fusionar y activar `M08.12`.
+M08.11 está implementada en `codex/m08-11-relations` pero no está cerrada. Ejecutar ElectroCraft Base CI completo sobre la candidata. Solo con gate GREEN registrar cierre, fusionar y activar `M08.12`.
