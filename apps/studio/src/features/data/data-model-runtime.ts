@@ -9,6 +9,8 @@ import {
   electroCraftDataFieldSchema,
   electroCraftDataModelSchema,
   electroCraftDataSchemaSchema,
+  electroTaxonomySchema,
+  electroTaxonomyTermSchema,
   readElectroCraftAdvancedFieldMetadata,
   type ElectroCraftAdvancedFieldMetadata,
   type ElectroCraftDataField,
@@ -17,7 +19,10 @@ import {
   type ElectroCraftObjectId,
   type ElectroCraftDataSchema,
   type ElectroCraftDataSourceDefinition,
+  type ElectroTaxonomy,
+  type ElectroTaxonomyTerm,
   type JsonValue,
+  taxonomyResourceId,
 } from '@electrocraft/domain';
 import { projectStorageRuntime } from '../projects/project-storage-runtime';
 import {
@@ -36,6 +41,7 @@ export interface DataModelWorkspaceSnapshot {
   readonly source: ElectroCraftDataSourceDefinition | null;
   readonly schema: ElectroCraftDataSchema | null;
   readonly models: readonly ElectroCraftDataModel[];
+  readonly taxonomies: readonly ElectroTaxonomy[];
   readonly selectedModelId: string | null;
   readonly message: string;
 }
@@ -62,12 +68,17 @@ let snapshot: DataModelWorkspaceSnapshot = Object.freeze({
   source: null,
   schema: null,
   models: Object.freeze([]),
+  taxonomies: Object.freeze([]),
   selectedModelId: null,
   message: 'Modelos pendientes de carga.',
 });
 
 function publish(next: DataModelWorkspaceSnapshot) {
-  snapshot = Object.freeze({ ...next, models: Object.freeze([...next.models]) });
+  snapshot = Object.freeze({
+    ...next,
+    models: Object.freeze([...next.models]),
+    taxonomies: Object.freeze([...next.taxonomies]),
+  });
   for (const listener of listeners) listener();
   return snapshot;
 }
@@ -102,6 +113,7 @@ async function loadWorkspace(): Promise<DataModelWorkspaceSnapshot> {
       source: null,
       schema: null,
       models: [],
+      taxonomies: [],
       selectedModelId: null,
       message: 'Abre un proyecto para editar sus modelos.',
     });
@@ -113,6 +125,7 @@ async function loadWorkspace(): Promise<DataModelWorkspaceSnapshot> {
       source: null,
       schema: null,
       models: [],
+      taxonomies: [],
       selectedModelId: null,
       message: 'Crea ElectroCraft Data en Fuentes de datos antes de definir modelos.',
     });
@@ -136,6 +149,7 @@ async function loadWorkspace(): Promise<DataModelWorkspaceSnapshot> {
     source,
     schema,
     models,
+    taxonomies: schema?.taxonomies ?? [],
     selectedModelId: selected?.id ?? null,
     message: models.length ? `${models.length} modelo(s) cargado(s).` : 'Todavía no hay modelos internos.',
   });
@@ -237,6 +251,17 @@ async function queryFieldImpact(
   return Object.freeze({ modelId: model.id, fieldId: field.id, fieldKey: field.key, recordCount, populatedCount });
 }
 
+async function queryTaxonomyTerms(taxonomyId: string): Promise<readonly ElectroTaxonomyTerm[]> {
+  const current = snapshot;
+  if (!current.source) throw new Error('ElectroCraft Data no está disponible.');
+  const result = await dataSourceWorkspaceRuntime.registry.query(current.source, 'development', {
+    resourceId: taxonomyResourceId(taxonomyId),
+  });
+  const parsed = electroTaxonomyTermSchema.array().safeParse(result);
+  if (!parsed.success) throw new Error('La respuesta de términos no es válida.');
+  return Object.freeze(parsed.data);
+}
+
 export const dataModelWorkspaceRuntime = Object.freeze({
   subscribe(listener: () => void) {
     listeners.add(listener);
@@ -302,6 +327,130 @@ export const dataModelWorkspaceRuntime = Object.freeze({
         });
     await persistSchema(schema, model.id, `Modelo ${model.label} creado.`);
     return model;
+  },
+  async createTaxonomy(modelId: string, labelInput = 'Nueva taxonomía') {
+    const current = snapshot;
+    if (!current.schema) throw new Error('No hay esquema interno para editar.');
+    const model = current.schema.models.find(({ id }) => id === modelId);
+    if (!model) throw new Error('Modelo no encontrado.');
+    const seed = globalThis.crypto.randomUUID();
+    const label = labelInput.trim() || 'Nueva taxonomía';
+    const taxonomy = electroTaxonomySchema.parse({
+      id: createDeterministicObjectId('taxonomy', seed),
+      key: normalizeKey(label, 'taxonomy'),
+      label,
+      singularLabel: label,
+      pluralLabel: `${label}s`,
+      description: '',
+      hierarchical: true,
+      modelRefs: [model.id],
+      templateRefs: [],
+      metadata: { owner: 'PGlite generic content store' },
+    });
+    const nextModels = current.schema.models.map((candidate) =>
+      candidate.id === model.id
+        ? electroCraftDataModelSchema.parse({
+            ...candidate,
+            capabilityRefs: [...new Set([...(candidate.capabilityRefs ?? []), 'data.taxonomies'])],
+          })
+        : candidate,
+    );
+    const nextSchema = electroCraftDataSchemaSchema.parse({
+      ...current.schema,
+      version: current.schema.version + 1,
+      models: nextModels,
+      taxonomies: [...(current.schema.taxonomies ?? []), taxonomy],
+    });
+    await persistSchema(nextSchema, model.id, `Taxonomía ${taxonomy.label} creada.`);
+    return taxonomy;
+  },
+  async updateTaxonomy(taxonomyId: string, patch: Partial<Omit<ElectroTaxonomy, 'id'>>) {
+    const current = snapshot;
+    if (!current.schema) throw new Error('No hay esquema interno para editar.');
+    const taxonomy = (current.schema.taxonomies ?? []).find(({ id }) => id === taxonomyId);
+    if (!taxonomy) throw new Error('Taxonomía no encontrada.');
+    if (taxonomy.hierarchical && patch.hierarchical === false) {
+      const terms = await queryTaxonomyTerms(taxonomy.id);
+      if (terms.some(({ parentId }) => parentId !== null)) {
+        throw new Error('Mueve los términos hijos a la raíz antes de desactivar la jerarquía.');
+      }
+    }
+    const nextTaxonomy = electroTaxonomySchema.parse({ ...taxonomy, ...patch, id: taxonomy.id });
+    const nextSchema = electroCraftDataSchemaSchema.parse({
+      ...current.schema,
+      version: current.schema.version + 1,
+      taxonomies: (current.schema.taxonomies ?? []).map((candidate) =>
+        candidate.id === taxonomy.id ? nextTaxonomy : candidate,
+      ),
+    });
+    await persistSchema(
+      nextSchema,
+      nextTaxonomy.modelRefs[0] ?? current.selectedModelId ?? '',
+      'Taxonomía actualizada.',
+    );
+    return nextTaxonomy;
+  },
+  async deleteTaxonomy(taxonomyId: string) {
+    const current = snapshot;
+    if (!current.schema) throw new Error('No hay esquema interno para editar.');
+    const taxonomy = (current.schema.taxonomies ?? []).find(({ id }) => id === taxonomyId);
+    if (!taxonomy) throw new Error('Taxonomía no encontrada.');
+    if (current.schema.models.some((model) => model.fields.some((field) => field.taxonomyRef === taxonomy.id))) {
+      throw new Error('Desvincula primero los campos que usan esta taxonomía.');
+    }
+    const terms = await queryTaxonomyTerms(taxonomy.id);
+    if (terms.length > 0) throw new Error('Elimina primero los términos de esta taxonomía.');
+    const nextModels = current.schema.models.map((model) => {
+      const stillAttached = (current.schema!.taxonomies ?? []).some(
+        (candidate) => candidate.id !== taxonomy.id && candidate.modelRefs.includes(model.id),
+      );
+      return electroCraftDataModelSchema.parse({
+        ...model,
+        capabilityRefs: stillAttached
+          ? model.capabilityRefs
+          : (model.capabilityRefs ?? []).filter((ref) => ref !== 'data.taxonomies'),
+      });
+    });
+    const nextSchema = electroCraftDataSchemaSchema.parse({
+      ...current.schema,
+      version: current.schema.version + 1,
+      models: nextModels,
+      taxonomies: (current.schema.taxonomies ?? []).filter(({ id }) => id !== taxonomy.id),
+    });
+    await persistSchema(nextSchema, current.selectedModelId ?? nextModels[0]?.id ?? '', 'Taxonomía eliminada.');
+  },
+  async listTaxonomyTerms(taxonomyId: string): Promise<readonly ElectroTaxonomyTerm[]> {
+    return queryTaxonomyTerms(taxonomyId);
+  },
+  async createTaxonomyTerm(taxonomyId: string, input: { name: string; slug: string; parentId?: string | null }) {
+    const current = snapshot;
+    if (!current.source) throw new Error('ElectroCraft Data no está disponible.');
+    return dataSourceWorkspaceRuntime.registry.mutate(current.source, 'development', {
+      resourceId: taxonomyResourceId(taxonomyId),
+      operation: 'create',
+      input: { ...input, id: createDeterministicObjectId('taxonomy-term', globalThis.crypto.randomUUID()) },
+    });
+  },
+  async updateTaxonomyTerm(
+    taxonomyId: string,
+    term: Omit<ElectroTaxonomyTerm, 'parentId'> & { readonly parentId: string | null },
+  ) {
+    const current = snapshot;
+    if (!current.source) throw new Error('ElectroCraft Data no está disponible.');
+    return dataSourceWorkspaceRuntime.registry.mutate(current.source, 'development', {
+      resourceId: taxonomyResourceId(taxonomyId),
+      operation: 'update',
+      input: term as unknown as JsonValue,
+    });
+  },
+  async deleteTaxonomyTerm(taxonomyId: string, termId: string) {
+    const current = snapshot;
+    if (!current.source) throw new Error('ElectroCraft Data no está disponible.');
+    return dataSourceWorkspaceRuntime.registry.mutate(current.source, 'development', {
+      resourceId: taxonomyResourceId(taxonomyId),
+      operation: 'delete',
+      input: { id: termId },
+    });
   },
   async updateModelIdentity(modelId: string, patch: Partial<Omit<ElectroCraftDataModel, 'id' | 'fields'>>) {
     const current = snapshot;

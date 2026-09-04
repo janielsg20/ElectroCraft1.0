@@ -9,6 +9,7 @@ import {
   primaryKey,
   text,
   timestamp,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core';
 
 export const projects = pgTable('projects', {
@@ -103,11 +104,12 @@ export const taxonomyTerms = pgTable(
     taxonomyId: text('taxonomy_id').notNull(),
     slug: text('slug').notNull(),
     name: text('name').notNull(),
+    parentId: text('parent_id'),
     metadata: jsonb('metadata').$type<ElectroCraftMetadata>().notNull().default({}),
   },
   (table) => [
     primaryKey({ columns: [table.projectId, table.id] }),
-    index('taxonomy_terms_taxonomy_idx').on(table.projectId, table.taxonomyId, table.slug),
+    uniqueIndex('taxonomy_terms_taxonomy_slug_idx').on(table.projectId, table.taxonomyId, table.slug),
   ],
 );
 

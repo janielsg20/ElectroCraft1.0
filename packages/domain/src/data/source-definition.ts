@@ -20,6 +20,7 @@ export const electroCraftCanonicalDataSourceCapabilitySchema = z.enum([
   'realtime',
   'file',
   'transactions',
+  'taxonomies',
 ]);
 export type ElectroCraftCanonicalDataSourceCapability = z.infer<typeof electroCraftCanonicalDataSourceCapabilitySchema>;
 

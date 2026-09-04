@@ -55,6 +55,7 @@ const INTERNAL_CAPABILITIES = Object.freeze([
   'filtering',
   'sort',
   'transactions',
+  'taxonomies',
 ] as const satisfies readonly ElectroCraftCanonicalDataSourceCapability[]);
 
 const listeners = new Set<() => void>();

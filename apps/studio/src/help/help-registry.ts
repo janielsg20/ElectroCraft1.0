@@ -447,8 +447,12 @@ const studioDefinitions = Object.freeze([
       'impacto de datos',
       'renombrar campo',
       'eliminar campo',
+      'taxonomías',
+      'términos',
+      'jerarquía',
+      'taxonomy_terms',
     ],
-    learnMoreRef: '.ai/microphases/M08_8.md',
+    learnMoreRef: '.ai/microphases/M08_10.md',
   },
 ] as const satisfies readonly HelpDefinition[]);
 

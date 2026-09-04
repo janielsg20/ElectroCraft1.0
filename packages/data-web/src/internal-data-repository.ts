@@ -8,8 +8,16 @@ import type {
   InternalDataRecordUpdate,
   InternalDataRepository,
   InternalDataSourceStats,
+  InternalTaxonomyTermInput,
+  InternalTaxonomyTermUpdate,
 } from '@electrocraft/application';
-import { electroCraftDataSchemaSchema, type ElectroCraftDataSchema, type JsonValue } from '@electrocraft/domain';
+import {
+  electroCraftDataSchemaSchema,
+  electroTaxonomyTermSchema,
+  type ElectroCraftDataSchema,
+  type ElectroTaxonomyTerm,
+  type JsonValue,
+} from '@electrocraft/domain';
 import { and, asc, count, eq } from 'drizzle-orm';
 import type { StudioProjectDatabase } from './repository';
 import * as schema from './schema';
@@ -35,6 +43,17 @@ function toRecord(row: typeof schema.contentRecords.$inferSelect): InternalDataR
     state: row.state,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
+  });
+}
+
+function toTaxonomyTerm(row: typeof schema.taxonomyTerms.$inferSelect): ElectroTaxonomyTerm {
+  return electroTaxonomyTermSchema.parse({
+    id: row.id,
+    taxonomyRef: row.taxonomyId,
+    slug: row.slug,
+    name: row.name,
+    parentId: row.parentId,
+    metadata: row.metadata,
   });
 }
 
@@ -106,8 +125,8 @@ export function createDrizzleInternalDataRepository(db: StudioProjectDatabase): 
   ): Promise<readonly DataSourceResourceDescriptor[]> {
     const dataSchema = await getSchema(projectIdInput, sourceIdInput);
     if (!dataSchema) return Object.freeze([]);
-    return Object.freeze(
-      dataSchema.models.map((model) =>
+    return Object.freeze([
+      ...dataSchema.models.map((model) =>
         Object.freeze({
           id: model.id,
           label: model.label,
@@ -219,7 +238,45 @@ export function createDrizzleInternalDataRepository(db: StudioProjectDatabase): 
           }),
         }),
       ),
-    );
+      ...(dataSchema.taxonomies ?? []).map((taxonomy) =>
+        Object.freeze({
+          id: `taxonomy:${taxonomy.id}`,
+          label: taxonomy.label,
+          kind: 'taxonomy',
+          operations: Object.freeze([
+            Object.freeze({
+              id: 'read',
+              label: 'Listar términos',
+              capability: 'read' as const,
+              parameters: Object.freeze([]),
+              inputSchema: null,
+            }),
+            Object.freeze({
+              id: 'create',
+              label: 'Crear término',
+              capability: 'create' as const,
+              parameters: Object.freeze([]),
+              inputSchema: null,
+            }),
+            Object.freeze({
+              id: 'update',
+              label: 'Actualizar término',
+              capability: 'update' as const,
+              parameters: Object.freeze([]),
+              inputSchema: null,
+            }),
+            Object.freeze({
+              id: 'delete',
+              label: 'Eliminar término',
+              capability: 'delete' as const,
+              parameters: Object.freeze([]),
+              inputSchema: null,
+            }),
+          ]),
+          metadata: Object.freeze({ taxonomyId: taxonomy.id, hierarchical: taxonomy.hierarchical }),
+        }),
+      ),
+    ]);
   }
 
   async function queryRecords(
@@ -324,13 +381,13 @@ export function createDrizzleInternalDataRepository(db: StudioProjectDatabase): 
 
   async function getStats(projectIdInput: string, sourceIdInput: string): Promise<InternalDataSourceStats> {
     const projectId = requireNonEmpty(projectIdInput, 'projectId');
-    const resources = await listResources(projectId, sourceIdInput);
+    const dataSchema = await getSchema(projectId, sourceIdInput);
     const recordCount = await db
       .select({ value: count(schema.contentRecords.id) })
       .from(schema.contentRecords)
       .where(eq(schema.contentRecords.projectId, projectId));
     return Object.freeze({
-      modelCount: resources.length,
+      modelCount: dataSchema?.models.length ?? 0,
       recordCount: Number(recordCount[0]?.value ?? 0),
     });
   }
@@ -357,6 +414,181 @@ export function createDrizzleInternalDataRepository(db: StudioProjectDatabase): 
     return Object.freeze({ modelId, fieldKey, recordCount: rows.length, populatedCount });
   }
 
+  async function requireTaxonomy(projectId: string, sourceId: string, taxonomyId: string) {
+    const dataSchema = await getSchema(projectId, sourceId);
+    const taxonomy = dataSchema?.taxonomies?.find(({ id }) => id === taxonomyId) ?? null;
+    if (!taxonomy) throw new Error(`Taxonomía interna no encontrada: ${taxonomyId}.`);
+    return taxonomy;
+  }
+
+  async function listTaxonomyTerms(
+    projectIdInput: string,
+    sourceIdInput: string,
+    taxonomyIdInput: string,
+  ): Promise<readonly ElectroTaxonomyTerm[]> {
+    const projectId = requireNonEmpty(projectIdInput, 'projectId');
+    const sourceId = requireNonEmpty(sourceIdInput, 'sourceId');
+    const taxonomyId = requireNonEmpty(taxonomyIdInput, 'taxonomyId');
+    await requireTaxonomy(projectId, sourceId, taxonomyId);
+    const rows = await db
+      .select()
+      .from(schema.taxonomyTerms)
+      .where(and(eq(schema.taxonomyTerms.projectId, projectId), eq(schema.taxonomyTerms.taxonomyId, taxonomyId)))
+      .orderBy(asc(schema.taxonomyTerms.name), asc(schema.taxonomyTerms.id));
+    return Object.freeze(rows.map(toTaxonomyTerm));
+  }
+
+  async function validateTermParent(
+    projectId: string,
+    sourceId: string,
+    taxonomyId: string,
+    termId: string,
+    parentId: string | null,
+  ) {
+    const taxonomy = await requireTaxonomy(projectId, sourceId, taxonomyId);
+    if (parentId === null) return;
+    if (!taxonomy.hierarchical) throw new Error('Esta taxonomía no admite jerarquía de términos.');
+    if (parentId === termId) throw new Error('Un término no puede ser su propio padre.');
+    const terms = await listTaxonomyTerms(projectId, sourceId, taxonomyId);
+    const byId = new Map<string, ElectroTaxonomyTerm>(terms.map((term) => [term.id, term]));
+    if (!byId.has(parentId)) throw new Error('El término padre no pertenece a esta taxonomía.');
+    let cursor: string | null = parentId;
+    const visited = new Set<string>();
+    while (cursor !== null) {
+      if (cursor === termId) throw new Error('La jerarquía de términos no puede contener ciclos.');
+      if (visited.has(cursor)) throw new Error('La jerarquía de términos existente contiene un ciclo.');
+      visited.add(cursor);
+      cursor = byId.get(cursor)?.parentId ?? null;
+    }
+  }
+
+  async function assertUniqueTermSlug(projectId: string, taxonomyId: string, slug: string, exceptId?: string) {
+    const rows = await db
+      .select({ id: schema.taxonomyTerms.id })
+      .from(schema.taxonomyTerms)
+      .where(
+        and(
+          eq(schema.taxonomyTerms.projectId, projectId),
+          eq(schema.taxonomyTerms.taxonomyId, taxonomyId),
+          eq(schema.taxonomyTerms.slug, slug),
+        ),
+      );
+    if (rows.some(({ id }) => id !== exceptId)) throw new Error(`Ya existe un término con el slug ${slug}.`);
+  }
+
+  async function createTaxonomyTerm(
+    projectIdInput: string,
+    sourceIdInput: string,
+    taxonomyIdInput: string,
+    input: InternalTaxonomyTermInput,
+  ) {
+    const projectId = requireNonEmpty(projectIdInput, 'projectId');
+    const sourceId = requireNonEmpty(sourceIdInput, 'sourceId');
+    const taxonomyId = requireNonEmpty(taxonomyIdInput, 'taxonomyId');
+    const id = requireNonEmpty(input.id ?? globalThis.crypto.randomUUID(), 'term.id');
+    const slug = requireNonEmpty(input.slug, 'term.slug');
+    const name = requireNonEmpty(input.name, 'term.name');
+    const parentId = input.parentId ?? null;
+    await validateTermParent(projectId, sourceId, taxonomyId, id, parentId);
+    await assertUniqueTermSlug(projectId, taxonomyId, slug);
+    const candidate = electroTaxonomyTermSchema.parse({
+      id,
+      taxonomyRef: taxonomyId,
+      slug,
+      name,
+      parentId,
+      metadata: input.metadata ?? {},
+    });
+    const inserted = await db
+      .insert(schema.taxonomyTerms)
+      .values({
+        projectId,
+        id: candidate.id,
+        taxonomyId: candidate.taxonomyRef,
+        slug: candidate.slug,
+        name: candidate.name,
+        parentId: candidate.parentId,
+        metadata: candidate.metadata,
+      })
+      .returning();
+    if (!inserted[0]) throw new Error('El término no pudo crearse.');
+    return toTaxonomyTerm(inserted[0]);
+  }
+
+  async function updateTaxonomyTerm(
+    projectIdInput: string,
+    sourceIdInput: string,
+    taxonomyIdInput: string,
+    input: InternalTaxonomyTermUpdate,
+  ) {
+    const projectId = requireNonEmpty(projectIdInput, 'projectId');
+    const sourceId = requireNonEmpty(sourceIdInput, 'sourceId');
+    const taxonomyId = requireNonEmpty(taxonomyIdInput, 'taxonomyId');
+    const id = requireNonEmpty(input.id, 'term.id');
+    const slug = requireNonEmpty(input.slug, 'term.slug');
+    const name = requireNonEmpty(input.name, 'term.name');
+    const parentId = input.parentId ?? null;
+    await validateTermParent(projectId, sourceId, taxonomyId, id, parentId);
+    await assertUniqueTermSlug(projectId, taxonomyId, slug, id);
+    const candidate = electroTaxonomyTermSchema.parse({
+      id,
+      taxonomyRef: taxonomyId,
+      slug,
+      name,
+      parentId,
+      metadata: input.metadata ?? {},
+    });
+    const updated = await db
+      .update(schema.taxonomyTerms)
+      .set({ slug: candidate.slug, name: candidate.name, parentId: candidate.parentId, metadata: candidate.metadata })
+      .where(
+        and(
+          eq(schema.taxonomyTerms.projectId, projectId),
+          eq(schema.taxonomyTerms.taxonomyId, taxonomyId),
+          eq(schema.taxonomyTerms.id, id),
+        ),
+      )
+      .returning();
+    if (!updated[0]) throw new Error(`Término no encontrado: ${id}.`);
+    return toTaxonomyTerm(updated[0]);
+  }
+
+  async function deleteTaxonomyTerm(
+    projectIdInput: string,
+    sourceIdInput: string,
+    taxonomyIdInput: string,
+    termIdInput: string,
+  ) {
+    const projectId = requireNonEmpty(projectIdInput, 'projectId');
+    const sourceId = requireNonEmpty(sourceIdInput, 'sourceId');
+    const taxonomyId = requireNonEmpty(taxonomyIdInput, 'taxonomyId');
+    const termId = requireNonEmpty(termIdInput, 'termId');
+    await requireTaxonomy(projectId, sourceId, taxonomyId);
+    const children = await db
+      .select({ id: schema.taxonomyTerms.id })
+      .from(schema.taxonomyTerms)
+      .where(
+        and(
+          eq(schema.taxonomyTerms.projectId, projectId),
+          eq(schema.taxonomyTerms.taxonomyId, taxonomyId),
+          eq(schema.taxonomyTerms.parentId, termId),
+        ),
+      )
+      .limit(1);
+    if (children.length > 0) throw new Error('Mueve o elimina primero los términos hijos.');
+    const deleted = await db
+      .delete(schema.taxonomyTerms)
+      .where(
+        and(
+          eq(schema.taxonomyTerms.projectId, projectId),
+          eq(schema.taxonomyTerms.taxonomyId, taxonomyId),
+          eq(schema.taxonomyTerms.id, termId),
+        ),
+      )
+      .returning({ id: schema.taxonomyTerms.id });
+    return deleted.length > 0;
+  }
+
   return Object.freeze({
     testConnection,
     listResources,
@@ -367,5 +599,9 @@ export function createDrizzleInternalDataRepository(db: StudioProjectDatabase): 
     deleteRecord,
     getStats,
     getFieldUsage,
+    listTaxonomyTerms,
+    createTaxonomyTerm,
+    updateTaxonomyTerm,
+    deleteTaxonomyTerm,
   });
 }
