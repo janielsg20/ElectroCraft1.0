@@ -10,6 +10,7 @@ import {
   type InternalDataRecordInput,
   type InternalDataRecordUpdate,
   type InternalDataRepository,
+  type InternalRelationRepository,
 } from '@electrocraft/application';
 import { createInternalDataSourceAdapter, InternalDataPermissionError } from '@electrocraft/connectors';
 import {
@@ -145,6 +146,52 @@ describe('M08.2 InternalDataSourceAdapter', () => {
         resourceId: 'ec_model_0000000000082',
         operation: 'delete',
         input: { id: 'record-1' },
+      }),
+    ).resolves.toEqual({ deleted: true });
+  });
+
+  it('delegates relation-aware record deletion exactly once to the transactional relation repository', async () => {
+    const source = electroCraftDataSourceDefinitionSchema.parse(fixture('internal-data-source-v1'));
+    const dataSchema = electroCraftDataSchemaSchema.parse(fixture('internal-data-schema-v1'));
+    const baseRepository = createMemoryRepository(dataSchema);
+    const repository: InternalDataRepository = {
+      ...baseRepository,
+      async deleteRecord() {
+        throw new Error('non-atomic fallback delete must not run when relation repository is present');
+      },
+    };
+    const relations: InternalRelationRepository = {
+      async listRelationEdges() {
+        return [];
+      },
+      async createRelationEdge() {
+        throw new Error('not used');
+      },
+      async updateRelationEdge() {
+        throw new Error('not used');
+      },
+      async deleteRelationEdge() {
+        throw new Error('not used');
+      },
+      async prepareRecordDelete() {
+        return true;
+      },
+    };
+    const registry = new ConnectorRegistry();
+    registry.registerAdapter(
+      createInternalDataSourceAdapter({
+        projectId: 'project-m08-2',
+        repository,
+        relations,
+        permissions: { authorize: () => true },
+      }),
+    );
+
+    await expect(
+      registry.mutate(source, 'development', {
+        resourceId: 'ec_model_0000000000082',
+        operation: 'delete',
+        input: { id: 'record-atomic' },
       }),
     ).resolves.toEqual({ deleted: true });
   });
