@@ -42,8 +42,12 @@ jobs:
         run: npm run test:docs
       - name: Lint
         run: npm run lint
+      - name: Verify offline lint/toolchain contract
+        run: npm run lint:offline
       - name: Typecheck
         run: npm run typecheck
+      - name: Verify TypeScript boundaries
+        run: npm run test:boundaries
       - name: Test
         run: npm run test
       - name: Build
