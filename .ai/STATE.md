@@ -22,7 +22,7 @@
 - M08.9 — Group, Repeater, Calculated y Conditional Fields: `IMPLEMENTADA / GREEN MICROFASE`.
 - M08.10 — Taxonomías dentro de Modelos: `IMPLEMENTADA / GREEN MICROFASE`.
 - M08.11 — Relaciones 1:1, 1:N y N:N: `IMPLEMENTADA / GREEN MICROFASE`.
-- M08.12 — CRUD de Registros y validación: `IMPLEMENTADA / PENDIENTE GATE`.
+- M08.12 — CRUD de Registros y validación: `ACTIVE`.
 
 ## Rama activa
 
@@ -45,22 +45,26 @@ Owner: `PGlite generic content store` existente, accesible mediante el adapter i
 - Data Explorer descubre las relaciones como recursos `relation:<id>` detrás del mismo ConnectorRegistry.
 - no se permite un segundo store, un registry paralelo, internals PGlite ni secretos persistidos.
 
-## M08.12 — alcance activo
+## M08.12 — estado de implementación
+
+`IMPLEMENTADA / PENDIENTE GATE`.
 
 Owner: `PGlite generic content store` existente.
 
-- `content_records` continúa como almacenamiento JSON físico estable.
-- cada create/update debe validar contra `ElectroCraftDataSchema` antes de escribir.
-- soft delete debe seguir una policy portable de estado/deletedAt sin DDL dinámico.
-- `Datos > Registros` debe ofrecer DataView/lista en desktop y cards en mobile, con selector de modelo y formulario/detail.
-- ningún write de UI puede saltarse service/adapter/ConnectorRegistry.
+- `content_records` continúa como almacenamiento JSON físico estable y añade únicamente `deletedAt` como policy genérica de soft delete.
+- create/update valida contra `ElectroCraftDataSchema` antes de escribir.
+- soft delete usa `state=deleted` + `deletedAt`, sin DDL dinámico por modelo.
+- `Datos > Registros` ofrece selector de modelo, list/detail, formulario generado y cards adaptadas a mobile.
+- ningún write de UI salta service/adapter/ConnectorRegistry.
+- integridad relacional `restrict/detach/cascade` mantiene atomicidad y comparte la policy soft-delete.
 
 ## Evidencia F08 reciente
 
 - `.ai/evidence/F08/M08.10/CLOSURE_2026-09-04.md`
 - `.ai/evidence/F08/M08.11/IMPLEMENTATION_2026-09-04.md`
 - `.ai/evidence/F08/M08.11/CLOSURE_2026-09-05.md`
+- `.ai/evidence/F08/M08.12/IMPLEMENTATION_2026-09-05.md`
 
 ## Siguiente transición
 
-Iniciar M08.12 desde `main` certificado. Leer `.ai/microphases/M08_12.md`, inspeccionar el CRUD existente de `content_records`, definir la validación canónica y la policy de soft delete sin crear otro store ni otra ruta de persistencia.
+Ejecutar ElectroCraft Base CI completo sobre PR `#79`. Solo con gate GREEN registrar cierre, fusionar y activar la siguiente microfase exacta de F08.
