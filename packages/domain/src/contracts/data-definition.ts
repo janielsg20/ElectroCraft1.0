@@ -258,10 +258,18 @@ export const electroCraftDataSchemaSchema = z
     const taxonomyModelsById = new Map<ElectroCraftObjectId, Set<ElectroCraftObjectId>>();
     for (const [taxonomyIndex, taxonomy] of (schema.taxonomies ?? []).entries()) {
       if (taxonomyIds.has(taxonomy.id)) {
-        context.addIssue({ code: 'custom', path: ['taxonomies', taxonomyIndex, 'id'], message: 'duplicate taxonomy id' });
+        context.addIssue({
+          code: 'custom',
+          path: ['taxonomies', taxonomyIndex, 'id'],
+          message: 'duplicate taxonomy id',
+        });
       }
       if (taxonomyKeys.has(taxonomy.key)) {
-        context.addIssue({ code: 'custom', path: ['taxonomies', taxonomyIndex, 'key'], message: 'duplicate taxonomy key' });
+        context.addIssue({
+          code: 'custom',
+          path: ['taxonomies', taxonomyIndex, 'key'],
+          message: 'duplicate taxonomy key',
+        });
       }
       taxonomyIds.add(taxonomy.id);
       taxonomyKeys.add(taxonomy.key);
@@ -291,10 +299,18 @@ export const electroCraftDataSchemaSchema = z
     const relationsById = new Map<ElectroCraftObjectId, ElectroRelation>();
     for (const [relationIndex, relation] of (schema.relations ?? []).entries()) {
       if (relationIds.has(relation.id)) {
-        context.addIssue({ code: 'custom', path: ['relations', relationIndex, 'id'], message: 'duplicate relation id' });
+        context.addIssue({
+          code: 'custom',
+          path: ['relations', relationIndex, 'id'],
+          message: 'duplicate relation id',
+        });
       }
       if (relationKeys.has(relation.key)) {
-        context.addIssue({ code: 'custom', path: ['relations', relationIndex, 'key'], message: 'duplicate relation key' });
+        context.addIssue({
+          code: 'custom',
+          path: ['relations', relationIndex, 'key'],
+          message: 'duplicate relation key',
+        });
       }
       if (!modelIds.has(relation.sourceModelRef)) {
         context.addIssue({

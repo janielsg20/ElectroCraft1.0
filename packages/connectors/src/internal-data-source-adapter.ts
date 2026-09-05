@@ -248,10 +248,34 @@ export class InternalDataSourceAdapter implements DataSourceAdapter {
         label: relation.label,
         kind: 'relation',
         operations: Object.freeze([
-          Object.freeze({ id: 'read', label: 'Listar vínculos', capability: 'read' as const, parameters: [], inputSchema: null }),
-          Object.freeze({ id: 'create', label: 'Crear vínculo', capability: 'create' as const, parameters: [], inputSchema: null }),
-          Object.freeze({ id: 'update', label: 'Actualizar vínculo', capability: 'update' as const, parameters: [], inputSchema: null }),
-          Object.freeze({ id: 'delete', label: 'Eliminar vínculo', capability: 'delete' as const, parameters: [], inputSchema: null }),
+          Object.freeze({
+            id: 'read',
+            label: 'Listar vínculos',
+            capability: 'read' as const,
+            parameters: [],
+            inputSchema: null,
+          }),
+          Object.freeze({
+            id: 'create',
+            label: 'Crear vínculo',
+            capability: 'create' as const,
+            parameters: [],
+            inputSchema: null,
+          }),
+          Object.freeze({
+            id: 'update',
+            label: 'Actualizar vínculo',
+            capability: 'update' as const,
+            parameters: [],
+            inputSchema: null,
+          }),
+          Object.freeze({
+            id: 'delete',
+            label: 'Eliminar vínculo',
+            capability: 'delete' as const,
+            parameters: [],
+            inputSchema: null,
+          }),
         ]),
         metadata: Object.freeze({
           relationId: relation.id,

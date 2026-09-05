@@ -35,7 +35,11 @@ export const electroRelationSchema = z
   })
   .superRefine((relation, context) => {
     if (relation.inverse?.key === relation.key) {
-      context.addIssue({ code: 'custom', path: ['inverse', 'key'], message: 'inverse relation key must differ from relation key' });
+      context.addIssue({
+        code: 'custom',
+        path: ['inverse', 'key'],
+        message: 'inverse relation key must differ from relation key',
+      });
     }
   });
 export type ElectroRelation = z.infer<typeof electroRelationSchema>;

@@ -622,10 +622,13 @@ export const dataModelWorkspaceRuntime = Object.freeze({
         if (!row || Array.isArray(row) || typeof row !== 'object') return [];
         const record = row as Record<string, JsonValue>;
         if (typeof record.id !== 'string') return [];
-        const data = record.data && !Array.isArray(record.data) && typeof record.data === 'object'
-          ? (record.data as Record<string, JsonValue>)
-          : {};
-        const preferred = [data.name, data.title, data.label].find((value) => typeof value === 'string' && value.trim());
+        const data =
+          record.data && !Array.isArray(record.data) && typeof record.data === 'object'
+            ? (record.data as Record<string, JsonValue>)
+            : {};
+        const preferred = [data.name, data.title, data.label].find(
+          (value) => typeof value === 'string' && value.trim(),
+        );
         return [{ id: record.id, label: typeof preferred === 'string' ? preferred : record.id }];
       }),
     );

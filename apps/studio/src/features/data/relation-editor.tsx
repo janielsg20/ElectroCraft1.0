@@ -282,7 +282,7 @@ export function RelationEditor({ model, models, relations }: RelationEditorProps
                   </select>
                 </label>
                 <label>
-                  Clave inversa
+                  Inverso · clave
                   <Input
                     value={draft.inverseKey}
                     placeholder="productos"
@@ -290,7 +290,7 @@ export function RelationEditor({ model, models, relations }: RelationEditorProps
                   />
                 </label>
                 <label>
-                  Etiqueta inversa
+                  Inverso · etiqueta
                   <Input
                     value={draft.inverseLabel}
                     placeholder="Productos"

@@ -34,7 +34,11 @@ function toEdge(row: typeof schema.relationEdges.$inferSelect): ElectroRelationE
   });
 }
 
-async function getSchema(db: StudioProjectDatabase, projectId: string, sourceId: string): Promise<ElectroCraftDataSchema> {
+async function getSchema(
+  db: StudioProjectDatabase,
+  projectId: string,
+  sourceId: string,
+): Promise<ElectroCraftDataSchema> {
   const rows = await db
     .select({ payload: schema.projectObjects.payload })
     .from(schema.projectObjects)
@@ -238,11 +242,9 @@ export function createDrizzleInternalRelationRepository(db: StudioProjectDatabas
     const dataSchema = await getSchema(db, projectId, sourceId);
     const relations = new Map((dataSchema.relations ?? []).map((relation) => [relation.id, relation]));
     if (relations.size === 0) return;
-    const edges = (await db
-      .select()
-      .from(schema.relationEdges)
-      .where(eq(schema.relationEdges.projectId, projectId)))
-      .map(toEdge);
+    const edges = (
+      await db.select().from(schema.relationEdges).where(eq(schema.relationEdges.projectId, projectId))
+    ).map(toEdge);
 
     const visited = new Set<string>();
     const cascadeNodes = new Map<string, { modelId: string; recordId: string }>();

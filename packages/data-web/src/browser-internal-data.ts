@@ -82,7 +82,7 @@ export function createBrowserInternalDataRepositoryPort(
     return operation(relationRepository);
   };
 
-  const relations: InternalRelationRepository = Object.freeze({
+  const relations = Object.freeze({
     listRelationEdges: (projectId, sourceId, relationId, query) =>
       relationDelegate((active) => active.listRelationEdges(projectId, sourceId, relationId, query)),
     createRelationEdge: (projectId, sourceId, relationId, input) =>
@@ -93,7 +93,7 @@ export function createBrowserInternalDataRepositoryPort(
       relationDelegate((active) => active.deleteRelationEdge(projectId, sourceId, relationId, edgeId)),
     prepareRecordDelete: (projectId, sourceId, modelId, recordId) =>
       relationDelegate((active) => active.prepareRecordDelete(projectId, sourceId, modelId, recordId)),
-  });
+  } satisfies InternalRelationRepository);
 
   const port: BrowserInternalDataRepositoryPort = {
     offlineCapable: true,
@@ -104,7 +104,8 @@ export function createBrowserInternalDataRepositoryPort(
     queryRecords: (projectId, modelId, query) => delegate((active) => active.queryRecords(projectId, modelId, query)),
     createRecord: (projectId, modelId, input) => delegate((active) => active.createRecord(projectId, modelId, input)),
     updateRecord: (projectId, modelId, input) => delegate((active) => active.updateRecord(projectId, modelId, input)),
-    deleteRecord: (projectId, modelId, recordId) => delegate((active) => active.deleteRecord(projectId, modelId, recordId)),
+    deleteRecord: (projectId, modelId, recordId) =>
+      delegate((active) => active.deleteRecord(projectId, modelId, recordId)),
     getStats: (projectId, sourceId) => delegate((active) => active.getStats(projectId, sourceId)),
     getFieldUsage: (projectId, modelId, fieldKey) =>
       delegate((active) => active.getFieldUsage(projectId, modelId, fieldKey)),
