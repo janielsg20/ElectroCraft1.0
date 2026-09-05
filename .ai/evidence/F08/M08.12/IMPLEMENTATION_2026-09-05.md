@@ -43,6 +43,12 @@ Estado: `IMPLEMENTADA / PENDIENTE GATE`.
 - `tooling/vitest/contract/m08-12-record-boundary.test.ts`;
 - `tooling/playwright/m08-12-records.spec.ts`.
 
+## Correcciones observadas durante el gate
+
+- Base CI `#904` detectó que la continuidad no conservaba el token canónico `ACTIVE`; se restauró `M08.12 — ACTIVE` sin declarar cierre.
+- Base CI `#905` pasó convenciones documentales y detectó exclusivamente formato Prettier en siete archivos; el candidate fue normalizado con el formatter bloqueado del repositorio en `eac228c5ec65bc885baed15509e49ff43485cfea`.
+- Base CI `#906` quedó como `action_required` porque el commit de formato fue emitido por `github-actions[bot]`; no representa un fallo de código. Este commit normal del repositorio vuelve a disparar la certificación con el actor autorizado.
+
 ## Gate
 
-Pendiente de PR y ElectroCraft Base CI completo. No declarar cierre hasta GREEN.
+PR `#79` abierta. Pendiente de ElectroCraft Base CI completo sobre el candidate actual. No declarar cierre hasta GREEN.
