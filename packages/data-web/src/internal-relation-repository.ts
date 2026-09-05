@@ -239,12 +239,24 @@ export function createDrizzleInternalRelationRepository(db: StudioProjectDatabas
     const sourceId = requireNonEmpty(sourceIdInput, 'sourceId');
     const modelId = requireNonEmpty(modelIdInput, 'modelId');
     const recordId = requireNonEmpty(recordIdInput, 'recordId');
+    const root = await db
+      .select({ id: schema.contentRecords.id })
+      .from(schema.contentRecords)
+      .where(
+        and(
+          eq(schema.contentRecords.projectId, projectId),
+          eq(schema.contentRecords.modelId, modelId),
+          eq(schema.contentRecords.id, recordId),
+        ),
+      )
+      .limit(1);
+    if (!root[0]) return false;
+
     const dataSchema = await getSchema(db, projectId, sourceId);
     const relations = new Map((dataSchema.relations ?? []).map((relation) => [relation.id, relation]));
-    if (relations.size === 0) return;
-    const edges = (
-      await db.select().from(schema.relationEdges).where(eq(schema.relationEdges.projectId, projectId))
-    ).map(toEdge);
+    const edges = relations.size
+      ? (await db.select().from(schema.relationEdges).where(eq(schema.relationEdges.projectId, projectId))).map(toEdge)
+      : [];
 
     const visited = new Set<string>();
     const cascadeNodes = new Map<string, { modelId: string; recordId: string }>();
@@ -277,7 +289,7 @@ export function createDrizzleInternalRelationRepository(db: StudioProjectDatabas
     }
 
     visit(modelId, recordId);
-    await db.transaction(async (tx) => {
+    return db.transaction(async (tx) => {
       for (const edgeId of edgeIds) {
         await tx
           .delete(schema.relationEdges)
@@ -294,6 +306,17 @@ export function createDrizzleInternalRelationRepository(db: StudioProjectDatabas
             ),
           );
       }
+      const deletedRoot = await tx
+        .delete(schema.contentRecords)
+        .where(
+          and(
+            eq(schema.contentRecords.projectId, projectId),
+            eq(schema.contentRecords.modelId, modelId),
+            eq(schema.contentRecords.id, recordId),
+          ),
+        )
+        .returning({ id: schema.contentRecords.id });
+      return deletedRoot.length > 0;
     });
   }
 

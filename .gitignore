@@ -11,4 +11,5 @@ test-results/
 /COMPLETE_PACKAGE_MANIFEST.md
 /FILES.sha256
 /PATCH_BASE.txt
+/.tmp-*.log
 *.tsbuildinfo

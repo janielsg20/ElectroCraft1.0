@@ -23,7 +23,7 @@ import {
 import * as storageSchema from '../../../packages/data-web/src/schema';
 
 describe('M08.11 relations through ConnectorRegistry and PGlite', () => {
-  it('persists relation_edges, enforces 1:N, delete integrity and permissions', async () => {
+  it('persists relation_edges, enforces cardinality, atomic delete integrity and permissions', async () => {
     const client = await PGlite.create();
     try {
       await applyStudioStorageMigrations(client);
@@ -202,6 +202,59 @@ describe('M08.11 relations through ConnectorRegistry and PGlite', () => {
         }),
       ).resolves.toEqual({ deleted: true });
       await expect(registry.query(source, 'development', { resourceId })).resolves.toEqual([]);
+
+      const cascadeSchema = electroCraftDataSchemaSchema.parse({
+        ...detachedSchema,
+        version: 3,
+        relations: [{ ...relation, deleteBehavior: 'cascade' }],
+      });
+      await db
+        .update(storageSchema.projectObjects)
+        .set({ payload: cascadeSchema, checksum: 'm08-11-schema-fixture-v3' })
+        .where(eq(storageSchema.projectObjects.objectId, dataSchema.id));
+
+      await registry.mutate(source, 'development', {
+        resourceId: sourceModel.id,
+        operation: 'create',
+        input: { id: 'order-cascade', data: { name: 'Pedido cascada' } },
+      });
+      await registry.mutate(source, 'development', {
+        resourceId: targetModel.id,
+        operation: 'create',
+        input: { id: 'customer-cascade', data: { name: 'Cliente cascada' } },
+      });
+      await registry.mutate(source, 'development', {
+        resourceId,
+        operation: 'create',
+        input: {
+          id: 'edge-cascade',
+          fromRecordId: 'order-cascade',
+          toRecordId: 'customer-cascade',
+          payload: {},
+        },
+      });
+
+      await expect(
+        registry.mutate(source, 'development', {
+          resourceId: sourceModel.id,
+          operation: 'delete',
+          input: { id: 'order-cascade' },
+        }),
+      ).resolves.toEqual({ deleted: true });
+      await expect(registry.query(source, 'development', { resourceId })).resolves.toEqual([]);
+      await expect(
+        registry.query(source, 'development', {
+          resourceId: targetModel.id,
+          input: { filter: { field: 'name', value: 'Cliente cascada' } },
+        }),
+      ).resolves.toMatchObject({ total: 0, rows: [] });
+      await expect(
+        registry.mutate(source, 'development', {
+          resourceId: sourceModel.id,
+          operation: 'delete',
+          input: { id: 'missing-record' },
+        }),
+      ).resolves.toEqual({ deleted: false });
 
       const denied = new ConnectorRegistry();
       denied.registerAdapter(

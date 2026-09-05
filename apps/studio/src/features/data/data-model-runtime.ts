@@ -531,6 +531,9 @@ export const dataModelWorkspaceRuntime = Object.freeze({
     if (edges.length > 0 && (patch.targetModelRef ?? relation.targetModelRef) !== relation.targetModelRef) {
       throw new Error('Elimina los vínculos existentes antes de cambiar el modelo de destino.');
     }
+    if (edges.length > 0 && patch.cardinality !== undefined && patch.cardinality !== relation.cardinality) {
+      throw new Error('Elimina los vínculos existentes antes de cambiar la cardinalidad.');
+    }
     const nextRelation = electroRelationSchema.parse({ ...relation, ...patch, id: relation.id });
     const nextSchema = electroCraftDataSchemaSchema.parse({
       ...current.schema,

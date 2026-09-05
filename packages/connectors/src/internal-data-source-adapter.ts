@@ -393,15 +393,15 @@ export class InternalDataSourceAdapter implements DataSourceAdapter {
       })) as unknown as JsonValue;
     }
     const recordId = parseDeleteId(request.input);
-    await this.options.relations?.prepareRecordDelete(
-      this.options.projectId,
-      context.source.id,
-      request.resourceId,
-      recordId,
-    );
-    return Object.freeze({
-      deleted: await this.options.repository.deleteRecord(this.options.projectId, request.resourceId, recordId),
-    }) as unknown as JsonValue;
+    const deleted = this.options.relations
+      ? await this.options.relations.prepareRecordDelete(
+          this.options.projectId,
+          context.source.id,
+          request.resourceId,
+          recordId,
+        )
+      : await this.options.repository.deleteRecord(this.options.projectId, request.resourceId, recordId);
+    return Object.freeze({ deleted }) as unknown as JsonValue;
   }
 }
 

@@ -13,9 +13,12 @@ describe('M08.11 relation architecture boundary', () => {
     expect(relationRepository).toContain('createDrizzleInternalRelationRepository');
     expect(relationRepository).toContain('validateCardinality');
     expect(relationRepository).toContain('prepareRecordDelete');
+    expect(relationRepository).toContain('deletedRoot.length > 0');
     expect(adapter).toContain('parseRelationResourceId');
     expect(adapter).toContain("'relations'");
+    expect(adapter).toContain('this.options.relations.prepareRecordDelete');
     expect(runtime).toContain('dataSourceWorkspaceRuntime.registry');
+    expect(runtime).toContain('Elimina los vínculos existentes antes de cambiar la cardinalidad.');
     expect(runtime).not.toMatch(/@electric-sql\/pglite|drizzle-orm/);
   });
 
