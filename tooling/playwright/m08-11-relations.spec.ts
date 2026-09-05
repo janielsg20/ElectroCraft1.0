@@ -40,7 +40,7 @@ test('M08.11 define y persiste una relación N:N desde Modelos', async ({ page }
   const definition = page.locator('section').filter({ has: page.getByRole('heading', { name: 'Definición' }) });
   await expect(definition).toBeVisible({ timeout: 60_000 });
   await definition.getByLabel('Nombre').fill('Productos relacionados');
-  await definition.getByLabel('Clave').fill('related-products');
+  await definition.getByLabel('Clave', { exact: true }).fill('related-products');
   await definition.getByLabel('Tipo de relación').selectOption('many-to-many');
   await definition.getByLabel('Integridad al eliminar').selectOption('detach');
   await definition.getByLabel('Clave inversa').fill('related-from');

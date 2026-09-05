@@ -281,8 +281,9 @@ export function RelationEditor({ model, models, relations }: RelationEditorProps
                     <option value="cascade">Cascada</option>
                   </select>
                 </label>
+                <div className="ec-relation-field-group-title">Inverso</div>
                 <label>
-                  Inverso · clave
+                  Clave inversa
                   <Input
                     value={draft.inverseKey}
                     placeholder="productos"
@@ -290,7 +291,7 @@ export function RelationEditor({ model, models, relations }: RelationEditorProps
                   />
                 </label>
                 <label>
-                  Inverso · etiqueta
+                  Etiqueta inversa
                   <Input
                     value={draft.inverseLabel}
                     placeholder="Productos"

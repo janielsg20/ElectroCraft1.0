@@ -46,6 +46,15 @@
   margin-top: 12px;
 }
 
+.ec-relation-field-group-title {
+  grid-column: 1 / -1;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .ec-relation-edge-list .ec-field-row {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
 }
