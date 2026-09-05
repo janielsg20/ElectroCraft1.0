@@ -9,6 +9,7 @@ export * from './browser-workspace-preferences';
 export * from './connector-catalog';
 export * from './data-source-repository';
 export * from './internal-data-repository';
+export * from './internal-relation-repository';
 export * from './migration';
 export * from './project-revision-repository';
 export * from './repository';

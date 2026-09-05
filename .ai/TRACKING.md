@@ -21,50 +21,44 @@ Date: 2026-09-04.
 | F08 / M08.7        | IMPLEMENTADA / GREEN MICROFASE                             | PR `#73`; Base CI `33792230116` (#858); merge `7bded471c94bb50009a6b99215d6e02cb3b726b2`; `.ai/evidence/F08/M08.7/CLOSURE_2026-09-03.md` |
 | F08 / M08.8        | IMPLEMENTADA / GREEN MICROFASE                             | PR `#74`; Base CI `33804227049` (#875); merge `8225f3aa5797972265a470f49c8aff75c5bab87c`; `.ai/evidence/F08/M08.8/CLOSURE_2026-09-03.md` |
 | F08 / M08.9        | IMPLEMENTADA / GREEN MICROFASE                             | PR `#75`; Base CI `33812380216` (#878); merge `93440130d8c5fd62f73366925df7695dd309daf3`; `.ai/evidence/F08/M08.9/CLOSURE_2026-09-03.md` |
-| F08 / M08.10       | ACTIVE / CANDIDATA A GATE                                  | `.ai/evidence/F08/M08.10/IMPLEMENTATION_2026-09-04.md`                                                                                   |
+| F08 / M08.10       | IMPLEMENTADA / GREEN MICROFASE                             | PR `#76`; Base CI `33896051996` (#882); merge `78c88b65ef8708575ea2885edf7ad6631a30afce`; `.ai/evidence/F08/M08.10/CLOSURE_2026-09-04.md` |
+| F08 / M08.11       | ACTIVE                                                     | `.ai/evidence/F08/M08.11/IMPLEMENTATION_2026-09-04.md`                                                                                   |
 
 ## Rama activa
 
-`codex/m08-10-taxonomies`
+`codex/m08-11-relations`
 
-## M08.8 — cierre certificado
-
-- Owner: `PGlite generic content store` y schema canónico `ElectroCraftDataModel`.
-- Field Registry portable, modelos persistidos como `data-schema` y registros en `content_records`.
-- Studio incluye `Datos > Modelos`, impacto de datos y `help.content.models`.
-- Base CI `33804227049` (#875) terminó documentación, lint, typecheck, tests, build, Playwright repository gate, empty-repo y artifacts en `success`.
-- PR `#74` se fusionó por squash a `main` en `8225f3aa5797972265a470f49c8aff75c5bab87c`.
-
-## M08.9 — cierre certificado
+## M08.10 — cierre certificado
 
 Owner: `PGlite generic content store`.
 
-- contratos portables para Group/Repeater/Calculated/Conditional y capability `data.advanced-fields`;
-- operaciones calculadas registradas y rule AST condicional sin `eval`;
-- detección de ciclos, dependencias ausentes/cross-scope y validación anidada;
-- normalización create/update detrás de `InternalDataSourceAdapter`/ConnectorRegistry;
-- store físico genérico `content_records`, sin DDL dinámico;
-- Studio con jerarquía indentada, configuración de estructura/dependencias y reordenamiento por botones;
-- unit/contract/integration PGlite verdes; E2E M08.9 preparado para el gate.
-- Base CI `33810318819` (#877) validó todo salvo un locator Playwright ambiguo (`120/121` E2E).
-- La adaptación acotó el assertion al panel Campos; Base CI `33812380216` (#878) terminó completo en `success` y PR `#75` se fusionó a `main`.
+- `ElectroTaxonomy`/`ElectroTaxonomyTerm` portables y refs fail-closed;
+- términos jerárquicos en `taxonomy_terms` mediante `parentId`;
+- adapter/repository detrás del ConnectorRegistry;
+- definición y gestor de términos separados en `Datos > Modelos > <modelo> > Taxonomías`;
+- Base CI `33896051996` (#882) terminó completo en `success` con `123/123` Playwright;
+- PR `#76` se fusionó por squash a `main` en `78c88b65ef8708575ea2885edf7ad6631a30afce`.
 
-## M08.10 — activa
+## M08.11 — estado de implementación
+
+`IMPLEMENTADA / PENDIENTE GATE`.
 
 Owner: `PGlite generic content store`.
 
-- metadata canónica `ElectroTaxonomy` y refs a modelos;
-- términos en `taxonomy_terms`, jerarquía portable mediante `parentId`;
-- definición y administración de términos separadas en `Datos > Modelos > <modelo> > Taxonomías`;
-- adapter/repository detrás del ConnectorRegistry, sin DDL dinámico.
-- implementación candidata: `ElectroTaxonomy`, `ElectroTaxonomyTerm`, capability `taxonomies`, storage v6 con `parent_id`, CRUD jerárquico y UI definición/gestor separados;
-- validación local: lint, typecheck, boundaries, build, Node `41/41` y Vitest `552/552` verdes;
-- E2E M08.10 escrito; la ejecución local quedó bloqueada porque no existe Chromium y su CDN respondió timeout/502.
+- metadata canónica `ElectroRelation` con source/target/cardinality/inverse/delete behavior/permisos;
+- capability canónica `relations`;
+- edges en la tabla genérica existente `relation_edges`, sin nueva migración ni DDL por cardinalidad;
+- validación de `1:1`, `1:N`, `N:N`, duplicados y records destino/origen en aplicación/repositorio;
+- integridad `restrict`, `detach`, `cascade` antes de borrar records;
+- recursos `relation:<id>` expuestos por InternalDataSourceAdapter/ConnectorRegistry y Data Explorer;
+- Studio añade `Datos > Modelos > <modelo> > Relaciones`, definición detallada y selectores de registros;
+- campos `relation` pueden referenciar `relationRef` manteniendo compatibilidad con `relationModelRef`;
+- unit/contract/integration PGlite/E2E preparados; gate completo todavía pendiente.
 
 ## Validación de engine
 
-La API oficial actual de PGlite confirma soporte de Drizzle, persistencia browser, consultas y transacciones. M08.9 reutiliza el mismo JSONB genérico; las expresiones y reglas son lógica portable de ElectroCraft, no ejecución SQL ni código dinámico.
+PGlite/Drizzle siguen siendo el único owner físico. `relation_edges` ya existía en el schema estable; M08.11 añade lógica portable y repositorio sobre esa tabla, no otro motor ni schema físico por relación.
 
 ## Siguiente acción exacta
 
-Publicar una única candidata M08.10 y ejecutar Base CI/Playwright. Si queda verde, registrar cierre, fusionar y activar M08.11; si falla, corregir solo la evidencia observada.
+Ejecutar ElectroCraft Base CI sobre PR `#77`. Con `success`, registrar VALIDATION/CLOSURE, fusionar y activar M08.12. Ante fallo, corregir únicamente la evidencia observada.

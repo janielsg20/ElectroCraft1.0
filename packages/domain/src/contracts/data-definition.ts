@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import { electroRelationSchema, type ElectroRelation } from '../data/relations';
 import type { ElectroCraftDataSourceDefinition } from '../data/source-definition';
 import { electroCraftMetadataSchema, jsonValueSchema } from './json-value';
 import { electroCraftObjectIdSchema, type ElectroCraftObjectId } from './object-id';
@@ -97,6 +98,7 @@ export const electroCraftDataFieldSchema = z
     indexed: z.boolean(),
     faceted: z.boolean(),
     relationModelRef: electroCraftObjectIdSchema.nullable(),
+    relationRef: electroCraftObjectIdSchema.nullable().optional(),
     taxonomyRef: electroCraftObjectIdSchema.nullable().optional(),
     help: z.string().trim().max(500).optional(),
     defaultValue: jsonValueSchema.optional(),
@@ -126,6 +128,13 @@ export const electroCraftDataFieldSchema = z
         code: 'custom',
         path: ['relationModelRef'],
         message: 'relationModelRef is only valid for relation fields',
+      });
+    }
+    if (field.type !== 'relation' && field.relationRef != null) {
+      context.addIssue({
+        code: 'custom',
+        path: ['relationRef'],
+        message: 'relationRef is only valid for relation fields',
       });
     }
     if (field.type !== 'taxonomy' && field.taxonomyRef != null) {
@@ -206,6 +215,7 @@ export const electroCraftDataSchemaSchema = z
     name: z.string().trim().min(1).max(160),
     models: z.array(electroCraftDataModelSchema).min(1).max(200),
     taxonomies: z.array(electroTaxonomySchema).max(200).optional(),
+    relations: z.array(electroRelationSchema).max(500).optional(),
     metadata: electroCraftMetadataSchema,
   })
   .superRefine((schema, context) => {
@@ -284,6 +294,43 @@ export const electroCraftDataSchemaSchema = z
       taxonomyModelsById.set(taxonomy.id, attachedModels);
     }
 
+    const relationIds = new Set<ElectroCraftObjectId>();
+    const relationKeys = new Set<string>();
+    const relationsById = new Map<ElectroCraftObjectId, ElectroRelation>();
+    for (const [relationIndex, relation] of (schema.relations ?? []).entries()) {
+      if (relationIds.has(relation.id)) {
+        context.addIssue({
+          code: 'custom',
+          path: ['relations', relationIndex, 'id'],
+          message: 'duplicate relation id',
+        });
+      }
+      if (relationKeys.has(relation.key)) {
+        context.addIssue({
+          code: 'custom',
+          path: ['relations', relationIndex, 'key'],
+          message: 'duplicate relation key',
+        });
+      }
+      if (!modelIds.has(relation.sourceModelRef)) {
+        context.addIssue({
+          code: 'custom',
+          path: ['relations', relationIndex, 'sourceModelRef'],
+          message: 'relation sourceModelRef must reference a model in the same data schema',
+        });
+      }
+      if (!modelIds.has(relation.targetModelRef)) {
+        context.addIssue({
+          code: 'custom',
+          path: ['relations', relationIndex, 'targetModelRef'],
+          message: 'relation targetModelRef must reference a model in the same data schema',
+        });
+      }
+      relationIds.add(relation.id);
+      relationKeys.add(relation.key);
+      relationsById.set(relation.id, relation);
+    }
+
     for (const [modelIndex, model] of schema.models.entries()) {
       for (const [fieldIndex, field] of model.fields.entries()) {
         if (field.relationModelRef !== null && !modelIds.has(field.relationModelRef)) {
@@ -292,6 +339,22 @@ export const electroCraftDataSchemaSchema = z
             path: ['models', modelIndex, 'fields', fieldIndex, 'relationModelRef'],
             message: 'relationModelRef must reference a model in the same data schema',
           });
+        }
+        if (field.relationRef != null) {
+          const relation = relationsById.get(field.relationRef);
+          if (!relation) {
+            context.addIssue({
+              code: 'custom',
+              path: ['models', modelIndex, 'fields', fieldIndex, 'relationRef'],
+              message: 'relationRef must reference a relation in the same data schema',
+            });
+          } else if (relation.sourceModelRef !== model.id || relation.targetModelRef !== field.relationModelRef) {
+            context.addIssue({
+              code: 'custom',
+              path: ['models', modelIndex, 'fields', fieldIndex, 'relationRef'],
+              message: 'relationRef source/target must match the relation field model refs',
+            });
+          }
         }
         if (field.taxonomyRef != null && !taxonomyIds.has(field.taxonomyRef)) {
           context.addIssue({
@@ -349,4 +412,11 @@ export function getElectroTaxonomy(
   taxonomyRef: ElectroCraftObjectId,
 ): ElectroTaxonomy | null {
   return (schema.taxonomies ?? []).find(({ id }) => id === taxonomyRef) ?? null;
+}
+
+export function getElectroRelation(
+  schema: ElectroCraftDataSchema,
+  relationRef: ElectroCraftObjectId,
+): ElectroRelation | null {
+  return (schema.relations ?? []).find(({ id }) => id === relationRef) ?? null;
 }

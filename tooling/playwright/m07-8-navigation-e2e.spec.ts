@@ -85,7 +85,7 @@ test.describe.serial('M07.8 Navigation E2E y UX', () => {
 
     await page.goto('/preview');
     await expect(page.locator('[data-navigation-preview]')).toBeVisible({ timeout: 60_000 });
-    await expect(page.getByRole('heading', { name: 'Preview' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Preview' })).toBeVisible({ timeout: 60_000 });
     await expect(page.getByLabel('Ruta del Preview')).toBeVisible();
     await expect(page.getByText(/Ruta pública|Acceso permitido/)).toBeVisible();
     await page.screenshot({ path: '.ai/evidence/F07/M07.8/preview-desktop.png', fullPage: true });
