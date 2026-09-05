@@ -1,0 +1,47 @@
+name: Audit runtime patch
+
+on:
+  push:
+    branches: [codex/audit-remediation-2026-09-05]
+    paths:
+      - '.github/workflows/audit-runtime-patch.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: codex/audit-remediation-2026-09-05
+      - name: Guard relation cardinality changes with existing edges
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('apps/studio/src/features/data/data-model-runtime.ts')
+          text = path.read_text()
+          old = """    if (edges.length > 0 && (patch.targetModelRef ?? relation.targetModelRef) !== relation.targetModelRef) {
+              throw new Error('Elimina los vínculos existentes antes de cambiar el modelo de destino.');
+            }
+          """
+          new = """    if (edges.length > 0 && (patch.targetModelRef ?? relation.targetModelRef) !== relation.targetModelRef) {
+              throw new Error('Elimina los vínculos existentes antes de cambiar el modelo de destino.');
+            }
+            if (edges.length > 0 && patch.cardinality !== undefined && patch.cardinality !== relation.cardinality) {
+              throw new Error('Elimina los vínculos existentes antes de cambiar la cardinalidad.');
+            }
+          """
+          if old not in text:
+              raise SystemExit('expected relation update guard was not found')
+          path.write_text(text.replace(old, new, 1))
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/studio/src/features/data/data-model-runtime.ts
+          git commit -m 'fix(M08.11): guard cardinality changes with existing edges'
+          git push origin HEAD:codex/audit-remediation-2026-09-05
