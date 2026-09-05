@@ -182,19 +182,39 @@ function validateScalar(field: ElectroCraftDataField, value: JsonValue | undefin
   if (field.type === 'datetime' && typeof value === 'string' && Number.isNaN(Date.parse(value))) {
     diagnostics.push({ fieldKey: field.key, path, message: `${field.label} no tiene fecha/hora válida.` });
   }
-  if (field.type === 'color' && typeof value === 'string' && !/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(value)) {
+  if (
+    field.type === 'color' &&
+    typeof value === 'string' &&
+    !/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(value)
+  ) {
     diagnostics.push({ fieldKey: field.key, path, message: `${field.label} no tiene un color hexadecimal válido.` });
   }
   if (field.validation?.min !== undefined && typeof value === 'number' && value < field.validation.min) {
-    diagnostics.push({ fieldKey: field.key, path, message: `${field.label} debe ser mayor o igual que ${field.validation.min}.` });
+    diagnostics.push({
+      fieldKey: field.key,
+      path,
+      message: `${field.label} debe ser mayor o igual que ${field.validation.min}.`,
+    });
   }
   if (field.validation?.max !== undefined && typeof value === 'number' && value > field.validation.max) {
-    diagnostics.push({ fieldKey: field.key, path, message: `${field.label} debe ser menor o igual que ${field.validation.max}.` });
+    diagnostics.push({
+      fieldKey: field.key,
+      path,
+      message: `${field.label} debe ser menor o igual que ${field.validation.max}.`,
+    });
   }
-  if (field.validation?.minLength !== undefined && typeof value === 'string' && value.length < field.validation.minLength) {
+  if (
+    field.validation?.minLength !== undefined &&
+    typeof value === 'string' &&
+    value.length < field.validation.minLength
+  ) {
     diagnostics.push({ fieldKey: field.key, path, message: `${field.label} no alcanza la longitud mínima.` });
   }
-  if (field.validation?.maxLength !== undefined && typeof value === 'string' && value.length > field.validation.maxLength) {
+  if (
+    field.validation?.maxLength !== undefined &&
+    typeof value === 'string' &&
+    value.length > field.validation.maxLength
+  ) {
     diagnostics.push({ fieldKey: field.key, path, message: `${field.label} supera la longitud máxima.` });
   }
   if (field.validation?.pattern && typeof value === 'string') {
@@ -203,7 +223,11 @@ function validateScalar(field: ElectroCraftDataField, value: JsonValue | undefin
         diagnostics.push({ fieldKey: field.key, path, message: `${field.label} no cumple el patrón configurado.` });
       }
     } catch {
-      diagnostics.push({ fieldKey: field.key, path, message: `${field.label} tiene un patrón de validación inválido.` });
+      diagnostics.push({
+        fieldKey: field.key,
+        path,
+        message: `${field.label} tiene un patrón de validación inválido.`,
+      });
     }
   }
   return diagnostics;
@@ -228,7 +252,8 @@ function normalizeScope(
   const result: Record<string, JsonValue> = { ...input };
   const diagnostics: AdvancedFieldRuntimeDiagnostic[] = [];
   for (const key of Object.keys(input)) {
-    if (!byKey.has(key)) diagnostics.push({ fieldKey: key, path: `${path}.${key}`, message: `El campo ${key} no existe en el modelo.` });
+    if (!byKey.has(key))
+      diagnostics.push({ fieldKey: key, path: `${path}.${key}`, message: `El campo ${key} no existe en el modelo.` });
   }
   for (const field of scopedFields) {
     if (result[field.key] === undefined && field.defaultValue !== undefined && field.type !== 'calculated') {

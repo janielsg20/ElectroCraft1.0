@@ -1,8 +1,4 @@
-import {
-  electroCraftDataSchemaSchema,
-  type ElectroCraftDataSchema,
-  type JsonValue,
-} from '@electrocraft/domain';
+import { electroCraftDataSchemaSchema, type ElectroCraftDataSchema, type JsonValue } from '@electrocraft/domain';
 import { normalizeElectroCraftAdvancedFieldRecord } from './advanced-field-runtime';
 
 export interface ElectroCraftRecordValidator {

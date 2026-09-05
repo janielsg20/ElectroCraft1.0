@@ -77,7 +77,13 @@ function compareValues(left: JsonValue | undefined, right: JsonValue | undefined
 function normalizeQuery(query: InternalDataQuery | undefined) {
   const offset = Math.max(0, Math.trunc(query?.offset ?? 0));
   const limit = Math.min(200, Math.max(1, Math.trunc(query?.limit ?? 50)));
-  return Object.freeze({ offset, limit, filter: query?.filter, sort: query?.sort, includeDeleted: query?.includeDeleted === true });
+  return Object.freeze({
+    offset,
+    limit,
+    filter: query?.filter,
+    sort: query?.sort,
+    includeDeleted: query?.includeDeleted === true,
+  });
 }
 
 async function schemasForSource(

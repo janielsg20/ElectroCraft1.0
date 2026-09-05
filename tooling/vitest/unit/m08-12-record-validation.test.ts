@@ -15,21 +15,44 @@ function fixture() {
     fields: [
       electroCraftDataFieldSchema.parse({
         id: createDeterministicObjectId('data-field', 'm08-12-name'),
-        key: 'name', label: 'Nombre', type: 'text', nullable: false, required: true,
-        indexed: true, faceted: false, relationModelRef: null,
-        validation: { minLength: 3, pattern: '^[A-Z]' }, metadata: {},
+        key: 'name',
+        label: 'Nombre',
+        type: 'text',
+        nullable: false,
+        required: true,
+        indexed: true,
+        faceted: false,
+        relationModelRef: null,
+        validation: { minLength: 3, pattern: '^[A-Z]' },
+        metadata: {},
       }),
       electroCraftDataFieldSchema.parse({
         id: createDeterministicObjectId('data-field', 'm08-12-price'),
-        key: 'price', label: 'Precio', type: 'number', nullable: false,
-        indexed: true, faceted: false, relationModelRef: null,
-        validation: { min: 0 }, defaultValue: 0, metadata: {},
+        key: 'price',
+        label: 'Precio',
+        type: 'number',
+        nullable: false,
+        indexed: true,
+        faceted: false,
+        relationModelRef: null,
+        validation: { min: 0 },
+        defaultValue: 0,
+        metadata: {},
       }),
       electroCraftDataFieldSchema.parse({
         id: createDeterministicObjectId('data-field', 'm08-12-status'),
-        key: 'status', label: 'Estado', type: 'select', nullable: false,
-        indexed: true, faceted: true, relationModelRef: null,
-        options: [{ label: 'Activo', value: 'active' }, { label: 'Pausado', value: 'paused' }], metadata: {},
+        key: 'status',
+        label: 'Estado',
+        type: 'select',
+        nullable: false,
+        indexed: true,
+        faceted: true,
+        relationModelRef: null,
+        options: [
+          { label: 'Activo', value: 'active' },
+          { label: 'Pausado', value: 'paused' },
+        ],
+        metadata: {},
       }),
     ],
     metadata: {},
@@ -39,7 +62,9 @@ function fixture() {
     id: createDeterministicObjectId('data-schema', 'm08-12-schema'),
     version: 3,
     sourceRef: createDeterministicObjectId('data-source', 'm08-12-source'),
-    name: 'ElectroCraft Data', models: [model], metadata: {},
+    name: 'ElectroCraft Data',
+    models: [model],
+    metadata: {},
   });
   return { model, schema };
 }
@@ -49,7 +74,11 @@ describe('M08.12 record validation compiler', () => {
     const { model, schema } = fixture();
     const validator = compileElectroCraftRecordValidator(schema, model.id);
     expect(validator).toMatchObject({ schemaId: schema.id, schemaVersion: 3, modelId: model.id });
-    expect(validator.validate({ name: 'Mesa', status: 'active' })).toEqual({ name: 'Mesa', price: 0, status: 'active' });
+    expect(validator.validate({ name: 'Mesa', status: 'active' })).toEqual({
+      name: 'Mesa',
+      price: 0,
+      status: 'active',
+    });
   });
 
   it('fails closed for required, pattern, option, numeric and unknown-field violations', () => {
