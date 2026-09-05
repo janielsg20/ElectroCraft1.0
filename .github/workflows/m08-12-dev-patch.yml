@@ -1,0 +1,80 @@
+name: M08.12 Dev Patch
+
+on:
+  push:
+    branches: [codex/m08-12-record-crud-validation]
+    paths:
+      - '.github/workflows/m08-12-dev-patch.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    name: Apply M08.12 implementation batch
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: codex/m08-12-record-crud-validation
+          fetch-depth: 0
+      - name: Apply implementation patch
+        run: python tooling/m08-12-dev-patch.py
+      - name: Apply final safety refinements
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          advanced = Path('packages/connectors/src/advanced-field-runtime.ts')
+          text = advanced.read_text()
+          text = text.replace(
+              'function optionMatches(left: JsonValue, right: string | number | boolean) {',
+              'function optionMatches(left: JsonValue | undefined, right: string | number | boolean) {',
+          )
+          advanced.write_text(text)
+
+          adapter = Path('packages/connectors/src/internal-data-source-adapter.ts')
+          text = adapter.read_text()
+          text = text.replace(
+              "  return Object.freeze({\n    ...(typeof input.id === 'string' ? { id: input.id } : {}),\n    data: Object.freeze({ ...data }),\n    ...(typeof input.state === 'string' ? { state: input.state } : {}),\n  });",
+              "  if (input.state === 'deleted') throw new TypeError('El estado deleted está reservado para la política de borrado.');\n  return Object.freeze({\n    ...(typeof input.id === 'string' ? { id: input.id } : {}),\n    data: Object.freeze({ ...data }),\n    ...(typeof input.state === 'string' ? { state: input.state } : {}),\n  });",
+              1,
+          )
+          text = text.replace(
+              "  return Object.freeze({\n    id: input.id,\n    data: Object.freeze({ ...data }),\n    ...(typeof input.state === 'string' ? { state: input.state } : {}),\n  });",
+              "  if (input.state === 'deleted') throw new TypeError('El estado deleted está reservado para la política de borrado.');\n  return Object.freeze({\n    id: input.id,\n    data: Object.freeze({ ...data }),\n    ...(typeof input.state === 'string' ? { state: input.state } : {}),\n  });",
+              1,
+          )
+          adapter.write_text(text)
+
+          records = Path('apps/studio/src/features/data/records-workspace.tsx')
+          text = records.read_text()
+          text = text.replace(
+              "onChange={(event) => onValue(Array.from(event.currentTarget.selectedOptions).map(({ value }) => value))}",
+              "onChange={(event) => onValue(Array.from(event.currentTarget.selectedOptions).map(({ value }) => field.options?.find((option) => String(option.value) === value)?.value ?? value))}",
+          )
+          text = text.replace(
+              "onChange={(event) => onValue(event.target.value)}>",
+              "onChange={(event) => { const next = field.options?.find((option) => String(option.value) === event.target.value)?.value; onValue(event.target.value === '' ? undefined : (next ?? event.target.value)); }}>",
+              1,
+          )
+          records.write_text(text)
+
+          relations = Path('packages/data-web/src/internal-relation-repository.ts')
+          text = relations.read_text()
+          marker = "eq(schema.contentRecords.id, recordId),\n        ),\n      )\n      .limit(1);\n    if (!root[0]) return false;"
+          replacement = "eq(schema.contentRecords.id, recordId),\n          isNull(schema.contentRecords.deletedAt),\n        ),\n      )\n      .limit(1);\n    if (!root[0]) return false;"
+          if marker in text:
+              text = text.replace(marker, replacement, 1)
+          relations.write_text(text)
+          PY
+      - name: Remove temporary patch tooling
+        run: rm -f tooling/m08-12-dev-patch.py .github/workflows/m08-12-dev-patch.yml
+      - name: Commit implementation
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "feat(M08.12): add validated record CRUD and soft delete"
+          git push origin HEAD:codex/m08-12-record-crud-validation
