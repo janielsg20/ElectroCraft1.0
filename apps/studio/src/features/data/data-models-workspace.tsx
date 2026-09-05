@@ -6,6 +6,7 @@ import { HelpTrigger } from '../../help/help-ui';
 import { AdvancedFieldEditor } from './advanced-field-editor';
 import { orderAdvancedFieldsForDisplay } from './advanced-field-model';
 import { dataModelWorkspaceRuntime, type DataFieldImpact } from './data-model-runtime';
+import { RelationEditor } from './relation-editor';
 import { TaxonomyEditor } from './taxonomy-editor';
 import './data-models-workspace.css';
 
@@ -15,6 +16,8 @@ interface FieldDraft {
   readonly type: ElectroCraftDataFieldType;
   readonly required: boolean;
   readonly indexed: boolean;
+  readonly relationModelRef: ElectroCraftObjectId | null;
+  readonly relationRef: ElectroCraftObjectId | null;
   readonly taxonomyRef: ElectroCraftObjectId | null;
 }
 
@@ -25,6 +28,8 @@ function fieldDraft(field: ElectroCraftDataField): FieldDraft {
     type: field.type,
     required: field.required ?? !field.nullable,
     indexed: field.indexed,
+    relationModelRef: field.relationModelRef,
+    relationRef: field.relationRef ?? null,
     taxonomyRef: field.taxonomyRef ?? null,
   };
 }
@@ -99,7 +104,8 @@ export function DataModelsWorkspace() {
           required: fieldState.required,
           indexed: descriptor.supportsIndexing ? fieldState.indexed : false,
           faceted: selectedField.faceted && descriptor.supportsIndexing && fieldState.indexed,
-          relationModelRef: fieldState.type === 'relation' ? (selectedField.relationModelRef ?? model.id) : null,
+          relationModelRef: fieldState.type === 'relation' ? (fieldState.relationModelRef ?? model.id) : null,
+          relationRef: fieldState.type === 'relation' ? fieldState.relationRef : null,
           taxonomyRef: fieldState.type === 'taxonomy' ? fieldState.taxonomyRef : null,
           metadata: {
             ...selectedField.metadata,
@@ -222,6 +228,7 @@ export function DataModelsWorkspace() {
               <TabsTrigger value="identity">Identidad</TabsTrigger>
               <TabsTrigger value="fields">Campos</TabsTrigger>
               <TabsTrigger value="taxonomies">Taxonomías</TabsTrigger>
+              <TabsTrigger value="relations">Relaciones</TabsTrigger>
               <TabsTrigger value="validation">Validación</TabsTrigger>
               <TabsTrigger value="templates">Plantillas</TabsTrigger>
               <TabsTrigger value="workflow">Workflow</TabsTrigger>
@@ -435,6 +442,35 @@ export function DataModelsWorkspace() {
                             ))}
                           </select>
                         </label>
+                        {fieldState.type === 'relation' ? (
+                          <label>
+                            Relación
+                            <select
+                              aria-label="Relación del campo"
+                              value={fieldState.relationRef ?? ''}
+                              onChange={(event) => {
+                                const relation = snapshot.relations.find(({ id }) => id === event.target.value);
+                                setFieldState({
+                                  ...fieldState,
+                                  relationRef: relation?.id ?? null,
+                                  relationModelRef: relation?.targetModelRef ?? fieldState.relationModelRef ?? model.id,
+                                });
+                              }}
+                            >
+                              <option value="">Referencia simple</option>
+                              {snapshot.relations
+                                .filter(({ sourceModelRef }) => sourceModelRef === model.id)
+                                .map((relation) => {
+                                  const target = snapshot.models.find(({ id }) => id === relation.targetModelRef);
+                                  return (
+                                    <option key={relation.id} value={relation.id}>
+                                      {relation.label} · {target?.label ?? relation.targetModelRef}
+                                    </option>
+                                  );
+                                })}
+                            </select>
+                          </label>
+                        ) : null}
                         {fieldState.type === 'taxonomy' ? (
                           <label>
                             Taxonomía
@@ -540,6 +576,10 @@ export function DataModelsWorkspace() {
               <TaxonomyEditor model={model} models={snapshot.models} taxonomies={snapshot.taxonomies} />
             </TabsContent>
 
+            <TabsContent value="relations" className="ec-model-tab-content">
+              <RelationEditor model={model} models={snapshot.models} relations={snapshot.relations} />
+            </TabsContent>
+
             <TabsContent value="validation" className="ec-model-tab-content">
               <section className="ec-model-panel">
                 <h3>Validación</h3>
@@ -566,8 +606,8 @@ export function DataModelsWorkspace() {
                   acoplarla al store físico.
                 </p>
                 <p>
-                  Taxonomías y Relaciones se mantienen como referencias canónicas; las taxonomías se administran en su
-                  sección y las relaciones avanzadas pertenecen a M08.11.
+                  Taxonomías y relaciones se mantienen como referencias canónicas y se administran en sus secciones
+                  dedicadas.
                 </p>
               </section>
             </TabsContent>
@@ -594,7 +634,10 @@ export function DataModelsWorkspace() {
             <TabsContent value="storage" className="ec-model-tab-content">
               <section className="ec-model-panel">
                 <h3>Almacenamiento</h3>
-                <p>PGlite + Drizzle usan `content_records` como store genérico. No existe DDL dinámico por modelo.</p>
+                <p>
+                  PGlite + Drizzle usan `content_records` y `relation_edges` como stores genéricos. No existe DDL
+                  dinámico por modelo o cardinalidad.
+                </p>
                 <div className="ec-storage-list">
                   {model.fields.map((field) => (
                     <span key={field.id}>

@@ -40,10 +40,23 @@ async function readDocuments(page: Page, projectId: string): Promise<StoredDocum
 }
 
 async function dispatch(page: Page, action: Record<string, unknown>) {
-  await page.evaluate(async (nextAction) => {
-    const { studioPuckEditorCommands } = await import('/src/features/editor/puck-editor-runtime.ts');
-    studioPuckEditorCommands.dispatch(nextAction as Parameters<typeof studioPuckEditorCommands.dispatch>[0]);
-  }, action);
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      await page.waitForLoadState('domcontentloaded');
+      await page.evaluate(async (nextAction) => {
+        const { studioPuckEditorCommands } = await import('/src/features/editor/puck-editor-runtime.ts');
+        studioPuckEditorCommands.dispatch(nextAction as Parameters<typeof studioPuckEditorCommands.dispatch>[0]);
+      }, action);
+      return;
+    } catch (error) {
+      if (!(error instanceof Error) || !error.message.includes('Execution context was destroyed') || attempt > 0) {
+        throw error;
+      }
+      await expect(page.locator('.ec-editor-workspace')).toHaveAttribute('data-editor-sync-state', 'ready', {
+        timeout: 60_000,
+      });
+    }
+  }
 }
 
 test.describe('M06.6 breadcrumbs and context actions', () => {

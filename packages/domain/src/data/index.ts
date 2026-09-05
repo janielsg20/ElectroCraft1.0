@@ -5,6 +5,7 @@ export * from './secrets';
 export * from './explorer';
 export * from './connector-extension';
 export * from './taxonomies';
+export * from './relations';
 export {
   electroCraftDataFieldConditionSchema,
   electroCraftDataFieldOptionSchema,
@@ -17,6 +18,7 @@ export {
   electroTaxonomySchema,
   getDataField,
   getDataModel,
+  getElectroRelation,
   getElectroTaxonomy,
   validateDataSchemaReferences,
   type DataOwnershipReferenceDiagnostic,
