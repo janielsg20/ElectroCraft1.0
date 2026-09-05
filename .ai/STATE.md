@@ -22,7 +22,7 @@
 - M08.9 — Group, Repeater, Calculated y Conditional Fields: `IMPLEMENTADA / GREEN MICROFASE`.
 - M08.10 — Taxonomías dentro de Modelos: `IMPLEMENTADA / GREEN MICROFASE`.
 - M08.11 — Relaciones 1:1, 1:N y N:N: `IMPLEMENTADA / GREEN MICROFASE`.
-- M08.12 — CRUD de Registros y validación: `ACTIVE`.
+- M08.12 — CRUD de Registros y validación: `IMPLEMENTADA / PENDIENTE GATE`.
 
 ## Rama activa
 

@@ -72,6 +72,7 @@ export interface InternalDataRecord {
   readonly state: string;
   readonly createdAt: string;
   readonly updatedAt: string;
+  readonly deletedAt: string | null;
 }
 
 export interface InternalDataFilter {
@@ -89,6 +90,7 @@ export interface InternalDataQuery {
   readonly limit?: number;
   readonly filter?: InternalDataFilter;
   readonly sort?: InternalDataSort;
+  readonly includeDeleted?: boolean;
 }
 
 export interface InternalDataQueryResult {

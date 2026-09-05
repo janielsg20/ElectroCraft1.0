@@ -87,6 +87,7 @@ export const contentRecords = pgTable(
     state: text('state').notNull().default('published'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true }),
   },
   (table) => [
     primaryKey({ columns: [table.projectId, table.id] }),

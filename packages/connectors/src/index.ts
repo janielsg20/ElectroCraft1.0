@@ -13,6 +13,7 @@ export * from './graphql-data-source-adapter';
 export * from './internal-data-source-adapter';
 export * from './openapi-import-adapter';
 export * from './rest-data-source-adapter';
+export * from './record-validation';
 export * from './server-connector-gateway';
 export * from './server-secret-store';
 export { dataSourceConnectorRegistry };
