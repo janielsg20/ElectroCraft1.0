@@ -36,5 +36,5 @@ export interface InternalRelationRepository {
     input: InternalRelationEdgeUpdate,
   ): Promise<ElectroRelationEdge>;
   deleteRelationEdge(projectId: string, sourceId: string, relationId: string, edgeId: string): Promise<boolean>;
-  prepareRecordDelete(projectId: string, sourceId: string, modelId: string, recordId: string): Promise<void>;
+  prepareRecordDelete(projectId: string, sourceId: string, modelId: string, recordId: string): Promise<boolean>;
 }
