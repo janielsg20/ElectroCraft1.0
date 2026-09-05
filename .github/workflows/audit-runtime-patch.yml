@@ -23,25 +23,25 @@ jobs:
 
           path = Path('apps/studio/src/features/data/data-model-runtime.ts')
           text = path.read_text()
-          old = """    if (edges.length > 0 && (patch.targetModelRef ?? relation.targetModelRef) !== relation.targetModelRef) {
-              throw new Error('Elimina los vínculos existentes antes de cambiar el modelo de destino.');
-            }
-          """
-          new = """    if (edges.length > 0 && (patch.targetModelRef ?? relation.targetModelRef) !== relation.targetModelRef) {
-              throw new Error('Elimina los vínculos existentes antes de cambiar el modelo de destino.');
-            }
-            if (edges.length > 0 && patch.cardinality !== undefined && patch.cardinality !== relation.cardinality) {
+          needle = "    const nextRelation = electroRelationSchema.parse({ ...relation, ...patch, id: relation.id });"
+          guard = """    if (edges.length > 0 && patch.cardinality !== undefined && patch.cardinality !== relation.cardinality) {
               throw new Error('Elimina los vínculos existentes antes de cambiar la cardinalidad.');
             }
           """
-          if old not in text:
-              raise SystemExit('expected relation update guard was not found')
-          path.write_text(text.replace(old, new, 1))
+          if needle not in text:
+              raise SystemExit('expected relation update insertion point was not found')
+          if 'Elimina los vínculos existentes antes de cambiar la cardinalidad.' not in text:
+              text = text.replace(needle, guard + needle, 1)
+              path.write_text(text)
           PY
       - name: Commit patch
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if git diff --quiet; then
+            echo 'Runtime guard already applied.'
+            exit 0
+          fi
           git add apps/studio/src/features/data/data-model-runtime.ts
           git commit -m 'fix(M08.11): guard cardinality changes with existing edges'
           git push origin HEAD:codex/audit-remediation-2026-09-05
