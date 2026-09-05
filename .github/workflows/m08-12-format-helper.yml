@@ -1,0 +1,45 @@
+name: M08.12 Format Helper
+
+on:
+  push:
+    branches: [codex/m08-12-format-helper]
+    paths:
+      - '.github/workflows/m08-12-format-helper.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    name: Format M08.12 candidate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: codex/m08-12-record-crud-validation
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Format only observed lint failures
+        run: >-
+          npx prettier --write
+          packages/connectors/src/advanced-field-runtime.ts
+          packages/connectors/src/record-validation.ts
+          packages/data-web/src/internal-data-repository.ts
+          apps/studio/src/features/data/records-workspace.css
+          apps/studio/src/features/data/records-workspace.tsx
+          tooling/vitest/integration/m08-12-record-crud-pglite.test.ts
+          tooling/vitest/unit/m08-12-record-validation.test.ts
+      - name: Commit formatting
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add packages/connectors/src/advanced-field-runtime.ts packages/connectors/src/record-validation.ts packages/data-web/src/internal-data-repository.ts apps/studio/src/features/data/records-workspace.css apps/studio/src/features/data/records-workspace.tsx tooling/vitest/integration/m08-12-record-crud-pglite.test.ts tooling/vitest/unit/m08-12-record-validation.test.ts
+          git commit -m "style(M08.12): format record CRUD candidate"
+          git push origin HEAD:codex/m08-12-record-crud-validation
