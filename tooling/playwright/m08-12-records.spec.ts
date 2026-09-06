@@ -35,17 +35,19 @@ test('M08.12 crea, valida, edita y elimina suavemente un registro desde /content
   await expect(page.getByRole('heading', { name: 'Nuevo modelo', exact: true })).toBeVisible({ timeout: 60_000 });
 
   await page.goto('/content');
-  await expect(page.locator('[data-records-workspace]')).toBeVisible({ timeout: 60_000 });
-  await page.getByRole('button', { name: 'Nuevo registro' }).click();
-  const detail = page.getByRole('region', { name: 'Detalle del registro' });
+  const workspace = page.locator('[data-records-workspace]');
+  await expect(workspace).toBeVisible({ timeout: 60_000 });
+  const recordsStatus = workspace.locator('.ec-records-status');
+  await workspace.getByRole('button', { name: 'Nuevo registro' }).click();
+  const detail = workspace.getByRole('region', { name: 'Detalle del registro' });
   const firstText = detail.locator('input[type="text"]').first();
   await firstText.fill('Producto E2E');
   await detail.getByRole('button', { name: 'Guardar' }).click();
-  await expect(page.getByRole('status')).toContainText(/Registro creado|registro\(s\) cargado/i, { timeout: 60_000 });
-  await expect(page.getByText('Producto E2E', { exact: true }).first()).toBeVisible();
+  await expect(recordsStatus).toContainText(/Registro creado|registro\(s\) cargado/i, { timeout: 60_000 });
+  await expect(workspace.getByText('Producto E2E', { exact: true }).first()).toBeVisible();
 
   await detail.getByRole('button', { name: 'Eliminar' }).click();
-  await expect(page.getByRole('status')).toContainText(/eliminado/i, { timeout: 60_000 });
-  await page.getByLabel('Incluir eliminados').check();
-  await expect(page.getByText('Eliminado', { exact: true }).first()).toBeVisible({ timeout: 60_000 });
+  await expect(recordsStatus).toContainText(/eliminado/i, { timeout: 60_000 });
+  await workspace.getByLabel('Incluir eliminados').check();
+  await expect(workspace.getByText('Eliminado', { exact: true }).first()).toBeVisible({ timeout: 60_000 });
 });
