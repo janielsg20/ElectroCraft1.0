@@ -66,6 +66,7 @@ export * from './contracts/project-definition';
 export * from './contracts/project-snapshot';
 export * from './contracts/query-definition';
 export * from './contracts/responsive';
+export * from './contracts/platform-style';
 export * from './contracts/serialization';
 export {
   canonicalNavigationDefinitionRoundTrip,
