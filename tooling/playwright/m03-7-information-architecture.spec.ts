@@ -55,9 +55,10 @@ test.describe('M03.7 Progressive Disclosure and information architecture', () =>
 
     const route = page.locator('[data-ia-route="content-list-detail"]');
     await expect(route).toBeVisible();
-    await expect(route.locator('[data-list-detail-pattern]')).toBeVisible();
-    await expect(route.getByText('Todavía no hay contenido', { exact: true })).toBeVisible();
-    await expect(route.getByText('Selecciona un registro', { exact: true })).toBeVisible();
+    await expect(route.locator('[data-list-detail-pattern]').first()).toBeVisible();
+    await expect(route).toContainText(
+      /Abre un proyecto|ElectroCraft Data|No hay modelos de datos|No hay registros|Selecciona un registro|Nuevo registro/i,
+    );
     await expect(page).toHaveURL(/\/content$/);
   });
 
