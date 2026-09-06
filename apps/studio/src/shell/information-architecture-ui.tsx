@@ -109,7 +109,9 @@ export function StudioContentListDetailRoute() {
           </div>
         </div>
       </header>
-      <RecordsWorkspace />
+      <div className="ec-ia-list-detail" data-list-detail-pattern>
+        <RecordsWorkspace />
+      </div>
     </section>
   );
 }
