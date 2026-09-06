@@ -43,7 +43,9 @@ test('M08.12 crea, valida, edita y elimina suavemente un registro desde /content
   const firstText = detail.locator('input[type="text"]').first();
   await firstText.fill('Producto E2E');
   await detail.getByRole('button', { name: 'Guardar' }).click();
-  await expect(recordsStatus).toContainText(/Registro creado|registro\(s\) cargado/i, { timeout: 60_000 });
+  await expect(recordsStatus).toContainText(/Registro creado|registro\(s\) cargado/i, {
+    timeout: 60_000,
+  });
   await expect(workspace.getByText('Producto E2E', { exact: true }).first()).toBeVisible();
 
   await detail.getByRole('button', { name: 'Eliminar' }).click();
