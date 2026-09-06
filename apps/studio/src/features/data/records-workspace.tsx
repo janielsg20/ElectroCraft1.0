@@ -308,6 +308,7 @@ export function RecordsWorkspace() {
 
   async function save() {
     if (!internalSource || !model) return;
+    setLoading(true);
     setMessage('Validando y guardando registro…');
     try {
       const data = materializeDraft();
@@ -336,11 +337,14 @@ export function RecordsWorkspace() {
       }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'No se pudo guardar el registro.');
+    } finally {
+      setLoading(false);
     }
   }
 
   async function remove() {
     if (!internalSource || !model || !selected || selected.deletedAt) return;
+    setLoading(true);
     setMessage('Moviendo registro a eliminados…');
     try {
       await dataSourceWorkspaceRuntime.mutate(internalSource, 'development', model.id, 'delete', { id: selected.id });
@@ -348,6 +352,8 @@ export function RecordsWorkspace() {
       setMessage('Registro eliminado de forma reversible en almacenamiento.');
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'No se pudo eliminar el registro.');
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -392,6 +398,7 @@ export function RecordsWorkspace() {
         <label className="ec-records-toggle">
           <input
             type="checkbox"
+            disabled={loading}
             checked={includeDeleted}
             onChange={(event) => setIncludeDeleted(event.target.checked)}
           />
@@ -460,7 +467,7 @@ export function RecordsWorkspace() {
                     Guardar
                   </Button>
                   {selected && !selected.deletedAt ? (
-                    <Button size="sm" variant="ghost" onClick={() => void remove()}>
+                    <Button size="sm" variant="ghost" disabled={loading} onClick={() => void remove()}>
                       Eliminar
                     </Button>
                   ) : null}
