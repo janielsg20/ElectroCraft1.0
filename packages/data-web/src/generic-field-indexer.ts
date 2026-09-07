@@ -23,9 +23,8 @@ import { createDrizzleInternalDataRepository } from './internal-data-repository'
 import type { StudioProjectDatabase } from './repository';
 import * as schema from './schema';
 
-type IndexWriteDatabase = Pick<StudioProjectDatabase, 'delete' | 'insert'>;
+type IndexInsert = typeof schema.recordFieldIndex.$inferInsert;
 type IndexRow = typeof schema.recordFieldIndex.$inferSelect;
-
 type ExtractedValue = Readonly<{ value: JsonValue; ordinal: number }>;
 
 function requireNonEmpty(value: string, field: string) {
@@ -105,9 +104,8 @@ function childContainers(
   if (!parentRef) return Object.freeze([data]);
   const parent = model.fields.find(({ id }) => id === parentRef);
   if (!parent) return Object.freeze([]);
-  const containers = childContainers(model, parent, data, visited);
   const next: Readonly<Record<string, JsonValue>>[] = [];
-  for (const container of containers) {
+  for (const container of childContainers(model, parent, data, visited)) {
     const value = container[parent.key];
     if (parent.type === 'repeater' && Array.isArray(value)) {
       for (const item of value) {
@@ -115,9 +113,7 @@ function childContainers(
           next.push(item as Readonly<Record<string, JsonValue>>);
         }
       }
-      continue;
-    }
-    if (value && !Array.isArray(value) && typeof value === 'object') {
+    } else if (value && !Array.isArray(value) && typeof value === 'object') {
       next.push(value as Readonly<Record<string, JsonValue>>);
     }
   }
@@ -139,25 +135,19 @@ function extractedValues(
   return Object.freeze(values.map((value, ordinal) => Object.freeze({ value, ordinal })));
 }
 
-function typedIndexValue(field: ElectroCraftDataField, value: JsonValue) {
-  if (typeof value === 'number' && Number.isFinite(value)) {
-    return Object.freeze({ valueKind: 'number', numericValue: value });
+function typedIndexValue(field: ElectroCraftDataField, value: JsonValue): Partial<IndexInsert> | null {
+  if (typeof value === 'number' && Number.isFinite(value)) return { valueKind: 'number', numericValue: value };
+  if (typeof value === 'boolean') return { valueKind: 'boolean', booleanValue: value };
+  if (typeof value !== 'string') return null;
+  if (field.type === 'date' || field.type === 'datetime') {
+    const timestamp = new Date(value);
+    if (Number.isFinite(timestamp.getTime())) return { valueKind: 'date', timestampValue: timestamp };
   }
-  if (typeof value === 'boolean') {
-    return Object.freeze({ valueKind: 'boolean', booleanValue: value });
-  }
-  if (typeof value === 'string') {
-    if (field.type === 'date' || field.type === 'datetime') {
-      const timestamp = new Date(value);
-      if (Number.isFinite(timestamp.getTime())) return Object.freeze({ valueKind: 'date', timestampValue: timestamp });
-    }
-    return Object.freeze({
-      valueKind: 'text',
-      textValue: value,
-      normalizedText: normalizeElectroCraftIndexText(value),
-    });
-  }
-  return null;
+  return {
+    valueKind: 'text',
+    textValue: value,
+    normalizedText: normalizeElectroCraftIndexText(value),
+  };
 }
 
 export function createGenericFieldIndexRows(
@@ -165,45 +155,34 @@ export function createGenericFieldIndexRows(
   model: ElectroCraftDataModel,
   recordId: string,
   data: Readonly<Record<string, JsonValue>>,
-) {
-  return Object.freeze(
-    model.fields.flatMap((field) => {
-      if (!hasElectroCraftFieldIndexing(field)) return [];
-      const flags = readElectroCraftFieldIndexing(field);
-      return extractedValues(model, field, data).flatMap(({ value, ordinal }) => {
-        const typed = typedIndexValue(field, value);
-        if (!typed) return [];
-        return [
-          Object.freeze({
-            projectId,
-            modelId: model.id,
-            recordId,
-            fieldId: field.id,
-            ordinal,
-            ...typed,
-            searchable: flags.searchable,
-            filterable: flags.filterable,
-            sortable: flags.sortable,
-            faceted: flags.faceted,
-          }),
-        ];
+): IndexInsert[] {
+  const rows: IndexInsert[] = [];
+  for (const field of model.fields) {
+    if (!hasElectroCraftFieldIndexing(field)) continue;
+    const flags = readElectroCraftFieldIndexing(field);
+    for (const { value, ordinal } of extractedValues(model, field, data)) {
+      const typed = typedIndexValue(field, value);
+      if (!typed?.valueKind) continue;
+      rows.push({
+        projectId,
+        modelId: model.id,
+        recordId,
+        fieldId: field.id,
+        ordinal,
+        valueKind: typed.valueKind,
+        textValue: typed.textValue,
+        normalizedText: typed.normalizedText,
+        numericValue: typed.numericValue,
+        booleanValue: typed.booleanValue,
+        timestampValue: typed.timestampValue,
+        searchable: flags.searchable,
+        filterable: flags.filterable,
+        sortable: flags.sortable,
+        faceted: flags.faceted,
       });
-    }),
-  );
-}
-
-async function replaceRecordIndex(
-  database: IndexWriteDatabase,
-  projectId: string,
-  model: ElectroCraftDataModel,
-  recordId: string,
-  data: Readonly<Record<string, JsonValue>>,
-) {
-  await database
-    .delete(schema.recordFieldIndex)
-    .where(and(eq(schema.recordFieldIndex.projectId, projectId), eq(schema.recordFieldIndex.recordId, recordId)));
-  const rows = createGenericFieldIndexRows(projectId, model, recordId, data);
-  if (rows.length) await database.insert(schema.recordFieldIndex).values(rows);
+    }
+  }
+  return rows;
 }
 
 function comparable(value: JsonValue | undefined): string | number | boolean | null {
@@ -227,10 +206,6 @@ function indexRowJsonValue(row: IndexRow): JsonValue {
   if (row.valueKind === 'boolean') return row.booleanValue ?? null;
   if (row.valueKind === 'date') return row.timestampValue?.toISOString() ?? null;
   return row.textValue ?? null;
-}
-
-function indexRowMatches(row: IndexRow, value: JsonValue) {
-  return compareValues(indexRowJsonValue(row), value) === 0;
 }
 
 function fieldRows(rows: readonly IndexRow[], fieldId: string) {
@@ -267,8 +242,7 @@ async function currentIndexStatus(
     ),
   );
   const actualKeys = new Set(actualRows.map((row) => `${row.recordId}:${row.fieldId}:${row.ordinal}`));
-  const stale =
-    expectedKeys.size !== actualKeys.size || [...expectedKeys].some((key) => !actualKeys.has(key));
+  const stale = expectedKeys.size !== actualKeys.size || [...expectedKeys].some((key) => !actualKeys.has(key));
   const indexedRecordCount = new Set(actualRows.map(({ recordId }) => recordId)).size;
   const status: InternalDataIndexStatus['status'] =
     indexableFieldCount === 0 ? 'disabled' : records.length === 0 ? 'empty' : stale ? 'stale' : 'ready';
@@ -322,7 +296,7 @@ export function createGenericFieldIndexedInternalDataRepository(
       if (field && indexing?.filterable) {
         const matchingIds = new Set(
           fieldRows(indexRows, field.id)
-            .filter((row) => row.filterable && indexRowMatches(row, query.filter!.value))
+            .filter((row) => row.filterable && compareValues(indexRowJsonValue(row), query.filter!.value) === 0)
             .map(({ recordId }) => recordId),
         );
         filtered = filtered.filter(({ id }) => matchingIds.has(id));
@@ -334,11 +308,14 @@ export function createGenericFieldIndexedInternalDataRepository(
     if (query.search?.text.trim()) {
       const needle = normalizeElectroCraftIndexText(query.search.text);
       const requested = new Set(query.search.fields ?? []);
-      const searchableFields = model.fields.filter((field) => {
-        if (!readElectroCraftFieldIndexing(field).searchable) return false;
-        return requested.size === 0 || requested.has(field.key);
-      });
-      const fieldIds = new Set(searchableFields.map(({ id }) => id));
+      const fieldIds = new Set(
+        model.fields
+          .filter(
+            (field) =>
+              readElectroCraftFieldIndexing(field).searchable && (requested.size === 0 || requested.has(field.key)),
+          )
+          .map(({ id }) => id),
+      );
       const matchingIds = new Set(
         indexRows
           .filter(
@@ -425,7 +402,8 @@ export function createGenericFieldIndexedInternalDataRepository(
         })
         .returning();
       if (!inserted[0]) throw new Error('internal data record was not created');
-      await replaceRecordIndex(tx, projectId, model, id, input.data);
+      const indexRows = createGenericFieldIndexRows(projectId, model, id, input.data);
+      if (indexRows.length) await tx.insert(schema.recordFieldIndex).values(indexRows);
       return toRecord(inserted[0]);
     });
   }
@@ -453,7 +431,11 @@ export function createGenericFieldIndexedInternalDataRepository(
         )
         .returning();
       if (!updated[0]) throw new Error(`internal data record not found or deleted: ${id}`);
-      await replaceRecordIndex(tx, projectId, model, id, input.data);
+      await tx
+        .delete(schema.recordFieldIndex)
+        .where(and(eq(schema.recordFieldIndex.projectId, projectId), eq(schema.recordFieldIndex.recordId, id)));
+      const indexRows = createGenericFieldIndexRows(projectId, model, id, input.data);
+      if (indexRows.length) await tx.insert(schema.recordFieldIndex).values(indexRows);
       return toRecord(updated[0]);
     });
   }
@@ -513,8 +495,13 @@ export function createGenericFieldIndexedInternalDataRepository(
         .delete(schema.recordFieldIndex)
         .where(and(eq(schema.recordFieldIndex.projectId, projectId), eq(schema.recordFieldIndex.modelId, modelId)));
       for (const record of records) {
-        const rows = createGenericFieldIndexRows(projectId, model, record.id, asJsonObject(record.data, 'record.data'));
-        if (rows.length) await tx.insert(schema.recordFieldIndex).values(rows);
+        const indexRows = createGenericFieldIndexRows(
+          projectId,
+          model,
+          record.id,
+          asJsonObject(record.data, 'record.data'),
+        );
+        if (indexRows.length) await tx.insert(schema.recordFieldIndex).values(indexRows);
       }
     });
     return currentIndexStatus(db, projectId, sourceId, modelId);
