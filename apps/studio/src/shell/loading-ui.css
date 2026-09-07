@@ -142,13 +142,14 @@
   animation-delay: 30ms;
 }
 
-/* Runtime loaders keep the source text for assistive technology while replacing
-   text-only visual loading states with one compact ElectroCraft indicator. */
+/* Runtime loaders keep source copy available to assistive technology while
+   replacing text-only visual waits with one compact ElectroCraft indicator. */
 .ec-screens-workspace > p[role='status'],
 .ec-navigation-preview > p[role='status'],
 .ec-data-sources-workspace > p[role='status'],
 .ec-data-explorer > p[role='status'],
-.ec-editor-screen-context-state[role='status'] {
+.ec-editor-screen-context-state[role='status'],
+html[data-workspace-persistence-state='loading'] .ec-project-history-route-empty > p {
   position: relative;
   min-height: 144px;
   display: grid;
@@ -164,11 +165,16 @@
   min-height: 82px;
 }
 
+html[data-workspace-persistence-state='loading'] .ec-project-history-route-empty > p {
+  min-height: 96px;
+}
+
 .ec-screens-workspace > p[role='status']::before,
 .ec-navigation-preview > p[role='status']::before,
 .ec-data-sources-workspace > p[role='status']::before,
 .ec-data-explorer > p[role='status']::before,
-.ec-editor-screen-context-state[role='status']::before {
+.ec-editor-screen-context-state[role='status']::before,
+html[data-workspace-persistence-state='loading'] .ec-project-history-route-empty > p::before {
   content: '';
   width: 28px;
   height: 28px;
@@ -179,7 +185,8 @@
   animation: ec-loading-orbit 720ms linear infinite;
 }
 
-.ec-editor-screen-context-state[role='status']::before {
+.ec-editor-screen-context-state[role='status']::before,
+html[data-workspace-persistence-state='loading'] .ec-project-history-route-empty > p::before {
   width: 22px;
   height: 22px;
   border-width: 2px;
@@ -376,7 +383,8 @@
   .ec-navigation-preview > p[role='status']::before,
   .ec-data-sources-workspace > p[role='status']::before,
   .ec-data-explorer > p[role='status']::before,
-  .ec-editor-screen-context-state[role='status']::before {
+  .ec-editor-screen-context-state[role='status']::before,
+  html[data-workspace-persistence-state='loading'] .ec-project-history-route-empty > p::before {
     animation: none;
   }
 }
