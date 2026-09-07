@@ -1,0 +1,44 @@
+name: M08.13 format helper
+
+on:
+  push:
+    branches:
+      - codex/m08-13-generic-field-indexer
+
+permissions:
+  contents: read
+
+jobs:
+  format:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22.16.0
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Format M08.13 files
+        run: >-
+          npx prettier --write
+          packages/connectors/src/generic-field-index-adapter.ts
+          packages/data-web/src/generic-field-indexer.ts
+          packages/data-web/src/internal-relation-repository.ts
+          apps/studio/src/features/data/advanced-field-editor.tsx
+          apps/studio/src/features/data/data-source-runtime.ts
+          tooling/vitest/integration/m08-13-generic-field-index-pglite.test.ts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: m08-13-prettier-output
+          if-no-files-found: error
+          path: |
+            packages/connectors/src/generic-field-index-adapter.ts
+            packages/data-web/src/generic-field-indexer.ts
+            packages/data-web/src/internal-relation-repository.ts
+            apps/studio/src/features/data/advanced-field-editor.tsx
+            apps/studio/src/features/data/data-source-runtime.ts
+            tooling/vitest/integration/m08-13-generic-field-index-pglite.test.ts
