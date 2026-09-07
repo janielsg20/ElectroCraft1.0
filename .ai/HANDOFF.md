@@ -2,61 +2,58 @@
 
 ## Current
 
-F08 / M08.12 — CRUD de Registros y validación — `ACTIVE` (`IMPLEMENTADA / PENDIENTE GATE`).
+F08 / M08.13 — Índice tipado para búsqueda/filtros — `ACTIVE` (`IMPLEMENTADA / PENDIENTE GATE`).
 
-Rama activa: `codex/m08-12-record-crud-validation`.
+Rama activa: `codex/m08-13-generic-field-indexer`.
 
-M08.11 quedó certificada tras auditoría correctiva por ElectroCraft Base CI `33995779383` (#900) sobre `ec50b655560e749e98aead608924612346beb87d`. PR `#78` fue fusionada por squash a `main` en `89075e17b10332d5d6eaebbd9800f33e0987ffaf`.
+M08.12 quedó certificada por ElectroCraft Base CI `34063642245` (#914) sobre `8b9371756006a754bbbf1702cff963369eeeabd6`. PR `#79` fue fusionada por squash a `main` en `096fb2bc6ae7110c899968b851728e0fa5795e96`.
 
-## M08.11 — cierre certificado
+## M08.12 — cierre certificado
 
 `IMPLEMENTADA / GREEN MICROFASE`.
 
+Evidencia: `.ai/evidence/F08/M08.12/CLOSURE_2026-09-06.md`.
+
+## M08.13 — objetivo y owner
+
 Owner: `PGlite generic content store` existente.
 
-- `ElectroRelation`/`ElectroRelationEdge` son contratos portables;
-- todos los edges viven en la tabla física estable `relation_edges`;
-- cardinalidad `1:1`, `1:N`, `N:N` se valida en aplicación/repositorio;
-- `restrict`, `detach` y `cascade` se resuelven atómicamente con el borrado del registro raíz;
-- el adapter no ejecuta un segundo delete fuera de la transacción;
-- cambio de cardinalidad/destino queda bloqueado con edges existentes;
-- acceso pasa por `InternalRelationRepository`, `InternalDataSourceAdapter` y el único ConnectorRegistry;
-- no hay DDL dinámico, segundo store, registry paralelo ni secretos persistidos.
+Ruta visible: `Datos > Modelos > Campo > Avanzado > Búsqueda y filtros`.
 
-Evidencia: `.ai/evidence/F08/M08.11/CLOSURE_2026-09-05.md`.
+- reutilizar `record_field_index`; no crear otra tabla;
+- capacidades explícitas Searchable / Filterable / Sortable / Faceted;
+- filas tipadas y `normalizedText` con ordinal;
+- CRUD de registro + índice dentro de una transacción;
+- búsqueda/filtros/orden/facetas por índice cuando estén configurados;
+- fallback JSON para filtros/orden no indexados;
+- operación visible de rebuild y estado `disabled|empty|ready|stale`;
+- todo query/rebuild detrás del único `ConnectorRegistry`.
 
-## Precondición M08.12
+## Implementación candidata
 
-- M08.11: `GREEN` por Base CI `33995779383` (#900).
-- docs, lint, lint offline, typecheck, boundaries, tests, build, Playwright, empty-repo y artifacts: `success`.
-- PR correctiva `#78`: fusionada por squash en `89075e17b10332d5d6eaebbd9800f33e0987ffaf`.
-- no quedaron P0/P1 abiertos en M08.11.
+- contrato `ElectroCraftFieldIndexing` portable en metadata;
+- `GenericFieldIndexer` en `packages/data-web/src/generic-field-indexer.ts`;
+- storage schema v8 añade `normalized_text` y elimina el GIN FTS de expresión heredado;
+- browser repository usa el indexed repository como owner de CRUD;
+- relation cascade limpia filas de índice en la misma transacción;
+- adapter `GenericFieldIndexedInternalDataSourceAdapter` expone search/facets y recurso `index:<modelId>`;
+- Studio permite editar capacidades, inspeccionar estado y reconstruir;
+- unit, contract, integration PGlite y E2E añadidos.
 
-## M08.12 — objetivo exacto
-
-Ruta: `Datos > Registros`.
-
-- mantener `content_records` como store JSON físico propietario;
-- validar create/update usando `ElectroCraftDataSchema` antes del write;
-- implementar soft delete por policy de estado/deletedAt sin DDL por modelo;
-- DataView/list + record form/detail en desktop;
-- cards y controles adaptados en mobile;
-- selector de tipo/modelo en toolbar;
-- todos los writes pasan por service/adapter/ConnectorRegistry;
-- errores de validación permanecen visibles y reparables.
+Evidencia candidata: `.ai/evidence/F08/M08.13/IMPLEMENTATION_2026-09-06.md`.
 
 ## Límites
 
-- no crear otra tabla por modelo o tipo de contenido;
-- no insertar records desde UI saltándose el service;
-- no persistir internals PGlite como parte del proyecto canónico;
-- no duplicar ConnectorRegistry ni repositorios de datos;
-- no declarar cierre sin unit/integration/negative/persistence/E2E y gate completo.
+- no DDL dinámico por modelo/campo;
+- no índices SQL nuevos por campo;
+- no segundo query engine/store/ConnectorRegistry;
+- no acceso PGlite/Drizzle desde Studio UI;
+- no declarar cierre sin Base CI completo GREEN.
 
 ## Siguiente acción exacta
 
-Inspeccionar `InternalDataRepository`, contratos de modelo/fields, adapter interno y superficies actuales de contenido. Definir primero validation compiler/service y soft-delete policy; después integrar `Datos > Registros` y sus tests.
+Abrir PR de M08.13 y ejecutar un único ElectroCraft Base CI completo. Reparar cualquier fallo real sin relajar tests. Solo con gate GREEN registrar `CLOSURE`, fusionar y activar M08.14.
 
 ## Read set
 
-`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M08_12.md → .ai/evidence/F08/M08.11/CLOSURE_2026-09-05.md → packages/domain/src/data → packages/application/src/data → packages/data-web/src/internal-data-repository.ts → packages/connectors/src/internal-data-source-adapter.ts → apps/studio/src/features/data → tooling/vitest → tooling/playwright`.
+`AGENTS → .ai/README → RULES → MEMORY → STATE → TRACKING → HANDOFF → .ai/microphases/M08_13.md → .ai/evidence/F08/M08.12/CLOSURE_2026-09-06.md → .ai/evidence/F08/M08.13/IMPLEMENTATION_2026-09-06.md → packages/domain/src/data/field-indexing.ts → packages/data-web/src/generic-field-indexer.ts → packages/connectors/src/generic-field-index-adapter.ts → apps/studio/src/features/data/advanced-field-editor.tsx → tooling/vitest → tooling/playwright`.
