@@ -4,6 +4,7 @@ import type {
   DataSourceMutationRequest,
   DataSourceQueryRequest,
   InternalDataIndexStatus,
+  InternalDataQuery,
 } from '@electrocraft/application';
 import {
   dataModelIndexResourceId,
@@ -18,6 +19,69 @@ import {
 
 function indexStatusAsJson(status: InternalDataIndexStatus) {
   return status as unknown as JsonValue;
+}
+
+function asObject(value: JsonValue | undefined) {
+  return value && !Array.isArray(value) && typeof value === 'object' ? (value as Record<string, JsonValue>) : null;
+}
+
+function parseIndexedQuery(value: JsonValue | undefined): InternalDataQuery | null {
+  const input = asObject(value);
+  if (!input || (input.search === undefined && input.facets === undefined)) return null;
+  const filterValue = asObject(input.filter);
+  const sortValue = asObject(input.sort);
+  const searchValue = asObject(input.search);
+  if (input.offset !== undefined && typeof input.offset !== 'number') throw new TypeError('offset debe ser numérico.');
+  if (input.limit !== undefined && typeof input.limit !== 'number') throw new TypeError('limit debe ser numérico.');
+  if (input.includeDeleted !== undefined && typeof input.includeDeleted !== 'boolean') {
+    throw new TypeError('includeDeleted debe ser booleano.');
+  }
+  const filter = filterValue
+    ? (() => {
+        if (typeof filterValue.field !== 'string' || !filterValue.field.trim()) {
+          throw new TypeError('filter.field es obligatorio.');
+        }
+        if (!Object.hasOwn(filterValue, 'value')) throw new TypeError('filter.value es obligatorio.');
+        return Object.freeze({ field: filterValue.field, value: filterValue.value });
+      })()
+    : undefined;
+  const sort = sortValue
+    ? (() => {
+        if (typeof sortValue.field !== 'string' || !sortValue.field.trim()) {
+          throw new TypeError('sort.field es obligatorio.');
+        }
+        if (sortValue.direction !== 'asc' && sortValue.direction !== 'desc') {
+          throw new TypeError('sort.direction debe ser asc o desc.');
+        }
+        return Object.freeze({ field: sortValue.field, direction: sortValue.direction });
+      })()
+    : undefined;
+  const search = searchValue
+    ? (() => {
+        if (typeof searchValue.text !== 'string') throw new TypeError('search.text debe ser texto.');
+        const fields = searchValue.fields;
+        if (fields !== undefined && (!Array.isArray(fields) || fields.some((field) => typeof field !== 'string'))) {
+          throw new TypeError('search.fields debe ser una lista de claves de campo.');
+        }
+        return Object.freeze({
+          text: searchValue.text,
+          ...(Array.isArray(fields) ? { fields: Object.freeze(fields as string[]) } : {}),
+        });
+      })()
+    : undefined;
+  const facets = input.facets;
+  if (facets !== undefined && (!Array.isArray(facets) || facets.some((field) => typeof field !== 'string'))) {
+    throw new TypeError('facets debe ser una lista de claves de campo.');
+  }
+  return Object.freeze({
+    ...(typeof input.offset === 'number' ? { offset: input.offset } : {}),
+    ...(typeof input.limit === 'number' ? { limit: input.limit } : {}),
+    ...(filter ? { filter } : {}),
+    ...(sort ? { sort } : {}),
+    ...(search ? { search } : {}),
+    ...(Array.isArray(facets) ? { facets: Object.freeze(facets as string[]) } : {}),
+    ...(typeof input.includeDeleted === 'boolean' ? { includeDeleted: input.includeDeleted } : {}),
+  });
 }
 
 export class GenericFieldIndexedInternalDataSourceAdapter implements DataSourceAdapter {
@@ -104,18 +168,25 @@ export class GenericFieldIndexedInternalDataSourceAdapter implements DataSourceA
 
   async query(context: DataSourceAdapterContext, request: DataSourceQueryRequest): Promise<JsonValue> {
     const modelId = parseDataModelIndexResourceId(request.resourceId);
-    if (!modelId) return this.base.query(context, request);
-    await this.authorize(context, request.resourceId, 'read');
-    if (!this.options.repository.getModelIndexStatus) {
-      throw new Error('El GenericFieldIndexer no está disponible para esta fuente.');
+    if (modelId) {
+      await this.authorize(context, request.resourceId, 'read');
+      if (!this.options.repository.getModelIndexStatus) {
+        throw new Error('El GenericFieldIndexer no está disponible para esta fuente.');
+      }
+      return indexStatusAsJson(
+        await this.options.repository.getModelIndexStatus(this.options.projectId, context.source.id, modelId),
+      );
     }
-    return indexStatusAsJson(
-      await this.options.repository.getModelIndexStatus(
-        this.options.projectId,
-        context.source.id,
-        modelId,
-      ),
-    );
+    const indexedQuery = parseIndexedQuery(request.input);
+    if (!indexedQuery) return this.base.query(context, request);
+    const dataSchema = await this.base.getSchema(context);
+    if (!dataSchema?.models.some(({ id }) => id === request.resourceId)) return this.base.query(context, request);
+    await this.authorize(context, request.resourceId, 'read');
+    return (await this.options.repository.queryRecords(
+      this.options.projectId,
+      request.resourceId,
+      indexedQuery,
+    )) as unknown as JsonValue;
   }
 
   async mutate(context: DataSourceAdapterContext, request: DataSourceMutationRequest): Promise<JsonValue> {
