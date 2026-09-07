@@ -34,4 +34,18 @@ describe('M08.13 GenericFieldIndexer architecture boundary', () => {
     expect(editor).not.toContain('drizzle-orm');
     expect(editor).not.toContain('schema.recordFieldIndex');
   });
+
+  it('publishes a committed schema without reopening the entire data workspace after every model mutation', () => {
+    const modelRuntime = read('apps/studio/src/features/data/data-model-runtime.ts');
+    const persistStart = modelRuntime.indexOf('async function persistSchema');
+    const persistEnd = modelRuntime.indexOf('function replaceModel', persistStart);
+    const persistSchema = modelRuntime.slice(persistStart, persistEnd);
+
+    expect(persistStart).toBeGreaterThanOrEqual(0);
+    expect(persistEnd).toBeGreaterThan(persistStart);
+    expect(persistSchema).toContain('await projectStorageRuntime.flushAutosave()');
+    expect(persistSchema).not.toContain('await loadWorkspace()');
+    expect(persistSchema).toContain('schema: parsed');
+    expect(persistSchema).toContain('models: parsed.models');
+  });
 });
