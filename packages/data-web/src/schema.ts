@@ -159,6 +159,7 @@ export const recordFieldIndex = pgTable(
     ordinal: integer('ordinal').notNull().default(0),
     valueKind: text('value_kind').notNull(),
     textValue: text('text_value'),
+    normalizedText: text('normalized_text'),
     numericValue: doublePrecision('numeric_value'),
     booleanValue: boolean('boolean_value'),
     timestampValue: timestamp('timestamp_value', { withTimezone: true }),
