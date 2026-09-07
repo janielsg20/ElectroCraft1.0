@@ -13,7 +13,7 @@ describe('M08.12 record CRUD architecture boundary', () => {
     const adapter = read('packages/connectors/src/internal-data-source-adapter.ts');
     const validator = read('packages/connectors/src/record-validation.ts');
     const workspace = read('apps/studio/src/features/data/records-workspace.tsx');
-    expect(STUDIO_STORAGE_SCHEMA_VERSION).toBe(7);
+    expect(STUDIO_STORAGE_SCHEMA_VERSION).toBe(8);
     expect(schema).toContain("'content_records'");
     expect(schema).toContain("deletedAt: timestamp('deleted_at'");
     expect(migration).toContain('ALTER TABLE content_records ADD COLUMN IF NOT EXISTS deleted_at');
