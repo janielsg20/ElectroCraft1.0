@@ -6,7 +6,10 @@ import {
   type DataExplorerOperationDescriptor,
   type StoredProjectDefinition,
 } from '@electrocraft/application';
-import { createInternalDataSourceAdapter, INTERNAL_DATA_ADAPTER_ID } from '@electrocraft/connectors';
+import {
+  createGenericFieldIndexedInternalDataSourceAdapter,
+  INTERNAL_DATA_ADAPTER_ID,
+} from '@electrocraft/connectors';
 import { createBrowserInternalDataRepositoryPort, webDataSourceRepository } from '@electrocraft/data-web';
 import {
   createDeterministicObjectId,
@@ -54,6 +57,7 @@ const INTERNAL_CAPABILITIES = Object.freeze([
   'pagination',
   'filtering',
   'sort',
+  'aggregate',
   'transactions',
   'taxonomies',
   'relations',
@@ -87,7 +91,7 @@ function activeProjectId() {
 function registerInternalAdapter(projectId: string) {
   if (registeredInternalProjectId === projectId) return;
   dataSourceConnectorRegistry.registerAdapter(
-    createInternalDataSourceAdapter({
+    createGenericFieldIndexedInternalDataSourceAdapter({
       projectId,
       repository: internalDataRepository,
       relations: internalDataRepository.relations,
