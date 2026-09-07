@@ -1,5 +1,6 @@
 import {
   Button,
+  Loader,
   Select,
   SelectContent,
   SelectItem,
@@ -59,7 +60,9 @@ export function EditorScreenTopbarSelect({ fallbackLabel }: { readonly fallbackL
       ? selection.screenId
       : (screens[0]?.id ?? '');
 
-  if (navigation.state === 'loading' && screens.length === 0) return <span>Cargando Pantalla…</span>;
+  if (navigation.state === 'loading' && screens.length === 0) {
+    return <Loader className="ec-topbar-screen-loader" label="Preparando Pantalla" size="xs" />;
+  }
   if (screens.length === 0) return <span>{fallbackLabel}</span>;
 
   return (
@@ -121,9 +124,9 @@ export function EditorScreensContextPanel() {
   if (navigation.state === 'loading' && screens.length === 0) {
     return (
       <EditorScreensContextShell count={0}>
-        <p className="ec-editor-screen-context-state" role="status">
-          Cargando Pantallas…
-        </p>
+        <div className="ec-editor-screen-context-state ec-editor-screen-context-loading">
+          <Loader label="Preparando Pantallas" size="sm" />
+        </div>
       </EditorScreensContextShell>
     );
   }
