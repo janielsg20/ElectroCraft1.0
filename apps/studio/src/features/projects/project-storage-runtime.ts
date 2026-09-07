@@ -100,6 +100,18 @@ const autosave = createProjectAutosaveController({
     runPersistence(() => revisionService.checkpoint(projectId, reason ?? 'manual')),
 });
 
+async function flushAutosaveCanonical() {
+  // Explicit flushes are read barriers. Even when no dirty batch exists, a
+  // caller that flushes and then opens the project must never reuse a snapshot
+  // captured before the barrier.
+  invalidateOpenProjectCache();
+  try {
+    return await autosave.flush();
+  } finally {
+    invalidateOpenProjectCache();
+  }
+}
+
 async function recoveryCandidate(projectId: string) {
   const latest = (await revisionService.list(projectId))[0];
   if (!latest) return service.recoveryCandidate(projectId);
@@ -163,7 +175,7 @@ export const projectStorageRuntime = Object.freeze({
     rememberCurrentProjectId(request.project.id);
     return autosave.queue(request);
   },
-  flushAutosave: () => autosave.flush(),
+  flushAutosave: flushAutosaveCanonical,
   createCheckpoint: (projectId: string, reason = 'manual') => autosave.checkpoint(projectId, reason),
   checkpointBeforeImport: (projectId: string) => autosave.checkpoint(projectId, 'pre-import'),
   checkpointBeforeMigration: (projectId: string) => autosave.checkpoint(projectId, 'pre-migration'),
@@ -205,18 +217,18 @@ export const projectStorageRuntime = Object.freeze({
     }
   },
   async listRevisionHistory(projectId: string) {
-    await autosave.flush();
+    await flushAutosaveCanonical();
     return revisionService.list(projectId);
   },
   async saveRevision(projectId: string) {
-    await autosave.flush();
+    await flushAutosaveCanonical();
     const revision = await revisionService.saveRevision(projectId);
     rememberCurrentProjectId(projectId);
     autosave.noteCheckpointCommitted();
     return revision;
   },
   async restoreRevisionFromHistory(projectId: string, revisionId: string) {
-    await autosave.flush();
+    await flushAutosaveCanonical();
     invalidateOpenProjectCache();
     try {
       const result = await revisionService.restore(projectId, revisionId);
@@ -228,12 +240,12 @@ export const projectStorageRuntime = Object.freeze({
     }
   },
   async backupProject(projectId: string) {
-    await autosave.flush();
+    await flushAutosaveCanonical();
     return backupService.backupProject(projectId);
   },
   previewImport: backupService.previewImport,
   async importBackup(serialized: string, collisionStrategy: ProjectBackupCollisionStrategy = 'copy') {
-    await autosave.flush();
+    await flushAutosaveCanonical();
     const result = await runPersistence(() => backupService.importBackup(serialized, collisionStrategy));
     rememberCurrentProjectId(result.projectId);
     autosave.noteCheckpointCommitted();
@@ -268,7 +280,7 @@ export const projectStorageRuntime = Object.freeze({
   },
   recoveryCandidate,
   async restoreRevision(projectId: string, revisionId: string) {
-    await autosave.flush();
+    await flushAutosaveCanonical();
     invalidateOpenProjectCache();
     try {
       const result = await revisionService.restore(projectId, revisionId);
@@ -280,7 +292,7 @@ export const projectStorageRuntime = Object.freeze({
     }
   },
   async close() {
-    await autosave.flush();
+    await flushAutosaveCanonical();
     autosave.dispose();
     invalidateOpenProjectCache();
     await service.close();
