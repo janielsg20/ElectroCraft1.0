@@ -1,5 +1,6 @@
 import {
   Button,
+  Loader,
   Select,
   SelectContent,
   SelectItem,
@@ -59,7 +60,9 @@ export function EditorScreenTopbarSelect({ fallbackLabel }: { readonly fallbackL
       ? selection.screenId
       : (screens[0]?.id ?? '');
 
-  if (navigation.state === 'loading' && screens.length === 0) return <span>Cargando Pantalla…</span>;
+  if (navigation.state === 'loading' && screens.length === 0) {
+    return <Loader label="Cargando Pantalla" size="xs" announce />;
+  }
   if (screens.length === 0) return <span>{fallbackLabel}</span>;
 
   return (

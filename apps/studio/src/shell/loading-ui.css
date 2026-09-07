@@ -142,6 +142,56 @@
   animation-delay: 30ms;
 }
 
+/* Runtime loaders keep source copy available to assistive technology while
+   replacing text-only visual waits with one compact ElectroCraft indicator. */
+.ec-screens-workspace > p[role='status'],
+.ec-navigation-preview > p[role='status'],
+.ec-data-sources-workspace > p[role='status'],
+.ec-data-explorer > p[role='status'],
+.ec-editor-screen-context-state[role='status'],
+html[data-workspace-persistence-state='loading'] .ec-project-history-route-empty > p {
+  position: relative;
+  min-height: 144px;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  color: transparent;
+  font-size: 0;
+  line-height: 0;
+  contain: layout paint;
+}
+
+.ec-editor-screen-context-state[role='status'] {
+  min-height: 82px;
+}
+
+html[data-workspace-persistence-state='loading'] .ec-project-history-route-empty > p {
+  min-height: 96px;
+}
+
+.ec-screens-workspace > p[role='status']::before,
+.ec-navigation-preview > p[role='status']::before,
+.ec-data-sources-workspace > p[role='status']::before,
+.ec-data-explorer > p[role='status']::before,
+.ec-editor-screen-context-state[role='status']::before,
+html[data-workspace-persistence-state='loading'] .ec-project-history-route-empty > p::before {
+  content: '';
+  width: 28px;
+  height: 28px;
+  border: 3px solid color-mix(in srgb, var(--primary) 18%, var(--surface));
+  border-top-color: var(--primary);
+  border-right-color: color-mix(in srgb, var(--primary) 62%, var(--surface));
+  border-radius: 999px;
+  animation: ec-loading-orbit 720ms linear infinite;
+}
+
+.ec-editor-screen-context-state[role='status']::before,
+html[data-workspace-persistence-state='loading'] .ec-project-history-route-empty > p::before {
+  width: 22px;
+  height: 22px;
+  border-width: 2px;
+}
+
 .ec-project-wizard-loading {
   position: fixed;
   inset: 0;
@@ -253,6 +303,12 @@
   }
 }
 
+@keyframes ec-loading-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (max-width: 900px) {
   .ec-route-skeleton--editor {
     grid-template-columns: minmax(150px, 210px) minmax(0, 1fr);
@@ -305,6 +361,13 @@
     min-height: 360px;
     padding: 20px;
   }
+
+  .ec-screens-workspace > p[role='status'],
+  .ec-navigation-preview > p[role='status'],
+  .ec-data-sources-workspace > p[role='status'],
+  .ec-data-explorer > p[role='status'] {
+    min-height: 112px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -315,7 +378,13 @@
   .ec-route-skeleton--generic > *,
   .ec-route-skeleton-heading,
   .ec-route-skeleton-toolbar,
-  .ec-project-wizard-loading {
+  .ec-project-wizard-loading,
+  .ec-screens-workspace > p[role='status']::before,
+  .ec-navigation-preview > p[role='status']::before,
+  .ec-data-sources-workspace > p[role='status']::before,
+  .ec-data-explorer > p[role='status']::before,
+  .ec-editor-screen-context-state[role='status']::before,
+  html[data-workspace-persistence-state='loading'] .ec-project-history-route-empty > p::before {
     animation: none;
   }
 }

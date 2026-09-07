@@ -29,7 +29,7 @@ describe('M03.1 Studio foundation integration', () => {
 
     expect(buttonMarkup).toContain('<a');
     expect(buttonMarkup).toContain('href="/__design-system"');
-    expect(buttonMarkup).toContain('border-border');
+    expect(buttonMarkup).toContain('border-input');
     expect(separatorMarkup).toContain('data-orientation="horizontal"');
   });
 

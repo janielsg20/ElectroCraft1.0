@@ -26,8 +26,8 @@
   --warning-foreground: #3c2500;
   --info: #0b57d0;
   --info-foreground: #ffffff;
-  --border: #d7dce1;
-  --input: #c7cdd3;
+  --border: #c5cad0;
+  --input: #8e959d;
   --ring: #0b57d0;
   --overlay: rgb(32 33 36 / 0.42);
   --skeleton: #e7eaee;
@@ -115,8 +115,8 @@
   --warning-foreground: #4b3200;
   --info: #a8c7fa;
   --info-foreground: #062e6f;
-  --border: #37393d;
-  --input: #55585d;
+  --border: #4a4d52;
+  --input: #6b6f76;
   --ring: #a8c7fa;
   --overlay: rgb(0 0 0 / 0.58);
   --skeleton: #2b2d30;

@@ -4,14 +4,14 @@ import type { ButtonHTMLAttributes } from 'react';
 import { cn } from '../../lib/utils';
 
 export const buttonVariants = cva(
-  'inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-[var(--ec-studio-button-radius,var(--radius))] text-sm font-medium outline-none transition-[background-color,border-color,color,box-shadow] duration-150 focus-visible:ring-2 focus-visible:ring-ring/35 focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-45 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+  'inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-[var(--ec-studio-button-radius,var(--radius))] text-sm font-medium outline-none transition-[background-color,border-color,color,box-shadow] duration-150 focus-visible:ring-2 focus-visible:ring-ring/45 focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-45 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
         default: 'border border-primary bg-primary text-primary-foreground hover:bg-primary/92',
         theme: 'border border-primary bg-primary text-primary-foreground hover:bg-primary/92',
         secondary: 'border border-transparent bg-secondary text-secondary-foreground hover:bg-muted',
-        outline: 'border border-input bg-surface text-foreground hover:border-border hover:bg-muted/70',
+        outline: 'border border-input bg-surface text-foreground hover:border-primary/65 hover:bg-muted/70',
         ghost: 'border border-transparent bg-transparent text-foreground hover:bg-muted/80',
         destructive: 'border border-destructive bg-destructive text-destructive-foreground hover:bg-destructive/92',
       },
