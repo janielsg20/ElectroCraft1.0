@@ -33,7 +33,9 @@ test('M08.13 configura búsqueda/filtros y persiste el índice tipado desde Camp
   await page.getByRole('tab', { name: 'Identidad' }).click();
   await page.getByLabel('Nombre del modelo').fill('Producto indexado');
   await page.getByRole('button', { name: 'Guardar identidad' }).click();
-  await expect(page.getByRole('heading', { name: 'Producto indexado', exact: true })).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByRole('heading', { name: 'Producto indexado', exact: true })).toBeVisible({
+    timeout: 60_000,
+  });
 
   await page.getByRole('tab', { name: 'Campos' }).click();
   await page.getByLabel('Nombre del nuevo campo').fill('Título buscable');
@@ -47,11 +49,15 @@ test('M08.13 configura búsqueda/filtros y persiste el índice tipado desde Camp
   await indexing.getByLabel(/Sortable/).check();
   await indexing.getByLabel(/Faceted/).check();
   await indexing.getByRole('button', { name: 'Guardar búsqueda y filtros' }).click();
-  await expect(page.getByRole('status')).toContainText(/índice reconstruido/i, { timeout: 60_000 });
+  await expect(page.locator('.ec-models-action-status')).toContainText(/índice reconstruido/i, {
+    timeout: 60_000,
+  });
   await expect(indexing).toContainText(/Sin registros para indexar|Índice actualizado/);
 
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Producto indexado', exact: true })).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByRole('heading', { name: 'Producto indexado', exact: true })).toBeVisible({
+    timeout: 60_000,
+  });
   await page.getByRole('tab', { name: 'Campos' }).click();
   await page.getByRole('listitem').filter({ hasText: 'Título buscable' }).click();
   const reloadedIndexing = page.locator('[data-field-indexing]');
