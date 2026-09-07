@@ -40,6 +40,7 @@ let snapshot: ProjectStorageDiagnostics = Object.freeze({
   message: 'Almacenamiento local pendiente de inicialización.',
 });
 let initializePromise: Promise<ProjectStorageDiagnostics> | null = null;
+let initialized = false;
 let currentProjectId: string | null = readCurrentProjectId();
 
 function rememberCurrentProjectId(projectId: string | null) {
@@ -104,11 +105,15 @@ export const projectStorageRuntime = Object.freeze({
   },
   getSnapshot: () => snapshot,
   async initialize() {
+    if (initialized) return snapshot;
     if (!initializePromise) {
       publish(Object.freeze({ ...snapshot, state: 'loading', message: 'Inicializando almacenamiento local…' }));
       initializePromise = service
         .initialize()
-        .then(publish)
+        .then((next) => {
+          initialized = true;
+          return publish(next);
+        })
         .finally(() => {
           initializePromise = null;
         });
@@ -215,6 +220,8 @@ export const projectStorageRuntime = Object.freeze({
     await autosave.flush();
     autosave.dispose();
     await service.close();
+    initialized = false;
+    initializePromise = null;
     return publish(await service.diagnostics());
   },
 });
