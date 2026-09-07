@@ -93,7 +93,7 @@ describe('M04.1 storage ownership boundary', () => {
     );
   });
 
-  it('does not allow an open-project cache snapshot to survive a concurrent persistence write', () => {
+  it('does not allow an open-project cache snapshot to survive or cross a persistence write', () => {
     const runtime = read('apps/studio/src/features/projects/project-storage-runtime.ts');
     const persistenceStart = runtime.indexOf('async function runPersistence');
     const persistenceEnd = runtime.indexOf('const autosave =', persistenceStart);
@@ -104,9 +104,12 @@ describe('M04.1 storage ownership boundary', () => {
 
     expect(persistenceStart).toBeGreaterThanOrEqual(0);
     expect(persistenceEnd).toBeGreaterThan(persistenceStart);
+    expect(runtime).toContain('let persistenceEpoch = 0;');
+    expect(runtime).toContain('function invalidateOpenProjectCache()');
     expect(persistence).toContain('finally {');
-    expect(persistence).toContain('openProjectCache = null;');
-    expect(openProject).toContain("const canCache = snapshot.state !== 'saving';");
-    expect(openProject).toContain("if (snapshot.state !== 'saving') openProjectCache = opened;");
+    expect(persistence).toContain('invalidateOpenProjectCache();');
+    expect(openProject).toContain('const readEpoch = persistenceEpoch;');
+    expect(openProject).toContain("const canUseCache = snapshot.state !== 'saving';");
+    expect(openProject).toContain('readEpoch === persistenceEpoch');
   });
 });
