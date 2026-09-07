@@ -8,6 +8,7 @@ import type {
 import {
   dataModelIndexResourceId,
   parseDataModelIndexResourceId,
+  type ElectroCraftCanonicalDataSourceCapability,
   type JsonValue,
 } from '@electrocraft/domain';
 import {
@@ -39,7 +40,9 @@ export class GenericFieldIndexedInternalDataSourceAdapter implements DataSourceA
   }
 
   get capabilities() {
-    return this.base.capabilities;
+    return Object.freeze([
+      ...new Set([...this.base.capabilities, 'aggregate' as ElectroCraftCanonicalDataSourceCapability]),
+    ]);
   }
 
   get supportsSchemaDiscovery() {
