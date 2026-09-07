@@ -11,8 +11,8 @@ export function SelectTrigger({ className, children, ...props }: ComponentProps<
   return (
     <SelectPrimitive.Trigger
       className={cn(
-        'flex h-[var(--ec-control-md)] min-w-32 items-center justify-between gap-2 rounded-[var(--ec-studio-field-radius,var(--radius))] border border-input bg-surface px-2.5 text-[var(--ec-text-sm)] text-foreground outline-none transition-[border-color,box-shadow,background-color] duration-150',
-        'hover:border-border focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-55',
+        'flex h-[var(--ec-control-md)] min-w-32 items-center justify-between gap-2 rounded-[var(--ec-studio-field-radius,var(--radius))] border border-input bg-surface px-2.5 text-[var(--ec-text-sm)] text-foreground outline-none transition-[border-color,box-shadow,background-color,color] duration-150',
+        'hover:border-border focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20 disabled:cursor-not-allowed disabled:border-border disabled:bg-muted disabled:text-muted-foreground',
         className,
       )}
       {...props}
@@ -68,7 +68,7 @@ export function SelectItem({ className, children, ...props }: ComponentProps<typ
     <SelectPrimitive.Item
       className={cn(
         'relative flex min-h-8 cursor-default select-none items-center rounded-md py-1.5 pl-8 pr-2.5 text-[var(--ec-text-sm)] outline-none',
-        'focus:bg-accent focus:text-accent-foreground data-[state=checked]:font-medium data-[disabled]:pointer-events-none data-[disabled]:opacity-45',
+        'focus:bg-accent focus:text-accent-foreground data-[state=checked]:font-medium data-[disabled]:pointer-events-none data-[disabled]:bg-muted/40 data-[disabled]:text-muted-foreground',
         className,
       )}
       {...props}
