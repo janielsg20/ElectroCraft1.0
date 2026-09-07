@@ -7,6 +7,7 @@ export const M04_6_REFERENTIAL_INTEGRITY_CHECKSUM = 'm04.6:referential-integrity
 export const M04_8_REVISION_STORE_CHECKSUM = 'm04.8:revision-object-versions-v5' as const;
 export const M08_10_TAXONOMY_TERMS_CHECKSUM = 'm08.10:taxonomy-terms-v6' as const;
 export const M08_12_RECORD_SOFT_DELETE_CHECKSUM = 'm08.12:record-soft-delete-v7' as const;
+export const M08_13_GENERIC_FIELD_INDEX_CHECKSUM = 'm08.13:generic-field-index-v8' as const;
 
 export const M04_1_SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS projects (
@@ -197,6 +198,10 @@ CREATE INDEX IF NOT EXISTS content_records_active_model_idx
   ON content_records(project_id, model_id, created_at, id)
   WHERE deleted_at IS NULL;
 `;
+export const M08_13_GENERIC_FIELD_INDEX_SQL = `
+ALTER TABLE record_field_index ADD COLUMN IF NOT EXISTS normalized_text text;
+DROP INDEX IF EXISTS record_field_index_fts_idx;
+`;
 
 export interface PGliteMigrationClient {
   exec(query: string): Promise<unknown>;
@@ -230,10 +235,11 @@ export async function applyStudioStorageMigrations(client: PGliteMigrationClient
   await applyMigration(client, 4, M04_6_REFERENTIAL_INTEGRITY_CHECKSUM, M04_6_REFERENTIAL_INTEGRITY_SQL);
   await applyMigration(client, 5, M04_8_REVISION_STORE_CHECKSUM, M04_8_REVISION_STORE_SQL);
   await applyMigration(client, 6, M08_10_TAXONOMY_TERMS_CHECKSUM, M08_10_TAXONOMY_TERMS_SQL);
+  await applyMigration(client, 7, M08_12_RECORD_SOFT_DELETE_CHECKSUM, M08_12_RECORD_SOFT_DELETE_SQL);
   await applyMigration(
     client,
     STUDIO_STORAGE_SCHEMA_VERSION,
-    M08_12_RECORD_SOFT_DELETE_CHECKSUM,
-    M08_12_RECORD_SOFT_DELETE_SQL,
+    M08_13_GENERIC_FIELD_INDEX_CHECKSUM,
+    M08_13_GENERIC_FIELD_INDEX_SQL,
   );
 }

@@ -6,6 +6,7 @@ import {
   M04_8_REVISION_STORE_CHECKSUM,
   M08_10_TAXONOMY_TERMS_CHECKSUM,
   M08_12_RECORD_SOFT_DELETE_CHECKSUM,
+  M08_13_GENERIC_FIELD_INDEX_CHECKSUM,
 } from './migration';
 import { STUDIO_STORAGE_SCHEMA_VERSION } from './schema-contract';
 
@@ -31,6 +32,7 @@ export async function verifyStudioStorageHealth(client: StudioStorageHealthClien
     M04_8_REVISION_STORE_CHECKSUM,
     M08_10_TAXONOMY_TERMS_CHECKSUM,
     M08_12_RECORD_SOFT_DELETE_CHECKSUM,
+    M08_13_GENERIC_FIELD_INDEX_CHECKSUM,
   ];
   const valid = expected.every(
     (checksum, index) => result.rows[index]?.schema_version === index + 1 && result.rows[index]?.checksum === checksum,

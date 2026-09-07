@@ -35,6 +35,10 @@ async function dispatch(page: Page, action: Record<string, unknown>) {
   }, action);
 }
 
+async function selectRootItem(page: Page, index: number) {
+  await dispatch(page, { type: 'setUi', ui: { itemSelector: { index, zone: 'root:default-zone' } } });
+}
+
 async function readDocument(page: Page, projectId: string): Promise<StoredDocument | null> {
   return page.evaluate(async (id) => {
     const { projectStorageRuntime } = await import('/src/features/projects/project-storage-runtime.ts');
@@ -74,12 +78,16 @@ test.describe('M06.3 platform overrides', () => {
     await expect
       .poll(async () => (await readDocument(page, projectId))?.root?.children?.length, { timeout: 60_000 })
       .toBe(1);
-    await dispatch(page, { type: 'setUi', ui: { itemSelector: { index: 0, zone: 'root:default-zone' } } });
+    await selectRootItem(page, 0);
     await page.locator('.ec-editor-panel-tab').filter({ hasText: 'Diseño' }).click();
 
     await selectPlatform(page, 'Android');
+    // The contextual tools Sheet legitimately moves focus outside Puck. Restore
+    // the same canonical item before editing its platform-specific presentation.
+    await selectRootItem(page, 0);
 
     const inspector = page.locator('[data-puck-layout-style-inspector]');
+    await expect(inspector).toBeVisible();
     await inspector.getByRole('tab', { name: 'Plataforma', exact: true }).click();
     await expect(inspector.locator('[data-platform-diagnostic="adapted"]')).toContainText('Adaptado');
     await inspector.getByLabel('Ancho en píxeles').fill('320');

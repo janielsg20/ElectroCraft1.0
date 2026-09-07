@@ -85,11 +85,23 @@ export interface InternalDataSort {
   readonly direction: 'asc' | 'desc';
 }
 
+export interface InternalDataSearch {
+  readonly text: string;
+  readonly fields?: readonly string[];
+}
+
+export interface InternalDataFacetBucket {
+  readonly value: JsonValue;
+  readonly count: number;
+}
+
 export interface InternalDataQuery {
   readonly offset?: number;
   readonly limit?: number;
   readonly filter?: InternalDataFilter;
   readonly sort?: InternalDataSort;
+  readonly search?: InternalDataSearch;
+  readonly facets?: readonly string[];
   readonly includeDeleted?: boolean;
 }
 
@@ -98,6 +110,7 @@ export interface InternalDataQueryResult {
   readonly total: number;
   readonly offset: number;
   readonly limit: number;
+  readonly facets?: Readonly<Record<string, readonly InternalDataFacetBucket[]>>;
 }
 
 export interface InternalDataRecordInput {
@@ -124,6 +137,15 @@ export interface InternalDataFieldUsage {
   readonly populatedCount: number;
 }
 
+export interface InternalDataIndexStatus {
+  readonly modelId: string;
+  readonly status: 'disabled' | 'empty' | 'ready' | 'stale';
+  readonly indexableFieldCount: number;
+  readonly activeRecordCount: number;
+  readonly indexedRecordCount: number;
+  readonly indexRowCount: number;
+}
+
 export interface InternalTaxonomyTermInput {
   readonly id?: string;
   readonly slug: string;
@@ -146,6 +168,8 @@ export interface InternalDataRepository {
   deleteRecord(projectId: string, modelId: string, recordId: string): Promise<boolean>;
   getStats(projectId: string, sourceId: string): Promise<InternalDataSourceStats>;
   getFieldUsage(projectId: string, modelId: string, fieldKey: string): Promise<InternalDataFieldUsage>;
+  getModelIndexStatus?(projectId: string, sourceId: string, modelId: string): Promise<InternalDataIndexStatus>;
+  reindexModel?(projectId: string, sourceId: string, modelId: string): Promise<InternalDataIndexStatus>;
   listTaxonomyTerms(projectId: string, sourceId: string, taxonomyId: string): Promise<readonly ElectroTaxonomyTerm[]>;
   createTaxonomyTerm(
     projectId: string,

@@ -87,6 +87,7 @@ export * from './data/connector-extension';
 export * from './data/advanced-fields';
 export * from './data/taxonomies';
 export * from './data/relations';
+export * from './data/field-indexing';
 
 export const packageDescriptor = Object.freeze({
   name: '@electrocraft/domain',

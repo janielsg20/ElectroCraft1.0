@@ -44,6 +44,7 @@ let initializePromise: Promise<ProjectStorageDiagnostics> | null = null;
 let initialized = false;
 let currentProjectId: string | null = readCurrentProjectId();
 let openProjectCache: OpenProjectResult | null = null;
+let persistenceEpoch = 0;
 
 function rememberCurrentProjectId(projectId: string | null) {
   currentProjectId = projectId;
@@ -64,8 +65,13 @@ function publish(next: ProjectStorageDiagnostics) {
   return snapshot;
 }
 
-async function runPersistence<T>(operation: () => Promise<T>) {
+function invalidateOpenProjectCache() {
+  persistenceEpoch += 1;
   openProjectCache = null;
+}
+
+async function runPersistence<T>(operation: () => Promise<T>) {
+  invalidateOpenProjectCache();
   publish(Object.freeze({ ...snapshot, state: 'saving', message: 'Guardando proyecto…' }));
   try {
     const result = await operation();
@@ -80,6 +86,11 @@ async function runPersistence<T>(operation: () => Promise<T>) {
       }),
     );
     throw error;
+  } finally {
+    // A read can start before or during the write and finish after it. Bump the
+    // epoch again so that any such read is forbidden from caching an older
+    // snapshot after the committed mutation.
+    invalidateOpenProjectCache();
   }
 }
 
@@ -88,6 +99,18 @@ const autosave = createProjectAutosaveController({
   createCheckpoint: (projectId, reason) =>
     runPersistence(() => revisionService.checkpoint(projectId, reason ?? 'manual')),
 });
+
+async function flushAutosaveCanonical() {
+  // Explicit flushes are read barriers. Even when no dirty batch exists, a
+  // caller that flushes and then opens the project must never reuse a snapshot
+  // captured before the barrier.
+  invalidateOpenProjectCache();
+  try {
+    return await autosave.flush();
+  } finally {
+    invalidateOpenProjectCache();
+  }
+}
 
 async function recoveryCandidate(projectId: string) {
   const latest = (await revisionService.list(projectId))[0];
@@ -148,11 +171,11 @@ export const projectStorageRuntime = Object.freeze({
     return revision;
   },
   queueAutosave(request: IncrementalSaveProjectRequest) {
-    openProjectCache = null;
+    invalidateOpenProjectCache();
     rememberCurrentProjectId(request.project.id);
     return autosave.queue(request);
   },
-  flushAutosave: () => autosave.flush(),
+  flushAutosave: flushAutosaveCanonical,
   createCheckpoint: (projectId: string, reason = 'manual') => autosave.checkpoint(projectId, reason),
   checkpointBeforeImport: (projectId: string) => autosave.checkpoint(projectId, 'pre-import'),
   checkpointBeforeMigration: (projectId: string) => autosave.checkpoint(projectId, 'pre-migration'),
@@ -162,63 +185,84 @@ export const projectStorageRuntime = Object.freeze({
   currentProjectId: () => currentProjectId,
   listProjects: service.listProjects,
   async setProjectStatus(projectId: string, status: Parameters<typeof service.setProjectStatus>[1]) {
-    const result = await service.setProjectStatus(projectId, status);
-    openProjectCache = null;
-    return result;
+    invalidateOpenProjectCache();
+    try {
+      return await service.setProjectStatus(projectId, status);
+    } finally {
+      invalidateOpenProjectCache();
+    }
   },
   async renameProject(projectId: string, name: string) {
-    const result = await service.renameProject(projectId, name);
-    openProjectCache = null;
-    return result;
+    invalidateOpenProjectCache();
+    try {
+      return await service.renameProject(projectId, name);
+    } finally {
+      invalidateOpenProjectCache();
+    }
   },
   async duplicateProject(sourceProjectId: string, name: string) {
-    const result = await service.duplicateProject(sourceProjectId, name);
-    openProjectCache = null;
-    return result;
+    invalidateOpenProjectCache();
+    try {
+      return await service.duplicateProject(sourceProjectId, name);
+    } finally {
+      invalidateOpenProjectCache();
+    }
   },
   async deleteProjectPermanently(projectId: string) {
-    await service.deleteProjectPermanently(projectId);
-    openProjectCache = null;
+    invalidateOpenProjectCache();
+    try {
+      await service.deleteProjectPermanently(projectId);
+    } finally {
+      invalidateOpenProjectCache();
+    }
   },
   async listRevisionHistory(projectId: string) {
-    await autosave.flush();
+    await flushAutosaveCanonical();
     return revisionService.list(projectId);
   },
   async saveRevision(projectId: string) {
-    await autosave.flush();
+    await flushAutosaveCanonical();
     const revision = await revisionService.saveRevision(projectId);
     rememberCurrentProjectId(projectId);
     autosave.noteCheckpointCommitted();
     return revision;
   },
   async restoreRevisionFromHistory(projectId: string, revisionId: string) {
-    await autosave.flush();
-    const result = await revisionService.restore(projectId, revisionId);
-    openProjectCache = null;
-    rememberCurrentProjectId(projectId);
-    autosave.noteCheckpointCommitted();
-    return result;
+    await flushAutosaveCanonical();
+    invalidateOpenProjectCache();
+    try {
+      const result = await revisionService.restore(projectId, revisionId);
+      rememberCurrentProjectId(projectId);
+      autosave.noteCheckpointCommitted();
+      return result;
+    } finally {
+      invalidateOpenProjectCache();
+    }
   },
   async backupProject(projectId: string) {
-    await autosave.flush();
+    await flushAutosaveCanonical();
     return backupService.backupProject(projectId);
   },
   previewImport: backupService.previewImport,
   async importBackup(serialized: string, collisionStrategy: ProjectBackupCollisionStrategy = 'copy') {
-    await autosave.flush();
+    await flushAutosaveCanonical();
     const result = await runPersistence(() => backupService.importBackup(serialized, collisionStrategy));
     rememberCurrentProjectId(result.projectId);
     autosave.noteCheckpointCommitted();
     return result;
   },
   async openProject(projectId: string) {
-    if (openProjectCache?.project.id === projectId) {
+    const readEpoch = persistenceEpoch;
+    const canUseCache = snapshot.state !== 'saving';
+    if (canUseCache && openProjectCache?.project.id === projectId) {
       rememberCurrentProjectId(projectId);
       return openProjectCache;
     }
     const opened = await service.openProject(projectId);
     if (opened) {
-      openProjectCache = opened;
+      // Only cache a read if no persistence invalidation happened while it was
+      // in flight. This closes both read-before-write and read-during-write races.
+      if (snapshot.state !== 'saving' && readEpoch === persistenceEpoch) openProjectCache = opened;
       rememberCurrentProjectId(opened.project.id);
     } else if (currentProjectId === projectId) {
       openProjectCache = null;
@@ -236,16 +280,21 @@ export const projectStorageRuntime = Object.freeze({
   },
   recoveryCandidate,
   async restoreRevision(projectId: string, revisionId: string) {
-    await autosave.flush();
-    const result = await revisionService.restore(projectId, revisionId);
-    openProjectCache = null;
-    rememberCurrentProjectId(projectId);
-    autosave.noteCheckpointCommitted();
-    return result.currentRevision;
+    await flushAutosaveCanonical();
+    invalidateOpenProjectCache();
+    try {
+      const result = await revisionService.restore(projectId, revisionId);
+      rememberCurrentProjectId(projectId);
+      autosave.noteCheckpointCommitted();
+      return result.currentRevision;
+    } finally {
+      invalidateOpenProjectCache();
+    }
   },
   async close() {
-    await autosave.flush();
+    await flushAutosaveCanonical();
     autosave.dispose();
+    invalidateOpenProjectCache();
     await service.close();
     initialized = false;
     initializePromise = null;

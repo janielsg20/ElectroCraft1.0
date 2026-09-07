@@ -1,6 +1,6 @@
 # TRACKING — ElectroCraft current position
 
-Date: 2026-09-05.
+Date: 2026-09-06.
 
 | Scope              | Estado                                                     | Evidencia                                                                                                                                        |
 | ------------------ | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -23,50 +23,47 @@ Date: 2026-09-05.
 | F08 / M08.9        | IMPLEMENTADA / GREEN MICROFASE                             | PR `#75`; Base CI `33812380216` (#878); merge `93440130d8c5fd62f73366925df7695dd309daf3`; `.ai/evidence/F08/M08.9/CLOSURE_2026-09-03.md`         |
 | F08 / M08.10       | IMPLEMENTADA / GREEN MICROFASE                             | PR `#76`; Base CI `33896051996` (#882); merge `78c88b65ef8708575ea2885edf7ad6631a30afce`; `.ai/evidence/F08/M08.10/CLOSURE_2026-09-04.md`        |
 | F08 / M08.11       | IMPLEMENTADA / GREEN MICROFASE                             | PR `#77` + audit PR `#78`; Base CI `33995779383` (#900); merge audit `89075e17b10332d5d6eaebbd9800f33e0987ffaf`; `M08.11/CLOSURE_2026-09-05.md` |
-| F08 / M08.12       | IMPLEMENTADA / PENDIENTE GATE                              | `.ai/evidence/F08/M08.12/IMPLEMENTATION_2026-09-05.md`                                                                                                                      |
+| F08 / M08.12       | IMPLEMENTADA / GREEN MICROFASE                             | PR `#79`; Base CI `34063642245` (#914); merge `096fb2bc6ae7110c899968b851728e0fa5795e96`; `M08.12/CLOSURE_2026-09-06.md`                         |
+| F08 / M08.13       | IMPLEMENTADA / PENDIENTE GATE                              | `.ai/evidence/F08/M08.13/IMPLEMENTATION_2026-09-06.md`                                                                                            |
 
 ## Rama activa
 
-`codex/m08-12-record-crud-validation`
+`codex/m08-13-generic-field-indexer`
 
-## M08.11 — cierre certificado
-
-Owner: `PGlite generic content store`.
-
-- metadata canónica `ElectroRelation` con source/target/cardinality/inverse/delete behavior/permisos;
-- capability canónica `relations`;
-- edges en la tabla genérica existente `relation_edges`, sin DDL por cardinalidad;
-- validación de `1:1`, `1:N`, `N:N`, duplicados y records destino/origen en aplicación/repositorio;
-- integridad `restrict`, `detach`, `cascade` es atómica con el borrado del record raíz;
-- cambio de cardinalidad/destino queda bloqueado mientras existan edges;
-- recursos `relation:<id>` pasan por InternalDataSourceAdapter/ConnectorRegistry y Data Explorer;
-- Studio expone `Datos > Modelos > <modelo> > Relaciones` con definición y selectores;
-- Base CI `33995779383` (#900) terminó completo en `success` incluyendo los nuevos gates `lint:offline` y `test:boundaries`;
-- PR correctiva `#78` se fusionó por squash a `main` en `89075e17b10332d5d6eaebbd9800f33e0987ffaf`.
-
-## Auditoría transversal cerrada
-
-- sin `TODO:`/`FIXME` activos relevantes detectados;
-- sin `test.skip`/`describe.skip` detectados;
-- sin `@ts-ignore`, `@ts-expect-error` o `eslint-disable` usados para ocultar errores;
-- logs temporales de Vite eliminados e ignorados;
-- Base CI ejecuta documentación, lint, lint offline, typecheck, boundaries, tests, build, Playwright y fixtures;
-- timeout del job aumentado a 45 minutos para evitar falsos `cancelled` en el borde de Playwright.
-
-## Riesgo de gobernanza
-
-`main` no tiene branch protection/required status checks configurados. La conexión actual no permite cambiar settings administrativos. Debe mantenerse como pendiente de configuración del repositorio, no como defecto de implementación de F08.
-
-## M08.12 — inicio
+## Último cierre certificado — M08.12
 
 Owner: `PGlite generic content store`.
 
-- reutilizar `content_records` JSON;
-- validar create/update desde `ElectroCraftDataSchema` antes de persistir;
-- definir soft delete por policy portable de estado/deletedAt;
-- construir `Datos > Registros` con DataView/list + detail y cards mobile;
-- mantener todas las mutaciones detrás de service/adapter/ConnectorRegistry.
+- CRUD validado contra `ElectroCraftDataSchema`;
+- soft delete `state=deleted + deletedAt`;
+- `Datos > Registros` list/detail/form y vista de eliminados;
+- integridad relacional mantiene `restrict/detach/cascade` atómico;
+- carrera UI al alternar `Incluir eliminados` durante una mutación corregida sin relajar E2E;
+- Base CI `34063642245` (#914) terminó completo en `success`;
+- PR `#79` fusionada por squash en `096fb2bc6ae7110c899968b851728e0fa5795e96`.
+
+## M08.13 — candidate
+
+Owner: `PGlite generic content store` usando `record_field_index` existente.
+
+- capacidades portables Searchable / Filterable / Sortable / Faceted;
+- schema v8 añade `normalized_text` y elimina FTS GIN de expresión heredado;
+- GenericFieldIndexer genera filas tipadas con ordinal;
+- CRUD y filas de índice se actualizan de forma transaccional;
+- cascades relacionales eliminan también sus filas de índice en la misma transacción;
+- query usa índice para búsqueda, filtros configurados, sort y facets; mantiene fallback JSON donde corresponde;
+- recurso `index:<modelId>` expone status/rebuild detrás del mismo ConnectorRegistry;
+- Studio muestra `Campo > Avanzado > Búsqueda y filtros` sin exponer SQL;
+- unit, contract, integration real PGlite y E2E incluidos.
+
+## Auditoría transversal vigente
+
+- sin segundo store o ConnectorRegistry;
+- sin DDL por modelo/campo;
+- sin acceso PGlite/Drizzle desde UI Studio;
+- Base CI sigue siendo el gate de cierre completo;
+- `main` continúa sin branch protection administrativa; la conexión actual no permite modificar esa configuración.
 
 ## Siguiente acción exacta
 
-Implementar M08.12 microfase por microfase sobre `codex/m08-12-record-crud-validation`, comenzando por validation compiler/service y soft-delete policy antes de ampliar la UI de Registros.
+Abrir PR de M08.13, ejecutar un único ElectroCraft Base CI y reparar solo fallos reales. Con gate GREEN registrar cierre, fusionar y activar M08.14.

@@ -15,7 +15,7 @@ describe('M08.10 taxonomy ownership boundary', () => {
     expect(domain).not.toMatch(/drizzle|PGlite|CREATE TABLE/i);
     expect(adapter).toContain('parseTaxonomyResourceId');
     expect(repository).toContain('schema.taxonomyTerms');
-    expect(STUDIO_STORAGE_SCHEMA_VERSION).toBe(7);
+    expect(STUDIO_STORAGE_SCHEMA_VERSION).toBe(8);
   });
 
   it('keeps definition and term management visible and separate in the canonical models route', () => {

@@ -22,49 +22,51 @@
 - M08.9 — Group, Repeater, Calculated y Conditional Fields: `IMPLEMENTADA / GREEN MICROFASE`.
 - M08.10 — Taxonomías dentro de Modelos: `IMPLEMENTADA / GREEN MICROFASE`.
 - M08.11 — Relaciones 1:1, 1:N y N:N: `IMPLEMENTADA / GREEN MICROFASE`.
-- M08.12 — CRUD de Registros y validación: `ACTIVE`.
+- M08.12 — CRUD de Registros y validación: `IMPLEMENTADA / GREEN MICROFASE`.
+- M08.13 — Índice tipado para búsqueda/filtros: `ACTIVE`.
 
 ## Rama activa
 
-`codex/m08-12-record-crud-validation`
+`codex/m08-13-generic-field-indexer`
 
 ## Último cierre certificado
 
-M08.11 quedó certificada tras la auditoría correctiva por ElectroCraft Base CI run `33995779383` (#900) sobre candidate `ec50b655560e749e98aead608924612346beb87d`: documentación, lint, lint offline, typecheck, boundaries, tests, build, Playwright, empty-repo y artifacts terminaron en `success`. PR `#78` se fusionó por squash a `main` en `89075e17b10332d5d6eaebbd9800f33e0987ffaf`.
+M08.12 quedó certificada por ElectroCraft Base CI run `34063642245` (#914) sobre candidate `8b9371756006a754bbbf1702cff963369eeeabd6`: documentación, lint, lint offline, typecheck, boundaries, tests, build y Playwright terminaron en `success`. PR `#79` se fusionó por squash a `main` en `096fb2bc6ae7110c899968b851728e0fa5795e96`.
 
-## M08.11 — cierre auditado
-
-Owner: `PGlite generic content store` existente, accesible mediante el adapter interno y el `ConnectorRegistry` certificados.
-
-- `ElectroRelation` es metadata canónica portable con origen, destino, cardinalidad, inverso, integridad y permisos.
-- todos los vínculos persisten en la tabla genérica existente `relation_edges`.
-- cardinalidad `1:1`, `1:N` y `N:N` se valida en aplicación/repositorio, nunca mediante DDL por relación.
-- `restrict`, `detach` y `cascade` se ejecutan de forma atómica con el borrado del registro raíz.
-- cambiar cardinalidad o destino queda bloqueado mientras existan vínculos incompatibles.
-- Studio expone `Datos > Modelos > <modelo> > Relaciones` y selectores de registros.
-- Data Explorer descubre las relaciones como recursos `relation:<id>` detrás del mismo ConnectorRegistry.
-- no se permite un segundo store, un registry paralelo, internals PGlite ni secretos persistidos.
-
-## M08.12 — estado de implementación
-
-`IMPLEMENTADA / PENDIENTE GATE`.
+## M08.12 — cierre auditado
 
 Owner: `PGlite generic content store` existente.
 
-- `content_records` continúa como almacenamiento JSON físico estable y añade únicamente `deletedAt` como policy genérica de soft delete.
+- `content_records` continúa como almacenamiento JSON físico estable y `deletedAt` implementa la policy genérica de soft delete.
 - create/update valida contra `ElectroCraftDataSchema` antes de escribir.
 - soft delete usa `state=deleted` + `deletedAt`, sin DDL dinámico por modelo.
-- `Datos > Registros` ofrece selector de modelo, list/detail, formulario generado y cards adaptadas a mobile.
+- `Datos > Registros` ofrece selector de modelo, list/detail, formulario generado y vista de eliminados.
 - ningún write de UI salta service/adapter/ConnectorRegistry.
 - integridad relacional `restrict/detach/cascade` mantiene atomicidad y comparte la policy soft-delete.
+- la carrera entre una mutación activa y `Incluir eliminados` quedó serializada antes del gate final.
+
+## M08.13 — estado de implementación
+
+`IN_PROGRESS / PENDIENTE GATE`.
+
+Owner: `PGlite generic content store` existente, usando la tabla física genérica `record_field_index` ya reservada por F04.
+
+- `GenericFieldIndexer` proyecta únicamente campos con capacidades explícitas `searchable`, `filterable`, `sortable` o `faceted`.
+- las capacidades se guardan de forma portable en metadata canónica y mantienen compatibilidad con los flags heredados `indexed`/`faceted`.
+- storage schema v8 añade `normalized_text` y elimina el FTS GIN de expresión heredado; no crea índices físicos por campo/modelo.
+- create/update/delete mantiene registro + filas tipadas dentro de una sola transacción Drizzle/PGlite.
+- cascades relacionales eliminan también sus filas de índice dentro de la transacción existente.
+- query usa el índice para búsqueda normalizada, filtros configurados, orden y facetas, con fallback JSON para campos no indexados.
+- el adapter interno expone estado y rebuild como recursos `index:<modelId>` detrás del mismo `ConnectorRegistry`.
+- Studio incorpora `Campo > Avanzado > Búsqueda y filtros` con Searchable, Filterable, Sortable, Faceted, estado y reconstrucción.
 
 ## Evidencia F08 reciente
 
-- `.ai/evidence/F08/M08.10/CLOSURE_2026-09-04.md`
-- `.ai/evidence/F08/M08.11/IMPLEMENTATION_2026-09-04.md`
 - `.ai/evidence/F08/M08.11/CLOSURE_2026-09-05.md`
 - `.ai/evidence/F08/M08.12/IMPLEMENTATION_2026-09-05.md`
+- `.ai/evidence/F08/M08.12/CLOSURE_2026-09-06.md`
+- `.ai/evidence/F08/M08.13/IMPLEMENTATION_2026-09-06.md`
 
 ## Siguiente transición
 
-Ejecutar ElectroCraft Base CI completo sobre PR `#79`. Solo con gate GREEN registrar cierre, fusionar y activar la siguiente microfase exacta de F08.
+Completar pruebas y evidencia de M08.13, ejecutar un único ElectroCraft Base CI completo y, solo con gate GREEN, registrar cierre, fusionar y activar M08.14.

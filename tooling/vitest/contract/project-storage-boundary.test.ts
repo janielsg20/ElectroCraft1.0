@@ -44,7 +44,7 @@ describe('M04.1 storage ownership boundary', () => {
   });
 
   it('pins one physical schema independent of user-defined model count', () => {
-    expect(STUDIO_STORAGE_SCHEMA_VERSION).toBe(7);
+    expect(STUDIO_STORAGE_SCHEMA_VERSION).toBe(8);
     expect(STUDIO_STORAGE_TABLES).toEqual(
       expect.arrayContaining([
         'projects',
@@ -91,5 +91,25 @@ describe('M04.1 storage ownership boundary', () => {
     expect([application, repository, revisionRepository, autosave].join('\n')).not.toMatch(
       /PuckHistory|ReteHistory|historySnapshot/,
     );
+  });
+
+  it('does not allow an open-project cache snapshot to survive or cross a persistence write', () => {
+    const runtime = read('apps/studio/src/features/projects/project-storage-runtime.ts');
+    const persistenceStart = runtime.indexOf('async function runPersistence');
+    const persistenceEnd = runtime.indexOf('const autosave =', persistenceStart);
+    const persistence = runtime.slice(persistenceStart, persistenceEnd);
+    const openStart = runtime.indexOf('async openProject(projectId: string)');
+    const openEnd = runtime.indexOf('verifyProject:', openStart);
+    const openProject = runtime.slice(openStart, openEnd);
+
+    expect(persistenceStart).toBeGreaterThanOrEqual(0);
+    expect(persistenceEnd).toBeGreaterThan(persistenceStart);
+    expect(runtime).toContain('let persistenceEpoch = 0;');
+    expect(runtime).toContain('function invalidateOpenProjectCache()');
+    expect(persistence).toContain('finally {');
+    expect(persistence).toContain('invalidateOpenProjectCache();');
+    expect(openProject).toContain('const readEpoch = persistenceEpoch;');
+    expect(openProject).toContain("const canUseCache = snapshot.state !== 'saving';");
+    expect(openProject).toContain('readEpoch === persistenceEpoch');
   });
 });

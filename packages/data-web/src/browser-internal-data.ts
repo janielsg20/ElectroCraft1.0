@@ -2,7 +2,7 @@ import type { InternalDataRepository, InternalRelationRepository } from '@electr
 import type { PGlite } from '@electric-sql/pglite';
 import { PGliteWorker } from '@electric-sql/pglite/worker';
 import { drizzle } from 'drizzle-orm/pglite';
-import { createDrizzleInternalDataRepository } from './internal-data-repository';
+import { createGenericFieldIndexedInternalDataRepository } from './generic-field-indexer';
 import { createDrizzleInternalRelationRepository } from './internal-relation-repository';
 import { applyStudioStorageMigrations } from './migration';
 import * as schema from './schema';
@@ -65,7 +65,7 @@ export function createBrowserInternalDataRepositoryPort(
       await applyStudioStorageMigrations(nextClient);
       const db = drizzle(nextClient as unknown as PGlite, { schema });
       client = nextClient;
-      repository = createDrizzleInternalDataRepository(db);
+      repository = createGenericFieldIndexedInternalDataRepository(db);
       relationRepository = createDrizzleInternalRelationRepository(db);
       return repository;
     })().finally(() => {
@@ -109,6 +109,16 @@ export function createBrowserInternalDataRepositoryPort(
     getStats: (projectId, sourceId) => delegate((active) => active.getStats(projectId, sourceId)),
     getFieldUsage: (projectId, modelId, fieldKey) =>
       delegate((active) => active.getFieldUsage(projectId, modelId, fieldKey)),
+    getModelIndexStatus: (projectId, sourceId, modelId) =>
+      delegate((active) => {
+        if (!active.getModelIndexStatus) throw new Error('El índice tipado no está disponible.');
+        return active.getModelIndexStatus(projectId, sourceId, modelId);
+      }),
+    reindexModel: (projectId, sourceId, modelId) =>
+      delegate((active) => {
+        if (!active.reindexModel) throw new Error('La reconstrucción del índice no está disponible.');
+        return active.reindexModel(projectId, sourceId, modelId);
+      }),
     listTaxonomyTerms: (projectId, sourceId, taxonomyId) =>
       delegate((active) => active.listTaxonomyTerms(projectId, sourceId, taxonomyId)),
     createTaxonomyTerm: (projectId, sourceId, taxonomyId, input) =>

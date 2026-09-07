@@ -6,6 +6,7 @@ export * from './explorer';
 export * from './connector-extension';
 export * from './taxonomies';
 export * from './relations';
+export * from './field-indexing';
 export {
   electroCraftDataFieldConditionSchema,
   electroCraftDataFieldOptionSchema,
