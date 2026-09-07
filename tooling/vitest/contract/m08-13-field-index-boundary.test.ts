@@ -17,7 +17,8 @@ describe('M08.13 GenericFieldIndexer architecture boundary', () => {
     expect(migration).not.toMatch(/CREATE\s+(?:UNIQUE\s+)?INDEX/i);
     expect(indexer).not.toMatch(/CREATE TABLE|ALTER TABLE|CREATE INDEX/i);
     expect(indexer).toContain('db.transaction');
-    expect(indexer).toContain('replaceRecordIndex');
+    expect(indexer).toContain('.delete(schema.recordFieldIndex)');
+    expect(indexer).toContain('.insert(schema.recordFieldIndex)');
   });
 
   it('keeps query/rebuild access behind ConnectorRegistry and exposes explicit Studio flags', () => {
@@ -29,6 +30,8 @@ describe('M08.13 GenericFieldIndexer architecture boundary', () => {
     expect(studioRuntime).toContain('dataSourceWorkspaceRuntime.registry');
     expect(editor).toContain('Búsqueda y filtros');
     for (const label of ['Searchable', 'Filterable', 'Sortable', 'Faceted']) expect(editor).toContain(label);
-    expect(editor).not.toMatch(/SELECT |INSERT |UPDATE |DELETE FROM/i);
+    expect(editor).not.toContain('@electric-sql/pglite');
+    expect(editor).not.toContain('drizzle-orm');
+    expect(editor).not.toContain('schema.recordFieldIndex');
   });
 });
