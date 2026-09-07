@@ -1,14 +1,19 @@
+import { getElectroCraftFieldRegistryEntry, type InternalDataIndexStatus } from '@electrocraft/application';
 import { Button, Input } from '@electrocraft/design-system';
 import {
   readElectroCraftAdvancedFieldMetadata,
+  readElectroCraftFieldIndexing,
+  writeElectroCraftFieldIndexing,
   type ElectroCraftCalculatedOperation,
   type ElectroCraftConditionalOperator,
   type ElectroCraftConditionalValueType,
   type ElectroCraftDataField,
   type ElectroCraftDataModel,
+  type ElectroCraftFieldIndexing,
   type ElectroCraftObjectId,
 } from '@electrocraft/domain';
 import { useEffect, useMemo, useState } from 'react';
+import { getDataModelIndexStatus, rebuildDataModelIndex } from './data-model-index-runtime';
 import { dataModelWorkspaceRuntime } from './data-model-runtime';
 
 interface AdvancedFieldEditorProps {
@@ -29,8 +34,16 @@ const comparisonOperators: readonly { readonly value: ElectroCraftConditionalOpe
   { value: 'not-empty', label: 'No está vacío' },
 ];
 
+const indexStatusLabels: Readonly<Record<InternalDataIndexStatus['status'], string>> = Object.freeze({
+  disabled: 'Sin campos indexables',
+  empty: 'Sin registros para indexar',
+  ready: 'Índice actualizado',
+  stale: 'Reconstrucción necesaria',
+});
+
 export function AdvancedFieldEditor({ model, field, onMessage }: AdvancedFieldEditorProps) {
   const advanced = readElectroCraftAdvancedFieldMetadata(field);
+  const descriptor = getElectroCraftFieldRegistryEntry(field.type);
   const [parentFieldRef, setParentFieldRef] = useState<ElectroCraftObjectId | ''>(advanced.parentFieldRef ?? '');
   const [minItems, setMinItems] = useState(String(advanced.repeater?.minItems ?? 0));
   const [maxItems, setMaxItems] = useState(String(advanced.repeater?.maxItems ?? ''));
@@ -54,6 +67,9 @@ export function AdvancedFieldEditor({ model, field, onMessage }: AdvancedFieldEd
   const [conditionalValueType, setConditionalValueType] = useState<ElectroCraftConditionalValueType>(
     advanced.conditional?.valueType ?? 'text',
   );
+  const [indexing, setIndexing] = useState<ElectroCraftFieldIndexing>(() => readElectroCraftFieldIndexing(field));
+  const [indexStatus, setIndexStatus] = useState<InternalDataIndexStatus | null>(null);
+  const [indexBusy, setIndexBusy] = useState(false);
 
   useEffect(() => {
     const next = readElectroCraftAdvancedFieldMetadata(field);
@@ -68,7 +84,18 @@ export function AdvancedFieldEditor({ model, field, onMessage }: AdvancedFieldEd
     setConditionOperator(rule?.operator ?? 'not-empty');
     setConditionValue(rule?.value === undefined || rule.value === null ? '' : String(rule.value));
     setConditionalValueType(next.conditional?.valueType ?? 'text');
+    setIndexing(readElectroCraftFieldIndexing(field));
   }, [field]);
+
+  useEffect(() => {
+    let active = true;
+    void getDataModelIndexStatus(model.id)
+      .then((status) => active && setIndexStatus(status))
+      .catch(() => active && setIndexStatus(null));
+    return () => {
+      active = false;
+    };
+  }, [model.id, field.id]);
 
   const parentCandidates = useMemo(
     () =>
@@ -123,6 +150,35 @@ export function AdvancedFieldEditor({ model, field, onMessage }: AdvancedFieldEd
     }
     await dataModelWorkspaceRuntime.updateAdvancedFieldMetadata(model.id, field.id, patch);
     onMessage('Configuración avanzada guardada. Dependencias y ciclos fueron validados.');
+  }
+
+  async function saveIndexing() {
+    if (!descriptor.supportsIndexing) throw new Error('Este tipo de campo no admite indexación tipada.');
+    setIndexBusy(true);
+    try {
+      const compatibility = writeElectroCraftFieldIndexing(field, indexing);
+      await dataModelWorkspaceRuntime.updateField(model.id, field.id, {
+        indexed: compatibility.indexed,
+        faceted: compatibility.faceted,
+        metadata: compatibility.metadata,
+      });
+      const status = await rebuildDataModelIndex(model.id);
+      setIndexStatus(status);
+      onMessage('Búsqueda y filtros guardados; índice reconstruido de forma transaccional.');
+    } finally {
+      setIndexBusy(false);
+    }
+  }
+
+  async function rebuildIndex() {
+    setIndexBusy(true);
+    try {
+      const status = await rebuildDataModelIndex(model.id);
+      setIndexStatus(status);
+      onMessage('Índice del modelo reconstruido.');
+    } finally {
+      setIndexBusy(false);
+    }
   }
 
   async function moveField(direction: -1 | 1) {
@@ -295,6 +351,97 @@ export function AdvancedFieldEditor({ model, field, onMessage }: AdvancedFieldEd
       >
         Guardar estructura
       </Button>
+
+      <section className="ec-indexing-editor" aria-label="Búsqueda y filtros" data-field-indexing>
+        <div className="ec-advanced-field-heading">
+          <div>
+            <strong>Búsqueda y filtros</strong>
+            <p>Configura capacidades explícitas sobre `record_field_index`; no se crean tablas ni índices por campo.</p>
+          </div>
+          <span>{indexStatus ? indexStatusLabels[indexStatus.status] : 'Comprobando índice…'}</span>
+        </div>
+        <div className="ec-model-form-grid">
+          <label className="ec-model-check">
+            <input
+              type="checkbox"
+              checked={indexing.searchable}
+              disabled={!descriptor.supportsIndexing || indexBusy}
+              onChange={(event) => setIndexing({ ...indexing, searchable: event.target.checked })}
+            />{' '}
+            Searchable · Búsqueda
+          </label>
+          <label className="ec-model-check">
+            <input
+              type="checkbox"
+              checked={indexing.filterable}
+              disabled={!descriptor.supportsIndexing || indexBusy || indexing.faceted}
+              onChange={(event) => setIndexing({ ...indexing, filterable: event.target.checked })}
+            />{' '}
+            Filterable · Filtrable
+          </label>
+          <label className="ec-model-check">
+            <input
+              type="checkbox"
+              checked={indexing.sortable}
+              disabled={!descriptor.supportsIndexing || indexBusy}
+              onChange={(event) => setIndexing({ ...indexing, sortable: event.target.checked })}
+            />{' '}
+            Sortable · Ordenable
+          </label>
+          <label className="ec-model-check">
+            <input
+              type="checkbox"
+              checked={indexing.faceted}
+              disabled={!descriptor.supportsIndexing || indexBusy}
+              onChange={(event) =>
+                setIndexing({
+                  ...indexing,
+                  faceted: event.target.checked,
+                  filterable: event.target.checked ? true : indexing.filterable,
+                })
+              }
+            />{' '}
+            Faceted · Facetas
+          </label>
+        </div>
+        {descriptor.supportsIndexing ? (
+          <div className="ec-field-metadata">
+            <span>{indexStatus?.indexableFieldCount ?? 0} campo(s) indexables</span>
+            <span>
+              {indexStatus?.indexedRecordCount ?? 0}/{indexStatus?.activeRecordCount ?? 0} registros indexados
+            </span>
+            <span>{indexStatus?.indexRowCount ?? 0} fila(s) tipadas</span>
+          </div>
+        ) : (
+          <p className="ec-advanced-hint">Este tipo de campo no se proyecta al índice tipado.</p>
+        )}
+        <div className="ec-advanced-order-actions">
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={!descriptor.supportsIndexing || indexBusy}
+            onClick={() =>
+              void saveIndexing().catch((error: unknown) =>
+                onMessage(error instanceof Error ? error.message : 'No se pudo guardar la configuración de índice.'),
+              )
+            }
+          >
+            Guardar búsqueda y filtros
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            disabled={indexBusy}
+            onClick={() =>
+              void rebuildIndex().catch((error: unknown) =>
+                onMessage(error instanceof Error ? error.message : 'No se pudo reconstruir el índice.'),
+              )
+            }
+          >
+            Reconstruir índice
+          </Button>
+        </div>
+      </section>
     </section>
   );
 }

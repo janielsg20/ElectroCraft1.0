@@ -310,6 +310,11 @@ export function createDrizzleInternalRelationRepository(db: StudioProjectDatabas
               isNull(schema.contentRecords.deletedAt),
             ),
           );
+        await tx
+          .delete(schema.recordFieldIndex)
+          .where(
+            and(eq(schema.recordFieldIndex.projectId, projectId), eq(schema.recordFieldIndex.recordId, node.recordId)),
+          );
       }
       const deletedRoot = await tx
         .update(schema.contentRecords)
@@ -323,6 +328,11 @@ export function createDrizzleInternalRelationRepository(db: StudioProjectDatabas
           ),
         )
         .returning({ id: schema.contentRecords.id });
+      if (deletedRoot.length > 0) {
+        await tx
+          .delete(schema.recordFieldIndex)
+          .where(and(eq(schema.recordFieldIndex.projectId, projectId), eq(schema.recordFieldIndex.recordId, recordId)));
+      }
       return deletedRoot.length > 0;
     });
   }

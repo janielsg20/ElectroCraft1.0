@@ -7,6 +7,7 @@ import {
   M04_8_REVISION_STORE_CHECKSUM,
   M08_10_TAXONOMY_TERMS_CHECKSUM,
   M08_12_RECORD_SOFT_DELETE_CHECKSUM,
+  M08_13_GENERIC_FIELD_INDEX_CHECKSUM,
   STUDIO_STORAGE_SCHEMA_VERSION,
   verifyStudioStorageHealth,
 } from '@electrocraft/data-web';
@@ -30,6 +31,7 @@ function createHealthClient(checksum: string) {
           M04_6_REFERENTIAL_INTEGRITY_CHECKSUM,
           M04_8_REVISION_STORE_CHECKSUM,
           M08_10_TAXONOMY_TERMS_CHECKSUM,
+          M08_12_RECORD_SOFT_DELETE_CHECKSUM,
           checksum,
         ].map(
           (migrationChecksum, index) => ({ schema_version: index + 1, checksum: migrationChecksum }) as unknown as T,
@@ -41,11 +43,11 @@ function createHealthClient(checksum: string) {
 
 describe('M04.2 storage lifecycle health', () => {
   it('accepts the current migration journal after the database responds', async () => {
-    const client = createHealthClient(M08_12_RECORD_SOFT_DELETE_CHECKSUM);
+    const client = createHealthClient(M08_13_GENERIC_FIELD_INDEX_CHECKSUM);
 
     await expect(verifyStudioStorageHealth(client)).resolves.toEqual({
       schemaVersion: STUDIO_STORAGE_SCHEMA_VERSION,
-      migrationChecksum: M08_12_RECORD_SOFT_DELETE_CHECKSUM,
+      migrationChecksum: M08_13_GENERIC_FIELD_INDEX_CHECKSUM,
     });
     expect(client.calls).toBe(2);
   });
