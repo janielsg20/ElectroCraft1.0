@@ -9,6 +9,7 @@ describe('M08.9 advanced field ownership boundary', () => {
   it('keeps generic PGlite storage and forbids dynamic DDL or eval', () => {
     const domain = read('packages/domain/src/data/advanced-fields.ts');
     const runtime = read('packages/connectors/src/advanced-field-runtime.ts');
+    const validator = read('packages/connectors/src/record-validation.ts');
     const adapter = read('packages/connectors/src/internal-data-source-adapter.ts');
 
     expect(advancedFieldStorageDescriptor).toEqual({
@@ -21,8 +22,9 @@ describe('M08.9 advanced field ownership boundary', () => {
     });
     expect(domain).toContain("ELECTROCRAFT_ADVANCED_FIELD_CAPABILITY = 'data.advanced-fields'");
     expect(runtime).not.toMatch(/\beval\s*\(|new Function\s*\(/);
-    expect(adapter).toContain('normalizeElectroCraftAdvancedFieldRecord');
-    expect(`${domain}\n${runtime}\n${adapter}`).not.toMatch(/CREATE TABLE|ALTER TABLE|DROP TABLE/i);
+    expect(validator).toContain('normalizeElectroCraftAdvancedFieldRecord');
+    expect(adapter).toContain('compileElectroCraftRecordValidator');
+    expect(`${domain}\n${runtime}\n${validator}\n${adapter}`).not.toMatch(/CREATE TABLE|ALTER TABLE|DROP TABLE/i);
   });
 
   it('integrates the advanced editor into the canonical models route', () => {

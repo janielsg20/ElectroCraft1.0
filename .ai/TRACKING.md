@@ -23,7 +23,7 @@ Date: 2026-09-05.
 | F08 / M08.9        | IMPLEMENTADA / GREEN MICROFASE                             | PR `#75`; Base CI `33812380216` (#878); merge `93440130d8c5fd62f73366925df7695dd309daf3`; `.ai/evidence/F08/M08.9/CLOSURE_2026-09-03.md`         |
 | F08 / M08.10       | IMPLEMENTADA / GREEN MICROFASE                             | PR `#76`; Base CI `33896051996` (#882); merge `78c88b65ef8708575ea2885edf7ad6631a30afce`; `.ai/evidence/F08/M08.10/CLOSURE_2026-09-04.md`        |
 | F08 / M08.11       | IMPLEMENTADA / GREEN MICROFASE                             | PR `#77` + audit PR `#78`; Base CI `33995779383` (#900); merge audit `89075e17b10332d5d6eaebbd9800f33e0987ffaf`; `M08.11/CLOSURE_2026-09-05.md` |
-| F08 / M08.12       | ACTIVE                                                     | `.ai/microphases/M08_12.md`                                                                                                                      |
+| F08 / M08.12       | IMPLEMENTADA / PENDIENTE GATE                              | `.ai/evidence/F08/M08.12/IMPLEMENTATION_2026-09-05.md`                                                                                                                      |
 
 ## Rama activa
 

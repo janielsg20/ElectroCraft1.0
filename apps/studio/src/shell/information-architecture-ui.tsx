@@ -7,6 +7,7 @@ import {
   getStudioIcon,
 } from '@electrocraft/design-system';
 import type { ReactNode } from 'react';
+import { RecordsWorkspace } from '../features/data/records-workspace';
 import { HelpTrigger } from '../help/help-ui';
 import { getHelpIdForNavigationItem, type StudioHelpId } from '../help/help-registry';
 import { iaT } from '../i18n/information-architecture.es';
@@ -109,17 +110,7 @@ export function StudioContentListDetailRoute() {
         </div>
       </header>
       <div className="ec-ia-list-detail" data-list-detail-pattern>
-        <section className="ec-ia-list-region" aria-labelledby="content-list-title" data-information-level="primary">
-          <h2 id="content-list-title">{iaT('studio.ia.content.listTitle')}</h2>
-          <StudioEmptyState id="content" />
-        </section>
-        <section
-          className="ec-ia-detail-region"
-          aria-label={iaT('studio.ia.listDetail.detailLabel')}
-          data-information-level="contextual"
-        >
-          <StudioEmptyState id="content-detail" />
-        </section>
+        <RecordsWorkspace />
       </div>
     </section>
   );

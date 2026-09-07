@@ -108,6 +108,20 @@ export function evaluateElectroCraftCalculatedField(
   }, numbers[0] ?? 0);
 }
 
+function optionMatches(left: JsonValue | undefined, right: string | number | boolean) {
+  return left === right;
+}
+
+function validDate(value: string) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`));
+}
+
+function validTime(value: string) {
+  if (!/^\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?$/.test(value)) return false;
+  const [hour, minute, second = '0'] = value.split(':');
+  return Number(hour) <= 23 && Number(minute) <= 59 && Number(second) < 60;
+}
+
 function validateScalar(field: ElectroCraftDataField, value: JsonValue | undefined, path: string) {
   const diagnostics: AdvancedFieldRuntimeDiagnostic[] = [];
   const required = field.required ?? !field.nullable;
@@ -116,17 +130,64 @@ function validateScalar(field: ElectroCraftDataField, value: JsonValue | undefin
     return diagnostics;
   }
 
-  if (['number', 'currency'].includes(field.type) && typeof value !== 'number') {
+  const textTypes = ['text', 'textarea', 'email', 'phone', 'url', 'date', 'time', 'datetime', 'color'];
+  const referenceTypes = ['image', 'file', 'relation', 'user', 'taxonomy'];
+  if (['number', 'currency'].includes(field.type) && (typeof value !== 'number' || !Number.isFinite(value))) {
     diagnostics.push({ fieldKey: field.key, path, message: `${field.label} debe ser numérico.` });
   }
   if (['boolean', 'switch'].includes(field.type) && typeof value !== 'boolean') {
     diagnostics.push({ fieldKey: field.key, path, message: `${field.label} debe ser booleano.` });
   }
-  if (
-    ['text', 'textarea', 'email', 'phone', 'url', 'date', 'time', 'datetime', 'color'].includes(field.type) &&
-    typeof value !== 'string'
-  ) {
+  if (textTypes.includes(field.type) && typeof value !== 'string') {
     diagnostics.push({ fieldKey: field.key, path, message: `${field.label} debe ser texto.` });
+  }
+  if (referenceTypes.includes(field.type) && typeof value !== 'string') {
+    diagnostics.push({ fieldKey: field.key, path, message: `${field.label} debe ser una referencia de texto.` });
+  }
+  if (field.type === 'gallery' && (!Array.isArray(value) || value.some((item) => typeof item !== 'string'))) {
+    diagnostics.push({ fieldKey: field.key, path, message: `${field.label} debe ser una lista de referencias.` });
+  }
+  if (field.type === 'map' && (!value || Array.isArray(value) || typeof value !== 'object')) {
+    diagnostics.push({ fieldKey: field.key, path, message: `${field.label} debe ser un objeto de ubicación.` });
+  }
+  if (['select', 'radio'].includes(field.type)) {
+    const allowed = field.options ?? [];
+    if (!allowed.some((option) => optionMatches(value, option.value))) {
+      diagnostics.push({ fieldKey: field.key, path, message: `${field.label} contiene una opción no permitida.` });
+    }
+  }
+  if (field.type === 'checkbox') {
+    const allowed = field.options ?? [];
+    if (!Array.isArray(value) || value.some((item) => !allowed.some((option) => optionMatches(item, option.value)))) {
+      diagnostics.push({ fieldKey: field.key, path, message: `${field.label} contiene opciones no permitidas.` });
+    }
+  }
+  if (field.type === 'email' && typeof value === 'string' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+    diagnostics.push({ fieldKey: field.key, path, message: `${field.label} no tiene un correo válido.` });
+  }
+  if (field.type === 'url' && typeof value === 'string') {
+    try {
+      const parsed = new URL(value);
+      if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('protocol');
+    } catch {
+      diagnostics.push({ fieldKey: field.key, path, message: `${field.label} no tiene una URL válida.` });
+    }
+  }
+  if (field.type === 'date' && typeof value === 'string' && !validDate(value)) {
+    diagnostics.push({ fieldKey: field.key, path, message: `${field.label} no tiene una fecha válida.` });
+  }
+  if (field.type === 'time' && typeof value === 'string' && !validTime(value)) {
+    diagnostics.push({ fieldKey: field.key, path, message: `${field.label} no tiene una hora válida.` });
+  }
+  if (field.type === 'datetime' && typeof value === 'string' && Number.isNaN(Date.parse(value))) {
+    diagnostics.push({ fieldKey: field.key, path, message: `${field.label} no tiene fecha/hora válida.` });
+  }
+  if (
+    field.type === 'color' &&
+    typeof value === 'string' &&
+    !/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(value)
+  ) {
+    diagnostics.push({ fieldKey: field.key, path, message: `${field.label} no tiene un color hexadecimal válido.` });
   }
   if (field.validation?.min !== undefined && typeof value === 'number' && value < field.validation.min) {
     diagnostics.push({
@@ -156,6 +217,19 @@ function validateScalar(field: ElectroCraftDataField, value: JsonValue | undefin
   ) {
     diagnostics.push({ fieldKey: field.key, path, message: `${field.label} supera la longitud máxima.` });
   }
+  if (field.validation?.pattern && typeof value === 'string') {
+    try {
+      if (!new RegExp(field.validation.pattern).test(value)) {
+        diagnostics.push({ fieldKey: field.key, path, message: `${field.label} no cumple el patrón configurado.` });
+      }
+    } catch {
+      diagnostics.push({
+        fieldKey: field.key,
+        path,
+        message: `${field.label} tiene un patrón de validación inválido.`,
+      });
+    }
+  }
   return diagnostics;
 }
 
@@ -177,6 +251,15 @@ function normalizeScope(
   const byKey = new Map(scopedFields.map((field) => [field.key, field]));
   const result: Record<string, JsonValue> = { ...input };
   const diagnostics: AdvancedFieldRuntimeDiagnostic[] = [];
+  for (const key of Object.keys(input)) {
+    if (!byKey.has(key))
+      diagnostics.push({ fieldKey: key, path: `${path}.${key}`, message: `El campo ${key} no existe en el modelo.` });
+  }
+  for (const field of scopedFields) {
+    if (result[field.key] === undefined && field.defaultValue !== undefined && field.type !== 'calculated') {
+      result[field.key] = structuredClone(field.defaultValue);
+    }
+  }
   const resolving = new Set<string>();
   const resolved = new Set<string>();
 

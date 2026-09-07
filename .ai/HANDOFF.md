@@ -2,7 +2,7 @@
 
 ## Current
 
-F08 / M08.12 — CRUD de Registros y validación — `ACTIVE`.
+F08 / M08.12 — CRUD de Registros y validación — `ACTIVE` (`IMPLEMENTADA / PENDIENTE GATE`).
 
 Rama activa: `codex/m08-12-record-crud-validation`.
 

@@ -11,7 +11,7 @@ import {
   type ElectroRelation,
   type ElectroRelationEdge,
 } from '@electrocraft/domain';
-import { and, asc, eq } from 'drizzle-orm';
+import { and, asc, eq, isNull } from 'drizzle-orm';
 import type { StudioProjectDatabase } from './repository';
 import * as schema from './schema';
 
@@ -74,6 +74,7 @@ async function requireRecord(db: StudioProjectDatabase, projectId: string, model
         eq(schema.contentRecords.projectId, projectId),
         eq(schema.contentRecords.modelId, modelId),
         eq(schema.contentRecords.id, recordId),
+        isNull(schema.contentRecords.deletedAt),
       ),
     )
     .limit(1);
@@ -247,6 +248,7 @@ export function createDrizzleInternalRelationRepository(db: StudioProjectDatabas
           eq(schema.contentRecords.projectId, projectId),
           eq(schema.contentRecords.modelId, modelId),
           eq(schema.contentRecords.id, recordId),
+          isNull(schema.contentRecords.deletedAt),
         ),
       )
       .limit(1);
@@ -295,24 +297,29 @@ export function createDrizzleInternalRelationRepository(db: StudioProjectDatabas
           .delete(schema.relationEdges)
           .where(and(eq(schema.relationEdges.projectId, projectId), eq(schema.relationEdges.id, edgeId)));
       }
+      const now = new Date();
       for (const node of cascadeNodes.values()) {
         await tx
-          .delete(schema.contentRecords)
+          .update(schema.contentRecords)
+          .set({ state: 'deleted', deletedAt: now, updatedAt: now })
           .where(
             and(
               eq(schema.contentRecords.projectId, projectId),
               eq(schema.contentRecords.modelId, node.modelId),
               eq(schema.contentRecords.id, node.recordId),
+              isNull(schema.contentRecords.deletedAt),
             ),
           );
       }
       const deletedRoot = await tx
-        .delete(schema.contentRecords)
+        .update(schema.contentRecords)
+        .set({ state: 'deleted', deletedAt: now, updatedAt: now })
         .where(
           and(
             eq(schema.contentRecords.projectId, projectId),
             eq(schema.contentRecords.modelId, modelId),
             eq(schema.contentRecords.id, recordId),
+            isNull(schema.contentRecords.deletedAt),
           ),
         )
         .returning({ id: schema.contentRecords.id });

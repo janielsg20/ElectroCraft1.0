@@ -7,6 +7,7 @@ import {
   M04_6_REFERENTIAL_INTEGRITY_CHECKSUM,
   M04_8_REVISION_STORE_CHECKSUM,
   M08_10_TAXONOMY_TERMS_CHECKSUM,
+  M08_12_RECORD_SOFT_DELETE_CHECKSUM,
   STUDIO_STORAGE_SCHEMA_VERSION,
   applyStudioStorageMigrations,
   verifyStudioStorageHealth,
@@ -28,7 +29,7 @@ describe('M04.2 migration lifecycle with real PGlite', () => {
 
     await expect(verifyStudioStorageHealth(client)).resolves.toEqual({
       schemaVersion: STUDIO_STORAGE_SCHEMA_VERSION,
-      migrationChecksum: M08_10_TAXONOMY_TERMS_CHECKSUM,
+      migrationChecksum: M08_12_RECORD_SOFT_DELETE_CHECKSUM,
     });
 
     const journal = await client.query<{ schema_version: number; checksum: string }>(
@@ -40,7 +41,8 @@ describe('M04.2 migration lifecycle with real PGlite', () => {
       { schema_version: 3, checksum: M04_4_MIGRATION_CHECKSUM },
       { schema_version: 4, checksum: M04_6_REFERENTIAL_INTEGRITY_CHECKSUM },
       { schema_version: 5, checksum: M04_8_REVISION_STORE_CHECKSUM },
-      { schema_version: STUDIO_STORAGE_SCHEMA_VERSION, checksum: M08_10_TAXONOMY_TERMS_CHECKSUM },
+      { schema_version: 6, checksum: M08_10_TAXONOMY_TERMS_CHECKSUM },
+      { schema_version: STUDIO_STORAGE_SCHEMA_VERSION, checksum: M08_12_RECORD_SOFT_DELETE_CHECKSUM },
     ]);
   });
 

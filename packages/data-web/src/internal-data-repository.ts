@@ -18,7 +18,7 @@ import {
   type ElectroTaxonomyTerm,
   type JsonValue,
 } from '@electrocraft/domain';
-import { and, asc, count, eq } from 'drizzle-orm';
+import { and, asc, count, eq, isNull } from 'drizzle-orm';
 import type { StudioProjectDatabase } from './repository';
 import * as schema from './schema';
 
@@ -43,6 +43,7 @@ function toRecord(row: typeof schema.contentRecords.$inferSelect): InternalDataR
     state: row.state,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
+    deletedAt: row.deletedAt?.toISOString() ?? null,
   });
 }
 
@@ -76,7 +77,13 @@ function compareValues(left: JsonValue | undefined, right: JsonValue | undefined
 function normalizeQuery(query: InternalDataQuery | undefined) {
   const offset = Math.max(0, Math.trunc(query?.offset ?? 0));
   const limit = Math.min(200, Math.max(1, Math.trunc(query?.limit ?? 50)));
-  return Object.freeze({ offset, limit, filter: query?.filter, sort: query?.sort });
+  return Object.freeze({
+    offset,
+    limit,
+    filter: query?.filter,
+    sort: query?.sort,
+    includeDeleted: query?.includeDeleted === true,
+  });
 }
 
 async function schemasForSource(
@@ -154,6 +161,15 @@ export function createDrizzleInternalDataRepository(db: StudioProjectDatabase): 
                   required: false,
                   valueType: 'number' as const,
                   defaultValue: 50,
+                }),
+                Object.freeze({
+                  name: 'includeDeleted',
+                  label: 'Incluir eliminados',
+                  location: 'input' as const,
+                  inputPath: Object.freeze(['includeDeleted']),
+                  required: false,
+                  valueType: 'boolean' as const,
+                  defaultValue: false,
                 }),
                 Object.freeze({
                   name: 'filter',
@@ -291,7 +307,15 @@ export function createDrizzleInternalDataRepository(db: StudioProjectDatabase): 
       await db
         .select()
         .from(schema.contentRecords)
-        .where(and(eq(schema.contentRecords.projectId, projectId), eq(schema.contentRecords.modelId, modelId)))
+        .where(
+          query.includeDeleted
+            ? and(eq(schema.contentRecords.projectId, projectId), eq(schema.contentRecords.modelId, modelId))
+            : and(
+                eq(schema.contentRecords.projectId, projectId),
+                eq(schema.contentRecords.modelId, modelId),
+                isNull(schema.contentRecords.deletedAt),
+              ),
+        )
         .orderBy(asc(schema.contentRecords.createdAt), asc(schema.contentRecords.id))
     ).map(toRecord);
 
@@ -355,10 +379,11 @@ export function createDrizzleInternalDataRepository(db: StudioProjectDatabase): 
           eq(schema.contentRecords.projectId, projectId),
           eq(schema.contentRecords.modelId, modelId),
           eq(schema.contentRecords.id, id),
+          isNull(schema.contentRecords.deletedAt),
         ),
       )
       .returning();
-    if (!updated[0]) throw new Error(`internal data record not found: ${id}`);
+    if (!updated[0]) throw new Error(`internal data record not found or deleted: ${id}`);
     return toRecord(updated[0]);
   }
 
@@ -366,13 +391,16 @@ export function createDrizzleInternalDataRepository(db: StudioProjectDatabase): 
     const projectId = requireNonEmpty(projectIdInput, 'projectId');
     const modelId = requireNonEmpty(modelIdInput, 'modelId');
     const recordId = requireNonEmpty(recordIdInput, 'recordId');
+    const now = new Date();
     const deleted = await db
-      .delete(schema.contentRecords)
+      .update(schema.contentRecords)
+      .set({ state: 'deleted', deletedAt: now, updatedAt: now })
       .where(
         and(
           eq(schema.contentRecords.projectId, projectId),
           eq(schema.contentRecords.modelId, modelId),
           eq(schema.contentRecords.id, recordId),
+          isNull(schema.contentRecords.deletedAt),
         ),
       )
       .returning({ id: schema.contentRecords.id });
@@ -385,7 +413,7 @@ export function createDrizzleInternalDataRepository(db: StudioProjectDatabase): 
     const recordCount = await db
       .select({ value: count(schema.contentRecords.id) })
       .from(schema.contentRecords)
-      .where(eq(schema.contentRecords.projectId, projectId));
+      .where(and(eq(schema.contentRecords.projectId, projectId), isNull(schema.contentRecords.deletedAt)));
     return Object.freeze({
       modelCount: dataSchema?.models.length ?? 0,
       recordCount: Number(recordCount[0]?.value ?? 0),
@@ -403,7 +431,13 @@ export function createDrizzleInternalDataRepository(db: StudioProjectDatabase): 
     const rows = await db
       .select({ data: schema.contentRecords.data })
       .from(schema.contentRecords)
-      .where(and(eq(schema.contentRecords.projectId, projectId), eq(schema.contentRecords.modelId, modelId)));
+      .where(
+        and(
+          eq(schema.contentRecords.projectId, projectId),
+          eq(schema.contentRecords.modelId, modelId),
+          isNull(schema.contentRecords.deletedAt),
+        ),
+      );
     let populatedCount = 0;
     for (const row of rows) {
       const data = asJsonObject(row.data, 'record.data');

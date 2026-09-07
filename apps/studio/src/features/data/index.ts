@@ -3,3 +3,4 @@ export * from './data-source-runtime';
 export * from './data-explorer';
 export * from './data-sources-feature-workspace';
 export * from './data-sources-workspace';
+export * from './records-workspace';

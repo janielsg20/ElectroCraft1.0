@@ -17,7 +17,7 @@ import type {
   InternalTaxonomyTermUpdate,
 } from '@electrocraft/application';
 import { parseRelationResourceId, parseTaxonomyResourceId, type JsonValue } from '@electrocraft/domain';
-import { normalizeElectroCraftAdvancedFieldRecord } from './advanced-field-runtime';
+import { compileElectroCraftRecordValidator } from './record-validation';
 
 export const INTERNAL_DATA_ADAPTER_ID = 'internal.pglite' as const;
 
@@ -80,11 +80,15 @@ function parseQuery(value: JsonValue | undefined): InternalDataQuery {
           return Object.freeze({ field: candidate.field, direction: candidate.direction });
         })()
       : undefined;
+  if (input.includeDeleted !== undefined && typeof input.includeDeleted !== 'boolean') {
+    throw new TypeError('includeDeleted debe ser booleano.');
+  }
   return Object.freeze({
     offset: optionalNumber(input.offset, 'offset'),
     limit: optionalNumber(input.limit, 'limit'),
     ...(filter ? { filter } : {}),
     ...(sort ? { sort } : {}),
+    ...(typeof input.includeDeleted === 'boolean' ? { includeDeleted: input.includeDeleted } : {}),
   });
 }
 
@@ -110,6 +114,7 @@ function parseCreateInput(value: JsonValue | undefined): InternalDataRecordInput
   if (input.state !== undefined && typeof input.state !== 'string') {
     throw new TypeError('mutation.input.state debe ser texto.');
   }
+  if (input.state === 'deleted') throw new TypeError('El estado deleted está reservado para la política de borrado.');
   return Object.freeze({
     ...(typeof input.id === 'string' ? { id: input.id } : {}),
     data: Object.freeze({ ...data }),
@@ -124,6 +129,7 @@ function parseUpdateInput(value: JsonValue | undefined): InternalDataRecordUpdat
   if (input.state !== undefined && typeof input.state !== 'string') {
     throw new TypeError('mutation.input.state debe ser texto.');
   }
+  if (input.state === 'deleted') throw new TypeError('El estado deleted está reservado para la política de borrado.');
   return Object.freeze({
     id: input.id,
     data: Object.freeze({ ...data }),
@@ -224,9 +230,8 @@ export class InternalDataSourceAdapter implements DataSourceAdapter {
     data: Readonly<Record<string, JsonValue>>,
   ) {
     const schema = await this.options.repository.getSchema(this.options.projectId, context.source.id);
-    const model = schema?.models.find(({ id }) => id === resourceId);
-    if (!model) throw new Error(`Modelo interno no encontrado: ${resourceId}.`);
-    return normalizeElectroCraftAdvancedFieldRecord(model, data);
+    if (!schema) throw new Error('No hay un schema de datos interno para esta fuente.');
+    return compileElectroCraftRecordValidator(schema, resourceId).validate(data);
   }
 
   private requireRelations() {
