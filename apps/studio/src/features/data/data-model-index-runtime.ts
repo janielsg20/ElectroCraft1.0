@@ -1,13 +1,20 @@
 import type { InternalDataIndexStatus } from '@electrocraft/application';
 import { dataModelIndexResourceId, type JsonValue } from '@electrocraft/domain';
+import { projectStorageRuntime } from '../projects/project-storage-runtime';
 import { dataSourceWorkspaceRuntime } from './data-source-runtime';
 
-function internalSource() {
-  return (
-    dataSourceWorkspaceRuntime
-      .getSnapshot()
-      .sources.find(({ kind, adapterId }) => kind === 'internal' && adapterId === 'internal.pglite') ?? null
-  );
+function loadedInternalSource() {
+  const workspace = dataSourceWorkspaceRuntime.getSnapshot();
+  const activeProjectId = projectStorageRuntime.currentProjectId();
+  if (!activeProjectId || workspace.project?.id !== activeProjectId) return null;
+  return workspace.sources.find(({ kind, adapterId }) => kind === 'internal' && adapterId === 'internal.pglite') ?? null;
+}
+
+async function internalSource() {
+  const loaded = loadedInternalSource();
+  if (loaded) return loaded;
+  await dataSourceWorkspaceRuntime.load();
+  return loadedInternalSource();
 }
 
 function parseIndexStatus(value: JsonValue): InternalDataIndexStatus {
@@ -34,8 +41,7 @@ function parseIndexStatus(value: JsonValue): InternalDataIndexStatus {
 }
 
 export async function getDataModelIndexStatus(modelId: string) {
-  await dataSourceWorkspaceRuntime.load();
-  const source = internalSource();
+  const source = await internalSource();
   if (!source) throw new Error('ElectroCraft Data no está disponible.');
   return parseIndexStatus(
     await dataSourceWorkspaceRuntime.registry.query(source, 'development', {
@@ -45,8 +51,7 @@ export async function getDataModelIndexStatus(modelId: string) {
 }
 
 export async function rebuildDataModelIndex(modelId: string) {
-  await dataSourceWorkspaceRuntime.load();
-  const source = internalSource();
+  const source = await internalSource();
   if (!source) throw new Error('ElectroCraft Data no está disponible.');
   return parseIndexStatus(
     await dataSourceWorkspaceRuntime.registry.mutate(source, 'development', {
