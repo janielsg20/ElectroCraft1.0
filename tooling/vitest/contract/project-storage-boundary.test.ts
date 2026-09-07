@@ -92,4 +92,21 @@ describe('M04.1 storage ownership boundary', () => {
       /PuckHistory|ReteHistory|historySnapshot/,
     );
   });
+
+  it('does not allow an open-project cache snapshot to survive a concurrent persistence write', () => {
+    const runtime = read('apps/studio/src/features/projects/project-storage-runtime.ts');
+    const persistenceStart = runtime.indexOf('async function runPersistence');
+    const persistenceEnd = runtime.indexOf('const autosave =', persistenceStart);
+    const persistence = runtime.slice(persistenceStart, persistenceEnd);
+    const openStart = runtime.indexOf('async openProject(projectId: string)');
+    const openEnd = runtime.indexOf('verifyProject:', openStart);
+    const openProject = runtime.slice(openStart, openEnd);
+
+    expect(persistenceStart).toBeGreaterThanOrEqual(0);
+    expect(persistenceEnd).toBeGreaterThan(persistenceStart);
+    expect(persistence).toContain('finally {');
+    expect(persistence).toContain('openProjectCache = null;');
+    expect(openProject).toContain("const canCache = snapshot.state !== 'saving';");
+    expect(openProject).toContain("if (snapshot.state !== 'saving') openProjectCache = opened;");
+  });
 });
