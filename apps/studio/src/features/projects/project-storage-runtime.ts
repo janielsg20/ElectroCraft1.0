@@ -3,6 +3,7 @@ import {
   createProjectRevisionService,
   createProjectStorageService,
   type IncrementalSaveProjectRequest,
+  type OpenProjectResult,
   type ProjectBackupCollisionStrategy,
   type ProjectStorageDiagnostics,
   type SaveProjectRequest,
@@ -40,7 +41,9 @@ let snapshot: ProjectStorageDiagnostics = Object.freeze({
   message: 'Almacenamiento local pendiente de inicialización.',
 });
 let initializePromise: Promise<ProjectStorageDiagnostics> | null = null;
+let initialized = false;
 let currentProjectId: string | null = readCurrentProjectId();
+let openProjectCache: OpenProjectResult | null = null;
 
 function rememberCurrentProjectId(projectId: string | null) {
   currentProjectId = projectId;
@@ -62,6 +65,7 @@ function publish(next: ProjectStorageDiagnostics) {
 }
 
 async function runPersistence<T>(operation: () => Promise<T>) {
+  openProjectCache = null;
   publish(Object.freeze({ ...snapshot, state: 'saving', message: 'Guardando proyecto…' }));
   try {
     const result = await operation();
@@ -104,11 +108,15 @@ export const projectStorageRuntime = Object.freeze({
   },
   getSnapshot: () => snapshot,
   async initialize() {
+    if (initialized) return snapshot;
     if (!initializePromise) {
       publish(Object.freeze({ ...snapshot, state: 'loading', message: 'Inicializando almacenamiento local…' }));
       initializePromise = service
         .initialize()
-        .then(publish)
+        .then((next) => {
+          initialized = true;
+          return publish(next);
+        })
         .finally(() => {
           initializePromise = null;
         });
@@ -140,6 +148,7 @@ export const projectStorageRuntime = Object.freeze({
     return revision;
   },
   queueAutosave(request: IncrementalSaveProjectRequest) {
+    openProjectCache = null;
     rememberCurrentProjectId(request.project.id);
     return autosave.queue(request);
   },
@@ -152,10 +161,25 @@ export const projectStorageRuntime = Object.freeze({
   pendingAutosaveObjectIds: () => autosave.pendingObjectIds(),
   currentProjectId: () => currentProjectId,
   listProjects: service.listProjects,
-  setProjectStatus: service.setProjectStatus,
-  renameProject: service.renameProject,
-  duplicateProject: service.duplicateProject,
-  deleteProjectPermanently: service.deleteProjectPermanently,
+  async setProjectStatus(projectId: string, status: Parameters<typeof service.setProjectStatus>[1]) {
+    const result = await service.setProjectStatus(projectId, status);
+    openProjectCache = null;
+    return result;
+  },
+  async renameProject(projectId: string, name: string) {
+    const result = await service.renameProject(projectId, name);
+    openProjectCache = null;
+    return result;
+  },
+  async duplicateProject(sourceProjectId: string, name: string) {
+    const result = await service.duplicateProject(sourceProjectId, name);
+    openProjectCache = null;
+    return result;
+  },
+  async deleteProjectPermanently(projectId: string) {
+    await service.deleteProjectPermanently(projectId);
+    openProjectCache = null;
+  },
   async listRevisionHistory(projectId: string) {
     await autosave.flush();
     return revisionService.list(projectId);
@@ -170,6 +194,7 @@ export const projectStorageRuntime = Object.freeze({
   async restoreRevisionFromHistory(projectId: string, revisionId: string) {
     await autosave.flush();
     const result = await revisionService.restore(projectId, revisionId);
+    openProjectCache = null;
     rememberCurrentProjectId(projectId);
     autosave.noteCheckpointCommitted();
     return result;
@@ -187,10 +212,16 @@ export const projectStorageRuntime = Object.freeze({
     return result;
   },
   async openProject(projectId: string) {
+    if (openProjectCache?.project.id === projectId) {
+      rememberCurrentProjectId(projectId);
+      return openProjectCache;
+    }
     const opened = await service.openProject(projectId);
     if (opened) {
+      openProjectCache = opened;
       rememberCurrentProjectId(opened.project.id);
     } else if (currentProjectId === projectId) {
+      openProjectCache = null;
       rememberCurrentProjectId(null);
     }
     return opened;
@@ -207,6 +238,7 @@ export const projectStorageRuntime = Object.freeze({
   async restoreRevision(projectId: string, revisionId: string) {
     await autosave.flush();
     const result = await revisionService.restore(projectId, revisionId);
+    openProjectCache = null;
     rememberCurrentProjectId(projectId);
     autosave.noteCheckpointCommitted();
     return result.currentRevision;
@@ -215,6 +247,9 @@ export const projectStorageRuntime = Object.freeze({
     await autosave.flush();
     autosave.dispose();
     await service.close();
+    initialized = false;
+    initializePromise = null;
+    openProjectCache = null;
     return publish(await service.diagnostics());
   },
 });
