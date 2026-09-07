@@ -7,7 +7,9 @@ function loadedInternalSource() {
   const workspace = dataSourceWorkspaceRuntime.getSnapshot();
   const activeProjectId = projectStorageRuntime.currentProjectId();
   if (!activeProjectId || workspace.project?.id !== activeProjectId) return null;
-  return workspace.sources.find(({ kind, adapterId }) => kind === 'internal' && adapterId === 'internal.pglite') ?? null;
+  return (
+    workspace.sources.find(({ kind, adapterId }) => kind === 'internal' && adapterId === 'internal.pglite') ?? null
+  );
 }
 
 async function internalSource() {
