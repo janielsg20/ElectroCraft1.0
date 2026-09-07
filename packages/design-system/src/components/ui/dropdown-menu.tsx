@@ -36,7 +36,7 @@ export function DropdownMenuItem({ destructive = false, className, ...props }: D
       data-destructive={destructive ? 'true' : undefined}
       className={cn(
         'relative flex min-h-8 cursor-default select-none items-center rounded-md px-2.5 py-1.5 text-[var(--ec-text-sm)] outline-none',
-        'focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-45',
+        'focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:bg-muted/40 data-[disabled]:text-muted-foreground',
         'data-[destructive=true]:text-destructive data-[destructive=true]:focus:bg-destructive/10 data-[destructive=true]:focus:text-destructive',
         className,
       )}
