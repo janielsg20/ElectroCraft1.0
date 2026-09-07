@@ -1,4 +1,4 @@
-import type { ElectroCraftMetadata, JsonValue } from '@electrocraft/domain';
+import type { ElectroCraftMetadata, ElectroCraftObjectId, JsonValue } from '@electrocraft/domain';
 import {
   boolean,
   doublePrecision,
@@ -155,7 +155,7 @@ export const recordFieldIndex = pgTable(
       .references(() => projects.id, { onDelete: 'cascade' }),
     modelId: text('model_id').notNull(),
     recordId: text('record_id').notNull(),
-    fieldId: text('field_id').notNull(),
+    fieldId: text('field_id').$type<ElectroCraftObjectId>().notNull(),
     ordinal: integer('ordinal').notNull().default(0),
     valueKind: text('value_kind').notNull(),
     textValue: text('text_value'),
