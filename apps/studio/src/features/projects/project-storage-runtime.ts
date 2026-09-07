@@ -80,6 +80,11 @@ async function runPersistence<T>(operation: () => Promise<T>) {
       }),
     );
     throw error;
+  } finally {
+    // A concurrent openProject() can finish while the write is still in flight.
+    // Always invalidate again after persistence so that an older snapshot can
+    // never survive a committed autosave/revision.
+    openProjectCache = null;
   }
 }
 
@@ -212,13 +217,16 @@ export const projectStorageRuntime = Object.freeze({
     return result;
   },
   async openProject(projectId: string) {
-    if (openProjectCache?.project.id === projectId) {
+    const canCache = snapshot.state !== 'saving';
+    if (canCache && openProjectCache?.project.id === projectId) {
       rememberCurrentProjectId(projectId);
       return openProjectCache;
     }
     const opened = await service.openProject(projectId);
     if (opened) {
-      openProjectCache = opened;
+      // Reads that overlap a write may observe the previous committed snapshot.
+      // Return it to the caller if requested, but do not promote it to cache.
+      if (snapshot.state !== 'saving') openProjectCache = opened;
       rememberCurrentProjectId(opened.project.id);
     } else if (currentProjectId === projectId) {
       openProjectCache = null;
