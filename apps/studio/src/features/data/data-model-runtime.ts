@@ -186,9 +186,18 @@ async function persistSchema(nextSchema: ElectroCraftDataSchema, selectedModelId
       dirtyObjects: [createStoredDataSchemaObject(parsed)],
     });
     await projectStorageRuntime.flushAutosave();
-    await loadWorkspace();
     const selected = parsed.models.find(({ id }) => id === selectedModelId) ?? parsed.models[0] ?? null;
-    return publish({ ...snapshot, selectedModelId: selected?.id ?? null, message });
+    return publish({
+      state: 'ready',
+      project: current.project,
+      source: current.source,
+      schema: parsed,
+      models: parsed.models,
+      taxonomies: parsed.taxonomies ?? [],
+      relations: parsed.relations ?? [],
+      selectedModelId: selected?.id ?? null,
+      message,
+    });
   } catch (error) {
     publish({
       ...current,
