@@ -231,6 +231,13 @@ export const navigationWorkspaceRuntime = Object.freeze({
     return screenUpdatedAt.get(screenId) ?? null;
   },
   load() {
+    const projectId = activeProjectId();
+    if (
+      snapshot.state === 'ready' &&
+      ((!projectId && !snapshot.project) || (projectId !== null && snapshot.project?.id === projectId))
+    ) {
+      return Promise.resolve(snapshot);
+    }
     if (!loadPromise) {
       loadPromise = loadWorkspace().finally(() => {
         loadPromise = null;
