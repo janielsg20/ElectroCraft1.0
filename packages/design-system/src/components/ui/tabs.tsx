@@ -13,7 +13,7 @@ export function TabsTrigger({ className, ...props }: ComponentProps<typeof TabsP
     <TabsPrimitive.Trigger
       className={cn(
         'inline-flex items-center justify-center whitespace-nowrap outline-none transition-[color,background-color,box-shadow,transform]',
-        'focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
+        'focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:cursor-not-allowed disabled:text-muted-foreground',
         className,
       )}
       {...props}
