@@ -88,6 +88,14 @@ No se expone SQL al usuario.
 
 Los contratos y fixtures de storage que fijaban v7 se avanzan a v8 conservando el journal explícito de M08.12 en versión 7.
 
+## Remediación del candidate
+
+- Base CI `34071035789` (#916) alcanzó `Lint` y falló únicamente el `prettier --check` de seis archivos M08.13; las etapas posteriores no llegaron a ejecutarse.
+- se aplicó el Prettier bloqueado del repo (`3.9.6`) sobre esos seis archivos, sin cambios funcionales;
+- el helper temporal de formato se autoeliminó en el mismo commit que aplicó el formato;
+- candidate de código formateado: `21b5fbf4bdfa6a8a5dd341560baf8464132fa2f1`;
+- el run automático asociado a ese push quedó `action_required` sin jobs por provenir de `github-actions[bot]`, por lo que este commit documental normal fuerza el gate real sobre el mismo código formateado.
+
 ## Gate pendiente
 
-Ejecutar un único ElectroCraft Base CI completo sobre la PR de M08.13. Solo si termina GREEN crear `CLOSURE`, fusionar y activar M08.14.
+Ejecutar ElectroCraft Base CI completo sobre la PR de M08.13. Solo si termina GREEN crear `CLOSURE`, fusionar y activar M08.14.
