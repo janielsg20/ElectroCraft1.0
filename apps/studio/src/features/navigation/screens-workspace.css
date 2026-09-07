@@ -4,7 +4,7 @@
   height: 100%;
   overflow: auto;
   padding: clamp(16px, 2vw, 26px);
-  background: var(--surface);
+  background: var(--background);
   color: var(--foreground);
 }
 
@@ -94,7 +94,7 @@
 .ec-screen-detail,
 .ec-screens-empty {
   border-radius: var(--ec-radius-lg);
-  background: var(--card);
+  background: var(--surface);
 }
 
 .ec-screens-list-panel {
@@ -120,6 +120,10 @@
 .ec-screen-list-item:hover,
 .ec-screen-list-item[data-selected='true'] {
   background: var(--accent);
+}
+
+.ec-screen-list-item[data-selected='true'] {
+  color: var(--accent-foreground);
 }
 
 .ec-screen-list-item:focus-visible {
@@ -183,7 +187,7 @@
   border-radius: 999px;
   padding: 3px 9px;
   background: var(--accent);
-  color: var(--muted-foreground);
+  color: var(--accent-foreground);
   font-size: var(--ec-text-xs);
   font-weight: 600;
 }
