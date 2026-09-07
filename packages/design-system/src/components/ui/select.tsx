@@ -12,7 +12,7 @@ export function SelectTrigger({ className, children, ...props }: ComponentProps<
     <SelectPrimitive.Trigger
       className={cn(
         'flex h-[var(--ec-control-md)] min-w-32 items-center justify-between gap-2 rounded-[var(--ec-studio-field-radius,var(--radius))] border border-input bg-surface px-2.5 text-[var(--ec-text-sm)] text-foreground outline-none transition-[border-color,box-shadow,background-color] duration-150',
-        'hover:border-border focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-55',
+        'hover:border-primary/65 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/35 disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-55',
         className,
       )}
       {...props}
