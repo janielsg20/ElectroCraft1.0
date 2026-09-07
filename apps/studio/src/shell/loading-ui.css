@@ -239,6 +239,60 @@
   width: 100%;
 }
 
+/* Legacy/local loading states use the same quiet animated indicator as the Studio shell.
+   The status copy stays in the accessibility tree but is not painted in the interface. */
+.ec-screens-workspace > p[role='status'],
+[data-navigation-preview] > p[role='status'],
+[data-data-sources-workspace] > p[role='status'],
+.ec-data-explorer > p[role='status'],
+.ec-editor-screen-context-state[role='status'] {
+  min-height: 144px;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  color: transparent;
+  font-size: 0;
+}
+
+.ec-screens-workspace > p[role='status']::before,
+[data-navigation-preview] > p[role='status']::before,
+[data-data-sources-workspace] > p[role='status']::before,
+.ec-data-explorer > p[role='status']::before,
+.ec-editor-screen-context-state[role='status']::before {
+  width: 22px;
+  height: 22px;
+  border: 2px solid color-mix(in srgb, var(--primary) 18%, var(--border));
+  border-top-color: var(--primary);
+  border-radius: 999px;
+  content: '';
+  animation: ec-studio-loading-spin 700ms linear infinite;
+}
+
+.ec-navigation-loading {
+  min-height: 72px;
+  justify-content: center;
+}
+
+.ec-navigation-loading > span {
+  display: none;
+}
+
+.ec-editor-screen-context-loading {
+  min-height: 96px;
+  place-items: center;
+}
+
+.ec-topbar-screen-loader {
+  min-width: 28px;
+  justify-content: center;
+}
+
+@keyframes ec-studio-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @keyframes ec-route-skeleton-enter {
   from {
     opacity: 0;
@@ -315,7 +369,12 @@
   .ec-route-skeleton--generic > *,
   .ec-route-skeleton-heading,
   .ec-route-skeleton-toolbar,
-  .ec-project-wizard-loading {
+  .ec-project-wizard-loading,
+  .ec-screens-workspace > p[role='status']::before,
+  [data-navigation-preview] > p[role='status']::before,
+  [data-data-sources-workspace] > p[role='status']::before,
+  .ec-data-explorer > p[role='status']::before,
+  .ec-editor-screen-context-state[role='status']::before {
     animation: none;
   }
 }
