@@ -42,6 +42,10 @@ test('M08.13 configura búsqueda/filtros y persiste el índice tipado desde Camp
   await page.getByLabel('Tipo del nuevo campo').selectOption('text');
   await page.getByRole('button', { name: 'Añadir' }).click();
 
+  const createdField = page.getByRole('listitem').filter({ hasText: 'Título buscable' });
+  await expect(createdField).toBeVisible({ timeout: 60_000 });
+  await createdField.click();
+
   const indexing = page.locator('[data-field-indexing]');
   await expect(indexing.getByText('Búsqueda y filtros', { exact: true })).toBeVisible();
   await indexing.getByLabel(/Searchable/).check();
