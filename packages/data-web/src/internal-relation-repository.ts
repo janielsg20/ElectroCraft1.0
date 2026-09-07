@@ -313,10 +313,7 @@ export function createDrizzleInternalRelationRepository(db: StudioProjectDatabas
         await tx
           .delete(schema.recordFieldIndex)
           .where(
-            and(
-              eq(schema.recordFieldIndex.projectId, projectId),
-              eq(schema.recordFieldIndex.recordId, node.recordId),
-            ),
+            and(eq(schema.recordFieldIndex.projectId, projectId), eq(schema.recordFieldIndex.recordId, node.recordId)),
           );
       }
       const deletedRoot = await tx
@@ -334,9 +331,7 @@ export function createDrizzleInternalRelationRepository(db: StudioProjectDatabas
       if (deletedRoot.length > 0) {
         await tx
           .delete(schema.recordFieldIndex)
-          .where(
-            and(eq(schema.recordFieldIndex.projectId, projectId), eq(schema.recordFieldIndex.recordId, recordId)),
-          );
+          .where(and(eq(schema.recordFieldIndex.projectId, projectId), eq(schema.recordFieldIndex.recordId, recordId)));
       }
       return deletedRoot.length > 0;
     });

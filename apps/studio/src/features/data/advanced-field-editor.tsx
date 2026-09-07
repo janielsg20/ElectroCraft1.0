@@ -407,7 +407,9 @@ export function AdvancedFieldEditor({ model, field, onMessage }: AdvancedFieldEd
         {descriptor.supportsIndexing ? (
           <div className="ec-field-metadata">
             <span>{indexStatus?.indexableFieldCount ?? 0} campo(s) indexables</span>
-            <span>{indexStatus?.indexedRecordCount ?? 0}/{indexStatus?.activeRecordCount ?? 0} registros indexados</span>
+            <span>
+              {indexStatus?.indexedRecordCount ?? 0}/{indexStatus?.activeRecordCount ?? 0} registros indexados
+            </span>
             <span>{indexStatus?.indexRowCount ?? 0} fila(s) tipadas</span>
           </div>
         ) : (

@@ -34,7 +34,8 @@ function requireNonEmpty(value: string, field: string) {
 }
 
 function asJsonObject(value: unknown, field: string): Readonly<Record<string, JsonValue>> {
-  if (!value || Array.isArray(value) || typeof value !== 'object') throw new TypeError(`${field} must be a JSON object`);
+  if (!value || Array.isArray(value) || typeof value !== 'object')
+    throw new TypeError(`${field} must be a JSON object`);
   return value as Readonly<Record<string, JsonValue>>;
 }
 
@@ -62,7 +63,10 @@ function normalizeQuery(query: InternalDataQuery | undefined) {
   });
 }
 
-async function dataSchemasForProject(db: StudioProjectDatabase, projectId: string): Promise<readonly ElectroCraftDataSchema[]> {
+async function dataSchemasForProject(
+  db: StudioProjectDatabase,
+  projectId: string,
+): Promise<readonly ElectroCraftDataSchema[]> {
   const rows = await db
     .select({ payload: schema.projectObjects.payload })
     .from(schema.projectObjects)

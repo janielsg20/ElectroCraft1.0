@@ -12,10 +12,7 @@ import {
   type ElectroCraftCanonicalDataSourceCapability,
   type JsonValue,
 } from '@electrocraft/domain';
-import {
-  createInternalDataSourceAdapter,
-  type InternalDataSourceAdapterOptions,
-} from './internal-data-source-adapter';
+import { createInternalDataSourceAdapter, type InternalDataSourceAdapterOptions } from './internal-data-source-adapter';
 
 function indexStatusAsJson(status: InternalDataIndexStatus) {
   return status as unknown as JsonValue;
@@ -113,11 +110,7 @@ export class GenericFieldIndexedInternalDataSourceAdapter implements DataSourceA
     return this.base.supportsSchemaDiscovery;
   }
 
-  private async authorize(
-    context: DataSourceAdapterContext,
-    resourceId: string,
-    operation: 'read' | 'update',
-  ) {
+  private async authorize(context: DataSourceAdapterContext, resourceId: string, operation: 'read' | 'update') {
     const allowed = await this.options.permissions.authorize({
       projectId: this.options.projectId,
       sourceId: context.source.id,

@@ -6,10 +6,7 @@ import {
   type DataExplorerOperationDescriptor,
   type StoredProjectDefinition,
 } from '@electrocraft/application';
-import {
-  createGenericFieldIndexedInternalDataSourceAdapter,
-  INTERNAL_DATA_ADAPTER_ID,
-} from '@electrocraft/connectors';
+import { createGenericFieldIndexedInternalDataSourceAdapter, INTERNAL_DATA_ADAPTER_ID } from '@electrocraft/connectors';
 import { createBrowserInternalDataRepositoryPort, webDataSourceRepository } from '@electrocraft/data-web';
 import {
   createDeterministicObjectId,

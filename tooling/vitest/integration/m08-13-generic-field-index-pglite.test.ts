@@ -3,10 +3,7 @@ import { drizzle } from 'drizzle-orm/pglite';
 import { describe, expect, it } from 'vitest';
 import { ConnectorRegistry } from '@electrocraft/application';
 import { createGenericFieldIndexedInternalDataSourceAdapter } from '@electrocraft/connectors';
-import {
-  applyStudioStorageMigrations,
-  createGenericFieldIndexedInternalDataRepository,
-} from '@electrocraft/data-web';
+import { applyStudioStorageMigrations, createGenericFieldIndexedInternalDataRepository } from '@electrocraft/data-web';
 import {
   createDeterministicObjectId,
   dataModelIndexResourceId,
