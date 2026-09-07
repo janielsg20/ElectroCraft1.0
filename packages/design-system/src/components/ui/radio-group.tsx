@@ -12,7 +12,7 @@ export function RadioGroupItem({ className, ...props }: ComponentProps<typeof Ra
     <RadioGroupPrimitive.Item
       className={cn(
         'size-4 shrink-0 rounded-full border border-input bg-surface text-primary outline-none transition-[border-color,box-shadow] duration-150',
-        'hover:border-border focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20 data-[state=checked]:border-primary disabled:cursor-not-allowed disabled:opacity-45',
+        'hover:border-primary/65 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/35 data-[state=checked]:border-primary disabled:cursor-not-allowed disabled:opacity-45',
         className,
       )}
       {...props}
