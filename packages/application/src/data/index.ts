@@ -168,8 +168,8 @@ export interface InternalDataRepository {
   deleteRecord(projectId: string, modelId: string, recordId: string): Promise<boolean>;
   getStats(projectId: string, sourceId: string): Promise<InternalDataSourceStats>;
   getFieldUsage(projectId: string, modelId: string, fieldKey: string): Promise<InternalDataFieldUsage>;
-  getModelIndexStatus(projectId: string, sourceId: string, modelId: string): Promise<InternalDataIndexStatus>;
-  reindexModel(projectId: string, sourceId: string, modelId: string): Promise<InternalDataIndexStatus>;
+  getModelIndexStatus?(projectId: string, sourceId: string, modelId: string): Promise<InternalDataIndexStatus>;
+  reindexModel?(projectId: string, sourceId: string, modelId: string): Promise<InternalDataIndexStatus>;
   listTaxonomyTerms(projectId: string, sourceId: string, taxonomyId: string): Promise<readonly ElectroTaxonomyTerm[]>;
   createTaxonomyTerm(
     projectId: string,
